@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TNR Business Solutions - Listing Tracker</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #2c5530 0%, #4a7c59 50%, #6b8e23 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #f59e0b;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #f59e0b;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .platforms {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .platform-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .platform-card:hover {
+            transform: translateY(-5px);
+            border-color: #f59e0b;
+        }
+        
+        .platform-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .platform-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .priority {
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .priority-1 { background: #dc2626; }
+        .priority-2 { background: #ea580c; }
+        .priority-3 { background: #d97706; }
+        .priority-4 { background: #65a30d; }
+        
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .status-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .status-label {
+            font-size: 0.9rem;
+        }
+        
+        .platform-url {
+            color: #f59e0b;
+            text-decoration: none;
+            font-size: 0.9rem;
+            word-break: break-all;
+        }
+        
+        .platform-url:hover {
+            text-decoration: underline;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f59e0b, #fbbf24);
+            transition: width 0.3s ease;
+        }
+        
+        .actions {
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .btn {
+            background: #f59e0b;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 0 10px;
+            transition: background 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: #d97706;
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid #f59e0b;
+            color: #f59e0b;
+        }
+        
+        .btn-secondary:hover {
+            background: #f59e0b;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 TNR Business Solutions - Listing Tracker</h1>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="completed-count">0</div>
+                <div class="stat-label">Completed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="total-count">12</div>
+                <div class="stat-label">Total Platforms</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="progress-percent">0%</div>
+                <div class="stat-label">Progress</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="priority-1-count">4</div>
+                <div class="stat-label">Priority 1</div>
+            </div>
+        </div>
+        
+        <div class="platforms" id="platforms-container">
+            <!-- Platforms will be populated by JavaScript -->
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+        </div>
+        
+        <div class="actions">
+            <button class="btn" onclick="exportProgress()">Export Progress</button>
+            <button class="btn btn-secondary" onclick="resetProgress()">Reset All</button>
+            <button class="btn btn-secondary" onclick="printReport()">Print Report</button>
+        </div>
+    </div>
+
+    <script>
+        const platforms = [
+            {
+                name: "Google Business Profile",
+                url: "https://business.google.com/create",
+                priority: 1,
+                completed: false
+            },
+            {
+                name: "Bing Places for Business",
+                url: "https://www.bing.com/business",
+                priority: 1,
+                completed: false
+            },
+            {
+                name: "Yelp for Business",
+                url: "https://biz.yelp.com",
+                priority: 1,
+                completed: false
+            },
+            {
+                name: "Better Business Bureau",
+                url: "https://www.bbb.org/get-accredited",
+                priority: 1,
+                completed: false
+            },
+            {
+                name: "Yellow Pages",
+                url: "https://www.yellowpages.com/upgrade",
+                priority: 2,
+                completed: false
+            },
+            {
+                name: "Superpages",
+                url: "https://www.superpages.com",
+                priority: 2,
+                completed: false
+            },
+            {
+                name: "Whitepages",
+                url: "https://www.whitepages.com/business",
+                priority: 2,
+                completed: false
+            },
+            {
+                name: "Facebook Business",
+                url: "https://www.facebook.com/business",
+                priority: 2,
+                completed: false
+            },
+            {
+                name: "LinkedIn Company Page",
+                url: "https://www.linkedin.com/company",
+                priority: 2,
+                completed: false
+            },
+            {
+                name: "Clutch.co",
+                url: "https://clutch.co/profile/add",
+                priority: 3,
+                completed: false
+            },
+            {
+                name: "GoodFirms",
+                url: "https://www.goodfirms.co/register",
+                priority: 3,
+                completed: false
+            },
+            {
+                name: "DesignRush",
+                url: "https://www.designrush.com/agency/add",
+                priority: 3,
+                completed: false
+            }
+        ];
+
+        // Load saved progress
+        function loadProgress() {
+            const saved = localStorage.getItem('tnr-listing-progress');
+            if (saved) {
+                const savedPlatforms = JSON.parse(saved);
+                platforms.forEach((platform, index) => {
+                    if (savedPlatforms[index]) {
+                        platform.completed = savedPlatforms[index].completed;
+                    }
+                });
+            }
+        }
+
+        // Save progress
+        function saveProgress() {
+            localStorage.setItem('tnr-listing-progress', JSON.stringify(platforms));
+        }
+
+        // Render platforms
+        function renderPlatforms() {
+            const container = document.getElementById('platforms-container');
+            container.innerHTML = platforms.map((platform, index) => `
+                <div class="platform-card">
+                    <div class="platform-header">
+                        <div class="platform-name">${platform.name}</div>
+                        <div class="priority priority-${platform.priority}">Priority ${platform.priority}</div>
+                    </div>
+                    <div class="status">
+                        <input type="checkbox" class="status-checkbox" ${platform.completed ? 'checked' : ''} 
+                               onchange="togglePlatform(${index})">
+                        <span class="status-label">${platform.completed ? 'Completed' : 'Pending'}</span>
+                    </div>
+                    <a href="${platform.url}" target="_blank" class="platform-url">${platform.url}</a>
+                </div>
+            `).join('');
+        }
+
+        // Toggle platform status
+        function togglePlatform(index) {
+            platforms[index].completed = !platforms[index].completed;
+            saveProgress();
+            updateStats();
+            renderPlatforms();
+        }
+
+        // Update statistics
+        function updateStats() {
+            const completed = platforms.filter(p => p.completed).length;
+            const total = platforms.length;
+            const percent = Math.round((completed / total) * 100);
+            const priority1 = platforms.filter(p => p.priority === 1).length;
+
+            document.getElementById('completed-count').textContent = completed;
+            document.getElementById('total-count').textContent = total;
+            document.getElementById('progress-percent').textContent = percent + '%';
+            document.getElementById('progress-fill').style.width = percent + '%';
+        }
+
+        // Export progress
+        function exportProgress() {
+            const completed = platforms.filter(p => p.completed);
+            const pending = platforms.filter(p => !p.completed);
+            
+            let report = "TNR Business Solutions - Listing Progress Report\n";
+            report += "=" .repeat(50) + "\n\n";
+            report += `Completed: ${completed.length}/${platforms.length} (${Math.round((completed.length / platforms.length) * 100)}%)\n\n`;
+            
+            report += "✅ COMPLETED PLATFORMS:\n";
+            completed.forEach(p => {
+                report += `- ${p.name} (Priority ${p.priority})\n`;
+            });
+            
+            report += "\n⏳ PENDING PLATFORMS:\n";
+            pending.forEach(p => {
+                report += `- ${p.name} (Priority ${p.priority}) - ${p.url}\n`;
+            });
+            
+            const blob = new Blob([report], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'tnr-listing-progress.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Reset progress
+        function resetProgress() {
+            if (confirm('Are you sure you want to reset all progress?')) {
+                platforms.forEach(p => p.completed = false);
+                saveProgress();
+                updateStats();
+                renderPlatforms();
+            }
+        }
+
+        // Print report
+        function printReport() {
+            window.print();
+        }
+
+        // Initialize
+        loadProgress();
+        renderPlatforms();
+        updateStats();
+    </script>
+</body>
+</html>
