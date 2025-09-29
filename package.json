@@ -1,0 +1,29 @@
+{
+  "name": "tnr-business-solutions-website",
+  "version": "1.0.0",
+  "description": "TNR Business Solutions - Digital Marketing & Insurance Services Website",
+  "main": "serve-clean.js",
+  "scripts": {
+    "start": "node serve-clean.js",
+    "dev": "node serve-clean.js",
+    "serve": "node serve-clean.js"
+  },
+  "keywords": [
+    "digital-marketing",
+    "insurance",
+    "web-design",
+    "seo",
+    "greensburg-pa",
+    "business-solutions"
+  ],
+  "author": "TNR Business Solutions",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tnr-business-solutions/website.git"
+  },
+  "homepage": "https://www.tnrbusinesssolutions.com"
+}

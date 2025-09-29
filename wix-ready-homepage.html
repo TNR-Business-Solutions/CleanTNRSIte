@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TNR Business Solutions | Digital Marketing & Insurance Services in Greensburg PA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+
+        .business-name h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            margin: 0;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .main-navigation {
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+            justify-content: flex-end;
+        }
+
+        .main-nav {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #ffd700;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 4rem 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .hero h2 {
+            font-size: 1.5rem;
+            color: #ffd700;
+            margin-bottom: 2rem;
+            font-weight: 500;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+            max-width: 800px;
+            margin: 0 auto 2rem;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            background: linear-gradient(45deg, #ff6b35, #f7931e);
+            color: white;
+            padding: 1rem 2rem;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin: 0.5rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 53, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+        }
+
+        /* Grid System */
+        .grid {
+            display: grid;
+            gap: 2rem;
+        }
+
+        .grid-4 {
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+
+        /* Cards */
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        .card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .card p {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Text Center */
+        .text-center {
+            text-align: center;
+        }
+
+        /* Footer */
+        .footer {
+            background: #1a1a2e;
+            color: white;
+            padding: 3rem 0;
+            margin-top: 4rem;
+        }
+
+        .footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer h3 {
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        .footer a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            color: #ffd700;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 1rem;
+            text-align: center;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-inner {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 1rem;
+            }
+
+            .main-nav {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero h2 {
+                font-size: 1.2rem;
+            }
+
+            .grid-4, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Mobile Menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: white;
+            margin: 3px 0;
+            transition: 0.3s;
+        }
+
+        @media (max-width: 768px) {
+            .hamburger {
+                display: flex;
+            }
+
+            .main-nav {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(0, 0, 0, 0.95);
+                flex-direction: column;
+                padding: 1rem;
+            }
+
+            .main-nav.active {
+                display: flex;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-inner">
+            <!-- Logo on the left -->
+            <a href="#" class="logo">
+                <img src="https://static.wixstatic.com/media/513afa_db3881ecf3d44580a9ca762cfe9065f2~mv2.png" alt="TNR Business Solutions Logo" style="height: 40px;">
+            </a>
+            
+            <!-- Business name centered -->
+            <div class="business-name">
+                <h1>TNR Business Solutions</h1>
+            </div>
+            
+            <!-- Navigation on the right -->
+            <nav class="main-navigation">
+                <ul class="main-nav">
+                    <li><a href="#" class="nav-link">Home</a></li>
+                    <li><a href="#" class="nav-link">Digital Marketing</a></li>
+                    <li><a href="#" class="nav-link">Insurance Services</a></li>
+                    <li><a href="#" class="nav-link">Packages</a></li>
+                    <li><a href="#" class="nav-link">About</a></li>
+                    <li><a href="#" class="nav-link">Contact</a></li>
+                    <li><a href="#" class="nav-link">Blog</a></li>
+                </ul>
+                <button class="hamburger" aria-label="Toggle menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <h1>TNR Business Solutions</h1>
+                    <h2>Leading Digital Marketing Agency & Insurance Services in Greensburg, PA | Westmoreland County</h2>
+                    <img src="https://static.wixstatic.com/media/513afa_db3881ecf3d44580a9ca762cfe9065f2~mv2.png" alt="TNR Business Solutions Logo" style="height: 80px; margin-top: 1rem;">
+                </div>
+                <p>At TNR Business Solutions, we are your trusted local partner for comprehensive digital marketing, professional web design, and complete insurance protection services. We help small and medium-sized businesses in Greensburg, Pennsylvania and surrounding areas grow, protect, and thrive in today's competitive marketplace.</p>
+                <div style="margin-top: 2rem;">
+                    <a href="#" class="btn">Get Started Today</a>
+                    <a href="#" class="btn btn-secondary">Our Services</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Digital Marketing Services Section -->
+        <section class="container" style="padding: 4rem 0;">
+            <h3 style="text-align: center; margin-bottom: 2rem; color: white;">Professional Digital Marketing Services for Small Businesses</h3>
+            <div class="grid grid-4" style="margin-bottom: 4rem;">
+                <div class="card" style="background: rgba(255, 215, 0, 0.1);">
+                    <img src="https://static.wixstatic.com/media/513afa_71d3408ec9b84db8be3c308989fbb60e~mv2.jpg" alt="Web Design Services" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;">
+                    <h3 style="color: #ffff00;">Web Design & Development</h3>
+                    <p style="color: #ffff00;">Expert web design services in Greensburg PA. We create professional, mobile-friendly websites that drive conversions and boost your online presence.</p>
+                    <a href="#" class="btn">Learn More</a>
+                </div>
+                <div class="card" style="background: rgba(255, 215, 0, 0.1);">
+                    <img src="https://static.wixstatic.com/media/513afa_a2012a8ead714d13b0e100fc8f9fd4ef~mv2.jpg" alt="SEO Services" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;">
+                    <h3 style="color: #ffff00;">SEO Services</h3>
+                    <p style="color: #ffff00;">Local SEO services in Westmoreland County. Our search engine optimization strategies help Greensburg businesses rank higher in Google.</p>
+                    <a href="#" class="btn">Learn More</a>
+                </div>
+                <div class="card" style="background: rgba(255, 215, 0, 0.1);">
+                    <img src="https://static.wixstatic.com/media/513afa_cc2cb7750d9d495fa77ee7df476c7123~mv2.jpg" alt="Social Media Management" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;">
+                    <h3 style="color: #ffff00;">Social Media Management</h3>
+                    <p style="color: #ffff00;">Professional social media marketing services for small businesses in Greensburg PA. We manage your Facebook, Instagram, and LinkedIn.</p>
+                    <a href="#" class="btn">Learn More</a>
+                </div>
+                <div class="card" style="background: rgba(255, 215, 0, 0.1);">
+                    <img src="https://static.wixstatic.com/media/513afa_483ce3d46f2042aaa77ae857e5fbd476~mv2.jpg" alt="Paid Advertising" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;">
+                    <h3 style="color: #ffff00;">Paid Advertising</h3>
+                    <p style="color: #ffff00;">Google Ads and Facebook advertising management for Greensburg businesses. Our PPC campaigns deliver targeted leads and measurable ROI.</p>
+                    <a href="#" class="btn">Learn More</a>
+                </div>
+            </div>
+            
+            <!-- Insurance Services Section -->
+            <h3 style="text-align: center; margin-bottom: 2rem; color: white;">Comprehensive Insurance Services in Greensburg PA</h3>
+            <div class="grid grid-4">
+                <div class="card" style="background: rgba(255, 215, 0, 0.1);">
+                    <img src="https://static.wixstatic.com/media/513afa_d57c6a6d25e8451d986d7985654f8ee7~mv2.jpg" alt="Auto Insurance" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;">
+                    <h3 style="color: #ffff00;">Auto Insurance</h3>
+                    <p style="color: #ffff00;">Affordable auto insurance quotes in Greensburg PA. We help you find the best car insurance coverage at competitive rates.</p>
+                    <a href="#" class="btn">Learn More</a>
+                </div>
+                <div class="card" style="background: rgba(255, 215, 0, 0.1);">
+                    <img src="https://static.wixstatic.com/media/513afa_847132a6a658488589a85a9aafcb5f69~mv2.png" alt="Home Insurance" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;">
+                    <h3 style="color: #ffff00;">Home Insurance</h3>
+                    <p style="color: #ffff00;">Homeowners insurance in Western Pennsylvania. Protect your home and belongings with comprehensive coverage from trusted insurance companies.</p>
+                    <a href="#" class="btn">Learn More</a>
+                </div>
+                <div class="card" style="background: rgba(255, 215, 0, 0.1);">
+                    <img src="https://static.wixstatic.com/media/513afa_8f9537d34e254382a85f716d7528683a~mv2.png" alt="Business Insurance" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;">
+                    <h3 style="color: #ffff00;">Business Insurance</h3>
+                    <p style="color: #ffff00;">Small business insurance in Greensburg PA. Comprehensive commercial insurance coverage including general liability and property insurance.</p>
+                    <a href="#" class="btn">Learn More</a>
+                </div>
+                <div class="card" style="background: rgba(255, 215, 0, 0.1);">
+                    <img src="https://static.wixstatic.com/media/513afa_2df140e0433042b38699645580bc1286~mv2.png" alt="Life Insurance" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;">
+                    <h3 style="color: #ffff00;">Life Insurance</h3>
+                    <p style="color: #ffff00;">Life insurance quotes in Greensburg PA. Term and whole life insurance policies to protect your family's future with affordable coverage.</p>
+                    <a href="#" class="btn">Learn More</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section class="container" style="padding: 4rem 0;">
+            <h2 style="text-align: center; margin-bottom: 3rem; color: white;">Why Choose TNR Business Solutions for Digital Marketing & Insurance in Greensburg PA?</h2>
+            <div class="grid grid-3">
+                <div class="card text-center">
+                    <h3 style="color: white;">Local Expertise</h3>
+                    <p style="color: white;">We understand the unique challenges facing businesses in Greensburg, PA and surrounding areas. Our local presence means we know your market, your customers, and your competition.</p>
+                </div>
+                <div class="card text-center">
+                    <h3 style="color: white;">Integrated Approach</h3>
+                    <p style="color: white;">Our unique combination of marketing and insurance services helps you grow safely and efficiently. One partner for all your business growth and protection needs.</p>
+                </div>
+                <div class="card text-center">
+                    <h3 style="color: white;">Proven Results</h3>
+                    <p style="color: white;">We've helped dozens of local businesses improve their online presence, increase their customer base, and protect their assets with comprehensive insurance coverage.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Reviews Section -->
+        <section class="container" style="padding: 4rem 0;">
+            <h2 style="text-align: center; margin-bottom: 3rem; color: white;">Client Reviews</h2>
+            <div style="text-align: center; background: rgba(255, 255, 255, 0.1); padding: 2rem; border-radius: 12px; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2);">
+                <img src="https://static.wixstatic.com/media/513afa_b5cb236758df406bb239a6b90cfb1813~mv2.png" alt="Scan to leave a review" style="max-width: 200px; margin-bottom: 1rem;">
+                <h3 style="color: white;">Share Your Experience</h3>
+                <p style="color: white;">Scan the QR code to leave us a review and help other businesses discover TNR Business Solutions.</p>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="container" style="padding: 4rem 0;">
+            <h2 style="text-align: center; margin-bottom: 3rem; color: white;">Ready to Get Started?</h2>
+            <div class="text-center">
+                <p style="font-size: 1.25rem; margin-bottom: 2rem; color: white;">Contact us today for a free consultation and discover how we can help your business grow and succeed.</p>
+                <a href="#" class="btn">Contact Us Now</a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-content">
+                <div>
+                    <img src="https://static.wixstatic.com/media/513afa_db3881ecf3d44580a9ca762cfe9065f2~mv2.png" alt="TNR Business Solutions Logo" style="height: 60px; margin-bottom: 1rem;">
+                    <h3>TNR Business Solutions</h3>
+                    <p>Your trusted partner for digital marketing and insurance services in Greensburg, PA.</p>
+                    <p>Phone: <a href="tel:4124992987" style="color: #ffd700;">412-499-2987</a></p>
+                    <p>Email: <a href="mailto:Roy.Turner@tnrbusinesssolutions.com" style="color: #ffd700;">Roy.Turner@tnrbusinesssolutions.com</a></p>
+                    <p>Address: 418 Concord Avenue, Greensburg, PA 15601</p>
+                </div>
+                <div>
+                    <h3>Digital Marketing Services</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li><a href="#">Web Design & Development</a></li>
+                        <li><a href="#">SEO Services</a></li>
+                        <li><a href="#">Social Media Management</a></li>
+                        <li><a href="#">Content Creation</a></li>
+                        <li><a href="#">Paid Advertising</a></li>
+                        <li><a href="#">Email Marketing</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Insurance Services</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li><a href="#">Auto Insurance</a></li>
+                        <li><a href="#">Home Insurance</a></li>
+                        <li><a href="#">Life Insurance</a></li>
+                        <li><a href="#">Business Insurance</a></li>
+                        <li><a href="#">BOP Insurance</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Company</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li><a href="#">Service Packages</a></li>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Blog</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 TNR Business Solutions. All rights reserved. | Serving Greensburg, PA and Westmoreland County</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburger = document.querySelector('.hamburger');
+            const mainNav = document.querySelector('.main-nav');
+
+            if (hamburger && mainNav) {
+                hamburger.addEventListener('click', function() {
+                    mainNav.classList.toggle('active');
+                    hamburger.classList.toggle('active');
+                });
+            }
+        });
+    </script>
+</body>
+</html>

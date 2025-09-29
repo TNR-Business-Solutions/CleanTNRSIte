@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Footer Styles */
+        .tnr-footer {
+            background: #1a1a2e;
+            color: white;
+            padding: 3rem 0;
+            margin-top: 4rem;
+            width: 100%;
+            margin-left: 0;
+            margin-right: 0;
+        }
+
+        .tnr-footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .tnr-footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .tnr-footer-section h3 {
+            color: #ffd700;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .tnr-footer-section p {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+
+        .tnr-footer-section ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .tnr-footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .tnr-footer-section a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .tnr-footer-section a:hover {
+            color: #ffd700;
+        }
+
+        .tnr-footer-section img {
+            margin-bottom: 1rem;
+        }
+
+        .tnr-footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 1rem;
+            text-align: center;
+        }
+
+        .tnr-footer-bottom p {
+            color: rgba(255, 255, 255, 0.7);
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        /* Contact Info Styling */
+        .tnr-contact-info a {
+            color: #ffd700 !important;
+        }
+
+        .tnr-contact-info a:hover {
+            color: #fff !important;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .tnr-footer {
+                padding: 2rem 0;
+            }
+
+            .tnr-footer-content {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+                text-align: center;
+            }
+
+            .tnr-footer-section {
+                text-align: center;
+            }
+
+            .tnr-footer-section ul {
+                text-align: left;
+                display: inline-block;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .tnr-footer {
+                padding: 1.5rem 0;
+            }
+
+            .tnr-footer-inner {
+                padding: 0 0.5rem;
+            }
+
+            .tnr-footer-section h3 {
+                font-size: 1.1rem;
+            }
+
+            .tnr-footer-section ul {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- TNR Business Solutions Footer -->
+    <footer class="tnr-footer">
+        <div class="tnr-footer-inner">
+            <div class="tnr-footer-content">
+                <!-- Company Info Section -->
+                <div class="tnr-footer-section">
+                    <img src="https://static.wixstatic.com/media/513afa_db3881ecf3d44580a9ca762cfe9065f2~mv2.png" alt="TNR Business Solutions Logo" style="height: 60px; margin-bottom: 1rem;">
+                    <h3>TNR Business Solutions</h3>
+                    <p>Your trusted partner for digital marketing and insurance services in Greensburg, PA.</p>
+                    <div class="tnr-contact-info">
+                        <p>Phone: <a href="tel:4124992987">412-499-2987</a></p>
+                        <p>Email: <a href="mailto:Roy.Turner@tnrbusinesssolutions.com">Roy.Turner@tnrbusinesssolutions.com</a></p>
+                        <p>Address: 418 Concord Avenue, Greensburg, PA 15601</p>
+                    </div>
+                </div>
+
+                <!-- Digital Marketing Services -->
+                <div class="tnr-footer-section">
+                    <h3>Digital Marketing Services</h3>
+                    <ul>
+                        <li><a href="#">Web Design & Development</a></li>
+                        <li><a href="#">SEO Services</a></li>
+                        <li><a href="#">Social Media Management</a></li>
+                        <li><a href="#">Content Creation</a></li>
+                        <li><a href="#">Paid Advertising</a></li>
+                        <li><a href="#">Email Marketing</a></li>
+                    </ul>
+                </div>
+
+                <!-- Insurance Services -->
+                <div class="tnr-footer-section">
+                    <h3>Insurance Services</h3>
+                    <ul>
+                        <li><a href="#">Auto Insurance</a></li>
+                        <li><a href="#">Home Insurance</a></li>
+                        <li><a href="#">Life Insurance</a></li>
+                        <li><a href="#">Business Insurance</a></li>
+                        <li><a href="#">BOP Insurance</a></li>
+                    </ul>
+                </div>
+
+                <!-- Company Links -->
+                <div class="tnr-footer-section">
+                    <h3>Company</h3>
+                    <ul>
+                        <li><a href="#">Service Packages</a></li>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Footer Bottom -->
+            <div class="tnr-footer-bottom">
+                <p>&copy; 2025 TNR Business Solutions. All rights reserved. | Serving Greensburg, PA and Westmoreland County</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Footer functionality (if needed)
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add any footer-specific JavaScript here
+            console.log('TNR Footer loaded successfully');
+        });
+    </script>
+</body>
+</html>

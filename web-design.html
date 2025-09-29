@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- DNS prefetch for external domains -->
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
+    
+    <!-- Preconnect to critical resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="assets/styles.css" as="style">
+    <link rel="preload" href="media/logo.png" as="image">
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Design & Development Services | TNR Business Solutions Greensburg PA</title>
+    <meta name="description" content="Professional web design and development services in Greensburg PA. Custom websites that convert visitors into customers. Mobile-responsive, fast-loading websites for small businesses.">
+    <meta name="keywords" content="web design Greensburg PA, website development, responsive design, e-commerce websites, mobile optimization, custom web design">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Web Design & Development Services | TNR Business Solutions">
+    <meta property="og:description" content="Professional web design and development services in Greensburg, PA. Custom websites that convert visitors into customers.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.tnrbusinesssolutions.com/web-design">
+    <meta property="og:image" content="https://www.tnrbusinesssolutions.com/media/hero-image.jpg">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Web Design & Development Services | TNR Business Solutions">
+    <meta name="twitter:description" content="Professional web design and development services in Greensburg, PA. Custom websites that convert visitors into customers.">
+    <meta name="twitter:image" content="https://www.tnrbusinesssolutions.com/media/hero-image.jpg">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="media/logo.png">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="assets/styles.css">
+    
+    <!-- Canonical and Language -->
+    <link rel="canonical" href="https://www.tnrbusinesssolutions.com/web-design">
+    <link rel="alternate" hreflang="en-us" href="https://www.tnrbusinesssolutions.com/web-design">
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "name": "Web Design & Development Services",
+        "description": "Professional web design and development services for businesses in Greensburg, PA",
+        "provider": {
+            "@type": "Organization",
+            "name": "TNR Business Solutions",
+            "url": "https://www.tnrbusinesssolutions.com"
+        },
+        "areaServed": "Greensburg, PA and surrounding areas",
+        "serviceType": "Web Design & Development"
+    }
+    </script>
+    
+    <!-- Breadcrumb Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Services",
+                "item": "https://www.tnrbusinesssolutions.com/services"
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Web Design",
+                "item": "https://www.tnrbusinesssolutions.com/web-design"
+            }
+        ]
+    }
+    </script>
+    
+    <style>
+    /* Army Green styling for hero and cards */
+    .hero { 
+        background: linear-gradient(135deg, #2c5530, #4a5d23); 
+        color: white; 
+        padding: 4rem 0; 
+        text-align: center; 
+    }
+    .card { 
+        background: linear-gradient(180deg, #4a5d23 0%, #2c5530 100%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+    .card h3 { color: var(--tnr-gold) !important; }
+    .card p { color: rgba(255, 255, 255, 0.9) !important; }
+    .btn { 
+        background: var(--tnr-gold) !important; 
+        color: var(--tnr-dark) !important; 
+    }
+    .btn:hover { background: #d4af37 !important; }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-inner">
+            <!-- Logo on the left -->
+            <a href="index.html" class="logo">
+                <img src="media/logo.png" alt="TNR Business Solutions Logo" style="height: 40px;" loading="lazy">
+            </a>
+            
+            <!-- Business name centered -->
+            <div class="business-name">
+                <h1>TNR Business Solutions</h1>
+            </div>
+            
+            <!-- Navigation on the right -->
+            <nav class="main-navigation">
+                <!-- Hamburger menu for mobile -->
+                <button class="hamburger" aria-label="Toggle menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                
+                <!-- Desktop menu -->
+                <ul class="main-nav">
+                    <li><a href="index.html" class="nav-link">Home</a></li>
+                    <li class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle">
+                            Digital Marketing
+                            <span class="dropdown-arrow">▾</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="web-design.html" class="dropdown-link">Web Design & Development</a></li>
+                            <li><a href="seo-services.html" class="dropdown-link">SEO Services</a></li>
+                            <li><a href="content-creation.html" class="dropdown-link">Content Creation</a></li>
+                            <li><a href="paid-advertising.html" class="dropdown-link">Paid Advertising</a></li>
+                            <li><a href="social-media.html" class="dropdown-link">Social Media Management</a></li>
+                            <li><a href="email-marketing.html" class="dropdown-link">Email Marketing</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle">
+                            Insurance Services
+                            <span class="dropdown-arrow">▾</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="auto-insurance.html" class="dropdown-link">Auto Insurance</a></li>
+                            <li><a href="home-insurance.html" class="dropdown-link">Home Insurance</a></li>
+                            <li><a href="life-insurance.html" class="dropdown-link">Life Insurance</a></li>
+                            <li><a href="business-insurance.html" class="dropdown-link">Business Insurance</a></li>
+                            <li><a href="umbrella-insurance.html" class="dropdown-link">Umbrella Insurance</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="packages.html" class="nav-link">Packages</a></li>
+                    <li><a href="about.html" class="nav-link">About</a></li>
+                    <li><a href="contact.html" class="nav-link">Contact</a></li>
+                    <li><a href="blog.html" class="nav-link">Blog</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Breadcrumb -->
+        <nav style="padding: 1rem 0; background: rgba(0,0,0,0.05);">
+            <div class="container">
+                <ol style="list-style: none; display: flex; gap: 0.5rem; margin: 0; padding: 0;">
+                    <li><a href="#" style="color: var(--tnr-primary); text-decoration: none;">Services</a></li>
+                    <li style="color: #666;">/</li>
+                    <li style="color: #333; font-weight: 500;">Web Design</li>
+                </ol>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="hero" style="background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('media/web-design-laptop.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; min-height: 60vh; display: flex; align-items: center;">
+            <div class="container">
+                <h1 style="text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8); margin-bottom: 1.5rem;">Professional Web Design & Development Services in Greensburg, PA</h1>
+                <p style="text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); font-size: 1.25rem; max-width: 800px; margin: 0 auto;">We create stunning, mobile-friendly websites that drive conversions and boost your online presence for small businesses in Western Pennsylvania.</p>
+            </div>
+        </section>
+
+        <!-- Content Section -->
+        <section class="container" style="padding: 4rem 0;">
+            
+            <div style="max-width: 800px; margin: 0 auto 4rem auto; text-align: center;">
+                <h2>Custom Website Design That Converts</h2>
+                <p>At TNR Business Solutions, we specialize in creating stunning, high-converting websites for businesses throughout Greensburg, Pennsylvania and the surrounding areas. Our web design and development services are tailored specifically for small and medium-sized businesses that need a professional online presence that drives results.</p>
+                <p>Our experienced team of web designers and developers understands that your website is often the first impression potential customers have of your business. That's why we focus on creating websites that not only look professional and modern but also provide an exceptional user experience that encourages visitors to become customers.</p>
+                <p>We believe that every business deserves access to professional-grade web design services, regardless of size or budget. Our comprehensive approach includes everything from initial concept and design to final deployment and ongoing maintenance, ensuring your website continues to perform at its best.</p>
+            </div>
+
+            <div style="margin-bottom: 4rem;">
+                <h2>Our Web Design Process</h2>
+                <p>Our proven web design process begins with a thorough consultation to understand your business goals, target audience, and unique requirements. We then create a custom design strategy that aligns with your brand identity and business objectives.</p>
+                <p>During the development phase, we focus on creating responsive, mobile-optimized websites that load quickly and provide an excellent user experience across all devices. We also implement search engine optimization best practices to help your website rank higher in search results.</p>
+                <p>Once your website is live, we provide comprehensive training and ongoing support to ensure you can easily manage and update your content. We also offer regular maintenance and updates to keep your website secure, fast, and up-to-date with the latest web standards.</p>
+            </div>
+
+            <!-- Web Design Services Cards -->
+            <h2 style="text-align: center; margin-bottom: 3rem;">Comprehensive Web Design Services</h2>
+            
+            <div class="grid grid-4" style="margin-bottom: 4rem;">
+                <div class="card" style="background: var(--tnr-secondary);">
+                    <img src="media/Website%20creation.jpg" alt="Custom Website Design" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;" loading="lazy">
+                    <h3 style="color: #f59e0b;">Custom Website Design</h3>
+                    <p style="color: white;">Unique, professional website designs tailored to your brand and business goals. We create visually appealing layouts that reflect your company's personality and values.</p>
+                    <a href="contact.html" class="btn">Learn More</a>
+                </div>
+                <div class="card" style="background: var(--tnr-secondary);">
+                    <img src="media/mobile-responsive-design.jpg" alt="Mobile Optimization" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;" loading="lazy">
+                    <h3 style="color: #f59e0b;">Mobile Optimization</h3>
+                    <p style="color: white;">Mobile-optimized websites that look and function perfectly on all devices, from smartphones to desktop computers. Your customers will have a great experience no matter how they access your site.</p>
+                    <a href="contact.html" class="btn">Learn More</a>
+                </div>
+                <div class="card" style="background: var(--tnr-secondary);">
+                    <img src="media/coding-programming.jpg" alt="Content Management" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;" loading="lazy">
+                    <h3 style="color: #f59e0b;">Content Management</h3>
+                    <p style="color: white;">Easy-to-use content management systems that allow you to update your website content without technical knowledge. Keep your site fresh and relevant.</p>
+                    <a href="contact.html" class="btn">Learn More</a>
+                </div>
+                <div class="card" style="background: var(--tnr-secondary);">
+                    <img src="media/seo-best-practices.jpg" alt="SEO Integration" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;" loading="lazy">
+                    <h3 style="color: #f59e0b;">SEO Integration</h3>
+                    <p style="color: white;">Built-in search engine optimization features that help your website rank higher in search results and attract more organic traffic from potential customers.</p>
+                    <a href="contact.html" class="btn">Learn More</a>
+                </div>
+            </div>
+
+            <div class="grid grid-4">
+                <div class="card" style="background: var(--tnr-secondary);">
+                    <img src="media/digital-transformation.jpg" alt="E-commerce Solutions" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;" loading="lazy">
+                    <h3 style="color: #f59e0b;">E-commerce Solutions</h3>
+                    <p style="color: white;">Complete online store solutions with secure payment processing, inventory management, and customer account features for businesses that sell products online.</p>
+                    <a href="contact.html" class="btn">Learn More</a>
+                </div>
+                <div class="card" style="background: var(--tnr-secondary);">
+                    <img src="media/data-analytics-charts.jpg" alt="Website Speed Optimization" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;" loading="lazy">
+                    <h3 style="color: #f59e0b;">Speed Optimization</h3>
+                    <p style="color: white;">Fast-loading websites optimized for performance. We ensure your site loads quickly to provide a better user experience and improve search engine rankings.</p>
+                    <a href="contact.html" class="btn">Learn More</a>
+                </div>
+                <div class="card" style="background: var(--tnr-secondary);">
+                    <img src="media/modern-office-workspace.jpg" alt="Website Security" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;" loading="lazy">
+                    <h3 style="color: #f59e0b;">Security Features</h3>
+                    <p style="color: white;">Advanced security measures to protect your website from threats. SSL certificates, regular backups, and security monitoring to keep your site safe.</p>
+                    <a href="contact.html" class="btn">Learn More</a>
+                </div>
+                <div class="card" style="background: var(--tnr-secondary);">
+                    <img src="media/small-business-owner.jpg" alt="Ongoing Maintenance" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;" loading="lazy">
+                    <h3 style="color: #f59e0b;">Ongoing Maintenance</h3>
+                    <p style="color: white;">Comprehensive maintenance and support services to keep your website running smoothly, securely, and up-to-date with the latest web standards.</p>
+                    <a href="contact.html" class="btn">Learn More</a>
+                </div>
+            </div>
+
+            <!-- Call to Action -->
+            <div style="text-align: center; margin-top: 4rem; background: rgba(255, 255, 255, 0.1); padding: 3rem; border-radius: 12px;">
+                <h2 style="color: var(--tnr-secondary); margin-bottom: 1rem;">Ready to Get Started?</h2>
+                <p style="font-size: 1.25rem; margin-bottom: 2rem;">Let us create a professional website that drives results for your Greensburg business.</p>
+                <a href="contact.html" class="btn">Get Your Free Website Consultation</a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-content">
+                <div>
+                    <img src="media/logo.png" alt="TNR Business Solutions Logo" style="height: 60px; margin-bottom: 1rem;" loading="lazy">
+                    <h3 style="color: #f59e0b;">TNR Business Solutions</h3>
+                    <p style="color: white;">Your trusted partner for digital marketing and insurance services in Greensburg, PA.</p>
+                    <p style="color: white;">Phone: <a href="tel:4124992987" style="color: var(--tnr-gold);">412-499-2987</a></p>
+                    <p style="color: white;">Email: <a href="mailto:Roy.Turner@tnrbusinesssolutions.com" style="color: var(--tnr-gold);">Roy.Turner@tnrbusinesssolutions.com</a></p>
+                    <p style="color: white;">Address: 418 Concord Avenue, Greensburg, PA 15601</p>
+                </div>
+                <div>
+                    <h3 style="color: #f59e0b;">Digital Marketing Services</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li><a href="web-design.html">Web Design & Development</a></li>
+                        <li><a href="seo-services.html">SEO Services</a></li>
+                        <li><a href="social-media.html">Social Media Management</a></li>
+                        <li><a href="content-creation.html">Content Creation</a></li>
+                        <li><a href="paid-advertising.html">Paid Advertising</a></li>
+                        <li><a href="email-marketing.html">Email Marketing</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 style="color: #f59e0b;">Insurance Services</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li><a href="auto-insurance.html">Auto Insurance</a></li>
+                        <li><a href="home-insurance.html">Home Insurance</a></li>
+                        <li><a href="life-insurance.html">Life Insurance</a></li>
+                        <li><a href="business-insurance.html">Business Insurance</a></li>
+                        <li><a href="bop-insurance.html">BOP Insurance</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 style="color: #f59e0b;">Company</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li><a href="packages.html">Service Packages</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                        <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                        <li><a href="terms-conditions.html">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 TNR Business Solutions. All rights reserved. | Serving Greensburg, PA and Westmoreland County</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

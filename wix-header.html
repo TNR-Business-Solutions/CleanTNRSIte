@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Header Styles */
+        .tnr-header {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            width: 100%;
+            margin: 0;
+        }
+
+        .tnr-header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .tnr-logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+
+        .tnr-business-name {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .tnr-business-name h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            margin: 0;
+            white-space: nowrap;
+        }
+
+        .tnr-main-navigation {
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+            justify-content: flex-end;
+        }
+
+        .tnr-main-nav {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            gap: 2rem;
+        }
+
+        .tnr-nav-link {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .tnr-nav-link:hover {
+            color: #ffd700;
+        }
+
+        /* Mobile Menu Styles */
+        .tnr-hamburger {
+            display: none;
+            flex-direction: column;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .tnr-hamburger span {
+            width: 25px;
+            height: 3px;
+            background: white;
+            margin: 3px 0;
+            transition: 0.3s;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .tnr-header-inner {
+                grid-template-columns: 1fr auto;
+                gap: 1rem;
+            }
+
+            .tnr-business-name {
+                justify-content: flex-start;
+                text-align: left;
+            }
+
+            .tnr-hamburger {
+                display: flex;
+            }
+
+            .tnr-main-nav {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(0, 0, 0, 0.95);
+                flex-direction: column;
+                padding: 1rem;
+                gap: 1rem;
+            }
+
+            .tnr-main-nav.active {
+                display: flex;
+            }
+
+            .tnr-nav-link {
+                padding: 0.5rem 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .tnr-business-name h1 {
+                font-size: 1.2rem;
+            }
+
+            .tnr-header-inner {
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- TNR Business Solutions Header -->
+    <header class="tnr-header">
+        <div class="tnr-header-inner">
+            <!-- Logo on the left -->
+            <a href="#" class="tnr-logo">
+                <img src="https://static.wixstatic.com/media/513afa_db3881ecf3d44580a9ca762cfe9065f2~mv2.png" alt="TNR Business Solutions Logo" style="height: 40px;">
+            </a>
+            
+            <!-- Business name centered -->
+            <div class="tnr-business-name">
+                <h1>TNR Business Solutions</h1>
+            </div>
+            
+            <!-- Navigation on the right -->
+            <nav class="tnr-main-navigation">
+                <ul class="tnr-main-nav">
+                    <li><a href="#" class="tnr-nav-link">Home</a></li>
+                    <li><a href="#" class="tnr-nav-link">Digital Marketing</a></li>
+                    <li><a href="#" class="tnr-nav-link">Insurance Services</a></li>
+                    <li><a href="#" class="tnr-nav-link">Packages</a></li>
+                    <li><a href="#" class="tnr-nav-link">About</a></li>
+                    <li><a href="#" class="tnr-nav-link">Contact</a></li>
+                    <li><a href="#" class="tnr-nav-link">Blog</a></li>
+                </ul>
+                <button class="tnr-hamburger" aria-label="Toggle menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <script>
+        // Mobile menu functionality for header
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburger = document.querySelector('.tnr-hamburger');
+            const mainNav = document.querySelector('.tnr-main-nav');
+
+            if (hamburger && mainNav) {
+                hamburger.addEventListener('click', function() {
+                    mainNav.classList.toggle('active');
+                    hamburger.classList.toggle('active');
+                });
+
+                // Close menu when clicking on a link
+                const navLinks = document.querySelectorAll('.tnr-nav-link');
+                navLinks.forEach(link => {
+                    link.addEventListener('click', function() {
+                        mainNav.classList.remove('active');
+                        hamburger.classList.remove('active');
+                    });
+                });
+
+                // Close menu when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (window.innerWidth <= 768) {
+                        if (!hamburger.contains(e.target) && !mainNav.contains(e.target)) {
+                            mainNav.classList.remove('active');
+                            hamburger.classList.remove('active');
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
