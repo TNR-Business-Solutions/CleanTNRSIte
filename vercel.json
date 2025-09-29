@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "name": "tnr-business-solutions",
   "builds": [
     {
       "src": "**/*.html",
@@ -33,12 +32,6 @@
     {
       "src": "**/*.svg",
       "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
     }
   ],
   "headers": [
