@@ -227,7 +227,6 @@
                     <li><a href="about.html" class="nav-link">About</a></li>
                     <li><a href="contact.html" class="nav-link">Contact</a></li>
                     <li><a href="blog.html" class="nav-link">Blog</a></li>
-                    <li><a href="admin-login.html" class="nav-link" style="color: var(--tnr-gold);">Admin</a></li>
                 </ul>
                 
                 <!-- Cart Icon -->
@@ -757,76 +756,35 @@
                 document.getElementById('footer-placeholder').innerHTML = data;
             });
 
-        // Shopping Cart Functionality with Backend Integration
+        // Simple Shopping Cart Functionality
         let cart = [];
-        let sessionId = null;
 
-        // Generate session ID for cart persistence
-        function generateSessionId() {
-            if (!sessionId) {
-                sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-            }
-            return sessionId;
-        }
-
-        // Add item to cart (backend integration)
-        async function addToCart(serviceId, serviceName, price, description) {
-            try {
-                const response = await fetch('/cart/add', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        sessionId: generateSessionId(),
-                        serviceId: serviceId,
-                        quantity: 1
-                    })
+        function addToCart(serviceId, serviceName, price, description) {
+            // Check if item already exists
+            const existingItem = cart.find(item => item.id === serviceId);
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    id: serviceId,
+                    name: serviceName,
+                    price: price,
+                    description: description,
+                    quantity: 1
                 });
-
-                if (response.ok) {
-                    const result = await response.json();
-                    cart = result.cart.items;
-                    updateCartDisplay();
-                    showMessage(`${serviceName} added to cart!`, 'success');
-                } else {
-                    showMessage('Failed to add item to cart', 'error');
-                }
-            } catch (error) {
-                console.error('Error adding to cart:', error);
-                showMessage('Error adding item to cart', 'error');
             }
+            
+            updateCartDisplay();
+            showMessage(`${serviceName} added to cart!`, 'success');
         }
 
-        // Remove item from cart (backend integration)
-        async function removeFromCart(serviceId) {
-            try {
-                const response = await fetch('/cart/remove', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        sessionId: generateSessionId(),
-                        serviceId: serviceId
-                    })
-                });
-
-                if (response.ok) {
-                    const result = await response.json();
-                    cart = result.cart.items;
-                    updateCartDisplay();
-                    showMessage('Item removed from cart', 'success');
-                } else {
-                    showMessage('Failed to remove item from cart', 'error');
-                }
-            } catch (error) {
-                console.error('Error removing from cart:', error);
-                showMessage('Error removing item from cart', 'error');
-            }
+        function removeFromCart(serviceId) {
+            cart = cart.filter(item => item.id !== serviceId);
+            updateCartDisplay();
+            showMessage('Item removed from cart', 'success');
         }
 
-        // Update cart display
         function updateCartDisplay() {
             const cartDiv = document.getElementById('shopping-cart');
             const cartItems = document.getElementById('cart-items');
@@ -852,8 +810,8 @@
                 itemCount += item.quantity;
             });
             
-            cartItems.innerHTML = html;
-            cartTotal.textContent = `Total: $${total.toLocaleString()}/month`;
+            if (cartItems) cartItems.innerHTML = html;
+            if (cartTotal) cartTotal.textContent = `Total: $${total.toLocaleString()}/month`;
             
             // Show/hide cart icon based on items
             if (itemCount > 0) {
@@ -866,44 +824,21 @@
             }
         }
 
-        // Clear cart (backend integration)
-        async function clearCart() {
-            try {
-                const response = await fetch('/cart/clear', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        sessionId: generateSessionId()
-                    })
-                });
-
-                if (response.ok) {
-                    cart = [];
-                    updateCartDisplay();
-                    showMessage('Cart cleared', 'success');
-                } else {
-                    showMessage('Failed to clear cart', 'error');
-                }
-            } catch (error) {
-                console.error('Error clearing cart:', error);
-                showMessage('Error clearing cart', 'error');
-            }
+        function clearCart() {
+            cart = [];
+            updateCartDisplay();
+            showMessage('Cart cleared', 'success');
         }
 
-        // Load cart on page load
-        async function loadCart() {
-            try {
-                const response = await fetch(`/cart?sessionId=${generateSessionId()}`);
-                if (response.ok) {
-                    const result = await response.json();
-                    cart = result.cart.items;
-                    updateCartDisplay();
-                }
-            } catch (error) {
-                console.error('Error loading cart:', error);
+        function proceedToCheckout() {
+            if (cart.length === 0) {
+                alert('Your cart is empty!');
+                return;
             }
+            
+            // Store cart in sessionStorage and redirect to checkout
+            sessionStorage.setItem('cart', JSON.stringify(cart));
+            window.location.href = 'checkout.html';
         }
 
         // Show message function
@@ -938,8 +873,14 @@
             }, 3000);
         }
 
-        // Load cart when page loads
-        document.addEventListener('DOMContentLoaded', loadCart);
+        // Load cart from sessionStorage on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedCart = sessionStorage.getItem('cart');
+            if (savedCart) {
+                cart = JSON.parse(savedCart);
+            }
+            updateCartDisplay();
+        });
 
         // Insurance Inquiry Form Handler
         document.getElementById('insurance-inquiry-form').addEventListener('submit', function(e) {
@@ -978,5 +919,8 @@
     
     <!-- Form Handler Script -->
     <script src="assets/form-handler.js"></script>
+    
+    <!-- Footer -->
+    <div id="footer-placeholder"></div>
 </body>
 </html>
