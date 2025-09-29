@@ -1,0 +1,19 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://www.tnrbusinesssolutions.com/sitemap.xml
+
+# Disallow admin areas
+Disallow: /admin-login.html
+Disallow: /admin-orders.html
+
+# Disallow test files
+Disallow: /test-*.js
+Disallow: /debug-*.js
+Disallow: /simple-test.js
+
+# Allow all other content
+Allow: /media/
+Allow: /assets/
+Allow: /includes/

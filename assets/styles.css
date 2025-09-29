@@ -99,6 +99,7 @@
     padding: 1rem;
     box-shadow: var(--tnr-shadow-lg);
     z-index: 1000;
+    border-radius: 0 0 12px 12px;
   }
   
   .main-nav.active {
@@ -1779,6 +1780,100 @@ footer.footer {
   a {
     min-height: 44px;
     min-width: 44px;
+  }
+  
+  /* Ensure cart icon is visible and properly sized on mobile */
+  #cart-icon {
+    display: flex !important;
+    align-items: center;
+    margin-left: 1rem;
+    font-size: 1.2rem;
+  }
+  
+  /* Improve form responsiveness */
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  /* Better spacing for mobile cards */
+  .card {
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Improve button spacing on mobile */
+  .btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+  }
+}
+
+/* Image optimization and lazy loading */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  transition: opacity 0.3s ease;
+}
+
+/* Lazy loading placeholder */
+img[loading="lazy"] {
+  opacity: 0;
+}
+
+img[loading="lazy"].loaded {
+  opacity: 1;
+}
+
+/* Critical images should load immediately */
+img[data-critical] {
+  loading: eager;
+  opacity: 1;
+}
+
+/* Accessibility improvements */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Focus indicators for better accessibility */
+.btn:focus,
+.nav-link:focus,
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid var(--tnr-gold);
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .card {
+    border: 2px solid var(--tnr-gold);
+  }
+  
+  .btn {
+    border: 2px solid currentColor;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 
