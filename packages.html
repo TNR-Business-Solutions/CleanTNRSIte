@@ -59,7 +59,7 @@
                 "addressCountry": "US"
             },
             "telephone": "+1-412-499-2987",
-            "email": "Roy.Turner@tnrbusinesssolutions.com"
+            "email": "roy.turner@tnrbusinesssolutions.com"
         },
         "areaServed": "Greensburg, PA and Westmoreland County",
         "serviceType": "Digital Marketing and Insurance Services"
@@ -224,9 +224,11 @@
                         </ul>
                     </li>
                     <li><a href="packages.html" class="nav-link">Packages</a></li>
+                    <li><a href="checkout.html" class="nav-link" id="cart-display">Cart (0)</a></li>
                     <li><a href="about.html" class="nav-link">About</a></li>
                     <li><a href="contact.html" class="nav-link">Contact</a></li>
                     <li><a href="blog.html" class="nav-link">Blog</a></li>
+                    <li><a href="admin-login.html" class="nav-link" style="color: var(--tnr-gold);">Admin</a></li>
                 </ul>
             </nav>
         </div>
@@ -261,7 +263,8 @@
                         <li>Social media links</li>
                         <li>3 months support</li>
                     </ul>
-                    <a href="contact.html" class="btn" style="width: 100%; margin-top: 1rem;">Get Started</a>
+                    <button class="btn add-to-cart-btn" data-service-id="basic-website" style="width: 100%; margin-top: 1rem;">Add to Cart</button>
+                    <a href="contact.html" class="btn btn-secondary" style="width: 100%; margin-top: 0.5rem; background: transparent; border: 1px solid var(--tnr-gold); color: var(--tnr-gold);">Learn More</a>
                 </div>
 
                 <!-- Growth Package -->
@@ -280,7 +283,8 @@
                         <li>Monthly content creation</li>
                         <li>6 months support</li>
                     </ul>
-                    <a href="contact.html" class="btn" style="width: 100%; margin-top: 1rem;">Get Started</a>
+                    <button class="btn add-to-cart-btn" data-service-id="premium-website" style="width: 100%; margin-top: 1rem;">Add to Cart</button>
+                    <a href="contact.html" class="btn btn-secondary" style="width: 100%; margin-top: 0.5rem; background: transparent; border: 1px solid var(--tnr-gold); color: var(--tnr-gold);">Learn More</a>
                 </div>
 
                 <!-- Premium Package -->
@@ -299,7 +303,8 @@
                         <li>Dedicated account manager</li>
                         <li>12 months support</li>
                     </ul>
-                    <a href="contact.html" class="btn" style="width: 100%; margin-top: 1rem;">Get Started</a>
+                    <button class="btn add-to-cart-btn" data-service-id="ecommerce-package" style="width: 100%; margin-top: 1rem;">Add to Cart</button>
+                    <a href="contact.html" class="btn btn-secondary" style="width: 100%; margin-top: 0.5rem; background: transparent; border: 1px solid var(--tnr-gold); color: var(--tnr-gold);">Learn More</a>
                 </div>
             </div>
 
@@ -431,14 +436,17 @@
                         <div class="service-item">
                             <span class="service-name">Basic Website (5 pages)</span>
                             <span class="service-price">$300</span>
+                            <button class="btn add-to-cart-btn" data-service-id="basic-website" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Add to Cart</button>
                         </div>
                         <div class="service-item">
                             <span class="service-name">Advanced Website (10+ pages)</span>
                             <span class="service-price">$600</span>
+                            <button class="btn add-to-cart-btn" data-service-id="premium-website" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Add to Cart</button>
                         </div>
                         <div class="service-item">
                             <span class="service-name">E-commerce Website</span>
                             <span class="service-price">$1,200</span>
+                            <button class="btn add-to-cart-btn" data-service-id="ecommerce-package" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Add to Cart</button>
                         </div>
                         <div class="service-item">
                             <span class="service-name">Website Maintenance</span>
@@ -447,6 +455,7 @@
                         <div class="service-item">
                             <span class="service-name">SEO Optimization</span>
                             <span class="service-price">$400/month</span>
+                            <button class="btn add-to-cart-btn" data-service-id="seo-optimization" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Add to Cart</button>
                         </div>
                         <div class="service-item">
                             <span class="service-name">Local SEO</span>
@@ -455,6 +464,7 @@
                         <div class="service-item">
                             <span class="service-name">Content Creation</span>
                             <span class="service-price">$200/month</span>
+                            <button class="btn add-to-cart-btn" data-service-id="content-creation" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Add to Cart</button>
                         </div>
                         <div class="service-item">
                             <span class="service-name">Blog Writing (4 posts)</span>
@@ -463,6 +473,7 @@
                         <div class="service-item">
                             <span class="service-name">Social Media Management</span>
                             <span class="service-price">$400/month</span>
+                            <button class="btn add-to-cart-btn" data-service-id="social-media-setup" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Add to Cart</button>
                         </div>
                         <div class="service-item">
                             <span class="service-name">Paid Advertising Management</span>
@@ -471,6 +482,7 @@
                         <div class="service-item">
                             <span class="service-name">Email Marketing</span>
                             <span class="service-price">$200/month</span>
+                            <button class="btn add-to-cart-btn" data-service-id="email-marketing-setup" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Add to Cart</button>
                         </div>
                         <div class="service-item">
                             <span class="service-name">Google Business Profile</span>
@@ -635,7 +647,7 @@
                 <h3>Ready to Get Started?</h3>
                 <p style="font-size: 1.2rem; margin: 1rem 0;">Contact us today for a free consultation and custom quote tailored to your business needs.</p>
                 <a href="contact.html" class="btn" style="background: white; color: var(--tnr-secondary); margin-right: 1rem;">Get Free Consultation</a>
-                <a href="tel:412-499-2987" class="btn btn-secondary" style="border-color: white; color: white;">Call (412) 499-2987</a>
+                <a href="tel:4124992987" class="btn btn-secondary" style="border-color: white; color: white;">Call (412) 499-2987</a>
         </div>
     </section>
     </main>
@@ -644,6 +656,100 @@
     <div id="footer-placeholder"></div>
 
     <script>
+        // Cart functionality
+        let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        let sessionId = localStorage.getItem('sessionId') || generateSessionId();
+
+        function generateSessionId() {
+            const id = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('sessionId', id);
+            return id;
+        }
+
+        function updateCartDisplay() {
+            const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const cartDisplay = document.getElementById('cart-display');
+            if (cartDisplay) {
+                cartDisplay.textContent = `Cart (${cartCount})`;
+            }
+        }
+
+        async function addToCart(serviceId) {
+            try {
+                const response = await fetch('/cart/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        sessionId: sessionId,
+                        serviceId: serviceId,
+                        quantity: 1
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Update local cart
+                    const existingItem = cart.find(item => item.id === serviceId);
+                    if (existingItem) {
+                        existingItem.quantity += 1;
+                    } else {
+                        // Get service details from the result
+                        const service = result.cart.items.find(item => item.id === serviceId);
+                        if (service) {
+                            cart.push(service);
+                        }
+                    }
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    updateCartDisplay();
+                    
+                    // Show success message
+                    showMessage('Item added to cart!', 'success');
+                } else {
+                    showMessage('Failed to add item to cart', 'error');
+                }
+            } catch (error) {
+                console.error('Add to cart error:', error);
+                showMessage('Error adding item to cart', 'error');
+            }
+        }
+
+        function showMessage(message, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 1rem 2rem;
+                border-radius: 8px;
+                color: white;
+                font-weight: bold;
+                z-index: 1000;
+                animation: slideIn 0.3s ease;
+                background: ${type === 'success' ? '#28a745' : '#dc3545'};
+            `;
+            messageDiv.textContent = message;
+            document.body.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 3000);
+        }
+
+        // Add event listeners to add to cart buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCartDisplay();
+            
+            document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const serviceId = this.getAttribute('data-service-id');
+                    addToCart(serviceId);
+                });
+            });
+        });
+
         // Load footer
         fetch('includes/footer.html')
             .then(response => response.text())
@@ -757,5 +863,8 @@
             window.location.href = `contact.html?${params.toString()}`;
         });
     </script>
+    
+    <!-- Form Handler Script -->
+    <script src="assets/form-handler.js"></script>
 </body>
 </html>

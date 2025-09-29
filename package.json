@@ -21,6 +21,10 @@
   "engines": {
     "node": ">=14.0.0"
   },
+  "dependencies": {
+    "nodemailer": "^6.9.7",
+    "dotenv": "^16.3.1"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/tnr-business-solutions/website.git"

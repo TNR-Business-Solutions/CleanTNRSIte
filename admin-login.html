@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - TNR Business Solutions</title>
+    <link rel="stylesheet" href="assets/styles.css">
+    <style>
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--tnr-primary), var(--tnr-secondary));
+        }
+        
+        .login-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .login-header h1 {
+            color: var(--tnr-gold);
+            margin-bottom: 0.5rem;
+        }
+        
+        .login-header p {
+            color: rgba(255, 255, 255, 0.8);
+            margin: 0;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            color: white;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--tnr-gold);
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.3);
+        }
+        
+        .login-btn {
+            width: 100%;
+            background: var(--tnr-gold);
+            color: var(--tnr-dark);
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+        
+        .login-btn:hover {
+            background: #d97706;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .login-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .error-message {
+            background: #dc3545;
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            text-align: center;
+            display: none;
+        }
+        
+        .back-link {
+            text-align: center;
+            margin-top: 1rem;
+        }
+        
+        .back-link a {
+            color: var(--tnr-gold);
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            color: var(--tnr-gold);
+        }
+        
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid var(--tnr-gold);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h1>Admin Login</h1>
+                <p>TNR Business Solutions</p>
+            </div>
+            
+            <div id="error-message" class="error-message"></div>
+            
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Enter your username" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                </div>
+                
+                <button type="submit" class="login-btn" id="login-btn">Login</button>
+                
+                <div id="loading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Authenticating...</p>
+                </div>
+            </form>
+            
+            <div class="back-link">
+                <a href="index.html">← Back to Website</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple authentication (in production, use proper authentication)
+        const ADMIN_CREDENTIALS = {
+            username: 'admin',
+            password: 'TNR2024!'
+        };
+        
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            showLoading(true);
+            
+            // Simulate authentication delay
+            setTimeout(() => {
+                if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+                    // Store authentication in sessionStorage
+                    sessionStorage.setItem('adminAuthenticated', 'true');
+                    sessionStorage.setItem('adminLoginTime', Date.now().toString());
+                    
+                    // Redirect to admin dashboard
+                    window.location.href = 'admin-orders.html';
+                } else {
+                    showError('Invalid username or password');
+                    showLoading(false);
+                }
+            }, 1000);
+        });
+        
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+            document.getElementById('login-btn').disabled = show;
+        }
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Check if already authenticated
+        if (sessionStorage.getItem('adminAuthenticated') === 'true') {
+            window.location.href = 'admin-orders.html';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Management - TNR Business Solutions</title>
+    <link rel="stylesheet" href="assets/styles.css">
+    <style>
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .order-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .order-card:hover {
+            border-color: var(--tnr-gold);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .order-number {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--tnr-gold);
+        }
+        
+        .order-status {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        
+        .status-new {
+            background: #ffc107;
+            color: #000;
+        }
+        
+        .status-contacted {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .status-paid {
+            background: #28a745;
+            color: white;
+        }
+        
+        .status-in-progress {
+            background: #fd7e14;
+            color: white;
+        }
+        
+        .status-completed {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .customer-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .info-group h4 {
+            color: var(--tnr-gold);
+            margin-bottom: 0.5rem;
+        }
+        
+        .info-group p {
+            margin: 0.25rem 0;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .order-items {
+            margin-bottom: 1rem;
+        }
+        
+        .order-items h4 {
+            color: var(--tnr-gold);
+            margin-bottom: 0.5rem;
+        }
+        
+        .item-list {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        
+        .item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .item:last-child {
+            border-bottom: none;
+        }
+        
+        .order-total {
+            text-align: right;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--tnr-gold);
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px solid var(--tnr-gold);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: var(--tnr-gold);
+            color: var(--tnr-dark);
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .btn-warning {
+            background: #ffc107;
+            color: #000;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .filters {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+        
+        .filter-group {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group select,
+        .filter-group input {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+            color: var(--tnr-dark);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--tnr-gold);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .customer-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main>
+        <div class="admin-container">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h1 style="color: var(--tnr-gold); margin: 0;">Order Management Dashboard</h1>
+                <button onclick="logout()" style="background: #dc3545; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: bold;">Logout</button>
+            </div>
+            
+            <!-- Statistics -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="total-orders">0</div>
+                    <div class="stat-label">Total Orders</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="new-orders">0</div>
+                    <div class="stat-label">New Orders</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="total-revenue">$0</div>
+                    <div class="stat-label">Total Revenue</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="pending-payments">0</div>
+                    <div class="stat-label">Pending Payments</div>
+                </div>
+            </div>
+            
+            <!-- Filters -->
+            <div class="filters">
+                <h3 style="color: var(--tnr-gold); margin-bottom: 1rem;">Filter Orders</h3>
+                <div class="filter-group">
+                    <select id="status-filter">
+                        <option value="">All Statuses</option>
+                        <option value="new">New</option>
+                        <option value="contacted">Contacted</option>
+                        <option value="paid">Paid</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                    <input type="date" id="date-filter" placeholder="Filter by date">
+                    <input type="text" id="search-filter" placeholder="Search by customer name or order number">
+                    <button class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+                    <button class="btn btn-info" onclick="clearFilters()">Clear</button>
+                </div>
+            </div>
+            
+            <!-- Orders List -->
+            <div id="orders-container">
+                <!-- Orders will be populated by JavaScript -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div id="footer-placeholder"></div>
+
+    <script>
+        // Authentication check
+        function checkAuth() {
+            const isAuthenticated = sessionStorage.getItem('adminAuthenticated') === 'true';
+            const loginTime = parseInt(sessionStorage.getItem('adminLoginTime') || '0');
+            const now = Date.now();
+            const sessionTimeout = 8 * 60 * 60 * 1000; // 8 hours
+            
+            if (!isAuthenticated || (now - loginTime) > sessionTimeout) {
+                sessionStorage.removeItem('adminAuthenticated');
+                sessionStorage.removeItem('adminLoginTime');
+                window.location.href = 'admin-login.html';
+                return false;
+            }
+            return true;
+        }
+        
+        // Logout function
+        function logout() {
+            sessionStorage.removeItem('adminAuthenticated');
+            sessionStorage.removeItem('adminLoginTime');
+            window.location.href = 'admin-login.html';
+        }
+        
+        // Check authentication on page load
+        if (!checkAuth()) {
+            // Redirect will happen in checkAuth
+        }
+        
+        // Sample orders data (in production, this would come from a database)
+        let orders = [
+            {
+                orderNumber: "TNR-1759154357795-WQWYHBRRF",
+                customerInfo: {
+                    firstName: "Sarah",
+                    lastName: "Johnson",
+                    email: "sarah.johnson@example.com",
+                    phone: "412-555-9876",
+                    company: "Johnson Marketing LLC",
+                    address: "456 Business Avenue, Greensburg, PA 15601"
+                },
+                items: [
+                    { name: "Basic Website Package", price: 300, quantity: 1 },
+                    { name: "SEO Optimization", price: 200, quantity: 1 },
+                    { name: "Content Creation", price: 100, quantity: 2 }
+                ],
+                total: 700,
+                status: "new",
+                createdAt: "2025-09-29T13:56:31.704Z",
+                projectTimeline: "1-month",
+                specialRequests: "Need help with our new business launch. Looking for a complete digital presence."
+            },
+            {
+                orderNumber: "TNR-1759154191704-0JOT4W4L8",
+                customerInfo: {
+                    firstName: "John",
+                    lastName: "Doe",
+                    email: "john.doe@example.com",
+                    phone: "412-555-1234",
+                    company: "Test Company LLC",
+                    address: "123 Main Street, Greensburg, PA 15601"
+                },
+                items: [
+                    { name: "Basic Website Package", price: 300, quantity: 1 },
+                    { name: "SEO Optimization", price: 200, quantity: 2 }
+                ],
+                total: 700,
+                status: "contacted",
+                createdAt: "2025-09-29T13:30:00.000Z",
+                projectTimeline: "asap",
+                specialRequests: "This is a test order for checkout functionality testing."
+            }
+        ];
+
+        function updateStats() {
+            const totalOrders = orders.length;
+            const newOrders = orders.filter(order => order.status === 'new').length;
+            const totalRevenue = orders.reduce((sum, order) => sum + order.total, 0);
+            const pendingPayments = orders.filter(order => ['new', 'contacted'].includes(order.status)).length;
+
+            document.getElementById('total-orders').textContent = totalOrders;
+            document.getElementById('new-orders').textContent = newOrders;
+            document.getElementById('total-revenue').textContent = `$${totalRevenue.toFixed(2)}`;
+            document.getElementById('pending-payments').textContent = pendingPayments;
+        }
+
+        function updateOrderStatus(orderNumber, newStatus) {
+            const order = orders.find(o => o.orderNumber === orderNumber);
+            if (order) {
+                order.status = newStatus;
+                renderOrders();
+                updateStats();
+            }
+        }
+
+        function renderOrders() {
+            const container = document.getElementById('orders-container');
+            
+            if (orders.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 3rem; color: rgba(255, 255, 255, 0.7);"><h3>No orders found</h3></div>';
+                return;
+            }
+
+            container.innerHTML = orders.map(order => `
+                <div class="order-card">
+                    <div class="order-header">
+                        <div class="order-number">${order.orderNumber}</div>
+                        <div class="order-status status-${order.status}">${order.status.replace('-', ' ').toUpperCase()}</div>
+                    </div>
+                    
+                    <div class="customer-info">
+                        <div class="info-group">
+                            <h4>Customer Information</h4>
+                            <p><strong>Name:</strong> ${order.customerInfo.firstName} ${order.customerInfo.lastName}</p>
+                            <p><strong>Email:</strong> <a href="mailto:${order.customerInfo.email}" style="color: var(--tnr-gold);">${order.customerInfo.email}</a></p>
+                            <p><strong>Phone:</strong> <a href="tel:${order.customerInfo.phone}" style="color: var(--tnr-gold);">${order.customerInfo.phone}</a></p>
+                            <p><strong>Company:</strong> ${order.customerInfo.company}</p>
+                        </div>
+                        <div class="info-group">
+                            <h4>Order Details</h4>
+                            <p><strong>Date:</strong> ${new Date(order.createdAt).toLocaleDateString()}</p>
+                            <p><strong>Timeline:</strong> ${order.projectTimeline}</p>
+                            <p><strong>Address:</strong> ${order.customerInfo.address}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="order-items">
+                        <h4>Items Ordered</h4>
+                        <div class="item-list">
+                            ${order.items.map(item => `
+                                <div class="item">
+                                    <span>${item.name} x ${item.quantity}</span>
+                                    <span>$${(item.price * item.quantity).toFixed(2)}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="order-total">Total: $${order.total.toFixed(2)}</div>
+                    </div>
+                    
+                    ${order.specialRequests ? `
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: var(--tnr-gold); margin-bottom: 0.5rem;">Special Requests</h4>
+                            <p style="color: rgba(255, 255, 255, 0.8); font-style: italic;">${order.specialRequests}</p>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="action-buttons">
+                        ${order.status === 'new' ? `
+                            <button class="btn btn-info" onclick="updateOrderStatus('${order.orderNumber}', 'contacted')">Mark as Contacted</button>
+                            <a href="mailto:${order.customerInfo.email}?subject=Order Confirmation - ${order.orderNumber}&body=Hi ${order.customerInfo.firstName},%0D%0A%0D%0AThank you for your order! I'll be contacting you shortly to discuss your project details and payment options.%0D%0A%0D%0AOrder: ${order.orderNumber}%0D%0ATotal: $${order.total.toFixed(2)}%0D%0A%0D%0ABest regards,%0D%0ARoy Turner" class="btn btn-primary">Send Email</a>
+                        ` : ''}
+                        
+                        ${order.status === 'contacted' ? `
+                            <button class="btn btn-success" onclick="updateOrderStatus('${order.orderNumber}', 'paid')">Mark as Paid</button>
+                            <button class="btn btn-warning" onclick="updateOrderStatus('${order.orderNumber}', 'in-progress')">Start Project</button>
+                        ` : ''}
+                        
+                        ${order.status === 'paid' ? `
+                            <button class="btn btn-warning" onclick="updateOrderStatus('${order.orderNumber}', 'in-progress')">Start Project</button>
+                        ` : ''}
+                        
+                        ${order.status === 'in-progress' ? `
+                            <button class="btn btn-success" onclick="updateOrderStatus('${order.orderNumber}', 'completed')">Mark Complete</button>
+                        ` : ''}
+                        
+                        <a href="tel:${order.customerInfo.phone}" class="btn btn-primary">Call Customer</a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function applyFilters() {
+            // Filter logic would go here
+            renderOrders();
+        }
+
+        function clearFilters() {
+            document.getElementById('status-filter').value = '';
+            document.getElementById('date-filter').value = '';
+            document.getElementById('search-filter').value = '';
+            renderOrders();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStats();
+            renderOrders();
+            loadHeader();
+            loadFooter();
+        });
+
+        // Load header and footer
+        function loadHeader() {
+            fetch('includes/header.html')
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('header-placeholder').innerHTML = html;
+                });
+        }
+
+        function loadFooter() {
+            fetch('includes/footer.html')
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('footer-placeholder').innerHTML = html;
+                });
+        }
+    </script>
+</body>
+</html>
