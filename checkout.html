@@ -302,16 +302,28 @@
                 </div>
                 <div class="cart-total">
                     <div class="total-line">
-                        <span>Subtotal:</span>
+                        <span>Monthly Subtotal:</span>
                         <span id="subtotal">$0.00</span>
                     </div>
                     <div class="total-line">
                         <span>Tax (8%):</span>
                         <span id="tax">$0.00</span>
                     </div>
+                    <div class="total-line">
+                        <span>Setup Fee (One-time):</span>
+                        <span id="setup-fee">$0.00</span>
+                    </div>
                     <div class="total-line final">
-                        <span>Total:</span>
+                        <span>Monthly Total:</span>
                         <span id="total">$0.00</span>
+                    </div>
+                    <div style="margin-top: 1rem; padding: 1rem; background: rgba(245, 158, 11, 0.1); border-radius: 8px; border-left: 4px solid var(--tnr-gold);">
+                        <div style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.8);">
+                            <strong>Annual Savings:</strong> <span id="annual-savings">$0.00</span>
+                        </div>
+                        <div style="font-size: 0.8rem; color: rgba(255, 255, 255, 0.6); margin-top: 0.5rem;">
+                            Save 2 months when paying annually
+                        </div>
                     </div>
                 </div>
             </div>
@@ -319,6 +331,24 @@
             <!-- Checkout Form -->
             <div class="checkout-form">
                 <h2 style="color: var(--tnr-gold); margin-bottom: 2rem; text-align: center;">Checkout</h2>
+                
+                <!-- Cost Summary -->
+                <div style="background: rgba(44, 85, 48, 0.2); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; border: 1px solid var(--tnr-gold);">
+                    <h3 style="color: var(--tnr-gold); margin-bottom: 1rem; text-align: center;">Estimated Costs</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; text-align: center;">
+                        <div>
+                            <div style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.7);">Monthly Total</div>
+                            <div style="font-size: 1.5rem; font-weight: bold; color: var(--tnr-gold);" id="summary-monthly">$0.00</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.7);">Annual Total</div>
+                            <div style="font-size: 1.5rem; font-weight: bold; color: var(--tnr-gold);" id="summary-annual">$0.00</div>
+                        </div>
+                    </div>
+                    <div style="text-align: center; margin-top: 1rem; font-size: 0.9rem; color: rgba(255, 255, 255, 0.8);">
+                        <span id="summary-savings">Save $0.00 with annual billing</span>
+                    </div>
+                </div>
                 
                 <div id="success-message" class="success-message"></div>
                 <div id="error-message" class="error-message"></div>
@@ -397,6 +427,15 @@
                                 <span>🅿️ PayPal</span>
                             </label>
                         </div>
+                        
+                        <div class="form-group" style="margin-top: 1.5rem;">
+                            <label for="paymentFrequency">Payment Frequency</label>
+                            <select id="paymentFrequency" name="paymentFrequency" onchange="updatePaymentFrequency()">
+                                <option value="monthly">Monthly</option>
+                                <option value="annually">Annually (Save 2 months!)</option>
+                            </select>
+                        </div>
+                        
                         <p style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; margin-top: 1rem;">
                             <strong>Note:</strong> For now, we'll process your order and send a confirmation email. 
                             Payment will be collected when we contact you to begin your project.
@@ -450,8 +489,8 @@
 
     <script>
         // Cart management
-        let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-        let sessionId = localStorage.getItem('sessionId') || generateSessionId();
+        let cart = JSON.parse(sessionStorage.getItem('cart') || '[]');
+        let sessionId = sessionStorage.getItem('sessionId') || generateSessionId();
 
         function generateSessionId() {
             return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -461,7 +500,9 @@
             const cartItemsContainer = document.getElementById('cart-items');
             const subtotalElement = document.getElementById('subtotal');
             const taxElement = document.getElementById('tax');
+            const setupFeeElement = document.getElementById('setup-fee');
             const totalElement = document.getElementById('total');
+            const annualSavingsElement = document.getElementById('annual-savings');
 
             if (cart.length === 0) {
                 cartItemsContainer.innerHTML = `
@@ -473,21 +514,37 @@
                 `;
                 subtotalElement.textContent = '$0.00';
                 taxElement.textContent = '$0.00';
+                setupFeeElement.textContent = '$0.00';
                 totalElement.textContent = '$0.00';
+                annualSavingsElement.textContent = '$0.00';
+                
+                // Reset cost summary
+                document.getElementById('summary-monthly').textContent = '$0.00';
+                document.getElementById('summary-annual').textContent = '$0.00';
+                document.getElementById('summary-savings').textContent = 'Save $0.00 with annual billing';
                 return;
             }
 
             let subtotal = 0;
+            let setupFee = 0;
+            
             cartItemsContainer.innerHTML = cart.map(item => {
                 const itemTotal = item.price * item.quantity;
                 subtotal += itemTotal;
+                
+                // Add setup fee for certain services
+                if (item.id.includes('website') || item.id.includes('ecommerce') || item.id.includes('seo')) {
+                    setupFee += 200; // $200 setup fee for major services
+                } else if (item.id.includes('ads') || item.id.includes('analytics')) {
+                    setupFee += 100; // $100 setup fee for ad services
+                }
                 
                 return `
                     <div class="cart-item">
                         <div class="item-details">
                             <h4>${item.name}</h4>
                             <p>${item.description}</p>
-                            <p>$${item.price.toFixed(2)} each</p>
+                            <p>$${item.price.toLocaleString()}/month each</p>
                         </div>
                         <div class="item-controls">
                             <div class="quantity-controls">
@@ -495,18 +552,30 @@
                                 <input type="number" class="quantity-input" value="${item.quantity}" min="1" onchange="updateQuantity('${item.id}', parseInt(this.value))">
                                 <button class="quantity-btn" onclick="updateQuantity('${item.id}', ${item.quantity + 1})">+</button>
                             </div>
-                            <button class="remove-btn" onclick="removeItem('${item.id}')">Remove</button>
+                            <div style="text-align: right; margin-left: 1rem;">
+                                <div style="font-weight: bold; color: var(--tnr-gold);">$${(itemTotal).toLocaleString()}/month</div>
+                                <button class="remove-btn" onclick="removeItem('${item.id}')">Remove</button>
+                            </div>
                         </div>
                     </div>
                 `;
             }).join('');
 
             const tax = subtotal * 0.08; // 8% tax
-            const total = subtotal + tax;
+            const monthlyTotal = subtotal + tax;
+            const annualTotal = monthlyTotal * 10; // 10 months instead of 12 for annual billing
+            const annualSavings = monthlyTotal * 2; // Save 2 months when paying annually
 
-            subtotalElement.textContent = `$${subtotal.toFixed(2)}`;
-            taxElement.textContent = `$${tax.toFixed(2)}`;
-            totalElement.textContent = `$${total.toFixed(2)}`;
+            subtotalElement.textContent = `$${subtotal.toLocaleString()}/month`;
+            taxElement.textContent = `$${tax.toLocaleString()}/month`;
+            setupFeeElement.textContent = `$${setupFee.toLocaleString()}`;
+            totalElement.textContent = `$${monthlyTotal.toLocaleString()}/month`;
+            annualSavingsElement.textContent = `$${annualSavings.toLocaleString()}`;
+            
+            // Update cost summary
+            document.getElementById('summary-monthly').textContent = `$${monthlyTotal.toLocaleString()}`;
+            document.getElementById('summary-annual').textContent = `$${annualTotal.toLocaleString()}`;
+            document.getElementById('summary-savings').textContent = `Save $${annualSavings.toLocaleString()} with annual billing`;
         }
 
         function updateQuantity(itemId, newQuantity) {
@@ -516,7 +585,7 @@
                     removeItem(itemId);
                 } else {
                     item.quantity = newQuantity;
-                    localStorage.setItem('cart', JSON.stringify(cart));
+                    sessionStorage.setItem('cart', JSON.stringify(cart));
                     updateCartDisplay();
                 }
             }
@@ -524,8 +593,28 @@
 
         function removeItem(itemId) {
             cart = cart.filter(item => item.id !== itemId);
-            localStorage.setItem('cart', JSON.stringify(cart));
+            sessionStorage.setItem('cart', JSON.stringify(cart));
             updateCartDisplay();
+        }
+
+        function updatePaymentFrequency() {
+            const frequency = document.getElementById('paymentFrequency').value;
+            const totalElement = document.getElementById('total');
+            const annualSavingsElement = document.getElementById('annual-savings');
+            const savingsBox = document.querySelector('.cart-total > div:last-child');
+            
+            if (frequency === 'annually') {
+                // Show annual pricing
+                const monthlyTotal = parseFloat(totalElement.textContent.replace(/[$,]/g, ''));
+                const annualTotal = monthlyTotal * 10; // 10 months instead of 12
+                totalElement.textContent = `$${annualTotal.toLocaleString()}/year`;
+                annualSavingsElement.textContent = `$${(monthlyTotal * 2).toLocaleString()}`;
+                savingsBox.style.display = 'block';
+            } else {
+                // Show monthly pricing
+                updateCartDisplay();
+                savingsBox.style.display = 'block';
+            }
         }
 
         // Payment method selection
@@ -588,7 +677,7 @@
                 if (result.success) {
                     showSuccess(`Order confirmed! Order number: ${result.orderNumber}. Check your email for confirmation.`);
                     cart = [];
-                    localStorage.removeItem('cart');
+                    sessionStorage.removeItem('cart');
                     updateCartDisplay();
                     this.reset();
                 } else {

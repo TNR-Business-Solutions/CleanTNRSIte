@@ -141,6 +141,23 @@
             margin: 0.5rem 0;
             border-radius: 8px;
             transition: background 0.3s ease;
+            min-height: 60px;
+        }
+        
+        .service-item .service-name {
+            flex: 1;
+            margin-right: 1rem;
+        }
+        
+        .service-item .service-price {
+            margin-right: 1rem;
+            min-width: 80px;
+            text-align: right;
+        }
+        
+        .service-item .btn {
+            min-width: 120px;
+            white-space: nowrap;
         }
         
         .service-item:hover {
@@ -457,6 +474,7 @@
                         <div class="service-item">
                             <span class="service-name">Website Maintenance</span>
                             <span class="service-price">$150/month</span>
+                            <button class="btn" style="padding: 0.5rem 1rem; font-size: 0.9rem;" onclick="addToCart('website-maintenance', 'Website Maintenance', 150, 'Monthly website maintenance service')">Add to Cart</button>
                         </div>
                         <div class="service-item">
                             <span class="service-name">SEO Optimization</span>
@@ -466,6 +484,7 @@
                         <div class="service-item">
                             <span class="service-name">Local SEO</span>
                             <span class="service-price">$300/month</span>
+                            <button class="btn" style="padding: 0.5rem 1rem; font-size: 0.9rem;" onclick="addToCart('local-seo', 'Local SEO', 300, 'Monthly local SEO optimization service')">Add to Cart</button>
                         </div>
                         <div class="service-item">
                             <span class="service-name">Content Creation</span>
@@ -475,6 +494,7 @@
                         <div class="service-item">
                             <span class="service-name">Blog Writing (4 posts)</span>
                             <span class="service-price">$300/month</span>
+                            <button class="btn" style="padding: 0.5rem 1rem; font-size: 0.9rem;" onclick="addToCart('blog-writing', 'Blog Writing (4 posts)', 300, 'Monthly blog writing service - 4 posts')">Add to Cart</button>
                         </div>
                         <div class="service-item">
                             <span class="service-name">Social Media Management</span>
@@ -484,6 +504,7 @@
                         <div class="service-item">
                             <span class="service-name">Paid Advertising Management</span>
                             <span class="service-price">$500/month</span>
+                            <button class="btn" style="padding: 0.5rem 1rem; font-size: 0.9rem;" onclick="addToCart('paid-advertising', 'Paid Advertising Management', 500, 'Monthly paid advertising management service')">Add to Cart</button>
                         </div>
                         <div class="service-item">
                             <span class="service-name">Email Marketing</span>
@@ -493,6 +514,7 @@
                         <div class="service-item">
                             <span class="service-name">Google Business Profile</span>
                             <span class="service-price">$100/month</span>
+                            <button class="btn" style="padding: 0.5rem 1rem; font-size: 0.9rem;" onclick="addToCart('google-business-profile', 'Google Business Profile', 100, 'Monthly Google Business Profile management')">Add to Cart</button>
                         </div>
                     </div>
 
@@ -543,38 +565,47 @@
                         <div class="service-item">
                             <span class="service-name">Logo Design</span>
                             <span class="service-price">$200</span>
+                            <button class="btn" style="padding: 0.5rem 1rem; font-size: 0.9rem; min-width: 120px;" onclick="addToCart('logo-design', 'Logo Design', 200, 'Professional logo design service')">Add to Cart</button>
                         </div>
                         <div class="service-item">
                             <span class="service-name">Business Card Design</span>
                             <span class="service-price">$100</span>
+                            <button class="btn" style="padding: 0.5rem 1rem; font-size: 0.9rem; min-width: 120px;" onclick="addToCart('business-card-design', 'Business Card Design', 100, 'Professional business card design service')">Add to Cart</button>
                         </div>
                         <div class="service-item">
                             <span class="service-name">Brochure Design</span>
                             <span class="service-price">$300</span>
+                            <button class="btn" style="padding: 0.5rem 1rem; font-size: 0.9rem; min-width: 120px;" onclick="addToCart('brochure-design', 'Brochure Design', 300, 'Professional brochure design service')">Add to Cart</button>
                         </div>
                         <div class="service-item">
                             <span class="service-name">Google Ads Setup</span>
                             <span class="service-price">$250</span>
+                            <button class="btn" style="padding: 0.5rem 1rem; font-size: 0.9rem; min-width: 120px;" onclick="addToCart('google-ads-setup', 'Google Ads Setup', 250, 'Google Ads campaign setup service')">Add to Cart</button>
                         </div>
                         <div class="service-item">
                             <span class="service-name">Facebook Ads Setup</span>
                             <span class="service-price">$200</span>
+                            <button class="btn" style="padding: 0.5rem 1rem; font-size: 0.9rem; min-width: 120px;" onclick="addToCart('facebook-ads-setup', 'Facebook Ads Setup', 200, 'Facebook Ads campaign setup service')">Add to Cart</button>
                         </div>
                         <div class="service-item">
                             <span class="service-name">Analytics Setup</span>
                             <span class="service-price">$150</span>
+                            <button class="btn" style="padding: 0.5rem 1rem; font-size: 0.9rem; min-width: 120px;" onclick="addToCart('analytics-setup', 'Analytics Setup', 150, 'Google Analytics and tracking setup service')">Add to Cart</button>
                         </div>
                         <div class="service-item">
                             <span class="service-name">Domain Registration</span>
                             <span class="service-price">$15/year</span>
+                            <button class="btn" style="padding: 0.5rem 1rem; font-size: 0.9rem; min-width: 120px;" onclick="addToCart('domain-registration', 'Domain Registration', 15, 'Domain name registration service')">Add to Cart</button>
                         </div>
                         <div class="service-item">
                             <span class="service-name">Hosting Setup</span>
                             <span class="service-price">$50</span>
+                            <button class="btn" style="padding: 0.5rem 1rem; font-size: 0.9rem; min-width: 120px;" onclick="addToCart('hosting-setup', 'Hosting Setup', 50, 'Web hosting setup and configuration service')">Add to Cart</button>
                         </div>
                         <div class="service-item">
                             <span class="service-name">SSL Certificate</span>
                             <span class="service-price">$75/year</span>
+                            <button class="btn" style="padding: 0.5rem 1rem; font-size: 0.9rem; min-width: 120px;" onclick="addToCart('ssl-certificate', 'SSL Certificate', 75, 'SSL certificate installation and setup service')">Add to Cart</button>
                         </div>
                     </div>
                 </div>
@@ -662,92 +693,8 @@
     <div id="footer-placeholder"></div>
 
     <script>
-        // Cart functionality
-        let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-        let sessionId = localStorage.getItem('sessionId') || generateSessionId();
-
-        function generateSessionId() {
-            const id = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-            localStorage.setItem('sessionId', id);
-            return id;
-        }
-
-        function updateCartDisplay() {
-            const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-            const cartDisplay = document.getElementById('cart-display');
-            if (cartDisplay) {
-                cartDisplay.textContent = `Cart (${cartCount})`;
-            }
-        }
-
-        async function addToCart(serviceId) {
-            try {
-                const response = await fetch('/cart/add', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        sessionId: sessionId,
-                        serviceId: serviceId,
-                        quantity: 1
-                    })
-                });
-
-                const result = await response.json();
-                
-                if (result.success) {
-                    // Update local cart
-                    const existingItem = cart.find(item => item.id === serviceId);
-                    if (existingItem) {
-                        existingItem.quantity += 1;
-                    } else {
-                        // Get service details from the result
-                        const service = result.cart.items.find(item => item.id === serviceId);
-                        if (service) {
-                            cart.push(service);
-                        }
-                    }
-                    localStorage.setItem('cart', JSON.stringify(cart));
-                    updateCartDisplay();
-                    
-                    // Show success message
-                    showMessage('Item added to cart!', 'success');
-                } else {
-                    showMessage('Failed to add item to cart', 'error');
-                }
-            } catch (error) {
-                console.error('Add to cart error:', error);
-                showMessage('Error adding item to cart', 'error');
-            }
-        }
-
-        function showMessage(message, type) {
-            const messageDiv = document.createElement('div');
-            messageDiv.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                padding: 1rem 2rem;
-                border-radius: 8px;
-                color: white;
-                font-weight: bold;
-                z-index: 1000;
-                animation: slideIn 0.3s ease;
-                background: ${type === 'success' ? '#28a745' : '#dc3545'};
-            `;
-            messageDiv.textContent = message;
-            document.body.appendChild(messageDiv);
-            
-            setTimeout(() => {
-                messageDiv.remove();
-            }, 3000);
-        }
-
-        // Add event listeners to add to cart buttons
-        document.addEventListener('DOMContentLoaded', function() {
-            updateCartDisplay();
-        });
+        // Simple Shopping Cart Functionality
+        let cart = [];
 
         // Load footer
         fetch('includes/footer.html')
@@ -755,9 +702,6 @@
             .then(data => {
                 document.getElementById('footer-placeholder').innerHTML = data;
             });
-
-        // Simple Shopping Cart Functionality
-        let cart = [];
 
         function addToCart(serviceId, serviceName, price, description) {
             // Check if item already exists
@@ -919,8 +863,5 @@
     
     <!-- Form Handler Script -->
     <script src="assets/form-handler.js"></script>
-    
-    <!-- Footer -->
-    <div id="footer-placeholder"></div>
 </body>
 </html>
