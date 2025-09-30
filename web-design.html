@@ -207,7 +207,7 @@
             
             <div class="grid grid-4" style="margin-bottom: 4rem;">
                 <div class="card" style="background: var(--tnr-secondary);">
-                    <img src="media/Website%20creation.jpg" alt="Custom Website Design" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;" loading="lazy">
+                    <img src="media/website-creation.jpg" alt="Custom Website Design" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;" loading="lazy">
                     <h3 style="color: #f59e0b;">Custom Website Design</h3>
                     <p style="color: white;">Unique, professional website designs tailored to your brand and business goals. We create visually appealing layouts that reflect your company's personality and values.</p>
                     <a href="contact.html" class="btn">Learn More</a>
@@ -318,5 +318,24 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        // Fix lazy loading images - make them visible when loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            const lazyImages = document.querySelectorAll('img[loading="lazy"]');
+            lazyImages.forEach(img => {
+                if (img.complete) {
+                    img.classList.add('loaded');
+                } else {
+                    img.addEventListener('load', function() {
+                        this.classList.add('loaded');
+                    });
+                    img.addEventListener('error', function() {
+                        this.classList.add('loaded'); // Show even if error occurs
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 </html>
