@@ -1,19 +1,53 @@
+# robots.txt for TNR Business Solutions - Greensburg PA
+# Digital Marketing and Insurance Services
+# https://www.tnrbusinesssolutions.com
+
+# Allow all search engines to crawl public content
 User-agent: *
 Allow: /
 
-# Sitemap
+# Primary Sitemap
 Sitemap: https://www.tnrbusinesssolutions.com/sitemap.xml
 
-# Disallow admin areas
-Disallow: /admin-login.html
-Disallow: /admin-orders.html
-
-# Disallow test files
-Disallow: /test-*.js
-Disallow: /debug-*.js
-Disallow: /simple-test.js
-
-# Allow all other content
+# Explicitly allow important directories for crawling
 Allow: /media/
 Allow: /assets/
 Allow: /includes/
+
+# Disallow admin and private areas
+Disallow: /admin-login.html
+Disallow: /admin-orders.html
+Disallow: /listing-tracker.html
+
+# Disallow test, debug, and development files
+Disallow: /test-*.js
+Disallow: /test-*.html
+Disallow: /debug-*.js
+Disallow: /simple-test.js
+Disallow: /image-test.html
+Disallow: /image-debug.html
+Disallow: /serve-clean.js
+Disallow: /verify-images.js
+
+# Disallow checkout utility pages (allow the main checkout page for conversion tracking)
+# Checkout.html is allowed for tracking purposes
+
+# Disallow documentation and strategy files
+Disallow: /*.md$
+
+# Rate limiting for crawlers (optional)
+# Crawl-delay: 1
+
+# Specific rules for major search engines
+# Google
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+# Bing
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 0
+
+# Specific sitemap URLs for verification
+# This helps with Google Search Console and Bing Webmaster Tools

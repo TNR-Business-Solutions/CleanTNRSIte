@@ -42,23 +42,78 @@
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
-        "@type": "InsuranceAgency",
-        "name": "TNR Business Solutions - Home Insurance",
-        "url": "https://www.tnrbusinesssolutions.com/home-insurance",
-        "logo": "https://www.tnrbusinesssolutions.com/media/logo.png",
-        "description": "Home insurance services in Greensburg PA and Westmoreland County",
-        "address": {
-            "@type": "PostalAddress",
-            "streetAddress": "418 Concord Avenue",
-            "addressLocality": "Greensburg",
-            "addressRegion": "PA",
-            "postalCode": "15601",
-            "addressCountry": "US"
+        "@type": "Service",
+        "serviceType": "Home Insurance",
+        "name": "Home Insurance in Greensburg PA",
+        "description": "Comprehensive homeowners insurance coverage for Greensburg PA and Westmoreland County residents. Protect your home, belongings, and liability with affordable insurance from trusted carriers.",
+        "provider": {
+            "@type": "LocalBusiness",
+            "@id": "https://www.tnrbusinesssolutions.com",
+            "name": "TNR Business Solutions",
+            "url": "https://www.tnrbusinesssolutions.com",
+            "telephone": "+1-412-499-2987",
+            "email": "roy.turner@tnrbusinesssolutions.com",
+            "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "418 Concord Avenue",
+                "addressLocality": "Greensburg",
+                "addressRegion": "PA",
+                "postalCode": "15601",
+                "addressCountry": "US"
+            }
         },
-        "telephone": "+1-412-499-2987",
-        "email": "roy.turner@tnrbusinesssolutions.com",
-        "areaServed": "Greensburg, PA and Westmoreland County",
-        "serviceType": "Home Insurance"
+        "areaServed": [
+            {
+                "@type": "City",
+                "name": "Greensburg"
+            },
+            {
+                "@type": "AdministrativeArea",
+                "name": "Westmoreland County"
+            }
+        ]
+    }
+    </script>
+    
+    <!-- FAQ Schema for Answer Engine Optimization -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What does homeowners insurance cover in Pennsylvania?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Standard homeowners insurance in Greensburg PA covers dwelling damage, personal property, liability protection, and additional living expenses. This includes protection against fire, theft, wind, hail, and other covered perils. We review your specific needs to ensure appropriate coverage limits."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How much homeowners insurance do I need?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Your dwelling coverage should equal your home's rebuild cost, not market value. For Greensburg PA homes, this typically includes full replacement cost coverage. We recommend liability coverage of at least $300,000-$500,000. We provide free home insurance evaluations to determine your ideal coverage amounts."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Does home insurance cover flooding in Westmoreland County?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Standard homeowners insurance doesn't cover flood damage. Greensburg PA homeowners in flood-prone areas should purchase separate flood insurance through the National Flood Insurance Program (NFIP). We can help you determine if you need flood coverage and obtain affordable policies."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How can I lower my home insurance premium?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Greensburg PA homeowners can reduce premiums by bundling home and auto insurance, increasing deductibles, installing security systems, maintaining good credit, and staying claims-free. We shop multiple carriers to find you the best rates and available discounts."
+                }
+            }
+        ]
     }
     </script>
     
@@ -150,7 +205,7 @@
             <!-- Homeowners Insurance Services Cards -->
             <h2 style="text-align: center; margin-bottom: 3rem; color: var(--tnr-secondary);">Homeowners Insurance Coverage Options</h2>
             <div class="grid grid-3" style="margin-bottom: 4rem;">
-                <div class="card" style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('media/Home%20Exterior.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; min-height: 300px; display: flex; flex-direction: column; justify-content: flex-end; padding: 2rem; color: white;">
+                <div class="card" style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('media/home-exterior.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; min-height: 300px; display: flex; flex-direction: column; justify-content: flex-end; padding: 2rem; color: white;">
                     <h3 style="color: #f59e0b; margin-bottom: 1rem;">Dwelling Coverage</h3>
                     <p style="color: white; margin-bottom: 1rem;">Protects the physical structure of your home from covered perils like fire, wind, hail, and vandalism.</p>
                     <ul style="margin: 1rem 0; padding-left: 1.5rem; color: white;">

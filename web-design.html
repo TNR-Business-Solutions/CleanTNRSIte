@@ -42,20 +42,86 @@
     <link rel="canonical" href="https://www.tnrbusinesssolutions.com/web-design">
     <link rel="alternate" hreflang="en-us" href="https://www.tnrbusinesssolutions.com/web-design">
     
-    <!-- Structured Data -->
+    <!-- Structured Data - Enhanced Service Schema -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
         "@type": "Service",
-        "name": "Web Design & Development Services",
-        "description": "Professional web design and development services for businesses in Greensburg, PA",
+        "serviceType": "Web Design & Development",
+        "name": "Web Design & Development Services in Greensburg PA",
+        "description": "Professional custom web design and development services for small businesses in Greensburg PA. Mobile-responsive, fast-loading websites that convert visitors into customers. Expert WordPress, e-commerce, and custom web application development.",
         "provider": {
-            "@type": "Organization",
+            "@type": "LocalBusiness",
+            "@id": "https://www.tnrbusinesssolutions.com",
             "name": "TNR Business Solutions",
-            "url": "https://www.tnrbusinesssolutions.com"
+            "url": "https://www.tnrbusinesssolutions.com",
+            "telephone": "+1-412-499-2987",
+            "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "418 Concord Avenue",
+                "addressLocality": "Greensburg",
+                "addressRegion": "PA",
+                "postalCode": "15601",
+                "addressCountry": "US"
+            }
         },
-        "areaServed": "Greensburg, PA and surrounding areas",
-        "serviceType": "Web Design & Development"
+        "areaServed": [
+            {
+                "@type": "City",
+                "name": "Greensburg"
+            },
+            {
+                "@type": "AdministrativeArea",
+                "name": "Westmoreland County"
+            }
+        ],
+        "offers": {
+            "@type": "Offer",
+            "availability": "https://schema.org/InStock",
+            "priceRange": "$$"
+        }
+    }
+    </script>
+    
+    <!-- FAQ Schema for Answer Engine Optimization -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "How much does a custom website cost in Greensburg PA?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Custom website costs vary based on features, complexity, and business needs. Basic websites for Greensburg PA small businesses typically start around $2,000-$5,000, while e-commerce and complex sites range from $5,000-$15,000+. We offer transparent pricing and custom quotes based on your specific requirements."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How long does it take to build a website?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Most small business websites take 4-8 weeks from start to launch. This includes discovery, design, development, content creation, testing, and revisions. E-commerce and complex sites may take 8-12 weeks. We provide detailed timelines during the consultation phase."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Do you provide ongoing website maintenance?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes, we offer comprehensive website maintenance packages for Greensburg PA businesses. Services include security updates, content updates, performance monitoring, backups, and technical support. Monthly maintenance plans ensure your website stays secure, fast, and up-to-date."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Will my website be mobile-friendly?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Absolutely! All websites we design are fully responsive and mobile-optimized. With over 60% of web traffic coming from mobile devices, we ensure your site looks great and functions perfectly on smartphones, tablets, and desktops. Mobile-friendliness is also crucial for Google rankings."
+                }
+            }
+        ]
     }
     </script>
     

@@ -42,23 +42,78 @@
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
-        "@type": "InsuranceAgency",
-        "name": "TNR Business Solutions - Life Insurance",
-        "url": "https://www.tnrbusinesssolutions.com/life-insurance",
-        "logo": "https://www.tnrbusinesssolutions.com/media/logo.png",
-        "description": "Life insurance services in Greensburg PA and Westmoreland County",
-        "address": {
-            "@type": "PostalAddress",
-            "streetAddress": "418 Concord Avenue",
-            "addressLocality": "Greensburg",
-            "addressRegion": "PA",
-            "postalCode": "15601",
-            "addressCountry": "US"
+        "@type": "Service",
+        "serviceType": "Life Insurance",
+        "name": "Life Insurance in Greensburg PA",
+        "description": "Life insurance policies for individuals and families in Greensburg PA. Term life, whole life, universal life, and final expense insurance to protect your family's financial future.",
+        "provider": {
+            "@type": "LocalBusiness",
+            "@id": "https://www.tnrbusinesssolutions.com",
+            "name": "TNR Business Solutions",
+            "url": "https://www.tnrbusinesssolutions.com",
+            "telephone": "+1-412-499-2987",
+            "email": "roy.turner@tnrbusinesssolutions.com",
+            "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "418 Concord Avenue",
+                "addressLocality": "Greensburg",
+                "addressRegion": "PA",
+                "postalCode": "15601",
+                "addressCountry": "US"
+            }
         },
-        "telephone": "+1-412-499-2987",
-        "email": "roy.turner@tnrbusinesssolutions.com",
-        "areaServed": "Greensburg, PA and Westmoreland County",
-        "serviceType": "Life Insurance"
+        "areaServed": [
+            {
+                "@type": "City",
+                "name": "Greensburg"
+            },
+            {
+                "@type": "AdministrativeArea",
+                "name": "Westmoreland County"
+            }
+        ]
+    }
+    </script>
+    
+    <!-- FAQ Schema for Answer Engine Optimization -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What's the difference between term and whole life insurance?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Term life insurance provides coverage for a specific period (10, 20, or 30 years) at lower premiums. Whole life insurance offers lifelong coverage with cash value accumulation but costs more. For most Greensburg PA families, term life provides affordable protection during working years when financial obligations are highest."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How much life insurance coverage do I need?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "A common rule is 10-12 times your annual income, but needs vary based on debts, dependents, and goals. Greensburg PA families should consider mortgage payoff, children's education, final expenses, and income replacement. We provide free needs analysis to determine your ideal coverage amount."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Do I need a medical exam for life insurance?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Traditional life insurance typically requires a medical exam. However, we offer simplified issue and guaranteed issue policies for Greensburg PA residents who prefer no-exam options. These policies have higher premiums but provide quick approval without medical underwriting."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How much does life insurance cost in Greensburg PA?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Term life insurance for healthy individuals typically costs $20-$100 per month depending on age, coverage amount, and term length. A 35-year-old in Greensburg PA might pay $30-$40 monthly for $500,000 of 20-year term coverage. We compare quotes from multiple carriers to find your best rates."
+                }
+            }
+        ]
     }
     </script>
     

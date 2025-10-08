@@ -38,27 +38,86 @@
     <!-- CSS -->
     <link rel="stylesheet" href="assets/styles.css">
     
-    <!-- Structured Data -->
+    <!-- Structured Data - Enhanced Insurance Service Schema -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
-        "@type": "InsuranceAgency",
-        "name": "TNR Business Solutions - Auto Insurance",
-        "url": "https://www.tnrbusinesssolutions.com/auto-insurance",
-        "logo": "https://www.tnrbusinesssolutions.com/media/logo.png",
-        "description": "Auto insurance services in Greensburg PA and Westmoreland County",
-        "address": {
-            "@type": "PostalAddress",
-            "streetAddress": "418 Concord Avenue",
-            "addressLocality": "Greensburg",
-            "addressRegion": "PA",
-            "postalCode": "15601",
-            "addressCountry": "US"
+        "@type": "Service",
+        "serviceType": "Auto Insurance",
+        "name": "Auto Insurance in Greensburg PA",
+        "description": "Affordable auto insurance coverage for drivers in Greensburg PA and Westmoreland County. Comprehensive, collision, liability, and full coverage car insurance with competitive rates and personalized service.",
+        "provider": {
+            "@type": "LocalBusiness",
+            "@id": "https://www.tnrbusinesssolutions.com",
+            "name": "TNR Business Solutions",
+            "url": "https://www.tnrbusinesssolutions.com",
+            "telephone": "+1-412-499-2987",
+            "email": "roy.turner@tnrbusinesssolutions.com",
+            "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "418 Concord Avenue",
+                "addressLocality": "Greensburg",
+                "addressRegion": "PA",
+                "postalCode": "15601",
+                "addressCountry": "US"
+            }
         },
-        "telephone": "+1-412-499-2987",
-        "email": "roy.turner@tnrbusinesssolutions.com",
-        "areaServed": "Greensburg, PA and Westmoreland County",
-        "serviceType": "Auto Insurance"
+        "areaServed": [
+            {
+                "@type": "City",
+                "name": "Greensburg"
+            },
+            {
+                "@type": "AdministrativeArea",
+                "name": "Westmoreland County"
+            }
+        ],
+        "offers": {
+            "@type": "Offer",
+            "availability": "https://schema.org/InStock"
+        }
+    }
+    </script>
+    
+    <!-- FAQ Schema for Answer Engine Optimization -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What types of auto insurance coverage are required in Pennsylvania?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Pennsylvania requires minimum auto insurance coverage including $15,000 bodily injury per person, $30,000 bodily injury per accident, $5,000 property damage, and first-party benefits. However, we recommend higher coverage limits to protect your assets. Full coverage including comprehensive and collision is recommended for financed vehicles."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How much does auto insurance cost in Greensburg PA?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Auto insurance costs in Greensburg PA vary based on factors including your driving record, age, vehicle type, coverage levels, and deductibles. Average rates range from $800-$2,000 annually for basic coverage. We shop multiple carriers to find you the best rates with appropriate coverage for your needs."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What factors affect my auto insurance rates?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Auto insurance rates are affected by your driving history, credit score, age, vehicle make and model, annual mileage, coverage levels, deductibles, and location. Greensburg PA drivers may qualify for discounts including safe driver, multi-policy, good student, and vehicle safety feature discounts."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Do I need full coverage or just liability insurance?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "If you have a car loan or lease, lenders require full coverage (comprehensive and collision). For paid-off older vehicles, liability-only coverage may be sufficient. We help Greensburg PA drivers evaluate their vehicle value, financial situation, and risk tolerance to determine the right coverage level."
+                }
+            }
+        ]
     }
     </script>
     

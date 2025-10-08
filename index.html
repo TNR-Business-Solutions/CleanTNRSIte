@@ -42,15 +42,19 @@
     <link rel="canonical" href="https://www.tnrbusinesssolutions.com">
     <link rel="alternate" hreflang="en-us" href="https://www.tnrbusinesssolutions.com">
     
-    <!-- Structured Data -->
+    <!-- Structured Data - LocalBusiness Schema -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
-        "@type": "Organization",
+        "@type": "LocalBusiness",
+        "@id": "https://www.tnrbusinesssolutions.com",
         "name": "TNR Business Solutions",
-        "url": "https://www.tnrbusinesssolutions.com",
+        "image": "https://www.tnrbusinesssolutions.com/media/logo.png",
         "logo": "https://www.tnrbusinesssolutions.com/media/logo.png",
-        "description": "Professional digital marketing and insurance services for small businesses in Greensburg, PA",
+        "url": "https://www.tnrbusinesssolutions.com",
+        "description": "Leading digital marketing agency and comprehensive insurance services provider serving small businesses in Greensburg, PA and Westmoreland County. Expert SEO, web design, social media marketing, and business insurance solutions.",
+        "telephone": "+1-412-499-2987",
+        "email": "roy.turner@tnrbusinesssolutions.com",
         "address": {
             "@type": "PostalAddress",
             "streetAddress": "418 Concord Avenue",
@@ -59,10 +63,149 @@
             "postalCode": "15601",
             "addressCountry": "US"
         },
-        "telephone": "+1-412-499-2987",
-        "email": "roy.turner@tnrbusinesssolutions.com",
-        "areaServed": "Greensburg, PA and surrounding areas",
-        "serviceType": ["Digital Marketing", "Web Design", "SEO", "Social Media Management", "Business Insurance"]
+        "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": "40.3017",
+            "longitude": "-79.5389"
+        },
+        "openingHoursSpecification": [
+            {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                "opens": "09:00",
+                "closes": "17:00"
+            }
+        ],
+        "priceRange": "$$",
+        "areaServed": [
+            {
+                "@type": "City",
+                "name": "Greensburg",
+                "containedInPlace": {
+                    "@type": "State",
+                    "name": "Pennsylvania"
+                }
+            },
+            {
+                "@type": "AdministrativeArea",
+                "name": "Westmoreland County"
+            }
+        ],
+        "hasOfferCatalog": {
+            "@type": "OfferCatalog",
+            "name": "Digital Marketing and Insurance Services",
+            "itemListElement": [
+                {
+                    "@type": "OfferCatalog",
+                    "name": "Digital Marketing Services",
+                    "itemListElement": [
+                        {
+                            "@type": "Offer",
+                            "itemOffered": {
+                                "@type": "Service",
+                                "name": "SEO Services",
+                                "description": "Search engine optimization for local businesses in Greensburg PA"
+                            }
+                        },
+                        {
+                            "@type": "Offer",
+                            "itemOffered": {
+                                "@type": "Service",
+                                "name": "Web Design & Development",
+                                "description": "Professional website design and development services"
+                            }
+                        },
+                        {
+                            "@type": "Offer",
+                            "itemOffered": {
+                                "@type": "Service",
+                                "name": "Social Media Management",
+                                "description": "Social media marketing and management services"
+                            }
+                        },
+                        {
+                            "@type": "Offer",
+                            "itemOffered": {
+                                "@type": "Service",
+                                "name": "Content Creation",
+                                "description": "Professional content creation and marketing services"
+                            }
+                        },
+                        {
+                            "@type": "Offer",
+                            "itemOffered": {
+                                "@type": "Service",
+                                "name": "Paid Advertising",
+                                "description": "Google Ads and social media advertising management"
+                            }
+                        },
+                        {
+                            "@type": "Offer",
+                            "itemOffered": {
+                                "@type": "Service",
+                                "name": "Email Marketing",
+                                "description": "Email marketing campaign management and automation"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "@type": "OfferCatalog",
+                    "name": "Insurance Services",
+                    "itemListElement": [
+                        {
+                            "@type": "Offer",
+                            "itemOffered": {
+                                "@type": "Service",
+                                "name": "Auto Insurance",
+                                "description": "Comprehensive auto insurance coverage in Greensburg PA"
+                            }
+                        },
+                        {
+                            "@type": "Offer",
+                            "itemOffered": {
+                                "@type": "Service",
+                                "name": "Home Insurance",
+                                "description": "Homeowners insurance for Western Pennsylvania residents"
+                            }
+                        },
+                        {
+                            "@type": "Offer",
+                            "itemOffered": {
+                                "@type": "Service",
+                                "name": "Business Insurance",
+                                "description": "Commercial insurance for small businesses"
+                            }
+                        },
+                        {
+                            "@type": "Offer",
+                            "itemOffered": {
+                                "@type": "Service",
+                                "name": "Life Insurance",
+                                "description": "Life insurance policies for individuals and families"
+                            }
+                        },
+                        {
+                            "@type": "Offer",
+                            "itemOffered": {
+                                "@type": "Service",
+                                "name": "Umbrella Insurance",
+                                "description": "Additional liability coverage protection"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        "sameAs": [
+            "https://www.facebook.com/tnrbusinesssolutions",
+            "https://www.linkedin.com/company/tnrbusinesssolutions"
+        ],
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "5.0",
+            "reviewCount": "1"
+        }
     }
     </script>
 </head>

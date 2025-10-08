@@ -38,27 +38,87 @@
     <!-- CSS -->
     <link rel="stylesheet" href="assets/styles.css">
     
-    <!-- Structured Data -->
+    <!-- Structured Data - Enhanced Service Schema -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
-        "@type": "ProfessionalService",
-        "name": "TNR Business Solutions - Social Media Management",
-        "url": "https://www.tnrbusinesssolutions.com/social-media",
-        "logo": "https://www.tnrbusinesssolutions.com/media/logo.png",
-        "description": "Social media management services for small businesses in Greensburg PA",
-        "address": {
-            "@type": "PostalAddress",
-            "streetAddress": "418 Concord Avenue",
-            "addressLocality": "Greensburg",
-            "addressRegion": "PA",
-            "postalCode": "15601",
-            "addressCountry": "US"
+        "@type": "Service",
+        "serviceType": "Social Media Management",
+        "name": "Social Media Management Services in Greensburg PA",
+        "description": "Professional social media management for small businesses in Greensburg PA. We manage Facebook, Instagram, LinkedIn, and other platforms to build your brand, engage customers, and drive business growth.",
+        "provider": {
+            "@type": "LocalBusiness",
+            "@id": "https://www.tnrbusinesssolutions.com",
+            "name": "TNR Business Solutions",
+            "url": "https://www.tnrbusinesssolutions.com",
+            "telephone": "+1-412-499-2987",
+            "email": "roy.turner@tnrbusinesssolutions.com",
+            "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "418 Concord Avenue",
+                "addressLocality": "Greensburg",
+                "addressRegion": "PA",
+                "postalCode": "15601",
+                "addressCountry": "US"
+            }
         },
-        "telephone": "+1-412-499-2987",
-        "email": "roy.turner@tnrbusinesssolutions.com",
-        "areaServed": "Greensburg, PA and Westmoreland County",
-        "serviceType": ["Social Media Management", "Facebook Marketing", "Instagram Marketing", "LinkedIn Marketing"]
+        "areaServed": [
+            {
+                "@type": "City",
+                "name": "Greensburg"
+            },
+            {
+                "@type": "AdministrativeArea",
+                "name": "Westmoreland County"
+            }
+        ],
+        "offers": {
+            "@type": "Offer",
+            "availability": "https://schema.org/InStock",
+            "priceRange": "$$"
+        }
+    }
+    </script>
+    
+    <!-- FAQ Schema for Answer Engine Optimization -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "Which social media platforms should my Greensburg business be on?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "The best platforms depend on your target audience and business type. Most Greensburg PA businesses benefit from Facebook for local engagement, Instagram for visual content, and LinkedIn for B2B connections. We analyze your audience and competitors to recommend the right platform mix for your business."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How often should I post on social media?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Consistent posting is key. We recommend Facebook posts 3-5 times per week, Instagram 4-7 times per week, and LinkedIn 2-3 times per week for Greensburg PA businesses. Our social media management packages ensure regular, high-quality content that keeps your audience engaged without overwhelming them."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What's included in social media management services?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Our social media management includes content creation, post scheduling, community management (responding to comments/messages), hashtag research, platform optimization, monthly analytics reports, and strategy adjustments. We handle everything so you can focus on running your Greensburg PA business."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How much does social media management cost?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Social media management pricing varies based on the number of platforms, posting frequency, and content complexity. Packages for Greensburg PA small businesses typically range from $500-$2,000 per month. We offer customized plans that fit your budget and deliver real results."
+                }
+            }
+        ]
     }
     </script>
     

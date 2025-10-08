@@ -38,27 +38,87 @@
     <!-- CSS -->
     <link rel="stylesheet" href="assets/styles.css">
     
-    <!-- Structured Data -->
+    <!-- Structured Data - Enhanced Service Schema -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
-        "@type": "ProfessionalService",
-        "name": "TNR Business Solutions - Content Creation & Graphic Design",
-        "url": "https://www.tnrbusinesssolutions.com/content-creation",
-        "logo": "https://www.tnrbusinesssolutions.com/media/logo.png",
-        "description": "Professional content creation and graphic design services in Greensburg PA",
-        "address": {
-            "@type": "PostalAddress",
-            "streetAddress": "418 Concord Avenue",
-            "addressLocality": "Greensburg",
-            "addressRegion": "PA",
-            "postalCode": "15601",
-            "addressCountry": "US"
+        "@type": "Service",
+        "serviceType": "Content Creation & Graphic Design",
+        "name": "Content Creation & Graphic Design Services in Greensburg PA",
+        "description": "Professional content creation and graphic design services for Greensburg PA businesses. Logos, branding, business cards, flyers, social media graphics, blog writing, and copywriting that builds trust and tells your story.",
+        "provider": {
+            "@type": "LocalBusiness",
+            "@id": "https://www.tnrbusinesssolutions.com",
+            "name": "TNR Business Solutions",
+            "url": "https://www.tnrbusinesssolutions.com",
+            "telephone": "+1-412-499-2987",
+            "email": "roy.turner@tnrbusinesssolutions.com",
+            "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "418 Concord Avenue",
+                "addressLocality": "Greensburg",
+                "addressRegion": "PA",
+                "postalCode": "15601",
+                "addressCountry": "US"
+            }
         },
-        "telephone": "+1-412-499-2987",
-        "email": "roy.turner@tnrbusinesssolutions.com",
-        "areaServed": "Greensburg, PA and Westmoreland County",
-        "serviceType": ["Content Creation", "Graphic Design", "Branding"]
+        "areaServed": [
+            {
+                "@type": "City",
+                "name": "Greensburg"
+            },
+            {
+                "@type": "AdministrativeArea",
+                "name": "Westmoreland County"
+            }
+        ],
+        "offers": {
+            "@type": "Offer",
+            "availability": "https://schema.org/InStock",
+            "priceRange": "$$"
+        }
+    }
+    </script>
+    
+    <!-- FAQ Schema for Answer Engine Optimization -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What types of content do you create?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "We create comprehensive content for Greensburg PA businesses including blog posts, website copy, social media content, email newsletters, infographics, videos, business cards, flyers, brochures, logos, and brand identity packages. All content is customized to your brand voice and business goals."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How much does logo design cost?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Professional logo design for Greensburg PA businesses typically ranges from $500-$2,500 depending on complexity and package inclusions. Our logo packages include multiple concepts, revisions, and file formats for print and digital use. We also offer complete brand identity packages with business cards, letterhead, and brand guidelines."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Do you write blog posts and website content?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes! We provide professional copywriting services including SEO-optimized blog posts, website content, product descriptions, and service pages. Our writers research your industry and target keywords to create content that ranks well in search engines and converts visitors into customers."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Can you help with my brand identity?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Absolutely! We offer complete brand identity development for Greensburg PA businesses. This includes logo design, color palettes, typography selection, brand guidelines, business card design, letterhead, and social media templates. We ensure your brand presents a consistent, professional image across all touchpoints."
+                }
+            }
+        ]
     }
     </script>
     

@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GMB Post Generator | TNR Business Solutions</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-right: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        .output-section {
+            margin-top: 40px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            display: none;
+        }
+        
+        .output-section.active {
+            display: block;
+        }
+        
+        .post-preview {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .post-preview h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .post-content {
+            line-height: 1.8;
+            white-space: pre-wrap;
+            margin-bottom: 15px;
+        }
+        
+        .post-meta {
+            color: #666;
+            font-size: 14px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .copy-btn {
+            background: #28a745;
+            color: white;
+            padding: 8px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .copy-btn:hover {
+            background: #218838;
+        }
+        
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .template-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .template-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+        
+        .template-card.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+        
+        .template-card h4 {
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+        
+        .template-card p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .char-count {
+            text-align: right;
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        .char-count.warning {
+            color: #ff9800;
+        }
+        
+        .char-count.error {
+            color: #f44336;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 GMB Post Generator</h1>
+        <p class="subtitle">Create professional Google My Business posts in seconds</p>
+        
+        <div class="form-group">
+            <label>Select Template Type:</label>
+            <div class="template-grid" id="templateGrid"></div>
+        </div>
+        
+        <div class="form-group">
+            <label for="businessName">Business Name:</label>
+            <input type="text" id="businessName" placeholder="e.g., Joe's Pizza">
+        </div>
+        
+        <div class="form-group">
+            <label for="businessType">Business Type/Industry:</label>
+            <select id="businessType">
+                <option value="">Select industry...</option>
+                <option value="restaurant">Restaurant/Food Service</option>
+                <option value="retail">Retail Store</option>
+                <option value="professional">Professional Services</option>
+                <option value="home_services">Home Services</option>
+                <option value="healthcare">Healthcare</option>
+                <option value="automotive">Automotive</option>
+                <option value="real_estate">Real Estate</option>
+                <option value="insurance">Insurance</option>
+                <option value="marketing">Marketing/Advertising</option>
+                <option value="beauty">Beauty/Wellness</option>
+                <option value="fitness">Fitness/Gym</option>
+                <option value="other">Other</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="location">City/Location:</label>
+            <input type="text" id="location" placeholder="e.g., Greensburg PA">
+        </div>
+        
+        <div class="form-group">
+            <label for="phone">Phone Number:</label>
+            <input type="tel" id="phone" placeholder="(412) 499-2987">
+        </div>
+        
+        <div class="form-group">
+            <label for="offerDetails">Offer/Details (for promotional posts):</label>
+            <textarea id="offerDetails" placeholder="e.g., 20% off all services, Free consultation, etc."></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="cta">Call-to-Action:</label>
+            <select id="cta">
+                <option value="call">Call Now</option>
+                <option value="visit">Visit Us</option>
+                <option value="learn">Learn More</option>
+                <option value="book">Book Now</option>
+                <option value="order">Order Online</option>
+                <option value="quote">Get Quote</option>
+                <option value="signup">Sign Up</option>
+            </select>
+        </div>
+        
+        <button class="btn" onclick="generatePosts()">Generate Posts</button>
+        <button class="btn btn-secondary" onclick="resetForm()">Reset</button>
+        
+        <div class="output-section" id="outputSection">
+            <h2 style="margin-bottom: 20px; color: #667eea;">📝 Generated Posts</h2>
+            <div id="postsContainer"></div>
+        </div>
+    </div>
+    
+    <script>
+        const templates = {
+            offer: {
+                name: "🎁 Special Offer",
+                description: "Promote discounts and deals",
+                icon: "🎁"
+            },
+            tip: {
+                name: "💡 Industry Tip",
+                description: "Share valuable tips",
+                icon: "💡"
+            },
+            update: {
+                name: "📢 Business Update",
+                description: "Announce changes or news",
+                icon: "📢"
+            },
+            event: {
+                name: "📅 Event Promotion",
+                description: "Promote upcoming events",
+                icon: "📅"
+            },
+            service: {
+                name: "⭐ Service Highlight",
+                description: "Showcase your services",
+                icon: "⭐"
+            },
+            testimonial: {
+                name: "❤️ Customer Story",
+                description: "Share success stories",
+                icon: "❤️"
+            }
+        };
+        
+        let selectedTemplate = null;
+        
+        function initTemplates() {
+            const grid = document.getElementById('templateGrid');
+            grid.innerHTML = '';
+            
+            for (let [key, template] of Object.entries(templates)) {
+                const card = document.createElement('div');
+                card.className = 'template-card';
+                card.innerHTML = `
+                    <h4>${template.icon} ${template.name}</h4>
+                    <p>${template.description}</p>
+                `;
+                card.onclick = () => selectTemplate(key, card);
+                grid.appendChild(card);
+            }
+        }
+        
+        function selectTemplate(key, element) {
+            document.querySelectorAll('.template-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            selectedTemplate = key;
+        }
+        
+        function generatePosts() {
+            if (!selectedTemplate) {
+                alert('Please select a template type first!');
+                return;
+            }
+            
+            const businessName = document.getElementById('businessName').value;
+            const location = document.getElementById('location').value;
+            const phone = document.getElementById('phone').value;
+            const offerDetails = document.getElementById('offerDetails').value;
+            const cta = document.getElementById('cta').value;
+            
+            if (!businessName || !location || !phone) {
+                alert('Please fill in business name, location, and phone number!');
+                return;
+            }
+            
+            const posts = generatePostContent(selectedTemplate, {
+                businessName,
+                location,
+                phone,
+                offerDetails,
+                cta
+            });
+            
+            displayPosts(posts);
+        }
+        
+        function generatePostContent(template, data) {
+            const posts = [];
+            const ctaText = {
+                call: 'Call Now',
+                visit: 'Visit Us',
+                learn: 'Learn More',
+                book: 'Book Now',
+                order: 'Order Online',
+                quote: 'Get A Free Quote',
+                signup: 'Sign Up Today'
+            };
+            
+            switch(template) {
+                case 'offer':
+                    posts.push({
+                        title: 'Special Offer Post',
+                        content: `🎉 SPECIAL OFFER ALERT! 🎉
+
+${data.offerDetails || 'Limited time offer for our valued customers!'}
+
+At ${data.businessName}, we're committed to providing the best service in ${data.location}!
+
+${ctaText[data.cta]}: ${data.phone}
+
+📍 Proudly serving ${data.location} and surrounding areas
+
+⏰ Offer valid while supplies last!
+
+#${data.location.replace(/\s+/g, '')} #LocalBusiness #SpecialOffer`,
+                        type: 'OFFER'
+                    });
+                    break;
+                    
+                case 'tip':
+                    posts.push({
+                        title: 'Industry Tip Post',
+                        content: `💡 PRO TIP FOR ${data.location.toUpperCase()} RESIDENTS
+
+${data.offerDetails || 'Did you know? We have expert tips to share!'}
+
+At ${data.businessName}, we don't just provide services – we educate our community!
+
+Want to learn more? ${ctaText[data.cta]}: ${data.phone}
+
+📍 Your local experts in ${data.location}
+
+#${data.location.replace(/\s+/g, '')} #LocalExperts #ProTips #SmallBusiness`,
+                        type: 'UPDATE'
+                    });
+                    break;
+                    
+                case 'update':
+                    posts.push({
+                        title: 'Business Update Post',
+                        content: `📢 EXCITING NEWS FROM ${data.businessName.toUpperCase()}!
+
+${data.offerDetails || 'We have some exciting updates to share with our valued customers!'}
+
+We're always working to serve ${data.location} better!
+
+Questions? ${ctaText[data.cta]}: ${data.phone}
+
+Thank you for supporting local business! 🙏
+
+#${data.location.replace(/\s+/g, '')} #LocalBusiness #CommunityFirst`,
+                        type: 'UPDATE'
+                    });
+                    break;
+                    
+                case 'event':
+                    posts.push({
+                        title: 'Event Promotion Post',
+                        content: `📅 UPCOMING EVENT AT ${data.businessName.toUpperCase()}!
+
+${data.offerDetails || 'Join us for a special event!'}
+
+📍 Location: ${data.location}
+📞 RSVP: ${data.phone}
+
+Don't miss out – space is limited!
+
+We can't wait to see our ${data.location} community there! ❤️
+
+#${data.location.replace(/\s+/g, '')} #LocalEvent #CommunityEvent`,
+                        type: 'EVENT'
+                    });
+                    break;
+                    
+                case 'service':
+                    posts.push({
+                        title: 'Service Highlight Post',
+                        content: `⭐ FEATURED SERVICE SPOTLIGHT ⭐
+
+Looking for quality service in ${data.location}?
+
+${data.businessName} offers:
+${data.offerDetails || '✅ Expert service\n✅ Competitive pricing\n✅ Local expertise'}
+
+Why choose us?
+🏆 Trusted by ${data.location} residents
+🏆 Professional team
+🏆 Satisfaction guaranteed
+
+${ctaText[data.cta]}: ${data.phone}
+
+#${data.location.replace(/\s+/g, '')} #LocalBusiness #QualityService`,
+                        type: 'UPDATE'
+                    });
+                    break;
+                    
+                case 'testimonial':
+                    posts.push({
+                        title: 'Customer Success Story',
+                        content: `❤️ CUSTOMER SUCCESS STORY ❤️
+
+"${data.offerDetails || 'Amazing service! Highly recommend!'}"
+
+We LOVE serving our ${data.location} community!
+
+Your success is our success. Thank you for trusting ${data.businessName}!
+
+Ready to get started? ${ctaText[data.cta]}: ${data.phone}
+
+📍 Serving ${data.location} with pride
+
+#${data.location.replace(/\s+/g, '')} #CustomerReview #LocalBusiness #5Stars`,
+                        type: 'UPDATE'
+                    });
+                    break;
+            }
+            
+            return posts;
+        }
+        
+        function displayPosts(posts) {
+            const container = document.getElementById('postsContainer');
+            container.innerHTML = '';
+            
+            posts.forEach((post, index) => {
+                const postDiv = document.createElement('div');
+                postDiv.className = 'post-preview';
+                
+                const charCount = post.content.length;
+                const charCountClass = charCount > 1500 ? 'error' : (charCount > 1200 ? 'warning' : '');
+                
+                postDiv.innerHTML = `
+                    <h3>${post.title}</h3>
+                    <div class="post-content">${post.content}</div>
+                    <div class="char-count ${charCountClass}">
+                        Characters: ${charCount} / 1500 ${charCount > 1500 ? '(Too long!)' : ''}
+                    </div>
+                    <div class="post-meta">
+                        <strong>Post Type:</strong> ${post.type}<br>
+                        <strong>Best Time to Post:</strong> ${getBestPostTime()}
+                        <br><br>
+                        <button class="copy-btn" onclick="copyToClipboard(\`${post.content.replace(/`/g, '\\`')}\`, this)">
+                            📋 Copy Post
+                        </button>
+                    </div>
+                `;
+                
+                container.appendChild(postDiv);
+            });
+            
+            document.getElementById('outputSection').classList.add('active');
+            document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function getBestPostTime() {
+            const times = [
+                'Tuesday 10 AM',
+                'Wednesday 2 PM', 
+                'Thursday 11 AM',
+                'Friday 9 AM'
+            ];
+            return times[Math.floor(Math.random() * times.length)];
+        }
+        
+        function copyToClipboard(text, button) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.innerHTML;
+                button.innerHTML = '✅ Copied!';
+                button.style.background = '#28a745';
+                
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.style.background = '';
+                }, 2000);
+            });
+        }
+        
+        function resetForm() {
+            document.getElementById('businessName').value = '';
+            document.getElementById('location').value = '';
+            document.getElementById('phone').value = '';
+            document.getElementById('offerDetails').value = '';
+            document.getElementById('cta').selectedIndex = 0;
+            document.getElementById('businessType').selectedIndex = 0;
+            document.querySelectorAll('.template-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            selectedTemplate = null;
+            document.getElementById('outputSection').classList.remove('active');
+        }
+        
+        // Initialize on load
+        initTemplates();
+    </script>
+</body>
+</html>
+

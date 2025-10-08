@@ -42,23 +42,78 @@
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
-        "@type": "InsuranceAgency",
-        "name": "TNR Business Solutions - Business Insurance",
-        "url": "https://www.tnrbusinesssolutions.com/business-insurance",
-        "logo": "https://www.tnrbusinesssolutions.com/media/logo.png",
-        "description": "Business insurance services for small businesses in Greensburg PA and Westmoreland County",
-        "address": {
-            "@type": "PostalAddress",
-            "streetAddress": "418 Concord Avenue",
-            "addressLocality": "Greensburg",
-            "addressRegion": "PA",
-            "postalCode": "15601",
-            "addressCountry": "US"
+        "@type": "Service",
+        "serviceType": "Business Insurance",
+        "name": "Business Insurance in Greensburg PA",
+        "description": "Comprehensive commercial insurance for small businesses in Greensburg PA and Westmoreland County. General liability, professional liability, property, workers compensation, and cyber liability coverage.",
+        "provider": {
+            "@type": "LocalBusiness",
+            "@id": "https://www.tnrbusinesssolutions.com",
+            "name": "TNR Business Solutions",
+            "url": "https://www.tnrbusinesssolutions.com",
+            "telephone": "+1-412-499-2987",
+            "email": "roy.turner@tnrbusinesssolutions.com",
+            "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "418 Concord Avenue",
+                "addressLocality": "Greensburg",
+                "addressRegion": "PA",
+                "postalCode": "15601",
+                "addressCountry": "US"
+            }
         },
-        "telephone": "+1-412-499-2987",
-        "email": "roy.turner@tnrbusinesssolutions.com",
-        "areaServed": "Greensburg, PA and Westmoreland County",
-        "serviceType": "Business Insurance"
+        "areaServed": [
+            {
+                "@type": "City",
+                "name": "Greensburg"
+            },
+            {
+                "@type": "AdministrativeArea",
+                "name": "Westmoreland County"
+            }
+        ]
+    }
+    </script>
+    
+    <!-- FAQ Schema for Answer Engine Optimization -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What types of business insurance do I need in Pennsylvania?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Most Greensburg PA businesses need general liability insurance at minimum. Additional coverages may include property insurance, professional liability (E&O), workers compensation (required if you have employees), cyber liability, and commercial auto. We assess your specific business risks to recommend appropriate coverage."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How much does small business insurance cost?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Business insurance costs vary by industry, size, and risks. Greensburg PA small businesses typically pay $500-$3,000 annually for general liability, $500-$2,000 for professional liability, and $1,000-$5,000+ for workers compensation. We provide custom quotes based on your specific business needs."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Do I need workers compensation insurance in Pennsylvania?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Pennsylvania law requires workers compensation insurance if you have any employees, including part-time workers. Sole proprietors and single-member LLCs are exempt but can purchase coverage. Penalties for non-compliance are severe. We help Greensburg PA businesses stay compliant with affordable workers comp coverage."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What is cyber liability insurance and do I need it?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Cyber liability insurance protects your Greensburg PA business from data breaches, cyber attacks, and digital liability. If you store customer data, process payments, or maintain business records electronically, you should consider cyber coverage. Claims can include data recovery, customer notification, legal fees, and regulatory fines."
+                }
+            }
+        ]
     }
     </script>
     

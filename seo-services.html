@@ -42,20 +42,132 @@
     <link rel="canonical" href="https://www.tnrbusinesssolutions.com/seo-services">
     <link rel="alternate" hreflang="en-us" href="https://www.tnrbusinesssolutions.com/seo-services">
     
-    <!-- Structured Data -->
+    <!-- Structured Data - Enhanced Service Schema -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
         "@type": "Service",
-        "name": "SEO Services",
-        "description": "Professional search engine optimization services for businesses in Greensburg, PA",
+        "serviceType": "Search Engine Optimization",
+        "name": "SEO Services in Greensburg PA",
+        "description": "Professional search engine optimization services for small businesses in Greensburg PA and Westmoreland County. Improve your Google rankings, increase organic traffic, and attract more local customers with our expert SEO strategies.",
         "provider": {
-            "@type": "Organization",
+            "@type": "LocalBusiness",
+            "@id": "https://www.tnrbusinesssolutions.com",
             "name": "TNR Business Solutions",
-            "url": "https://www.tnrbusinesssolutions.com"
+            "url": "https://www.tnrbusinesssolutions.com",
+            "telephone": "+1-412-499-2987",
+            "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "418 Concord Avenue",
+                "addressLocality": "Greensburg",
+                "addressRegion": "PA",
+                "postalCode": "15601",
+                "addressCountry": "US"
+            }
         },
-        "areaServed": "Greensburg, PA and surrounding areas",
-        "serviceType": "Search Engine Optimization"
+        "areaServed": [
+            {
+                "@type": "City",
+                "name": "Greensburg"
+            },
+            {
+                "@type": "AdministrativeArea",
+                "name": "Westmoreland County"
+            }
+        ],
+        "offers": {
+            "@type": "Offer",
+            "availability": "https://schema.org/InStock",
+            "priceRange": "$$"
+        },
+        "hasOfferCatalog": {
+            "@type": "OfferCatalog",
+            "name": "SEO Services",
+            "itemListElement": [
+                {
+                    "@type": "Offer",
+                    "itemOffered": {
+                        "@type": "Service",
+                        "name": "Local SEO Optimization",
+                        "description": "Optimize your business for local searches in Greensburg PA"
+                    }
+                },
+                {
+                    "@type": "Offer",
+                    "itemOffered": {
+                        "@type": "Service",
+                        "name": "Keyword Research & Strategy",
+                        "description": "Data-driven keyword research and SEO strategy development"
+                    }
+                },
+                {
+                    "@type": "Offer",
+                    "itemOffered": {
+                        "@type": "Service",
+                        "name": "On-Page SEO Optimization",
+                        "description": "Technical and content optimization for better rankings"
+                    }
+                },
+                {
+                    "@type": "Offer",
+                    "itemOffered": {
+                        "@type": "Service",
+                        "name": "Link Building",
+                        "description": "Quality backlink acquisition and authority building"
+                    }
+                }
+            ]
+        }
+    }
+    </script>
+    
+    <!-- FAQ Schema for Answer Engine Optimization -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What is SEO and why is it important for my Greensburg business?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "SEO (Search Engine Optimization) is the process of improving your website's visibility in search engines like Google. For Greensburg PA businesses, SEO is crucial because it helps local customers find you when they search for your products or services. Good SEO increases organic traffic, builds credibility, and generates more leads without ongoing advertising costs."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How long does it take to see results from SEO?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Most businesses begin seeing SEO results within 3-6 months. However, this timeline can vary based on your industry competition, website condition, and the SEO strategies implemented. Local SEO in Greensburg PA often shows faster results than broader national campaigns. SEO is a long-term investment that builds momentum over time."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What is local SEO and how does it differ from regular SEO?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Local SEO focuses on optimizing your online presence to attract customers in your geographic area, such as Greensburg and Westmoreland County. It includes optimizing your Google Business Profile, building local citations, getting local reviews, and targeting location-specific keywords. This differs from general SEO which targets broader, non-location-specific searches."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How much do SEO services cost in Greensburg PA?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "SEO pricing varies based on your business needs, competition level, and goals. At TNR Business Solutions, we offer customized SEO packages starting at affordable rates for small businesses in Greensburg PA. We provide transparent pricing and create strategies that deliver measurable ROI. Contact us for a free consultation and custom quote."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Can you guarantee first page rankings on Google?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "While we cannot guarantee specific rankings (no ethical SEO company can), we use proven strategies that have consistently achieved first-page results for our Greensburg clients. We focus on sustainable, white-hat SEO techniques that improve your rankings over time and provide detailed reporting so you can track progress."
+                }
+            }
+        ]
     }
     </script>
     

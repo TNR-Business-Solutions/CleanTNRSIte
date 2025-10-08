@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GMB Monthly Report Generator | TNR Business Solutions</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .header img {
+            max-width: 150px;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 18px;
+        }
+        
+        .form-section {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .form-section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .report-output {
+            display: none;
+            margin-top: 40px;
+        }
+        
+        .report-output.active {
+            display: block;
+        }
+        
+        .report-preview {
+            background: white;
+            padding: 40px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .report-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .metric-row:last-child {
+            border-bottom: none;
+        }
+        
+        .metric-label {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .metric-value {
+            color: #667eea;
+            font-weight: 700;
+            font-size: 18px;
+        }
+        
+        .positive {
+            color: #28a745;
+        }
+        
+        .negative {
+            color: #dc3545;
+        }
+        
+        .section-title {
+            background: #667eea;
+            color: white;
+            padding: 12px 20px;
+            margin: 30px -20px 20px -20px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .insight-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .action-box {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .copy-btn {
+            background: #28a745;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        
+        .copy-btn:hover {
+            background: #218838;
+        }
+        
+        .download-btn {
+            background: #007bff;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .download-btn:hover {
+            background: #0056b3;
+        }
+        
+        @media print {
+            body {
+                background: white;
+            }
+            .container {
+                box-shadow: none;
+            }
+            .form-section, .btn, .copy-btn, .download-btn {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 GMB Monthly Report Generator</h1>
+            <p class="subtitle">Professional client reporting in minutes</p>
+        </div>
+        
+        <div class="form-section">
+            <h2>Client Information</h2>
+            <div class="metric-grid">
+                <div class="form-group">
+                    <label>Client Business Name:</label>
+                    <input type="text" id="businessName" placeholder="e.g., Joe's Pizza">
+                </div>
+                <div class="form-group">
+                    <label>Report Month:</label>
+                    <input type="month" id="reportMonth">
+                </div>
+                <div class="form-group">
+                    <label>Location:</label>
+                    <input type="text" id="location" placeholder="e.g., Greensburg PA">
+                </div>
+                <div class="form-group">
+                    <label>Service Package:</label>
+                    <select id="packageType">
+                        <option>Starter</option>
+                        <option>Professional</option>
+                        <option>Elite</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h2>Performance Metrics - This Month</h2>
+            <div class="metric-grid">
+                <div class="form-group">
+                    <label>Profile Views:</label>
+                    <input type="number" id="profileViews" placeholder="e.g., 1250">
+                </div>
+                <div class="form-group">
+                    <label>Search Views:</label>
+                    <input type="number" id="searchViews" placeholder="e.g., 800">
+                </div>
+                <div class="form-group">
+                    <label>Discovery Views:</label>
+                    <input type="number" id="discoveryViews" placeholder="e.g., 450">
+                </div>
+                <div class="form-group">
+                    <label>Website Clicks:</label>
+                    <input type="number" id="websiteClicks" placeholder="e.g., 125">
+                </div>
+                <div class="form-group">
+                    <label>Phone Calls:</label>
+                    <input type="number" id="phoneCalls" placeholder="e.g., 45">
+                </div>
+                <div class="form-group">
+                    <label>Direction Requests:</label>
+                    <input type="number" id="directions" placeholder="e.g., 32">
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h2>Performance Metrics - Last Month (for comparison)</h2>
+            <div class="metric-grid">
+                <div class="form-group">
+                    <label>Previous Profile Views:</label>
+                    <input type="number" id="prevProfileViews" placeholder="e.g., 850">
+                </div>
+                <div class="form-group">
+                    <label>Previous Search Views:</label>
+                    <input type="number" id="prevSearchViews" placeholder="e.g., 550">
+                </div>
+                <div class="form-group">
+                    <label>Previous Discovery Views:</label>
+                    <input type="number" id="prevDiscoveryViews" placeholder="e.g., 300">
+                </div>
+                <div class="form-group">
+                    <label>Previous Website Clicks:</label>
+                    <input type="number" id="prevWebsiteClicks" placeholder="e.g., 85">
+                </div>
+                <div class="form-group">
+                    <label>Previous Phone Calls:</label>
+                    <input type="number" id="prevPhoneCalls" placeholder="e.g., 30">
+                </div>
+                <div class="form-group">
+                    <label>Previous Direction Requests:</label>
+                    <input type="number" id="prevDirections" placeholder="e.g., 20">
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h2>Reviews & Content</h2>
+            <div class="metric-grid">
+                <div class="form-group">
+                    <label>New Reviews This Month:</label>
+                    <input type="number" id="newReviews" placeholder="e.g., 5">
+                </div>
+                <div class="form-group">
+                    <label>Total Reviews:</label>
+                    <input type="number" id="totalReviews" placeholder="e.g., 23">
+                </div>
+                <div class="form-group">
+                    <label>Average Rating:</label>
+                    <input type="number" step="0.1" id="avgRating" placeholder="e.g., 4.8" min="0" max="5">
+                </div>
+                <div class="form-group">
+                    <label>Photos Uploaded:</label>
+                    <input type="number" id="photosUploaded" placeholder="e.g., 15">
+                </div>
+                <div class="form-group">
+                    <label>GMB Posts Published:</label>
+                    <input type="number" id="postsPublished" placeholder="e.g., 8">
+                </div>
+                <div class="form-group">
+                    <label>Q&A Answered:</label>
+                    <input type="number" id="qaAnswered" placeholder="e.g., 4">
+                </div>
+            </div>
+        </div>
+        
+        <button class="btn" onclick="generateReport()">🚀 Generate Report</button>
+        
+        <div id="reportOutput" class="report-output">
+            <div class="report-preview" id="reportPreview">
+                <!-- Report content will be generated here -->
+            </div>
+            <div style="margin-top: 20px; text-align: center;">
+                <button class="copy-btn" onclick="copyReport()">📋 Copy Report</button>
+                <button class="download-btn" onclick="window.print()">📄 Print/Save PDF</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function calculateChange(current, previous) {
+            if (!previous || previous === 0) return { percent: 0, isPositive: true };
+            const percent = ((current - previous) / previous * 100).toFixed(1);
+            return {
+                percent: Math.abs(percent),
+                isPositive: percent >= 0
+            };
+        }
+        
+        function generateReport() {
+            // Get all values
+            const businessName = document.getElementById('businessName').value;
+            const reportMonth = document.getElementById('reportMonth').value;
+            const location = document.getElementById('location').value;
+            const packageType = document.getElementById('packageType').value;
+            
+            // Current metrics
+            const profileViews = parseInt(document.getElementById('profileViews').value) || 0;
+            const searchViews = parseInt(document.getElementById('searchViews').value) || 0;
+            const discoveryViews = parseInt(document.getElementById('discoveryViews').value) || 0;
+            const websiteClicks = parseInt(document.getElementById('websiteClicks').value) || 0;
+            const phoneCalls = parseInt(document.getElementById('phoneCalls').value) || 0;
+            const directions = parseInt(document.getElementById('directions').value) || 0;
+            
+            // Previous metrics
+            const prevProfileViews = parseInt(document.getElementById('prevProfileViews').value) || 0;
+            const prevSearchViews = parseInt(document.getElementById('prevSearchViews').value) || 0;
+            const prevDiscoveryViews = parseInt(document.getElementById('prevDiscoveryViews').value) || 0;
+            const prevWebsiteClicks = parseInt(document.getElementById('prevWebsiteClicks').value) || 0;
+            const prevPhoneCalls = parseInt(document.getElementById('prevPhoneCalls').value) || 0;
+            const prevDirections = parseInt(document.getElementById('prevDirections').value) || 0;
+            
+            // Reviews & content
+            const newReviews = parseInt(document.getElementById('newReviews').value) || 0;
+            const totalReviews = parseInt(document.getElementById('totalReviews').value) || 0;
+            const avgRating = parseFloat(document.getElementById('avgRating').value) || 0;
+            const photosUploaded = parseInt(document.getElementById('photosUploaded').value) || 0;
+            const postsPublished = parseInt(document.getElementById('postsPublished').value) || 0;
+            const qaAnswered = parseInt(document.getElementById('qaAnswered').value) || 0;
+            
+            // Calculate changes
+            const profileChange = calculateChange(profileViews, prevProfileViews);
+            const searchChange = calculateChange(searchViews, prevSearchViews);
+            const discoveryChange = calculateChange(discoveryViews, prevDiscoveryViews);
+            const clicksChange = calculateChange(websiteClicks, prevWebsiteClicks);
+            const callsChange = calculateChange(phoneCalls, prevPhoneCalls);
+            const directionsChange = calculateChange(directions, prevDirections);
+            
+            const monthName = new Date(reportMonth + '-01').toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            
+            // Generate report HTML
+            const reportHTML = `
+                <div class="report-header">
+                    <h1 style="color: #667eea; margin-bottom: 10px;">Google My Business Performance Report</h1>
+                    <h2 style="color: #333;">${businessName}</h2>
+                    <p style="color: #666; font-size: 18px;">${monthName} | ${location}</p>
+                    <p style="color: #666;">Package: ${packageType}</p>
+                </div>
+                
+                <div class="metric-card">
+                    <h2 style="margin-bottom: 20px; font-size: 24px;">📊 Executive Summary</h2>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 20px;">
+                        <div style="text-align: center; padding: 15px; background: rgba(255,255,255,0.2); border-radius: 8px;">
+                            <div style="font-size: 36px; font-weight: bold; margin-bottom: 5px;">${profileViews.toLocaleString()}</div>
+                            <div style="font-size: 14px; opacity: 0.9;">Total Views</div>
+                            <div style="font-size: 14px; margin-top: 5px;">${profileChange.isPositive ? '↑' : '↓'} ${profileChange.percent}%</div>
+                        </div>
+                        <div style="text-align: center; padding: 15px; background: rgba(255,255,255,0.2); border-radius: 8px;">
+                            <div style="font-size: 36px; font-weight: bold; margin-bottom: 5px;">${totalReviews}</div>
+                            <div style="font-size: 14px; opacity: 0.9;">Total Reviews</div>
+                            <div style="font-size: 14px; margin-top: 5px;">+${newReviews} this month</div>
+                        </div>
+                        <div style="text-align: center; padding: 15px; background: rgba(255,255,255,0.2); border-radius: 8px;">
+                            <div style="font-size: 36px; font-weight: bold; margin-bottom: 5px;">${avgRating.toFixed(1)} ⭐</div>
+                            <div style="font-size: 14px; opacity: 0.9;">Average Rating</div>
+                            <div style="font-size: 14px; margin-top: 5px;">Excellent!</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <h3 class="section-title">📈 Profile Performance</h3>
+                
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <div class="metric-row">
+                        <span class="metric-label">👁️ Total Profile Views</span>
+                        <span class="metric-value ${profileChange.isPositive ? 'positive' : 'negative'}">
+                            ${profileViews.toLocaleString()} 
+                            (${profileChange.isPositive ? '+' : '-'}${profileChange.percent}%)
+                        </span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">🔍 Search Views</span>
+                        <span class="metric-value ${searchChange.isPositive ? 'positive' : 'negative'}">
+                            ${searchViews.toLocaleString()} 
+                            (${searchChange.isPositive ? '+' : '-'}${searchChange.percent}%)
+                        </span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">🗺️ Discovery Views (Maps)</span>
+                        <span class="metric-value ${discoveryChange.isPositive ? 'positive' : 'negative'}">
+                            ${discoveryViews.toLocaleString()} 
+                            (${discoveryChange.isPositive ? '+' : '-'}${discoveryChange.percent}%)
+                        </span>
+                    </div>
+                </div>
+                
+                <h3 class="section-title">💼 Customer Actions</h3>
+                
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <div class="metric-row">
+                        <span class="metric-label">🌐 Website Clicks</span>
+                        <span class="metric-value ${clicksChange.isPositive ? 'positive' : 'negative'}">
+                            ${websiteClicks.toLocaleString()} 
+                            (${clicksChange.isPositive ? '+' : '-'}${clicksChange.percent}%)
+                        </span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">📞 Phone Calls</span>
+                        <span class="metric-value ${callsChange.isPositive ? 'positive' : 'negative'}">
+                            ${phoneCalls.toLocaleString()} 
+                            (${callsChange.isPositive ? '+' : '-'}${callsChange.percent}%)
+                        </span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">🧭 Direction Requests</span>
+                        <span class="metric-value ${directionsChange.isPositive ? 'positive' : 'negative'}">
+                            ${directions.toLocaleString()} 
+                            (${directionsChange.isPositive ? '+' : '-'}${directionsChange.percent}%)
+                        </span>
+                    </div>
+                </div>
+                
+                <h3 class="section-title">⭐ Reviews & Reputation</h3>
+                
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <div class="metric-row">
+                        <span class="metric-label">New Reviews This Month</span>
+                        <span class="metric-value positive">+${newReviews}</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Total Reviews</span>
+                        <span class="metric-value">${totalReviews}</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Average Rating</span>
+                        <span class="metric-value">${avgRating.toFixed(1)} ⭐</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Response Rate</span>
+                        <span class="metric-value positive">100%</span>
+                    </div>
+                </div>
+                
+                <h3 class="section-title">📸 Content Activity</h3>
+                
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <div class="metric-row">
+                        <span class="metric-label">Photos Uploaded</span>
+                        <span class="metric-value">${photosUploaded}</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">GMB Posts Published</span>
+                        <span class="metric-value">${postsPublished}</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Questions Answered</span>
+                        <span class="metric-value">${qaAnswered}</span>
+                    </div>
+                </div>
+                
+                <div class="insight-box">
+                    <h3 style="color: #856404; margin-bottom: 10px;">💡 Key Insights</h3>
+                    <ul style="margin-left: 20px; line-height: 1.8; color: #856404;">
+                        <li>Profile views ${profileChange.isPositive ? 'increased' : 'decreased'} by ${profileChange.percent}%, showing ${profileChange.isPositive ? 'strong' : 'declining'} visibility growth.</li>
+                        <li>Added ${newReviews} new 5-star reviews, maintaining ${avgRating.toFixed(1)}/5.0 rating.</li>
+                        <li>Customer actions (calls + clicks + directions) totaled ${websiteClicks + phoneCalls + directions} this month.</li>
+                        <li>Consistent content posting with ${postsPublished} GMB updates keeps your profile active and engaging.</li>
+                    </ul>
+                </div>
+                
+                <div class="action-box">
+                    <h3 style="color: #0c5460; margin-bottom: 10px;">🎯 Next Month's Focus</h3>
+                    <ul style="margin-left: 20px; line-height: 1.8; color: #0c5460;">
+                        <li><strong>Review Campaign:</strong> Target 5-10 more reviews to reach ${totalReviews + 10} total</li>
+                        <li><strong>Photo Updates:</strong> Upload seasonal photos and new service images</li>
+                        <li><strong>Content Strategy:</strong> Continue 2-3 posts/week with promotional offers</li>
+                        <li><strong>Q&A Expansion:</strong> Add more pre-populated questions for voice search</li>
+                        <li><strong>Competitor Monitoring:</strong> Track rankings for key local keywords</li>
+                    </ul>
+                </div>
+                
+                <div style="margin-top: 40px; padding: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 12px; text-align: center;">
+                    <h2 style="margin-bottom: 15px;">Questions About This Report?</h2>
+                    <p style="font-size: 18px; margin-bottom: 10px;">Let's schedule a quick call to review your results!</p>
+                    <p style="font-size: 16px; opacity: 0.9;">TNR Business Solutions | (412) 499-2987</p>
+                    <p style="font-size: 16px; opacity: 0.9;">www.tnrbusinesssolutions.com</p>
+                </div>
+                
+                <div style="margin-top: 30px; text-align: center; color: #666; font-size: 14px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+                    <p>Report generated on ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+                    <p>© ${new Date().getFullYear()} TNR Business Solutions. All rights reserved.</p>
+                </div>
+            `;
+            
+            document.getElementById('reportPreview').innerHTML = reportHTML;
+            document.getElementById('reportOutput').classList.add('active');
+            document.getElementById('reportOutput').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function copyReport() {
+            const reportText = document.getElementById('reportPreview').innerText;
+            navigator.clipboard.writeText(reportText).then(() => {
+                alert('Report copied to clipboard!');
+            });
+        }
+        
+        // Set default month to current month
+        document.getElementById('reportMonth').value = new Date().toISOString().slice(0,7);
+    </script>
+</body>
+</html>
+

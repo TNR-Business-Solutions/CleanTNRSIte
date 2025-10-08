@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Request Generator | TNR Business Solutions</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #11998e;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .tab {
+            padding: 15px 30px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab.active {
+            color: #11998e;
+            border-bottom-color: #11998e;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #11998e;
+        }
+        
+        textarea {
+            min-height: 200px;
+            resize: vertical;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-right: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .output {
+            margin-top: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            display: none;
+        }
+        
+        .output.active {
+            display: block;
+        }
+        
+        .output h3 {
+            color: #11998e;
+            margin-bottom: 15px;
+        }
+        
+        .copy-btn {
+            background: #28a745;
+            color: white;
+            padding: 10px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 15px;
+        }
+        
+        .copy-btn:hover {
+            background: #218838;
+        }
+        
+        .preview-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #11998e;
+            white-space: pre-wrap;
+            line-height: 1.8;
+        }
+        
+        .qr-section {
+            text-align: center;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+        
+        .template-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .template-option {
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .template-option:hover {
+            border-color: #11998e;
+            transform: translateY(-2px);
+        }
+        
+        .template-option.selected {
+            border-color: #11998e;
+            background: #f0fff9;
+        }
+        
+        .template-option h4 {
+            color: #11998e;
+            margin-bottom: 5px;
+        }
+        
+        .template-option p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .stats-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        
+        .stats-box h3 {
+            margin-bottom: 15px;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⭐ Review Request Generator</h1>
+        <p class="subtitle">Automated review request emails, SMS, and QR codes</p>
+        
+        <div class="stats-box">
+            <h3>Why Reviews Matter:</h3>
+            <div class="stat-item">
+                <span>85% of consumers trust online reviews</span>
+                <span>📊</span>
+            </div>
+            <div class="stat-item">
+                <span>Businesses with 10+ reviews rank 53% higher</span>
+                <span>📈</span>
+            </div>
+            <div class="stat-item">
+                <span>Reviews influence 93% of purchasing decisions</span>
+                <span>💰</span>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('email')">📧 Email Template</button>
+            <button class="tab" onclick="switchTab('sms')">💬 SMS Template</button>
+            <button class="tab" onclick="switchTab('qr')">📱 QR Code</button>
+            <button class="tab" onclick="switchTab('automation')">🤖 Automation Setup</button>
+        </div>
+        
+        <!-- Email Tab -->
+        <div id="email" class="tab-content active">
+            <div class="form-group">
+                <label>Select Email Template:</label>
+                <div class="template-selector">
+                    <div class="template-option" onclick="selectEmailTemplate('friendly')">
+                        <h4>😊 Friendly</h4>
+                        <p>Casual and warm</p>
+                    </div>
+                    <div class="template-option" onclick="selectEmailTemplate('professional')">
+                        <h4>💼 Professional</h4>
+                        <p>Formal and polite</p>
+                    </div>
+                    <div class="template-option" onclick="selectEmailTemplate('followup')">
+                        <h4>🔄 Follow-up</h4>
+                        <p>Second request</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="clientName">Client Name:</label>
+                <input type="text" id="clientName" placeholder="e.g., John Smith">
+            </div>
+            
+            <div class="form-group">
+                <label for="businessName">Your Business Name:</label>
+                <input type="text" id="businessName" placeholder="e.g., Joe's Pizza">
+            </div>
+            
+            <div class="form-group">
+                <label for="serviceProvided">Service Provided:</label>
+                <input type="text" id="serviceProvided" placeholder="e.g., website design, oil change, etc.">
+            </div>
+            
+            <div class="form-group">
+                <label for="reviewLink">Google Review Link:</label>
+                <input type="text" id="reviewLink" placeholder="https://g.page/r/...">
+                <small style="color: #666; display: block; margin-top: 5px;">
+                    Get this from your Google My Business dashboard
+                </small>
+            </div>
+            
+            <button class="btn" onclick="generateEmail()">Generate Email</button>
+            
+            <div id="emailOutput" class="output">
+                <h3>📧 Email Template</h3>
+                <div class="preview-box" id="emailPreview"></div>
+                <button class="copy-btn" onclick="copyToClipboard('emailPreview')">📋 Copy Email</button>
+            </div>
+        </div>
+        
+        <!-- SMS Tab -->
+        <div id="sms" class="tab-content">
+            <div class="form-group">
+                <label for="smsClientName">Client Name:</label>
+                <input type="text" id="smsClientName" placeholder="e.g., John">
+            </div>
+            
+            <div class="form-group">
+                <label for="smsBusinessName">Your Business Name:</label>
+                <input type="text" id="smsBusinessName" placeholder="e.g., Joe's Pizza">
+            </div>
+            
+            <div class="form-group">
+                <label for="smsReviewLink">Short Review Link:</label>
+                <input type="text" id="smsReviewLink" placeholder="https://g.page/r/...">
+                <small style="color: #666; display: block; margin-top: 5px;">
+                    Tip: Use a URL shortener like bit.ly for SMS
+                </small>
+            </div>
+            
+            <button class="btn" onclick="generateSMS()">Generate SMS</button>
+            
+            <div id="smsOutput" class="output">
+                <h3>💬 SMS Template</h3>
+                <div class="preview-box" id="smsPreview"></div>
+                <div style="margin-top: 10px; color: #666; font-size: 14px;">
+                    Character count: <span id="smsCount">0</span> / 160
+                </div>
+                <button class="copy-btn" onclick="copyToClipboard('smsPreview')">📋 Copy SMS</button>
+            </div>
+        </div>
+        
+        <!-- QR Code Tab -->
+        <div id="qr" class="tab-content">
+            <div class="form-group">
+                <label for="qrReviewLink">Google Review Link:</label>
+                <input type="text" id="qrReviewLink" placeholder="https://g.page/r/...">
+            </div>
+            
+            <div class="form-group">
+                <label for="qrBusinessName">Business Name (for QR code label):</label>
+                <input type="text" id="qrBusinessName" placeholder="e.g., Joe's Pizza">
+            </div>
+            
+            <button class="btn" onclick="generateQR()">Generate QR Code</button>
+            
+            <div id="qrOutput" class="output">
+                <div class="qr-section">
+                    <h3>📱 Scan to Review</h3>
+                    <div id="qrCodeContainer" style="margin: 20px 0;"></div>
+                    <p style="color: #666; margin-bottom: 15px;">
+                        Print this QR code and place it on receipts, business cards, or your storefront
+                    </p>
+                    <button class="copy-btn" onclick="downloadQR()">⬇️ Download QR Code</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Automation Tab -->
+        <div id="automation" class="tab-content">
+            <h2 style="margin-bottom: 20px; color: #11998e;">🤖 Automated Review Request Workflow</h2>
+            
+            <div style="background: #f8f9fa; padding: 25px; border-radius: 12px; margin-bottom: 25px;">
+                <h3 style="color: #333; margin-bottom: 15px;">Step-by-Step Automation Setup:</h3>
+                
+                <div style="margin-bottom: 20px; padding: 15px; background: white; border-radius: 8px;">
+                    <h4 style="color: #11998e; margin-bottom: 10px;">1. Collect Customer Information</h4>
+                    <p>After each completed service, save:</p>
+                    <ul style="margin-left: 20px; color: #666;">
+                        <li>Customer name & email</li>
+                        <li>Phone number (for SMS)</li>
+                        <li>Service date & type</li>
+                        <li>Satisfaction level (if known)</li>
+                    </ul>
+                </div>
+                
+                <div style="margin-bottom: 20px; padding: 15px; background: white; border-radius: 8px;">
+                    <h4 style="color: #11998e; margin-bottom: 10px;">2. Set Up Email Sequence</h4>
+                    <p><strong>Day 1-2:</strong> Send thank you email with subtle review request<br>
+                    <strong>Day 7:</strong> Send friendly review reminder<br>
+                    <strong>Day 14:</strong> Final review request (if no response)</p>
+                </div>
+                
+                <div style="margin-bottom: 20px; padding: 15px; background: white; border-radius: 8px;">
+                    <h4 style="color: #11998e; margin-bottom: 10px;">3. Use Multiple Channels</h4>
+                    <ul style="margin-left: 20px; color: #666;">
+                        <li>📧 Email: Primary method (use templates above)</li>
+                        <li>💬 SMS: For close customers (more personal)</li>
+                        <li>📱 QR Code: On receipts and invoices</li>
+                        <li>🎁 In-person: Ask when customer is happy</li>
+                    </ul>
+                </div>
+                
+                <div style="margin-bottom: 20px; padding: 15px; background: white; border-radius: 8px;">
+                    <h4 style="color: #11998e; margin-bottom: 10px;">4. Track & Optimize</h4>
+                    <p>Monitor these metrics:</p>
+                    <ul style="margin-left: 20px; color: #666;">
+                        <li>Email open rate (target: 40%+)</li>
+                        <li>Click-through rate (target: 15%+)</li>
+                        <li>Conversion to review (target: 10%+)</li>
+                        <li>Time from request to review</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 25px; border-radius: 12px;">
+                <h3 style="margin-bottom: 15px;">💡 Pro Tips for More Reviews:</h3>
+                <ul style="margin-left: 20px; line-height: 2;">
+                    <li><strong>Timing is everything:</strong> Ask within 24-48 hours while experience is fresh</li>
+                    <li><strong>Make it easy:</strong> Direct link (not "search for us on Google")</li>
+                    <li><strong>Be specific:</strong> Reference the actual service provided</li>
+                    <li><strong>Personal touch:</strong> Use customer's name, not generic template</li>
+                    <li><strong>Don't incentivize:</strong> Against Google's policies (but can offer thank you gift AFTER)</li>
+                    <li><strong>Respond to all reviews:</strong> Shows you care and encourages others</li>
+                    <li><strong>Target happy customers:</strong> Ask when you know they're satisfied</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let selectedEmailTemplate = 'friendly';
+        
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tab).classList.add('active');
+        }
+        
+        function selectEmailTemplate(template) {
+            selectedEmailTemplate = template;
+            document.querySelectorAll('.template-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            event.target.closest('.template-option').classList.add('selected');
+        }
+        
+        function generateEmail() {
+            const clientName = document.getElementById('clientName').value;
+            const businessName = document.getElementById('businessName').value;
+            const service = document.getElementById('serviceProvided').value;
+            const reviewLink = document.getElementById('reviewLink').value;
+            
+            if (!clientName || !businessName || !reviewLink) {
+                alert('Please fill in all fields!');
+                return;
+            }
+            
+            let subject = '';
+            let body = '';
+            
+            switch(selectedEmailTemplate) {
+                case 'friendly':
+                    subject = `Quick favor - would you leave us a review? 🌟`;
+                    body = `Hi ${clientName},
+
+Hope you're doing well! I wanted to reach out and say thank you for choosing ${businessName} for ${service || 'your recent service'}.
+
+If you were happy with the results, would you mind taking 60 seconds to leave us a quick Google review? It really helps other people in our community find us.
+
+Here's the direct link:
+${reviewLink}
+
+Thanks so much for your support!
+
+Best regards,
+${businessName} Team
+
+P.S. - If you have any concerns, please reach out to us directly so we can make it right!`;
+                    break;
+                    
+                case 'professional':
+                    subject = `Your feedback matters to ${businessName}`;
+                    body = `Dear ${clientName},
+
+Thank you for choosing ${businessName} for ${service || 'your recent service'}. We hope you were satisfied with the quality of our work.
+
+We would greatly appreciate if you could take a moment to share your experience by leaving us a review on Google. Your feedback helps us improve and helps other customers make informed decisions.
+
+You can leave a review here:
+${reviewLink}
+
+If you have any questions or concerns, please don't hesitate to contact us directly.
+
+Thank you for your business.
+
+Sincerely,
+${businessName}`;
+                    break;
+                    
+                case 'followup':
+                    subject = `Following up - ${businessName} Review Request`;
+                    body = `Hi ${clientName},
+
+I hope this email finds you well! I wanted to follow up on my previous message.
+
+We really value your opinion about ${service || 'the service we provided'}. If you have a spare minute, a Google review would mean the world to us and help other local customers.
+
+Here's the link one more time:
+${reviewLink}
+
+Thank you so much for considering!
+
+Best,
+${businessName}
+
+P.S. - This is my last email about this. I promise! 😊`;
+                    break;
+            }
+            
+            const emailPreview = document.getElementById('emailPreview');
+            emailPreview.innerHTML = `<strong>Subject:</strong> ${subject}\n\n${body}`;
+            
+            document.getElementById('emailOutput').classList.add('active');
+            document.getElementById('emailOutput').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function generateSMS() {
+            const name = document.getElementById('smsClientName').value;
+            const business = document.getElementById('smsBusinessName').value;
+            const link = document.getElementById('smsReviewLink').value;
+            
+            if (!name || !business || !link) {
+                alert('Please fill in all fields!');
+                return;
+            }
+            
+            const sms = `Hi ${name}! Thanks for choosing ${business}. If you were happy with our service, we'd love a quick Google review: ${link} - Team ${business}`;
+            
+            document.getElementById('smsPreview').textContent = sms;
+            document.getElementById('smsCount').textContent = sms.length;
+            
+            document.getElementById('smsOutput').classList.add('active');
+            document.getElementById('smsOutput').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function generateQR() {
+            const link = document.getElementById('qrReviewLink').value;
+            const business = document.getElementById('qrBusinessName').value;
+            
+            if (!link || !business) {
+                alert('Please fill in all fields!');
+                return;
+            }
+            
+            const qrContainer = document.getElementById('qrCodeContainer');
+            qrContainer.innerHTML = `
+                <div style="text-align: center;">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(link)}" 
+                         alt="Review QR Code"
+                         style="max-width: 300px; border: 10px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 12px;">
+                    <h3 style="margin-top: 20px; color: #11998e;">Leave a Review for ${business}</h3>
+                    <p style="color: #666;">Scan with your phone camera</p>
+                </div>
+            `;
+            
+            document.getElementById('qrOutput').classList.add('active');
+            document.getElementById('qrOutput').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function downloadQR() {
+            const link = document.getElementById('qrReviewLink').value;
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=1000x1000&data=${encodeURIComponent(link)}`;
+            
+            const a = document.createElement('a');
+            a.href = qrUrl;
+            a.download = 'review-qr-code.png';
+            a.click();
+        }
+        
+        function copyToClipboard(elementId) {
+            const text = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Copied to clipboard!');
+            });
+        }
+    </script>
+</body>
+</html>
+
