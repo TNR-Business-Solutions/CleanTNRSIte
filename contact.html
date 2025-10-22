@@ -191,6 +191,28 @@
             color: rgba(255, 255, 255, 0.6);
         }
         
+        /* Fix dropdown visibility */
+        .form-group select {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .form-group select option {
+            background: #2c5530;
+            color: white;
+            padding: 8px 12px;
+        }
+        
+        .form-group select option:hover {
+            background: var(--tnr-gold);
+            color: var(--tnr-navy);
+        }
+        
+        .form-group select option:checked {
+            background: var(--tnr-gold);
+            color: var(--tnr-navy);
+        }
+        
         .checkbox-group {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -384,12 +406,12 @@
                     <!-- Personal Information -->
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="firstName">First Name <span class="required">*</span></label>
-                            <input type="text" id="firstName" name="firstName" required placeholder="Enter your first name">
+                            <label for="name">Full Name <span class="required">*</span></label>
+                            <input type="text" id="name" name="name" required placeholder="Enter your full name">
                         </div>
                         <div class="form-group">
-                            <label for="lastName">Last Name <span class="required">*</span></label>
-                            <input type="text" id="lastName" name="lastName" required placeholder="Enter your last name">
+                            <label for="company">Company Name</label>
+                            <input type="text" id="company" name="company" placeholder="Your company name">
                         </div>
                     </div>
 
@@ -407,85 +429,38 @@
                     <!-- Business Information -->
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="company">Company Name</label>
-                            <input type="text" id="company" name="company" placeholder="Your business name">
+                            <label for="website">Current Website (if any)</label>
+                            <input type="text" id="website" name="website" placeholder="www.yourwebsite.com or yourwebsite.com">
                         </div>
                         <div class="form-group">
-                            <label for="website">Current Website (if any)</label>
-                            <input type="url" id="website" name="website" placeholder="https://yourwebsite.com">
+                            <label for="industry">Industry</label>
+                            <select id="industry" name="industry">
+                                <option value="">Select your industry</option>
+                                <option value="Construction">Construction</option>
+                                <option value="Legal Services">Legal Services</option>
+                                <option value="E-commerce">E-commerce</option>
+                                <option value="Food Service">Food Service</option>
+                                <option value="Healthcare">Healthcare</option>
+                                <option value="Real Estate">Real Estate</option>
+                                <option value="Retail">Retail</option>
+                                <option value="Technology">Technology</option>
+                                <option value="Other">Other</option>
+                            </select>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="businessType">Type of Business</label>
-                        <select id="businessType" name="businessType">
-                            <option value="">Select your business type</option>
-                            <option value="retail">Retail/Store</option>
-                            <option value="restaurant">Restaurant/Food Service</option>
-                            <option value="professional">Professional Services</option>
-                            <option value="healthcare">Healthcare/Medical</option>
-                            <option value="construction">Construction/Contractor</option>
-                            <option value="manufacturing">Manufacturing</option>
-                            <option value="technology">Technology/IT</option>
-                            <option value="nonprofit">Non-Profit</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-
-                    <!-- Service Interest -->
-                    <div class="form-group">
-                        <label>Services of Interest <span class="required">*</span></label>
-                        <div class="checkbox-group">
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="web-design" name="services" value="web-design">
-                                <label for="web-design">Web Design & Development</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="seo" name="services" value="seo">
-                                <label for="seo">SEO Services</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="social-media" name="services" value="social-media">
-                                <label for="social-media">Social Media Management</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="paid-ads" name="services" value="paid-ads">
-                                <label for="paid-ads">Paid Advertising</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="content-creation" name="services" value="content-creation">
-                                <label for="content-creation">Content Creation</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="email-marketing" name="services" value="email-marketing">
-                                <label for="email-marketing">Email Marketing</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="auto-insurance" name="services" value="auto-insurance">
-                                <label for="auto-insurance">Auto Insurance</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="home-insurance" name="services" value="home-insurance">
-                                <label for="home-insurance">Home Insurance</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="business-insurance" name="services" value="business-insurance">
-                                <label for="business-insurance">Business Insurance</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="life-insurance" name="services" value="life-insurance">
-                                <label for="life-insurance">Life Insurance</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="umbrella-insurance" name="services" value="umbrella-insurance">
-                                <label for="umbrella-insurance">Umbrella Insurance</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="consultation" name="services" value="consultation">
-                                <label for="consultation">General Consultation</label>
-                            </div>
+                        <label>Services of Interest</label>
+                        <div class="checkbox-group" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.5rem;">
+                            <label><input type="checkbox" name="services[]" value="Web Design"> Web Design</label>
+                            <label><input type="checkbox" name="services[]" value="SEO Services"> SEO Services</label>
+                            <label><input type="checkbox" name="services[]" value="Social Media Management"> Social Media Management</label>
+                            <label><input type="checkbox" name="services[]" value="Content Creation"> Content Creation</label>
+                            <label><input type="checkbox" name="services[]" value="Paid Advertising"> Paid Advertising</label>
+                            <label><input type="checkbox" name="services[]" value="Email Marketing"> Email Marketing</label>
                         </div>
                     </div>
+
 
                     <!-- Budget and Timeline -->
                     <div class="form-row">
@@ -576,48 +551,78 @@
         </section>
     </main>
 
-    <!-- Footer -->
+    
+        <!-- Footer -->
     <footer class="footer">
-        <div class="container">
-            <p>&copy; 2025 TNR Business Solutions | Phone: 412-499-2987 | Email: roy.turner@tnrbusinesssolutions.com</p>
+        <div class="footer-inner">
+            <div class="footer-content">
+                <div>
+                    <img src="media/logo.png" alt="TNR Business Solutions Logo" style="height: 60px; margin-bottom: 1rem;" loading="lazy">
+                    <h3>TNR Business Solutions</h3>
+                    <p>Your trusted partner for digital marketing and insurance services in Greensburg, PA.</p>
+                    <p>Phone: <a href="tel:4124992987" style="color: var(--tnr-gold);">412-499-2987</a></p>
+                    <p>Email: <a href="mailto:roy.turner@tnrbusinesssolutions.com" style="color: var(--tnr-gold);">roy.turner@tnrbusinesssolutions.com</a></p>
+                    <p>Address: 418 Concord Avenue, Greensburg, PA 15601</p>
+                </div>
+                <div>
+                    <h3>Digital Marketing Services</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li><a href="web-design.html">Web Design & Development</a></li>
+                        <li><a href="seo-services.html">SEO Services</a></li>
+                        <li><a href="social-media.html">Social Media Management</a></li>
+                        <li><a href="content-creation.html">Content Creation</a></li>
+                        <li><a href="paid-advertising.html">Paid Advertising</a></li>
+                        <li><a href="email-marketing.html">Email Marketing</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Insurance Services</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li><a href="auto-insurance.html">Auto Insurance</a></li>
+                        <li><a href="home-insurance.html">Home Insurance</a></li>
+                        <li><a href="life-insurance.html">Life Insurance</a></li>
+                        <li><a href="business-insurance.html">Business Insurance</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Company</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li><a href="packages.html">Service Packages</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="careers.html">Careers</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                        <li><a href="admin-login.html" style="color: var(--tnr-gold); font-weight: bold;">Admin Login</a></li>
+                        <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                        <li><a href="terms-conditions.html">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 TNR Business Solutions. All rights reserved. | Serving Greensburg, PA and Westmoreland County</p>
+            </div>
         </div>
     </footer>
 
+    <script src="crm-data.js"></script>
+    <script src="form-integration-simple.js"></script>
     <script>
         // Form submission handler
-        document.getElementById('contact-form').addEventListener('submit', function(e) {
-            e.preventDefault();
+        // Form submission is now handled by form-integration.js
+        // The form will be processed automatically when submitted
+        
+        // Ensure form integration is working
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Contact page loaded, checking form integration...');
+            console.log('TNRCRMData available:', typeof window.TNRCRMData !== 'undefined');
+            console.log('tnrCRM instance:', window.tnrCRM ? 'Yes' : 'No');
+            console.log('tnrFormIntegration available:', typeof window.tnrFormIntegration !== 'undefined');
             
-            // Collect form data
-            const formData = new FormData(this);
-            const data = {};
-            
-            // Convert FormData to object
-            for (let [key, value] of formData.entries()) {
-                if (data[key]) {
-                    // Handle multiple values (checkboxes)
-                    if (Array.isArray(data[key])) {
-                        data[key].push(value);
-                    } else {
-                        data[key] = [data[key], value];
-                    }
-                } else {
-                    data[key] = value;
-                }
+            // Force CRM initialization if needed
+            if (typeof window.TNRCRMData !== 'undefined' && !window.tnrCRM) {
+                console.log('🏗️ Initializing CRM...');
+                window.tnrCRM = new window.TNRCRMData();
             }
-            
-            // Create query string
-            const params = new URLSearchParams();
-            Object.keys(data).forEach(key => {
-                if (Array.isArray(data[key])) {
-                    data[key].forEach(value => params.append(key, value));
-                } else {
-                    params.append(key, data[key]);
-                }
-            });
-            
-            // Redirect to contact page with form data
-            window.location.href = `contact.html?${params.toString()}`;
         });
 
         // Hamburger menu functionality
@@ -670,6 +675,5 @@
     </script>
     
     <!-- Form Handler Script -->
-    <script src="assets/form-handler.js"></script>
 </body>
 </html>

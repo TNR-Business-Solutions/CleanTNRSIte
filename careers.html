@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Careers - TNR Business Solutions</title>
+    <link rel="stylesheet" href="assets/styles.css">
+    <style>
+        .careers-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+        
+        .careers-header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 60px 40px;
+            background: linear-gradient(135deg, var(--tnr-primary) 0%, var(--tnr-secondary) 100%);
+            color: white;
+            border-radius: var(--tnr-radius-xl);
+            box-shadow: var(--tnr-shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .careers-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 30%, rgba(245, 158, 11, 0.1) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        
+        .careers-header h1 {
+            font-size: var(--tnr-text-5xl);
+            margin-bottom: 20px;
+            font-weight: 700;
+            color: var(--tnr-gold);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 2;
+        }
+        
+        .careers-header p {
+            font-size: var(--tnr-text-lg);
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .careers-section {
+            margin-bottom: 40px;
+            padding: 40px;
+            background: linear-gradient(135deg, var(--tnr-primary) 0%, var(--tnr-secondary) 50%, var(--tnr-accent) 100%);
+            border-radius: var(--tnr-radius-xl);
+            box-shadow: var(--tnr-shadow-lg);
+            border: 1px solid rgba(44, 85, 48, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .careers-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--tnr-primary), var(--tnr-gold));
+            opacity: 0.8;
+        }
+        
+        .careers-section h2 {
+            color: var(--tnr-gold);
+            font-size: var(--tnr-text-3xl);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+        }
+        
+        .section-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--tnr-gold);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            color: var(--tnr-navy);
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .careers-section h3 {
+            color: var(--tnr-light);
+            font-size: var(--tnr-text-xl);
+            margin-bottom: 15px;
+            margin-top: 25px;
+            font-weight: 600;
+        }
+        
+        .careers-section p {
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 15px;
+            line-height: var(--tnr-leading-relaxed);
+        }
+        
+        .careers-section ul {
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .careers-section li {
+            margin-bottom: 8px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .job-listing {
+            background: var(--tnr-pale-yellow);
+            border: 2px solid rgba(44, 85, 48, 0.3);
+            border-radius: var(--tnr-radius-lg);
+            padding: 30px;
+            margin-bottom: 25px;
+            transition: all var(--tnr-transition-normal);
+        }
+        
+        .job-listing:hover {
+            border-color: var(--tnr-gold);
+            box-shadow: 0 10px 30px rgba(245, 158, 11, 0.2);
+            transform: translateY(-5px);
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        }
+        
+        .job-title {
+            color: var(--tnr-primary);
+            font-size: var(--tnr-text-xl);
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .job-meta {
+            color: var(--tnr-gray-600);
+            font-size: var(--tnr-text-sm);
+            margin-bottom: 15px;
+        }
+        
+        .job-description {
+            color: var(--tnr-primary);
+            margin-bottom: 15px;
+            line-height: var(--tnr-leading-relaxed);
+        }
+        
+        .job-requirements {
+            margin-bottom: 20px;
+        }
+        
+        .job-requirements h4 {
+            color: var(--tnr-primary);
+            font-size: var(--tnr-text-base);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .job-requirements ul {
+            margin-left: 15px;
+            font-size: var(--tnr-text-sm);
+        }
+        
+        .job-requirements li {
+            color: var(--tnr-primary);
+        }
+        
+        .apply-btn {
+            background: linear-gradient(135deg, var(--tnr-gold) 0%, #d97706 100%);
+            color: var(--tnr-navy);
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--tnr-radius);
+            cursor: pointer;
+            font-size: var(--tnr-text-base);
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all var(--tnr-transition-normal);
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+        }
+        
+        .apply-btn:hover {
+            background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+            color: var(--tnr-navy);
+            text-decoration: none;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+        }
+        
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+        
+        .benefit-card {
+            background: var(--tnr-pale-yellow);
+            padding: 25px;
+            border-radius: var(--tnr-radius-lg);
+            text-align: center;
+            border: 2px solid rgba(44, 85, 48, 0.3);
+            transition: all var(--tnr-transition-normal);
+        }
+        
+        .benefit-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--tnr-gold);
+            box-shadow: 0 10px 30px rgba(245, 158, 11, 0.2);
+        }
+        
+        .benefit-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .benefit-title {
+            color: var(--tnr-primary);
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: var(--tnr-text-lg);
+        }
+        
+        .benefit-description {
+            color: var(--tnr-primary);
+            font-size: var(--tnr-text-sm);
+            line-height: var(--tnr-leading-relaxed);
+        }
+        
+        .culture-section {
+            background: linear-gradient(135deg, var(--tnr-primary) 0%, var(--tnr-secondary) 100%);
+            padding: 50px 40px;
+            border-radius: var(--tnr-radius-xl);
+            margin: 40px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .culture-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 80% 20%, rgba(245, 158, 11, 0.1) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        
+        .culture-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-top: 40px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .culture-item {
+            text-align: center;
+        }
+        
+        .culture-icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .culture-title {
+            color: var(--tnr-gold);
+            font-size: var(--tnr-text-xl);
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .culture-description {
+            color: rgba(255, 255, 255, 0.9);
+            line-height: var(--tnr-leading-relaxed);
+        }
+        
+        .application-form {
+            background: var(--tnr-pale-yellow);
+            padding: 40px;
+            border-radius: var(--tnr-radius-lg);
+            margin-top: 30px;
+            border: 2px solid rgba(44, 85, 48, 0.3);
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--tnr-primary);
+            font-size: var(--tnr-text-sm);
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--tnr-radius);
+            font-size: var(--tnr-text-base);
+            background: rgba(255, 255, 255, 0.95);
+            color: var(--tnr-navy);
+            transition: all var(--tnr-transition-normal);
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--tnr-gold);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+            transform: translateY(-1px);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(135deg, var(--tnr-gold) 0%, #d97706 100%);
+            color: var(--tnr-navy);
+            border: none;
+            padding: 18px 30px;
+            border-radius: var(--tnr-radius);
+            cursor: pointer;
+            font-size: var(--tnr-text-lg);
+            font-weight: 600;
+            width: 100%;
+            transition: all var(--tnr-transition-normal);
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+        }
+        
+        .submit-btn:hover {
+            background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-bottom: 30px;
+            color: var(--tnr-gold);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: var(--tnr-text-lg);
+            transition: all var(--tnr-transition-normal);
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+            color: #d97706;
+        }
+        
+        .highlight-box {
+            background: rgba(245, 158, 11, 0.1);
+            border: 2px solid var(--tnr-gold);
+            border-radius: var(--tnr-radius-lg);
+            padding: 25px;
+            margin: 25px 0;
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+        }
+        
+        .highlight-box h4 {
+            color: var(--tnr-gold);
+            margin-bottom: 15px;
+            font-size: var(--tnr-text-lg);
+            font-weight: 600;
+        }
+        
+        .highlight-box p {
+            color: rgba(255, 255, 255, 0.9);
+            margin: 0;
+            line-height: var(--tnr-leading-relaxed);
+        }
+        
+        .contact-info {
+            background: var(--tnr-pale-yellow);
+            padding: 25px;
+            border-radius: var(--tnr-radius-lg);
+            margin-top: 25px;
+            border: 2px solid rgba(44, 85, 48, 0.3);
+        }
+        
+        .contact-info p {
+            color: var(--tnr-primary);
+            margin-bottom: 10px;
+        }
+        
+        .contact-info a {
+            color: var(--tnr-gold);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all var(--tnr-transition-normal);
+        }
+        
+        .contact-info a:hover {
+            color: #d97706;
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .careers-container {
+                padding: 20px 15px;
+            }
+            
+            .careers-header {
+                padding: 40px 20px;
+            }
+            
+            .careers-header h1 {
+                font-size: var(--tnr-text-4xl);
+            }
+            
+            .careers-section {
+                padding: 25px 20px;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .culture-grid {
+                grid-template-columns: 1fr;
+                gap: 25px;
+            }
+            
+            .benefits-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="careers-container">
+        <a href="index.html" class="back-link">← Back to Home</a>
+        
+        <div class="careers-header">
+            <h1>🚀 Join Our Team</h1>
+            <p>Build your career with TNR Business Solutions - where innovation meets opportunity in digital marketing and insurance services.</p>
+        </div>
+
+        <div class="highlight-box">
+            <h4>🌟 Why Work With Us?</h4>
+            <p>We're a growing company that values innovation, collaboration, and professional growth. Join us in helping businesses across Greensburg, PA and beyond achieve their digital marketing and insurance goals.</p>
+        </div>
+
+        <!-- Current Openings -->
+        <div class="careers-section">
+            <h2><span class="section-icon">💼</span>Current Openings</h2>
+            
+            <div class="job-listing">
+                <div class="job-title">Digital Marketing Specialist</div>
+                <div class="job-meta">📍 Greensburg, PA | 💼 Full-time | 💰 $45,000 - $65,000</div>
+                <div class="job-description">
+                    We're looking for a creative and data-driven Digital Marketing Specialist to join our team. You'll work on SEO campaigns, social media management, and paid advertising for our diverse client base.
+                </div>
+                <div class="job-requirements">
+                    <h4>Requirements:</h4>
+                    <ul>
+                        <li>2+ years of digital marketing experience</li>
+                        <li>Proficiency in Google Ads, Facebook Ads, and SEO tools</li>
+                        <li>Experience with analytics platforms (Google Analytics, Facebook Insights)</li>
+                        <li>Strong written and verbal communication skills</li>
+                        <li>Bachelor's degree in Marketing or related field preferred</li>
+                    </ul>
+                </div>
+                <a href="#apply" class="apply-btn">Apply Now</a>
+            </div>
+
+            <div class="job-listing">
+                <div class="job-title">Insurance Sales Representative</div>
+                <div class="job-meta">📍 Greensburg, PA | 💼 Full-time | 💰 $40,000 - $70,000 + Commission</div>
+                <div class="job-description">
+                    Join our insurance team and help clients find the perfect coverage for their needs. This role offers excellent earning potential and the opportunity to build lasting relationships with local businesses and families.
+                </div>
+                <div class="job-requirements">
+                    <h4>Requirements:</h4>
+                    <ul>
+                        <li>Valid Pennsylvania insurance license (or ability to obtain)</li>
+                        <li>1+ years of sales experience preferred</li>
+                        <li>Strong interpersonal and communication skills</li>
+                        <li>Self-motivated and goal-oriented</li>
+                        <li>Knowledge of insurance products and regulations</li>
+                    </ul>
+                </div>
+                <a href="#apply" class="apply-btn">Apply Now</a>
+            </div>
+
+            <div class="job-listing">
+                <div class="job-title">Web Developer</div>
+                <div class="job-meta">📍 Remote/Hybrid | 💼 Full-time | 💰 $50,000 - $75,000</div>
+                <div class="job-description">
+                    We're seeking a talented Web Developer to create and maintain websites for our clients. You'll work with modern technologies and have the opportunity to work on diverse projects across different industries.
+                </div>
+                <div class="job-requirements">
+                    <h4>Requirements:</h4>
+                    <ul>
+                        <li>3+ years of web development experience</li>
+                        <li>Proficiency in HTML, CSS, JavaScript, and PHP</li>
+                        <li>Experience with WordPress and other CMS platforms</li>
+                        <li>Knowledge of responsive design principles</li>
+                        <li>Portfolio demonstrating previous work</li>
+                    </ul>
+                </div>
+                <a href="#apply" class="apply-btn">Apply Now</a>
+            </div>
+
+            <div class="job-listing">
+                <div class="job-title">Client Success Manager</div>
+                <div class="job-meta">📍 Greensburg, PA | 💼 Full-time | 💰 $42,000 - $58,000</div>
+                <div class="job-description">
+                    Help our clients achieve their goals by managing their accounts and ensuring their success. This role is perfect for someone who enjoys building relationships and driving results.
+                </div>
+                <div class="job-requirements">
+                    <h4>Requirements:</h4>
+                    <ul>
+                        <li>2+ years of account management or customer success experience</li>
+                        <li>Excellent communication and problem-solving skills</li>
+                        <li>Experience with CRM systems</li>
+                        <li>Ability to manage multiple client accounts</li>
+                        <li>Bachelor's degree in Business or related field</li>
+                    </ul>
+                </div>
+                <a href="#apply" class="apply-btn">Apply Now</a>
+            </div>
+        </div>
+
+        <!-- Benefits -->
+        <div class="careers-section">
+            <h2><span class="section-icon">🎁</span>Benefits & Perks</h2>
+            
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="benefit-icon">💰</div>
+                    <div class="benefit-title">Competitive Salary</div>
+                    <div class="benefit-description">Competitive pay with performance-based bonuses and commission opportunities</div>
+                </div>
+                
+                <div class="benefit-card">
+                    <div class="benefit-icon">🏥</div>
+                    <div class="benefit-title">Health Insurance</div>
+                    <div class="benefit-description">Comprehensive health, dental, and vision coverage for you and your family</div>
+                </div>
+                
+                <div class="benefit-card">
+                    <div class="benefit-icon">📚</div>
+                    <div class="benefit-title">Professional Development</div>
+                    <div class="benefit-description">Training opportunities, conference attendance, and skill development programs</div>
+                </div>
+                
+                <div class="benefit-card">
+                    <div class="benefit-icon">🏖️</div>
+                    <div class="benefit-title">Paid Time Off</div>
+                    <div class="benefit-description">Generous PTO policy including vacation days, sick leave, and holidays</div>
+                </div>
+                
+                <div class="benefit-card">
+                    <div class="benefit-icon">🏠</div>
+                    <div class="benefit-title">Flexible Work</div>
+                    <div class="benefit-description">Remote work options and flexible scheduling for work-life balance</div>
+                </div>
+                
+                <div class="benefit-card">
+                    <div class="benefit-icon">🎯</div>
+                    <div class="benefit-title">Growth Opportunities</div>
+                    <div class="benefit-description">Clear career progression paths and advancement opportunities</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Company Culture -->
+        <div class="culture-section">
+            <h2 style="text-align: center; color: #2c3e50; margin-bottom: 20px;">Our Culture</h2>
+            <p style="text-align: center; color: #495057; font-size: 1.1rem; margin-bottom: 0;">
+                At TNR Business Solutions, we believe in creating an environment where everyone can thrive and grow.
+            </p>
+            
+            <div class="culture-grid">
+                <div class="culture-item">
+                    <div class="culture-icon">🤝</div>
+                    <div class="culture-title">Collaborative</div>
+                    <div class="culture-description">We work together as a team, sharing knowledge and supporting each other's success.</div>
+                </div>
+                
+                <div class="culture-item">
+                    <div class="culture-icon">💡</div>
+                    <div class="culture-title">Innovative</div>
+                    <div class="culture-description">We encourage creative thinking and embrace new technologies and strategies.</div>
+                </div>
+                
+                <div class="culture-item">
+                    <div class="culture-icon">🎯</div>
+                    <div class="culture-title">Results-Driven</div>
+                    <div class="culture-description">We focus on delivering measurable results for our clients and our business.</div>
+                </div>
+                
+                <div class="culture-item">
+                    <div class="culture-icon">🌟</div>
+                    <div class="culture-title">Client-Focused</div>
+                    <div class="culture-description">Our clients' success is our success, and we go above and beyond to help them achieve their goals.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Application Form -->
+        <div class="careers-section" id="apply">
+            <h2><span class="section-icon">📝</span>Apply Now</h2>
+            <p>Ready to join our team? Fill out the application form below and we'll get back to you within 2-3 business days.</p>
+            
+            <div class="application-form">
+                <form id="careerApplicationForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="firstName">First Name *</label>
+                            <input type="text" id="firstName" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName">Company Name</label>
+                            <input type="text" id="lastName" name="company">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="email">Email Address *</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number *</label>
+                            <input type="tel" id="phone" name="phone" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="position">Position Applying For *</label>
+                        <select id="position" name="position" required>
+                            <option value="">Select a position</option>
+                            <option value="digital-marketing-specialist">Digital Marketing Specialist</option>
+                            <option value="insurance-sales-representative">Insurance Sales Representative</option>
+                            <option value="web-developer">Web Developer</option>
+                            <option value="client-success-manager">Client Success Manager</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="experience">Years of Experience *</label>
+                        <select id="experience" name="experience" required>
+                            <option value="">Select experience level</option>
+                            <option value="0-1">0-1 years</option>
+                            <option value="2-3">2-3 years</option>
+                            <option value="4-5">4-5 years</option>
+                            <option value="6-10">6-10 years</option>
+                            <option value="10+">10+ years</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="resume">Resume/CV *</label>
+                        <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="coverLetter">Cover Letter</label>
+                        <textarea id="coverLetter" name="message" rows="5" placeholder="Tell us why you're interested in joining TNR Business Solutions..." required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="availability">When can you start? *</label>
+                        <select id="availability" name="availability" required>
+                            <option value="">Select availability</option>
+                            <option value="immediately">Immediately</option>
+                            <option value="2-weeks">2 weeks notice</option>
+                            <option value="1-month">1 month notice</option>
+                            <option value="flexible">Flexible</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">Submit Application</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="careers-section">
+            <h2><span class="section-icon">📞</span>Questions?</h2>
+            <p>Have questions about our open positions or the application process? We're here to help!</p>
+            
+            <div class="contact-info">
+                <p><strong>Contact Information:</strong></p>
+                <p>📧 Email: <a href="mailto:roy.turner@tnrbusinesssolutions.com">roy.turner@tnrbusinesssolutions.com</a></p>
+                <p>📞 Phone: <a href="tel:+14124992987">(412) 499-2987</a></p>
+                <p>📍 Address: 418 Concord Avenue, Greensburg, PA 15601</p>
+                <p>🌐 Website: <a href="https://www.tnrbusinesssolutions.com">www.tnrbusinesssolutions.com</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Career Application Form Handler
+        document.getElementById('careerApplicationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form data
+            const formData = new FormData(this);
+            const applicationData = {
+                firstName: formData.get('firstName'),
+                lastName: formData.get('lastName'),
+                email: formData.get('email'),
+                phone: formData.get('phone'),
+                position: formData.get('position'),
+                experience: formData.get('experience'),
+                coverLetter: formData.get('coverLetter'),
+                availability: formData.get('availability'),
+                resume: formData.get('resume').name,
+                timestamp: new Date().toISOString()
+            };
+            
+            // In a real implementation, this would send data to a server
+            // Career application submitted successfully
+            
+            // Show success message
+            alert('Thank you for your application! We will review your information and get back to you within 2-3 business days.');
+            
+            // Reset form
+            this.reset();
+        });
+        
+        // Smooth scrolling for apply buttons
+        document.querySelectorAll('.apply-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('apply').scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-content">
+                <div>
+                    <img src="media/logo.png" alt="TNR Business Solutions Logo" style="height: 60px; margin-bottom: 1rem;" loading="lazy">
+                    <h3>TNR Business Solutions</h3>
+                    <p>Your trusted partner for digital marketing and insurance services in Greensburg, PA.</p>
+                    <p>Phone: <a href="tel:4124992987" style="color: var(--tnr-gold);">412-499-2987</a></p>
+                    <p>Email: <a href="mailto:roy.turner@tnrbusinesssolutions.com" style="color: var(--tnr-gold);">roy.turner@tnrbusinesssolutions.com</a></p>
+                    <p>Address: 418 Concord Avenue, Greensburg, PA 15601</p>
+                </div>
+                <div>
+                    <h3>Digital Marketing Services</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li><a href="web-design.html">Web Design & Development</a></li>
+                        <li><a href="seo-services.html">SEO Services</a></li>
+                        <li><a href="social-media.html">Social Media Management</a></li>
+                        <li><a href="content-creation.html">Content Creation</a></li>
+                        <li><a href="paid-advertising.html">Paid Advertising</a></li>
+                        <li><a href="email-marketing.html">Email Marketing</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Insurance Services</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li><a href="auto-insurance.html">Auto Insurance</a></li>
+                        <li><a href="home-insurance.html">Home Insurance</a></li>
+                        <li><a href="life-insurance.html">Life Insurance</a></li>
+                        <li><a href="business-insurance.html">Business Insurance</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Company</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li><a href="packages.html">Service Packages</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="careers.html">Careers</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                        <li><a href="admin-login.html" style="color: var(--tnr-gold); font-weight: bold;">Admin Login</a></li>
+                        <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                        <li><a href="terms-conditions.html">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 TNR Business Solutions. All rights reserved. | Serving Greensburg, PA and Westmoreland County</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Form Handler Script -->
+    <script src="crm-data.js"></script>
+    <script src="form-integration-simple.js"></script>
+</body>
+</html>

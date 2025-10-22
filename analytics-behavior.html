@@ -1,0 +1,130 @@
+<!-- User Behavior Tracking - TNR Business Solutions -->
+<script>
+  // User behavior tracking configuration
+  const BEHAVIOR_CONFIG = {
+    enabled: true,
+    trackScrollDepth: true,
+    trackTimeOnPage: true,
+    trackFormInteractions: true,
+    trackButtonClicks: true,
+    trackLinkClicks: true
+  };
+  
+  // Track button clicks
+  if (BEHAVIOR_CONFIG.trackButtonClicks) {
+    document.addEventListener('click', function(event) {
+      if (event.target.tagName === 'BUTTON' || event.target.classList.contains('btn')) {
+        const buttonText = event.target.textContent.trim();
+        const buttonLocation = event.target.closest('section')?.className || 'unknown';
+        
+        if (window.gtag) {
+          gtag('event', 'button_click', {
+            event_category: 'Button',
+            event_label: buttonText,
+            button_location: buttonLocation,
+            value: 1
+          });
+        }
+      }
+    });
+  }
+  
+  // Track link clicks
+  if (BEHAVIOR_CONFIG.trackLinkClicks) {
+    document.addEventListener('click', function(event) {
+      if (event.target.tagName === 'A') {
+        const linkText = event.target.textContent.trim();
+        const linkUrl = event.target.href;
+        const linkLocation = event.target.closest('section')?.className || 'unknown';
+        
+        if (window.gtag) {
+          gtag('event', 'link_click', {
+            event_category: 'Link',
+            event_label: linkText,
+            link_url: linkUrl,
+            link_location: linkLocation,
+            value: 1
+          });
+        }
+      }
+    });
+  }
+  
+  // Track form interactions
+  if (BEHAVIOR_CONFIG.trackFormInteractions) {
+    document.addEventListener('submit', function(event) {
+      const form = event.target;
+      const formId = form.id || 'unknown';
+      const formAction = form.action || 'unknown';
+      
+      if (window.gtag) {
+        gtag('event', 'form_submit', {
+          event_category: 'Form',
+          event_label: formId,
+          form_action: formAction,
+          value: 1
+        });
+      }
+    });
+    
+    // Track form field interactions
+    document.addEventListener('focus', function(event) {
+      if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA' || event.target.tagName === 'SELECT') {
+        const fieldName = event.target.name || event.target.id || 'unknown';
+        const fieldType = event.target.type || event.target.tagName.toLowerCase();
+        
+        if (window.gtag) {
+          gtag('event', 'form_field_focus', {
+            event_category: 'Form',
+            event_label: fieldName,
+            field_type: fieldType,
+            value: 1
+          });
+        }
+      }
+    }, true);
+  }
+  
+  // Track scroll depth
+  if (BEHAVIOR_CONFIG.trackScrollDepth) {
+    let maxScroll = 0;
+    const scrollThresholds = [25, 50, 75, 90, 100];
+    
+    window.addEventListener('scroll', function() {
+      const scrollPercent = Math.round((window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100);
+      
+      if (scrollPercent > maxScroll) {
+        maxScroll = scrollPercent;
+        
+        scrollThresholds.forEach(threshold => {
+          if (scrollPercent >= threshold && maxScroll < threshold + 10) {
+            if (window.gtag) {
+              gtag('event', 'scroll_depth', {
+                event_category: 'Engagement',
+                event_label: threshold + '%',
+                value: threshold
+              });
+            }
+          }
+        });
+      }
+    });
+  }
+  
+  // Track time on page
+  if (BEHAVIOR_CONFIG.trackTimeOnPage) {
+    const startTime = Date.now();
+    
+    window.addEventListener('beforeunload', function() {
+      const timeOnPage = Math.round((Date.now() - startTime) / 1000);
+      
+      if (window.gtag) {
+        gtag('event', 'time_on_page', {
+          event_category: 'Engagement',
+          event_label: 'time_on_page',
+          value: timeOnPage
+        });
+      }
+    });
+  }
+</script>

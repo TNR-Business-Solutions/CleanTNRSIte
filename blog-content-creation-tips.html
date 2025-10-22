@@ -388,16 +388,56 @@
         </section>
     </main>
 
-    <!-- Include Footer -->
-    <div id="footer-placeholder"></div>
-
-    <script>
-        // Load footer
-        fetch('includes/footer.html')
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('footer-placeholder').innerHTML = data;
-            });
-    </script>
+        <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-content">
+                <div>
+                    <img src="media/logo.png" alt="TNR Business Solutions Logo" style="height: 60px; margin-bottom: 1rem;" loading="lazy">
+                    <h3>TNR Business Solutions</h3>
+                    <p>Your trusted partner for digital marketing and insurance services in Greensburg, PA.</p>
+                    <p>Phone: <a href="tel:4124992987" style="color: var(--tnr-gold);">412-499-2987</a></p>
+                    <p>Email: <a href="mailto:roy.turner@tnrbusinesssolutions.com" style="color: var(--tnr-gold);">roy.turner@tnrbusinesssolutions.com</a></p>
+                    <p>Address: 418 Concord Avenue, Greensburg, PA 15601</p>
+                </div>
+                <div>
+                    <h3>Digital Marketing Services</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li><a href="web-design.html">Web Design & Development</a></li>
+                        <li><a href="seo-services.html">SEO Services</a></li>
+                        <li><a href="social-media.html">Social Media Management</a></li>
+                        <li><a href="content-creation.html">Content Creation</a></li>
+                        <li><a href="paid-advertising.html">Paid Advertising</a></li>
+                        <li><a href="email-marketing.html">Email Marketing</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Insurance Services</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li><a href="auto-insurance.html">Auto Insurance</a></li>
+                        <li><a href="home-insurance.html">Home Insurance</a></li>
+                        <li><a href="life-insurance.html">Life Insurance</a></li>
+                        <li><a href="business-insurance.html">Business Insurance</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Company</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li><a href="packages.html">Service Packages</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="careers.html">Careers</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                        <li><a href="admin-login.html" style="color: var(--tnr-gold); font-weight: bold;">Admin Login</a></li>
+                        <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                        <li><a href="terms-conditions.html">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 TNR Business Solutions. All rights reserved. | Serving Greensburg, PA and Westmoreland County</p>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>

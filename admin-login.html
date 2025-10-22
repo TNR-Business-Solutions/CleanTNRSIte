@@ -144,6 +144,120 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        
+        .admin-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+        
+        .admin-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+        }
+        
+        .admin-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: var(--tnr-gold);
+            color: var(--tnr-gold);
+            transform: translateY(-2px);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            -webkit-backdrop-filter: blur(5px);
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, var(--tnr-primary) 0%, var(--tnr-secondary) 100%);
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+        
+        .close {
+            color: var(--tnr-gold);
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            top: 15px;
+            right: 20px;
+        }
+        
+        .close:hover {
+            color: #d97706;
+        }
+        
+        .modal h3 {
+            color: var(--tnr-gold);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .modal .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .modal .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .modal .form-group input,
+        .modal .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .modal .form-group input::placeholder,
+        .modal .form-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .modal .form-group input:focus,
+        .modal .form-group textarea:focus {
+            outline: none;
+            border-color: var(--tnr-gold);
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.3);
+        }
+        
+        .modal .btn {
+            width: 100%;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -178,6 +292,11 @@
             <div class="back-link">
                 <a href="index.html">← Back to Website</a>
             </div>
+            
+            <div class="admin-actions">
+                <button type="button" class="admin-btn" onclick="showNewUserForm()">New User Request</button>
+                <button type="button" class="admin-btn" onclick="showForgotPasswordForm()">Forgot Password</button>
+            </div>
         </div>
     </div>
 
@@ -204,7 +323,7 @@
                     sessionStorage.setItem('adminLoginTime', Date.now().toString());
                     
                     // Redirect to admin dashboard
-                    window.location.href = 'admin-orders.html';
+                    window.location.href = 'admin-dashboard.html';
                 } else {
                     showError('Invalid username or password');
                     showLoading(false);
@@ -229,7 +348,182 @@
         
         // Check if already authenticated
         if (sessionStorage.getItem('adminAuthenticated') === 'true') {
-            window.location.href = 'admin-orders.html';
+            window.location.href = 'admin-dashboard.html';
+        }
+        
+        // New User Request Modal
+        function showNewUserForm() {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.id = 'newUserModal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <span class="close" onclick="closeModal('newUserModal')">&times;</span>
+                    <h3>👤 New User Request</h3>
+                    <form id="newUserForm">
+                        <div class="form-group">
+                            <label for="newUserName">Full Name *</label>
+                            <input type="text" id="newUserName" name="name" required placeholder="Enter full name">
+                        </div>
+                        <div class="form-group">
+                            <label for="newUserEmail">Email Address *</label>
+                            <input type="email" id="newUserEmail" name="email" required placeholder="Enter email address">
+                        </div>
+                        <div class="form-group">
+                            <label for="newUserPhone">Phone Number</label>
+                            <input type="tel" id="newUserPhone" name="phone" placeholder="Enter phone number">
+                        </div>
+                        <div class="form-group">
+                            <label for="newUserRole">Requested Role *</label>
+                            <select id="newUserRole" name="role" required>
+                                <option value="">Select a role</option>
+                                <option value="admin">Administrator</option>
+                                <option value="manager">Manager</option>
+                                <option value="staff">Staff Member</option>
+                                <option value="viewer">Viewer</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="newUserReason">Reason for Access *</label>
+                            <textarea id="newUserReason" name="reason" required placeholder="Explain why you need access to the admin dashboard" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn">Submit Request</button>
+                    </form>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            modal.style.display = 'block';
+            
+            // Handle form submission
+            document.getElementById('newUserForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                submitNewUserRequest();
+            });
+        }
+        
+        // Forgot Password Modal
+        function showForgotPasswordForm() {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.id = 'forgotPasswordModal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <span class="close" onclick="closeModal('forgotPasswordModal')">&times;</span>
+                    <h3>🔑 Forgot Password</h3>
+                    <form id="forgotPasswordForm">
+                        <div class="form-group">
+                            <label for="forgotEmail">Email Address *</label>
+                            <input type="email" id="forgotEmail" name="email" required placeholder="Enter your email address">
+                        </div>
+                        <div class="form-group">
+                            <label for="forgotUsername">Username *</label>
+                            <input type="text" id="forgotUsername" name="username" required placeholder="Enter your username">
+                        </div>
+                        <div class="form-group">
+                            <label for="forgotReason">Reason for Password Reset *</label>
+                            <textarea id="forgotReason" name="reason" required placeholder="Explain why you need a password reset" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn">Request Password Reset</button>
+                    </form>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            modal.style.display = 'block';
+            
+            // Handle form submission
+            document.getElementById('forgotPasswordForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                submitForgotPasswordRequest();
+            });
+        }
+        
+        // Close modal function
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.remove();
+            }
+        }
+        
+        // Submit new user request
+        function submitNewUserRequest() {
+            const formData = {
+                type: 'new_user_request',
+                name: document.getElementById('newUserName').value,
+                email: document.getElementById('newUserEmail').value,
+                phone: document.getElementById('newUserPhone').value,
+                role: document.getElementById('newUserRole').value,
+                reason: document.getElementById('newUserReason').value,
+                timestamp: new Date().toISOString()
+            };
+            
+            // In a real implementation, this would send to a server
+            console.log('New User Request:', formData);
+            
+            // Send email notification (simulated)
+            sendEmailNotification('New User Request', formData);
+            
+            alert('New user request submitted! Roy Turner will be notified for approval.');
+            closeModal('newUserModal');
+        }
+        
+        // Submit forgot password request
+        function submitForgotPasswordRequest() {
+            const formData = {
+                type: 'forgot_password_request',
+                email: document.getElementById('forgotEmail').value,
+                username: document.getElementById('forgotUsername').value,
+                reason: document.getElementById('forgotReason').value,
+                timestamp: new Date().toISOString()
+            };
+            
+            // In a real implementation, this would send to a server
+            console.log('Forgot Password Request:', formData);
+            
+            // Send email notification (simulated)
+            sendEmailNotification('Password Reset Request', formData);
+            
+            alert('Password reset request submitted! Roy Turner will be notified for approval.');
+            closeModal('forgotPasswordModal');
+        }
+        
+        // Send email notification (simulated)
+        function sendEmailNotification(subject, data) {
+            // In a real implementation, this would send an actual email
+            const emailContent = `
+Subject: ${subject} - TNR Business Solutions Admin
+
+A new ${data.type.replace('_', ' ')} has been submitted:
+
+${JSON.stringify(data, null, 2)}
+
+Please review and approve this request.
+
+---
+TNR Business Solutions Admin System
+            `;
+            
+            console.log('Email would be sent to: roy.turner@tnrbusinesssolutions.com');
+            console.log('Email content:', emailContent);
+            
+            // Store in localStorage for demo purposes
+            const notifications = JSON.parse(localStorage.getItem('adminNotifications') || '[]');
+            notifications.push({
+                id: Date.now(),
+                type: data.type,
+                subject: subject,
+                data: data,
+                timestamp: new Date().toISOString(),
+                status: 'pending'
+            });
+            localStorage.setItem('adminNotifications', JSON.stringify(notifications));
+        }
+        
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.remove();
+            }
         }
     </script>
 </body>

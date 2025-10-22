@@ -369,18 +369,18 @@
             <!-- Auto Insurance Quote Form -->
             <div style="background: rgba(255, 255, 255, 0.1); padding: 3rem; border-radius: 12px; margin-bottom: 4rem;">
                 <h2 style="text-align: center; color: var(--tnr-secondary); margin-bottom: 2rem;">Get Your Free Auto Insurance Quote</h2>
-                <form style="max-width: 800px; margin: 0 auto;">
+                <form id="insurance-inquiry-form" style="max-width: 800px; margin: 0 auto;">
                     
                     <!-- Personal Information Section -->
                     <div style="background: rgba(255, 255, 255, 0.05); padding: 2rem; border-radius: 8px; margin-bottom: 2rem;">
                         <h3 style="color: var(--tnr-gold); margin-bottom: 1.5rem; text-align: center;">Personal Information</h3>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                            <input type="text" placeholder="First Name *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
-                            <input type="text" placeholder="Last Name *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="text" name="name" placeholder="Full Name *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="email" name="email" placeholder="Email Address *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                            <input type="email" placeholder="Email Address *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
-                            <input type="tel" placeholder="Phone Number *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="tel" name="phone" placeholder="Phone Number" style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="text" name="company" placeholder="Company Name" style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
                             <input type="date" placeholder="Date of Birth *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
@@ -536,7 +536,38 @@
                     <div style="background: rgba(255, 255, 255, 0.05); padding: 2rem; border-radius: 8px; margin-bottom: 2rem;">
                         <h3 style="color: var(--tnr-gold); margin-bottom: 1.5rem; text-align: center;">Additional Information</h3>
                         <div style="margin-bottom: 1rem;">
-                            <textarea placeholder="Additional Information or Special Requests (Optional)" rows="4" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; resize: vertical;"></textarea>
+                            <textarea name="message" placeholder="Tell us about your insurance needs and any specific requirements..." rows="4" required style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; resize: vertical;"></textarea>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <select name="industry" style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; width: 100%; margin-bottom: 1rem;">
+                                <option value="">Select your industry</option>
+                                <option value="Construction">Construction</option>
+                                <option value="Legal Services">Legal Services</option>
+                                <option value="E-commerce">E-commerce</option>
+                                <option value="Food Service">Food Service</option>
+                                <option value="Healthcare">Healthcare</option>
+                                <option value="Real Estate">Real Estate</option>
+                                <option value="Retail">Retail</option>
+                                <option value="Technology">Technology</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display: block; margin-bottom: 1rem; color: white; font-weight: bold;">Preferred Contact Method</label>
+                            <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+                                <label style="display: flex; align-items: center; color: white;">
+                                    <input type="radio" name="contactMethod" value="phone" style="margin-right: 0.5rem;">
+                                    Phone Call
+                                </label>
+                                <label style="display: flex; align-items: center; color: white;">
+                                    <input type="radio" name="contactMethod" value="email" checked style="margin-right: 0.5rem;">
+                                    Email
+                                </label>
+                                <label style="display: flex; align-items: center; color: white;">
+                                    <input type="radio" name="contactMethod" value="text" style="margin-right: 0.5rem;">
+                                    Text Message
+                                </label>
+                            </div>
                         </div>
                         <div style="margin-bottom: 1rem;">
                             <label style="display: flex; align-items: center; color: white; font-size: 0.9rem;">
@@ -567,19 +598,60 @@
         </section>
     </main>
 
-    <!-- Include Footer -->
-    <div id="footer-placeholder"></div>
-
-    <script>
-        // Load footer
-        fetch('includes/footer.html')
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('footer-placeholder').innerHTML = data;
-            });
-    </script>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-content">
+                <div>
+                    <img src="media/logo.png" alt="TNR Business Solutions Logo" style="height: 60px; margin-bottom: 1rem;" loading="lazy">
+                    <h3>TNR Business Solutions</h3>
+                    <p>Your trusted partner for digital marketing and insurance services in Greensburg, PA.</p>
+                    <p>Phone: <a href="tel:4124992987" style="color: var(--tnr-gold);">412-499-2987</a></p>
+                    <p>Email: <a href="mailto:roy.turner@tnrbusinesssolutions.com" style="color: var(--tnr-gold);">roy.turner@tnrbusinesssolutions.com</a></p>
+                    <p>Address: 418 Concord Avenue, Greensburg, PA 15601</p>
+                </div>
+                <div>
+                    <h3>Digital Marketing Services</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li><a href="web-design.html">Web Design & Development</a></li>
+                        <li><a href="seo-services.html">SEO Services</a></li>
+                        <li><a href="social-media.html">Social Media Management</a></li>
+                        <li><a href="content-creation.html">Content Creation</a></li>
+                        <li><a href="paid-advertising.html">Paid Advertising</a></li>
+                        <li><a href="email-marketing.html">Email Marketing</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Insurance Services</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li><a href="auto-insurance.html">Auto Insurance</a></li>
+                        <li><a href="home-insurance.html">Home Insurance</a></li>
+                        <li><a href="life-insurance.html">Life Insurance</a></li>
+                        <li><a href="business-insurance.html">Business Insurance</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Company</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li><a href="packages.html">Service Packages</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="careers.html">Careers</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                        <li><a href="admin-login.html" style="color: var(--tnr-gold); font-weight: bold;">Admin Login</a></li>
+                        <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                        <li><a href="terms-conditions.html">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 TNR Business Solutions. All rights reserved. | Serving Greensburg, PA and Westmoreland County</p>
+            </div>
+        </div>
+    </footer>
     
     <!-- Form Handler Script -->
-    <script src="assets/form-handler.js"></script>
+    <script src="crm-data.js"></script>
+    <script src="form-integration-simple.js"></script>
 </body>
 </html>

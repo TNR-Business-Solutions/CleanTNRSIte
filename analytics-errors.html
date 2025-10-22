@@ -1,0 +1,101 @@
+<!-- Error Tracking - TNR Business Solutions -->
+<script>
+  // Error tracking configuration
+  const ERROR_CONFIG = {
+    enabled: true,
+    trackConsoleErrors: true,
+    trackUnhandledRejections: true,
+    trackResourceErrors: true,
+    trackNetworkErrors: true,
+    reportUrl: '/api/error-report'
+  };
+  
+  // Error reporting function
+  function reportError(error, context = {}) {
+    if (!ERROR_CONFIG.enabled) return;
+    
+    const errorReport = {
+      message: error.message || 'Unknown error',
+      stack: error.stack || '',
+      filename: error.filename || '',
+      lineno: error.lineno || 0,
+      colno: error.colno || 0,
+      url: window.location.href,
+      userAgent: navigator.userAgent,
+      timestamp: new Date().toISOString(),
+      context: context
+    };
+    
+    // Send error report
+    fetch(ERROR_CONFIG.reportUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(errorReport)
+    }).catch(err => {
+      console.log('Error report not sent:', err);
+    });
+    
+    // Also send to Google Analytics
+    if (window.gtag) {
+      gtag('event', 'exception', {
+        description: error.message,
+        fatal: false,
+        error_type: context.type || 'javascript_error'
+      });
+    }
+  }
+  
+  // Track console errors
+  if (ERROR_CONFIG.trackConsoleErrors) {
+    window.addEventListener('error', function(event) {
+      reportError(event.error || event, {
+        type: 'console_error',
+        filename: event.filename,
+        lineno: event.lineno,
+        colno: event.colno
+      });
+    });
+  }
+  
+  // Track unhandled promise rejections
+  if (ERROR_CONFIG.trackUnhandledRejections) {
+    window.addEventListener('unhandledrejection', function(event) {
+      reportError(new Error(event.reason), {
+        type: 'unhandled_rejection',
+        reason: event.reason
+      });
+    });
+  }
+  
+  // Track resource loading errors
+  if (ERROR_CONFIG.trackResourceErrors) {
+    window.addEventListener('error', function(event) {
+      if (event.target !== window) {
+        reportError(new Error('Resource loading error'), {
+          type: 'resource_error',
+          resource: event.target.src || event.target.href,
+          tagName: event.target.tagName
+        });
+      }
+    }, true);
+  }
+  
+  // Track network errors
+  if (ERROR_CONFIG.trackNetworkErrors) {
+    // Override fetch to catch network errors
+    const originalFetch = window.fetch;
+    window.fetch = function(...args) {
+      return originalFetch.apply(this, args)
+        .catch(error => {
+          reportError(error, {
+            type: 'network_error',
+            url: args[0],
+            method: args[1]?.method || 'GET'
+          });
+          throw error;
+        });
+    };
+  }
+</script>

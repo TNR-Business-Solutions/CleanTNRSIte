@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Form CRM Integration - Browser Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: #f5f5f5;
+        }
+        .container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .form-group { 
+            margin-bottom: 15px; 
+        }
+        label { 
+            display: block; 
+            margin-bottom: 5px; 
+            font-weight: bold; 
+        }
+        input, textarea, select { 
+            width: 100%; 
+            padding: 8px; 
+            border: 1px solid #ddd; 
+            border-radius: 4px; 
+            box-sizing: border-box;
+        }
+        button { 
+            background: #007bff; 
+            color: white; 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-size: 16px;
+        }
+        button:hover { 
+            background: #0056b3; 
+        }
+        .debug-section { 
+            background: #f8f9fa; 
+            padding: 15px; 
+            margin: 20px 0; 
+            border-radius: 4px; 
+            border-left: 4px solid #007bff; 
+        }
+        .success { 
+            color: #28a745; 
+            font-weight: bold;
+        }
+        .error { 
+            color: #dc3545; 
+            font-weight: bold;
+        }
+        .warning {
+            color: #ffc107;
+            font-weight: bold;
+        }
+        .test-results {
+            background: #e9ecef;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+        }
+        .lead-item {
+            background: #f8f9fa;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            border-left: 3px solid #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Form CRM Integration Test</h1>
+        <p>This page tests if form submissions are properly converted to CRM leads.</p>
+        
+        <form id="contact-form">
+            <h2>Test Contact Form</h2>
+            <div class="form-group">
+                <label for="name">Name *</label>
+                <input type="text" id="name" name="name" required value="Test User">
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email *</label>
+                <input type="email" id="email" name="email" required value="test@example.com">
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">Phone</label>
+                <input type="tel" id="phone" name="phone" value="555-123-4567">
+            </div>
+            
+            <div class="form-group">
+                <label for="company">Company</label>
+                <input type="text" id="company" name="company" value="Test Company">
+            </div>
+            
+            <div class="form-group">
+                <label for="message">Message *</label>
+                <textarea id="message" name="message" rows="4" required>This is a test form submission to verify CRM integration.</textarea>
+            </div>
+            
+            <button type="submit">Submit Test Form</button>
+        </form>
+        
+        <div class="debug-section">
+            <h3>🔍 System Status</h3>
+            <div id="system-status">Checking system status...</div>
+        </div>
+        
+        <div class="test-results">
+            <h3>📊 Test Results</h3>
+            <div id="test-results">Ready to test...</div>
+        </div>
+        
+        <div class="debug-section">
+            <h3>📋 CRM Data</h3>
+            <div id="crm-data">Loading CRM data...</div>
+        </div>
+        
+        <div class="debug-section">
+            <h3>📝 Recent Leads</h3>
+            <div id="recent-leads">No leads yet...</div>
+        </div>
+    </div>
+
+    <!-- Load scripts in correct order -->
+    <script src="crm-data.js"></script>
+    <script src="email-service.js"></script>
+    <script src="form-integration.js"></script>
+    
+    <script>
+        // Test and monitoring script
+        let testCount = 0;
+        
+        function updateSystemStatus() {
+            const statusDiv = document.getElementById('system-status');
+            const crmAvailable = typeof window.TNRCRMData !== 'undefined';
+            const formIntegrationAvailable = typeof window.tnrFormIntegration !== 'undefined';
+            const crmInstance = window.tnrCRM ? true : false;
+            
+            statusDiv.innerHTML = `
+                <p><strong>CRM Class Available:</strong> <span class="${crmAvailable ? 'success' : 'error'}">${crmAvailable ? '✅ Yes' : '❌ No'}</span></p>
+                <p><strong>Form Integration Available:</strong> <span class="${formIntegrationAvailable ? 'success' : 'error'}">${formIntegrationAvailable ? '✅ Yes' : '❌ No'}</span></p>
+                <p><strong>CRM Instance Created:</strong> <span class="${crmInstance ? 'success' : 'error'}">${crmInstance ? '✅ Yes' : '❌ No'}</span></p>
+                <p><strong>Local Storage Available:</strong> <span class="typeof(Storage) !== 'undefined' ? 'success' : 'error'}">${typeof(Storage) !== 'undefined' ? '✅ Yes' : '❌ No'}</span></p>
+            `;
+        }
+        
+        function updateTestResults() {
+            const resultsDiv = document.getElementById('test-results');
+            const submissions = JSON.parse(localStorage.getItem('tnr_form_submissions') || '[]');
+            const leads = window.tnrCRM ? window.tnrCRM.leads : [];
+            const newLeads = leads.filter(l => l.status === 'New');
+            
+            resultsDiv.innerHTML = `
+                <p><strong>Form Submissions:</strong> ${submissions.length}</p>
+                <p><strong>Total Leads in CRM:</strong> ${leads.length}</p>
+                <p><strong>New Leads:</strong> ${newLeads.length}</p>
+                <p><strong>Test Count:</strong> ${testCount}</p>
+                <p><strong>Last Update:</strong> ${new Date().toLocaleString()}</p>
+            `;
+        }
+        
+        function updateCRMData() {
+            const crmDiv = document.getElementById('crm-data');
+            if (window.tnrCRM) {
+                const stats = window.tnrCRM.getStats();
+                crmDiv.innerHTML = `
+                    <p><strong>Total Clients:</strong> ${stats.totalClients}</p>
+                    <p><strong>Active Clients:</strong> ${stats.activeClients}</p>
+                    <p><strong>New Leads:</strong> ${stats.newLeads}</p>
+                    <p><strong>Total Orders:</strong> ${stats.totalOrders}</p>
+                    <p><strong>Total Revenue:</strong> $${stats.totalRevenue.toLocaleString()}</p>
+                `;
+            } else {
+                crmDiv.innerHTML = '<p class="error">CRM not available</p>';
+            }
+        }
+        
+        function updateRecentLeads() {
+            const leadsDiv = document.getElementById('recent-leads');
+            if (window.tnrCRM && window.tnrCRM.leads.length > 0) {
+                const recentLeads = window.tnrCRM.leads.slice(-5);
+                leadsDiv.innerHTML = recentLeads.map(lead => `
+                    <div class="lead-item">
+                        <strong>${lead.name}</strong> (${lead.email})<br>
+                        <small>Source: ${lead.source} | Status: ${lead.status} | Date: ${lead.date}</small>
+                    </div>
+                `).join('');
+            } else {
+                leadsDiv.innerHTML = '<p class="warning">No leads found</p>';
+            }
+        }
+        
+        function runTest() {
+            testCount++;
+            console.log(`🧪 Running test #${testCount}`);
+            
+            // Update all displays
+            updateSystemStatus();
+            updateTestResults();
+            updateCRMData();
+            updateRecentLeads();
+            
+            console.log('📊 Test completed:', {
+                submissions: JSON.parse(localStorage.getItem('tnr_form_submissions') || '[]').length,
+                leads: window.tnrCRM ? window.tnrCRM.leads.length : 0,
+                newLeads: window.tnrCRM ? window.tnrCRM.leads.filter(l => l.status === 'New').length : 0
+            });
+        }
+        
+        // Override form submission to add testing
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Test page loaded');
+            
+            // Wait for scripts to load
+            setTimeout(() => {
+                runTest();
+                
+                // Set up form submission monitoring
+                const form = document.getElementById('contact-form');
+                if (form) {
+                    form.addEventListener('submit', function(e) {
+                        console.log('📝 Form submission detected');
+                        
+                        // Wait a moment for processing
+                        setTimeout(() => {
+                            console.log('🔄 Checking results after form submission...');
+                            runTest();
+                        }, 1000);
+                    });
+                }
+                
+                // Update every 2 seconds
+                setInterval(runTest, 2000);
+                
+            }, 1000);
+        });
+        
+        // Add console logging for debugging
+        const originalConsoleLog = console.log;
+        console.log = function(...args) {
+            originalConsoleLog.apply(console, args);
+            
+            // Also show important messages on the page
+            if (args[0] && typeof args[0] === 'string') {
+                if (args[0].includes('Converted') || args[0].includes('Created lead') || args[0].includes('Added lead')) {
+                    const resultsDiv = document.getElementById('test-results');
+                    const currentContent = resultsDiv.innerHTML;
+                    resultsDiv.innerHTML = currentContent + `<br><span class="success">${args[0]}</span>`;
+                }
+            }
+        };
+    </script>
+</body>
+</html>

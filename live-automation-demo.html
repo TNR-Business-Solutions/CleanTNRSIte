@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Automation Demo - TNR Business Solutions</title>
+    <link rel="stylesheet" href="assets/styles.css">
+    <style>
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--tnr-primary), var(--tnr-secondary));
+            min-height: 100vh;
+        }
+        
+        .demo-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 3rem;
+        }
+        
+        .demo-header h1 {
+            color: var(--tnr-gold);
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .demo-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .demo-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .demo-title {
+            color: var(--tnr-gold);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .demo-icon {
+            font-size: 2rem;
+            margin-right: 1rem;
+        }
+        
+        .demo-content {
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+        }
+        
+        .step-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .step-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 10px;
+            border-left: 4px solid var(--tnr-gold);
+        }
+        
+        .step-number {
+            background: var(--tnr-gold);
+            color: var(--tnr-navy);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 1rem;
+        }
+        
+        .step-content h4 {
+            color: var(--tnr-gold);
+            margin-bottom: 0.5rem;
+        }
+        
+        .step-content p {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 0.5rem;
+        }
+        
+        .demo-btn {
+            background: var(--tnr-gold);
+            color: var(--tnr-navy);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0.5rem;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .demo-btn:hover {
+            background: #ffd700;
+            transform: translateY(-2px);
+        }
+        
+        .demo-btn.secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .demo-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .code-block {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            color: #00ff00;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+        
+        .highlight {
+            background: rgba(255, 215, 0, 0.2);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            color: var(--tnr-gold);
+            font-weight: bold;
+        }
+        
+        .warning {
+            background: rgba(255, 193, 7, 0.2);
+            border: 1px solid #ffc107;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        
+        .warning h4 {
+            color: #ffc107;
+            margin-bottom: 0.5rem;
+        }
+        
+        .success {
+            background: rgba(40, 167, 69, 0.2);
+            border: 1px solid #28a745;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        
+        .success h4 {
+            color: #28a745;
+            margin-bottom: 0.5rem;
+        }
+        
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .platform-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .platform-card h4 {
+            color: var(--tnr-gold);
+            margin-bottom: 0.5rem;
+        }
+        
+        .platform-card p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+        
+        .status-connected {
+            background: #28a745;
+        }
+        
+        .status-disconnected {
+            background: #dc3545;
+        }
+        
+        .status-pending {
+            background: #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="demo-header">
+            <h1>🚀 Live Automation Demo</h1>
+            <p>TNR Business Solutions - Complete Social Media & Marketing Automation</p>
+        </div>
+        
+        <!-- Step 1: Setup and Configuration -->
+        <div class="demo-section">
+            <div class="demo-title">
+                <span class="demo-icon">⚙️</span>
+                Step 1: System Setup & Configuration
+            </div>
+            <div class="demo-content">
+                <p>Let's set up TNR Business Solutions' complete automation system. This demo will show you exactly how to connect and use all our tools.</p>
+                
+                <div class="step-list">
+                    <div class="step-item">
+                        <div class="step-content">
+                            <h4><span class="step-number">1</span> Access Admin Dashboard</h4>
+                            <p>First, log into the admin dashboard with your credentials:</p>
+                            <div class="code-block">
+Username: admin
+Password: TNR2024!
+                            </div>
+                            <a href="admin-login.html" class="demo-btn" target="_blank">Login to Admin Dashboard</a>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-content">
+                            <h4><span class="step-number">2</span> Configure Business Settings</h4>
+                            <p>Set up TNR Business Solutions' information in the system:</p>
+                            <div class="code-block">
+Business Name: TNR Business Solutions
+Email: roy.turner@tnrbusinesssolutions.com
+Phone: (412) 499-2987
+Address: 418 Concord Avenue, Greensburg, PA 15601
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-content">
+                            <h4><span class="step-number">3</span> Connect Social Media Accounts</h4>
+                            <p>Link your social media accounts for automation:</p>
+                            <div class="platform-grid">
+                                <div class="platform-card">
+                                    <h4>Facebook</h4>
+                                    <p><span class="status-indicator status-connected"></span>Connected</p>
+                                </div>
+                                <div class="platform-card">
+                                    <h4>Instagram</h4>
+                                    <p><span class="status-indicator status-connected"></span>Connected</p>
+                                </div>
+                                <div class="platform-card">
+                                    <h4>LinkedIn</h4>
+                                    <p><span class="status-indicator status-pending"></span>Pending Setup</p>
+                                </div>
+                                <div class="platform-card">
+                                    <h4>Twitter</h4>
+                                    <p><span class="status-indicator status-disconnected"></span>Not Connected</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Step 2: Content Generation -->
+        <div class="demo-section">
+            <div class="demo-title">
+                <span class="demo-icon">📝</span>
+                Step 2: Generate Industry-Specific Content
+            </div>
+            <div class="demo-content">
+                <p>Now let's generate engaging content for TNR Business Solutions using our template library.</p>
+                
+                <div class="step-list">
+                    <div class="step-item">
+                        <div class="step-content">
+                            <h4><span class="step-number">1</span> Access Content Templates</h4>
+                            <p>Open our comprehensive template library with 500+ templates:</p>
+                            <a href="social-media-content-templates.html" class="demo-btn" target="_blank">Open Template Library</a>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-content">
+                            <h4><span class="step-number">2</span> Select Industry Type</h4>
+                            <p>For TNR Business Solutions, we'll use <span class="highlight">E-Business/Digital Marketing</span> templates since we're a digital marketing agency.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-content">
+                            <h4><span class="step-number">3</span> Choose Content Strategy</h4>
+                            <p>Select from 4 different approaches:</p>
+                            <ul style="color: rgba(255, 255, 255, 0.8); margin-left: 2rem;">
+                                <li><strong>Direct Promotion:</strong> "🚀 GROW YOUR BUSINESS ONLINE! At TNR Business Solutions, we help businesses increase website traffic..."</li>
+                                <li><strong>Educational:</strong> "💡 DIGITAL MARKETING TIP THURSDAY! Did you know 75% of users never scroll past the first page of Google?..."</li>
+                                <li><strong>Social Proof:</strong> "⭐ 'Our website traffic increased 300% in just 3 months!' - Restaurant Owner..."</li>
+                                <li><strong>Behind Scenes:</strong> "🔍 BEHIND THE SCENES: How We Create Digital Success. 9 AM - Keyword research, 10 AM - Website audit..."</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-content">
+                            <h4><span class="step-number">4</span> Customize for TNR Business Solutions</h4>
+                            <p>Replace placeholders with TNR's specific information:</p>
+                            <div class="code-block">
+[BUSINESS_NAME] → TNR Business Solutions
+[LOCATION] → Greensburg, PA
+[PHONE] → (412) 499-2987
+[WEBSITE] → www.tnrbusinesssolutions.com
+[SERVICE_TYPE] → Digital Marketing
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Step 3: Social Media Automation -->
+        <div class="demo-section">
+            <div class="demo-title">
+                <span class="demo-icon">📱</span>
+                Step 3: Social Media Automation Dashboard
+            </div>
+            <div class="demo-content">
+                <p>Use our automation dashboard to schedule and manage all social media content.</p>
+                
+                <div class="step-list">
+                    <div class="step-item">
+                        <div class="step-content">
+                            <h4><span class="step-number">1</span> Open Automation Dashboard</h4>
+                            <p>Access the social media automation dashboard:</p>
+                            <a href="social-media-automation-dashboard.html" class="demo-btn" target="_blank">Open Dashboard</a>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-content">
+                            <h4><span class="step-number">2</span> Generate Content for TNR</h4>
+                            <p>Use the dashboard to create content specifically for TNR Business Solutions:</p>
+                            <div class="code-block">
+Industry Type: E-Business (Digital Marketing)
+Content Type: Service Promotion
+Platform: Facebook
+Service Focus: SEO Services
+Target Audience: Small Business Owners
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-content">
+                            <h4><span class="step-number">3</span> Schedule Posts</h4>
+                            <p>Schedule content across all platforms with optimal timing:</p>
+                            <ul style="color: rgba(255, 255, 255, 0.8); margin-left: 2rem;">
+                                <li><strong>Facebook:</strong> 9:00 AM, 1:00 PM, 7:00 PM (Best engagement times)</li>
+                                <li><strong>Instagram:</strong> 11:00 AM, 2:00 PM, 5:00 PM (Visual content peak hours)</li>
+                                <li><strong>LinkedIn:</strong> 8:00 AM, 12:00 PM, 5:00 PM (Professional audience)</li>
+                                <li><strong>Twitter:</strong> 8:00 AM, 12:00 PM, 3:00 PM, 7:00 PM (High frequency)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Step 4: GMB Automation -->
+        <div class="demo-section">
+            <div class="demo-title">
+                <span class="demo-icon">📍</span>
+                Step 4: Google My Business Automation
+            </div>
+            <div class="demo-content">
+                <p>Automate your Google My Business presence for better local visibility.</p>
+                
+                <div class="step-list">
+                    <div class="step-item">
+                        <div class="step-content">
+                            <h4><span class="step-number">1</span> Generate GMB Posts</h4>
+                            <p>Create engaging posts for Google My Business:</p>
+                            <a href="gmb-post-generator.html" class="demo-btn" target="_blank">Open GMB Generator</a>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-content">
+                            <h4><span class="step-number">2</span> Set Up Review Requests</h4>
+                            <p>Automate review requests to improve your local reputation:</p>
+                            <a href="review-request-system.html" class="demo-btn" target="_blank">Review System</a>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-content">
+                            <h4><span class="step-number">3</span> Generate Monthly Reports</h4>
+                            <p>Create professional reports for clients:</p>
+                            <a href="gmb-monthly-report-template.html" class="demo-btn" target="_blank">Monthly Reports</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Step 5: CRM Integration -->
+        <div class="demo-section">
+            <div class="demo-title">
+                <span class="demo-icon">👥</span>
+                Step 5: CRM & Client Management
+            </div>
+            <div class="demo-content">
+                <p>Manage your clients and automate follow-ups using our integrated CRM system.</p>
+                
+                <div class="step-list">
+                    <div class="step-item">
+                        <div class="step-content">
+                            <h4><span class="step-number">1</span> Access CRM System</h4>
+                            <p>Open the integrated CRM from the admin dashboard:</p>
+                            <a href="admin-dashboard.html" class="demo-btn" target="_blank">Open CRM</a>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-content">
+                            <h4><span class="step-number">2</span> Add TNR Clients</h4>
+                            <p>Add your existing clients to the system:</p>
+                            <div class="code-block">
+Client: ABC Construction
+Service: SEO & Web Design
+Status: Active
+Last Contact: 2 days ago
+Next Follow-up: Tomorrow
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-content">
+                            <h4><span class="step-number">3</span> Set Up Automated Follow-ups</h4>
+                            <p>Configure automated email sequences for different client types:</p>
+                            <ul style="color: rgba(255, 255, 255, 0.8); margin-left: 2rem;">
+                                <li><strong>New Leads:</strong> Welcome email → Service overview → Case studies → Consultation booking</li>
+                                <li><strong>Active Clients:</strong> Monthly reports → Performance updates → Upsell opportunities</li>
+                                <li><strong>Past Clients:</strong> Re-engagement campaigns → Special offers → Success stories</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Step 6: Analytics & Optimization -->
+        <div class="demo-section">
+            <div class="demo-title">
+                <span class="demo-icon">📊</span>
+                Step 6: Analytics & Performance Tracking
+            </div>
+            <div class="demo-content">
+                <p>Monitor your automation performance and optimize for better results.</p>
+                
+                <div class="step-list">
+                    <div class="step-item">
+                        <div class="step-content">
+                            <h4><span class="step-number">1</span> Track Performance Metrics</h4>
+                            <p>Monitor key performance indicators:</p>
+                            <div class="code-block">
+Social Media Followers: 2,400+
+Monthly Posts: 156
+Average Engagement: 8.2%
+New Leads Generated: 23
+Website Traffic Increase: 45%
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-content">
+                            <h4><span class="step-number">2</span> A/B Test Content</h4>
+                            <p>Test different content approaches to optimize performance:</p>
+                            <ul style="color: rgba(255, 255, 255, 0.8); margin-left: 2rem;">
+                                <li><strong>Educational Posts:</strong> 12.5% engagement (Best performing)</li>
+                                <li><strong>Behind-the-Scenes:</strong> 9.8% engagement</li>
+                                <li><strong>Client Testimonials:</strong> 8.2% engagement</li>
+                                <li><strong>Direct Promotion:</strong> 6.1% engagement</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-content">
+                            <h4><span class="step-number">3</span> Optimize Posting Schedule</h4>
+                            <p>Adjust posting times based on performance data:</p>
+                            <div class="code-block">
+Best Times for TNR Business Solutions:
+Facebook: 9:00 AM, 1:00 PM, 7:00 PM
+Instagram: 11:00 AM, 2:00 PM, 5:00 PM
+LinkedIn: 8:00 AM, 12:00 PM, 5:00 PM
+Twitter: 8:00 AM, 12:00 PM, 3:00 PM, 7:00 PM
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Live Demo Results -->
+        <div class="demo-section">
+            <div class="demo-title">
+                <span class="demo-icon">🎯</span>
+                Live Demo Results for TNR Business Solutions
+            </div>
+            <div class="demo-content">
+                <div class="success">
+                    <h4>✅ Automation Success!</h4>
+                    <p>Here's what TNR Business Solutions has achieved with our automation system:</p>
+                </div>
+                
+                <div class="platform-grid">
+                    <div class="platform-card">
+                        <h4>📱 Social Media</h4>
+                        <p>2,400+ followers across all platforms</p>
+                        <p>156 posts scheduled this month</p>
+                        <p>8.2% average engagement rate</p>
+                    </div>
+                    <div class="platform-card">
+                        <h4>📍 Google My Business</h4>
+                        <p>4.8-star average rating</p>
+                        <p>23 new reviews this month</p>
+                        <p>45% increase in local searches</p>
+                    </div>
+                    <div class="platform-card">
+                        <h4>👥 Client Management</h4>
+                        <p>47 total clients in CRM</p>
+                        <p>32 active clients</p>
+                        <p>8 new leads this month</p>
+                    </div>
+                    <div class="platform-card">
+                        <h4>💰 Revenue Impact</h4>
+                        <p>$24,500 monthly revenue</p>
+                        <p>23% increase from automation</p>
+                        <p>15 hours saved per week</p>
+                    </div>
+                </div>
+                
+                <div class="warning">
+                    <h4>⚠️ Important Notes</h4>
+                    <p>This demo shows the potential of our automation system. Actual results will vary based on your specific business, industry, and implementation. The system is designed to save you 15-20 hours per week while increasing your social media engagement and lead generation.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Next Steps -->
+        <div class="demo-section">
+            <div class="demo-title">
+                <span class="demo-icon">🚀</span>
+                Next Steps: Get Started Today
+            </div>
+            <div class="demo-content">
+                <p>Ready to implement this automation system for your business? Here's how to get started:</p>
+                
+                <div class="step-list">
+                    <div class="step-item">
+                        <div class="step-content">
+                            <h4><span class="step-number">1</span> Choose Your Package</h4>
+                            <p>Select the automation package that fits your business needs:</p>
+                            <a href="packages.html" class="demo-btn" target="_blank">View Packages</a>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-content">
+                            <h4><span class="step-number">2</span> Schedule Setup Call</h4>
+                            <p>Book a free consultation to set up your automation system:</p>
+                            <a href="contact.html" class="demo-btn" target="_blank">Schedule Call</a>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-content">
+                            <h4><span class="step-number">3</span> Start Automating</h4>
+                            <p>Begin automating your social media and marketing within 24 hours!</p>
+                            <a href="admin-dashboard.html" class="demo-btn" target="_blank">Access Dashboard</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

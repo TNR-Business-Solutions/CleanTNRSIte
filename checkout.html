@@ -684,7 +684,7 @@
                     showError(result.message || 'Checkout failed. Please try again.');
                 }
             } catch (error) {
-                console.error('Checkout error:', error);
+                // Checkout error occurred
                 showError('An error occurred during checkout. Please try again.');
             } finally {
                 showLoading(false);

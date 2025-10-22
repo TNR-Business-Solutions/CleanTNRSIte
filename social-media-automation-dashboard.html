@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TNR Social Media Automation Dashboard</title>
+    <link rel="stylesheet" href="assets/social-media-automation.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Social Media Automation Dashboard</h1>
+            <p>Streamline your social media marketing for TNR Business Solutions & Clients</p>
+        </div>
+        
+        <div class="dashboard-grid">
+            <!-- Content Generator -->
+            <div class="card">
+                <h3><span class="card-icon">📝</span>Content Generator</h3>
+                
+                <div class="platform-tabs">
+                    <div class="platform-tab active" onclick="switchPlatform('facebook')">Facebook</div>
+                    <div class="platform-tab" onclick="switchPlatform('instagram')">Instagram</div>
+                    <div class="platform-tab" onclick="switchPlatform('linkedin')">LinkedIn</div>
+                    <div class="platform-tab" onclick="switchPlatform('twitter')">Twitter</div>
+                </div>
+                
+                <div id="facebook" class="content-area active">
+                    <div class="form-group">
+                        <label for="contentType">Content Type</label>
+                        <select id="contentType" name="contentType" aria-label="Select content type">
+                            <option value="service-promotion">Service Promotion</option>
+                            <option value="client-success">Client Success Story</option>
+                            <option value="industry-tip">Industry Tip</option>
+                            <option value="behind-scenes">Behind the Scenes</option>
+                            <option value="local-news">Local News</option>
+                            <option value="insurance-tip">Insurance Tip</option>
+                            <option value="marketing-tip">Marketing Tip</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="professionType">Industry Type</label>
+                        <select id="professionType" name="professionType" aria-label="Select industry type">
+                            <option value="general">General Business</option>
+                            <option value="blue-collar">Blue Collar (Construction, Trades, Manufacturing)</option>
+                            <option value="white-collar">White Collar (Professional Services, Consulting)</option>
+                            <option value="e-business">E-Business (Online, Digital, Tech)</option>
+                            <option value="service-industry">Service Industry (Restaurant, Hospitality, Healthcare)</option>
+                            <option value="retail">Retail & Sales</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="serviceFocus">Service Focus</label>
+                        <select id="serviceFocus" name="serviceFocus" aria-label="Select service focus">
+                            <option value="seo">SEO Services</option>
+                            <option value="web-design">Web Design</option>
+                            <option value="social-media">Social Media</option>
+                            <option value="insurance">Insurance</option>
+                            <option value="paid-ads">Paid Advertising</option>
+                            <option value="email-marketing">Email Marketing</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="targetAudience">Target Audience</label>
+                        <select id="targetAudience" name="targetAudience" aria-label="Select target audience">
+                            <option value="small-business">Small Business Owners</option>
+                            <option value="local-residents">Local Residents</option>
+                            <option value="insurance-seekers">Insurance Seekers</option>
+                            <option value="marketing-managers">Marketing Managers</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn" onclick="generateContent()">Generate Content</button>
+                    
+                    <div id="contentPreview" class="post-preview hidden" role="region" aria-label="Generated content preview">
+                        <h4>Generated Post:</h4>
+                        <div id="previewContent"></div>
+                        <div class="hashtag-suggestions" id="hashtagSuggestions"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Post Scheduler -->
+            <div class="card">
+                <h3><span class="card-icon">📅</span>Post Scheduler</h3>
+                
+                <div class="form-group">
+                    <label for="schedulePlatform">Platform</label>
+                    <select id="schedulePlatform" name="schedulePlatform" aria-label="Select platform">
+                        <option value="facebook">Facebook</option>
+                        <option value="instagram">Instagram</option>
+                        <option value="linkedin">LinkedIn</option>
+                        <option value="twitter">Twitter</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="scheduleContent">Post Content</label>
+                    <textarea id="scheduleContent" name="scheduleContent" rows="4" placeholder="Enter your post content..." aria-label="Enter post content"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="scheduleDateTime">Schedule Date & Time</label>
+                    <input type="datetime-local" id="scheduleDateTime" name="scheduleDateTime" aria-label="Select date and time">
+                </div>
+                
+                <div class="form-group">
+                    <label for="scheduleClient">Client (Optional)</label>
+                    <select id="scheduleClient" name="scheduleClient" aria-label="Select client">
+                        <option value="tnr">TNR Business Solutions</option>
+                        <option value="client1">Client 1</option>
+                        <option value="client2">Client 2</option>
+                    </select>
+                </div>
+                
+                <button class="btn" onclick="schedulePostReal()">Schedule Post (Real API)</button>
+                <button class="btn btn-secondary" onclick="schedulePost()">Schedule Post (CSV Export)</button>
+                
+                <div id="scheduledPosts" class="schedule-grid"></div>
+            </div>
+            
+            <!-- Hashtag Research -->
+            <div class="card">
+                <h3><span class="card-icon">#️⃣</span>Hashtag Research</h3>
+                
+                <div class="form-group">
+                    <label for="hashtagIndustry">Industry/Service</label>
+                    <select id="hashtagIndustry" name="hashtagIndustry" aria-label="Select industry or service">
+                        <option value="digital-marketing">Digital Marketing</option>
+                        <option value="insurance">Insurance</option>
+                        <option value="web-design">Web Design</option>
+                        <option value="seo">SEO</option>
+                        <option value="social-media">Social Media</option>
+                        <option value="local-business">Local Business</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="hashtagLocation">Location</label>
+                    <input type="text" id="hashtagLocation" name="hashtagLocation" value="Greensburg PA" placeholder="Enter location" aria-label="Enter location">
+                </div>
+                
+                <button class="btn" onclick="generateHashtags()">Generate Hashtags</button>
+                
+                <div id="hashtagResults" class="hashtag-suggestions"></div>
+            </div>
+            
+            <!-- Client Management -->
+            <div class="card">
+                <h3><span class="card-icon">👥</span>Client Management</h3>
+                
+                <div class="form-group">
+                    <label for="newClientName">Add New Client</label>
+                    <input type="text" id="newClientName" name="newClientName" placeholder="Client Name" aria-label="Enter client name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="clientServices">Services</label>
+                    <select id="clientServices" name="clientServices" multiple aria-label="Select services">
+                        <option value="facebook">Facebook Management</option>
+                        <option value="instagram">Instagram Management</option>
+                        <option value="linkedin">LinkedIn Management</option>
+                        <option value="content-creation">Content Creation</option>
+                        <option value="scheduling">Post Scheduling</option>
+                    </select>
+                </div>
+                
+                <button class="btn" onclick="addClient()">Add Client</button>
+                
+                <div class="client-list" id="clientList">
+                    <div class="client-item">
+                        <div>
+                            <div class="client-name">TNR Business Solutions</div>
+                            <div class="client-services-text">All Platforms</div>
+                        </div>
+                        <span class="client-status status-active">Active</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- API Configuration -->
+            <div class="card">
+                <h3><span class="card-icon">🔧</span>API Configuration</h3>
+                
+                <div id="connectionStatus">
+                    <p>Loading connection status...</p>
+                </div>
+                
+                <button class="btn" onclick="showApiConfig()">Configure API Keys</button>
+                <a href="real-automation-setup.html" class="btn btn-secondary">Advanced Setup →</a>
+            </div>
+            
+            <!-- Analytics Dashboard -->
+            <div class="card">
+                <h3><span class="card-icon">📊</span>Analytics Dashboard</h3>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">1,247</div>
+                        <div class="stat-label">Total Posts</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">15.2K</div>
+                        <div class="stat-label">Total Reach</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">2,341</div>
+                        <div class="stat-label">Engagements</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">18.7%</div>
+                        <div class="stat-label">Engagement Rate</div>
+                    </div>
+                </div>
+                
+                <div class="export-options">
+                    <button class="export-btn" onclick="exportToBuffer()">Export to Buffer</button>
+                    <button class="export-btn" onclick="exportToHootsuite()">Export to Hootsuite</button>
+                    <button class="export-btn" onclick="exportToLater()">Export to Later</button>
+                    <button class="export-btn" onclick="exportToWebhook()">Export to Webhook</button>
+                </div>
+            </div>
+            
+            <!-- Content Calendar -->
+            <div class="card">
+                <h3><span class="card-icon">📆</span>Content Calendar</h3>
+                
+                <div class="form-group">
+                    <label for="calendarView">View</label>
+                    <select id="calendarView" name="calendarView" aria-label="Select calendar view">
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                        <option value="quarter">This Quarter</option>
+                    </select>
+                </div>
+                
+                <div id="calendarContent">
+                    <div class="schedule-item">
+                        <div class="schedule-time">Today 9:00 AM</div>
+                        <div class="schedule-content">Facebook: SEO Tips for Local Businesses</div>
+                    </div>
+                    <div class="schedule-item">
+                        <div class="schedule-time">Today 2:00 PM</div>
+                        <div class="schedule-content">Instagram: Behind the Scenes at TNR</div>
+                    </div>
+                    <div class="schedule-item">
+                        <div class="schedule-time">Tomorrow 10:00 AM</div>
+                        <div class="schedule-content">LinkedIn: Insurance Industry Insights</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="social-media-csv-export.js"></script>
+    <script src="social-media-api-integration.js"></script>
+    <script>
+        // Check admin authentication
+        if (sessionStorage.getItem('adminAuthenticated') !== 'true') {
+            alert('Admin authentication required. Redirecting to login...');
+            window.location.href = 'admin-login.html';
+        }
+        
+        // Content templates for different types
+        const contentTemplates = {
+            'service-promotion': {
+                facebook: "🚀 Ready to grow your {service} in {location}? Our expert team at TNR Business Solutions has helped {number}+ local businesses achieve their goals! 💼\n\n✅ Professional {service} services\n✅ Proven results\n✅ Local expertise\n\n📞 Call (412) 499-2987 for a FREE consultation!\n\n#TNRBusinessSolutions #{service} #{location} #LocalBusiness",
+                instagram: "🚀 Transform your business with our {service} expertise! 💼✨\n\nWe've helped {number}+ businesses in {location} achieve amazing results! 🎯\n\nSwipe to see our work 👆\n\nReady to get started? DM us! 📩\n\n#TNRBusinessSolutions #{service} #{location} #BusinessGrowth #Marketing #LocalBusiness",
+                linkedin: "🚀 Excited to share how our {service} strategies are helping local businesses in {location} thrive! 💼\n\nKey benefits our clients experience:\n✅ Increased online visibility\n✅ Higher conversion rates\n✅ Better customer engagement\n✅ Measurable ROI\n\nInterested in learning more? Let's connect! 🤝\n\n#TNRBusinessSolutions #{service} #{location} #BusinessGrowth #DigitalMarketing",
+                twitter: "🚀 Our {service} services are helping {location} businesses grow! 💼\n\n✅ Proven results\n✅ Local expertise\n✅ Free consultation\n\nReady to get started? Call (412) 499-2987! 📞\n\n#TNRBusinessSolutions #{service} #{location} #BusinessGrowth"
+            },
+            'blue-collar': {
+                facebook: "🔧 QUALITY WORK GUARANTEED! At {business_name}, we've been serving {location} for {years} years with:\n\n✅ Licensed & Insured\n✅ Free Estimates\n✅ 24/7 Emergency Service\n✅ 100% Satisfaction Guarantee\n\nFrom small repairs to major projects, we do it right the first time!\n\nCall us today: {phone}\nVisit: {website}\n\n#Construction #LocalContractor #QualityWork #Licensed #Insured #FreeEstimates",
+                instagram: "🔧 QUALITY WORK GUARANTEED! \n\nAt {business_name}, we've been serving {location} for {years} years with:\n\n✅ Licensed & Insured\n✅ Free Estimates\n✅ 24/7 Emergency Service\n✅ 100% Satisfaction Guarantee\n\nFrom small repairs to major projects, we do it right the first time!\n\nCall us today: {phone}\nVisit: {website}\n\n#Construction #LocalContractor #QualityWork #Licensed #Insured #FreeEstimates #BeforeAndAfter #HomeImprovement",
+                linkedin: "🔧 QUALITY WORK GUARANTEED! \n\nAt {business_name}, we've been serving {location} for {years} years with:\n\n✅ Licensed & Insured\n✅ Free Estimates\n✅ 24/7 Emergency Service\n✅ 100% Satisfaction Guarantee\n\nFrom small repairs to major projects, we do it right the first time!\n\nCall us today: {phone}\nVisit: {website}\n\n#Construction #LocalContractor #QualityWork #Licensed #Insured #FreeEstimates #ProfessionalServices",
+                twitter: "🔧 QUALITY WORK GUARANTEED! \n\n{business_name} - Licensed & Insured\n✅ Free Estimates\n✅ 24/7 Emergency Service\n✅ 100% Satisfaction Guarantee\n\nCall: {phone} | Web: {website}\n\n#Construction #LocalContractor #QualityWork #Licensed #Insured"
+            },
+            'white-collar': {
+                facebook: "💼 PROFESSIONAL EXCELLENCE YOU CAN TRUST\n\nAt {business_name}, we provide:\n\n✅ {years} Years of Experience\n✅ Licensed & Certified Professionals\n✅ Confidential & Secure\n✅ Free Initial Consultation\n✅ Proven Track Record\n\nServing {location} with integrity and expertise.\n\nSchedule your consultation today:\n📞 {phone} | 🌐 {website}\n\n#ProfessionalServices #Expertise #Trust #Consultation #LocalBusiness",
+                instagram: "💼 PROFESSIONAL EXCELLENCE YOU CAN TRUST\n\nAt {business_name}, we provide:\n\n✅ {years} Years of Experience\n✅ Licensed & Certified Professionals\n✅ Confidential & Secure\n✅ Free Initial Consultation\n✅ Proven Track Record\n\nServing {location} with integrity and expertise.\n\nSchedule your consultation today:\n📞 {phone} | 🌐 {website}\n\n#ProfessionalServices #Expertise #Trust #Consultation #LocalBusiness #SmallBusiness",
+                linkedin: "💼 PROFESSIONAL EXCELLENCE YOU CAN TRUST\n\nAt {business_name}, we provide:\n\n✅ {years} Years of Experience\n✅ Licensed & Certified Professionals\n✅ Confidential & Secure\n✅ Free Initial Consultation\n✅ Proven Track Record\n\nServing {location} with integrity and expertise.\n\nSchedule your consultation today:\n📞 {phone} | 🌐 {website}\n\n#ProfessionalServices #Expertise #Trust #Consultation #LocalBusiness #ProfessionalServices",
+                twitter: "💼 PROFESSIONAL EXCELLENCE YOU CAN TRUST\n\n{business_name}:\n✅ {years} Years Experience\n✅ Licensed Professionals\n✅ Free Consultation\n✅ Proven Track Record\n\n📞 {phone} | 🌐 {website}\n\n#ProfessionalServices #Expertise #Trust #Consultation"
+            },
+            'e-business': {
+                facebook: "🌐 GROW YOUR BUSINESS ONLINE!\n\nAt {business_name}, we help businesses:\n\n✅ Increase Website Traffic\n✅ Generate More Leads\n✅ Boost Online Sales\n✅ Build Brand Awareness\n✅ Dominate Search Results\n\nProven results for {number}+ clients in {location}.\n\nFree digital audit - limited time:\n📞 {phone} | 🌐 {website}\n\n#DigitalMarketing #WebDesign #SEO #OnlineMarketing #BusinessGrowth",
+                instagram: "🌐 GROW YOUR BUSINESS ONLINE!\n\nAt {business_name}, we help businesses:\n\n✅ Increase Website Traffic\n✅ Generate More Leads\n✅ Boost Online Sales\n✅ Build Brand Awareness\n✅ Dominate Search Results\n\nProven results for {number}+ clients in {location}.\n\nFree digital audit - limited time:\n📞 {phone} | 🌐 {website}\n\n#DigitalMarketing #WebDesign #SEO #OnlineMarketing #BusinessGrowth #SmallBusiness",
+                linkedin: "🌐 GROW YOUR BUSINESS ONLINE!\n\nAt {business_name}, we help businesses:\n\n✅ Increase Website Traffic\n✅ Generate More Leads\n✅ Boost Online Sales\n✅ Build Brand Awareness\n✅ Dominate Search Results\n\nProven results for {number}+ clients in {location}.\n\nFree digital audit - limited time:\n📞 {phone} | 🌐 {website}\n\n#DigitalMarketing #WebDesign #SEO #OnlineMarketing #BusinessGrowth #ProfessionalServices",
+                twitter: "🌐 GROW YOUR BUSINESS ONLINE!\n\n{business_name} helps businesses:\n✅ Increase Traffic\n✅ Generate Leads\n✅ Boost Sales\n✅ Build Brand Awareness\n\nFree digital audit:\n📞 {phone} | 🌐 {website}\n\n#DigitalMarketing #WebDesign #SEO #OnlineMarketing"
+            },
+            'service-industry': {
+                facebook: "🍽️ FRESH, DELICIOUS, LOCAL!\n\nAt {business_name}, we serve:\n\n✅ Fresh, Local Ingredients\n✅ Family Recipes\n✅ Cozy Atmosphere\n✅ Takeout & Delivery Available\n✅ Catering Services\n\nOpen {hours} in {location}\n\nOrder now: {phone} | {website}\n\n#LocalRestaurant #FreshFood #FamilyOwned #Takeout #Delivery #Catering",
+                instagram: "🍽️ FRESH, DELICIOUS, LOCAL!\n\nAt {business_name}, we serve:\n\n✅ Fresh, Local Ingredients\n✅ Family Recipes\n✅ Cozy Atmosphere\n✅ Takeout & Delivery Available\n✅ Catering Services\n\nOpen {hours} in {location}\n\nOrder now: {phone} | {website}\n\n#LocalRestaurant #FreshFood #FamilyOwned #Takeout #Delivery #Catering #Foodie #LocalEats",
+                linkedin: "🍽️ FRESH, DELICIOUS, LOCAL!\n\nAt {business_name}, we serve:\n\n✅ Fresh, Local Ingredients\n✅ Family Recipes\n✅ Cozy Atmosphere\n✅ Takeout & Delivery Available\n✅ Catering Services\n\nOpen {hours} in {location}\n\nOrder now: {phone} | {website}\n\n#LocalRestaurant #FreshFood #FamilyOwned #Takeout #Delivery #Catering #ProfessionalServices",
+                twitter: "🍽️ FRESH, DELICIOUS, LOCAL!\n\n{business_name}:\n✅ Fresh, Local Ingredients\n✅ Family Recipes\n✅ Takeout & Delivery\n✅ Catering Services\n\nOpen {hours} in {location}\nOrder: {phone} | {website}\n\n#LocalRestaurant #FreshFood #FamilyOwned #Takeout"
+            },
+            'retail': {
+                facebook: "🛍️ SHOP LOCAL, SHOP SMART!\n\nAt {business_name}, find:\n\n✅ Quality Products\n✅ Competitive Prices\n✅ Expert Advice\n✅ Friendly Service\n✅ Local Support\n\nVisit us at {address} in {location}\nOpen {hours}\n\n📞 {phone} | 🌐 {website}\n\n#ShopLocal #Retail #QualityProducts #LocalBusiness #CustomerService",
+                instagram: "🛍️ SHOP LOCAL, SHOP SMART!\n\nAt {business_name}, find:\n\n✅ Quality Products\n✅ Competitive Prices\n✅ Expert Advice\n✅ Friendly Service\n✅ Local Support\n\nVisit us at {address} in {location}\nOpen {hours}\n\n📞 {phone} | 🌐 {website}\n\n#ShopLocal #Retail #QualityProducts #LocalBusiness #CustomerService #SmallBusiness",
+                linkedin: "🛍️ SHOP LOCAL, SHOP SMART!\n\nAt {business_name}, find:\n\n✅ Quality Products\n✅ Competitive Prices\n✅ Expert Advice\n✅ Friendly Service\n✅ Local Support\n\nVisit us at {address} in {location}\nOpen {hours}\n\n📞 {phone} | 🌐 {website}\n\n#ShopLocal #Retail #QualityProducts #LocalBusiness #CustomerService #ProfessionalServices",
+                twitter: "🛍️ SHOP LOCAL, SHOP SMART!\n\n{business_name}:\n✅ Quality Products\n✅ Competitive Prices\n✅ Expert Advice\n✅ Friendly Service\n\nVisit us at {address} in {location}\nOpen {hours}\n📞 {phone} | 🌐 {website}\n\n#ShopLocal #Retail #QualityProducts #LocalBusiness"
+            },
+            'client-success': {
+                facebook: "🎉 SUCCESS STORY! We're thrilled to share how we helped {client} increase their {metric} by {percentage}%! 📈\n\nOur {service} strategies delivered:\n✅ {result1}\n✅ {result2}\n✅ {result3}\n\nReady for your success story? Contact TNR Business Solutions today! 📞 (412) 499-2987\n\n#SuccessStory #TNRBusinessSolutions #{service} #{location}",
+                instagram: "🎉 SUCCESS ALERT! 🎉\n\nWe're so proud of {client} and their amazing {percentage}% increase in {metric}! 📈✨\n\nSwipe to see the transformation 👆\n\nWant to be our next success story? DM us! 💬\n\n#SuccessStory #TNRBusinessSolutions #{service} #BusinessGrowth",
+                linkedin: "🎉 Thrilled to share another success story! Our {service} strategies helped {client} achieve a {percentage}% increase in {metric}! 📈\n\nKey factors that drove success:\n✅ Strategic planning\n✅ Data-driven approach\n✅ Consistent execution\n✅ Regular optimization\n\nInterested in similar results? Let's discuss! 🤝\n\n#SuccessStory #TNRBusinessSolutions #{service} #BusinessGrowth",
+                twitter: "🎉 SUCCESS! {client} saw {percentage}% increase in {metric} with our {service} strategies! 📈\n\nReady for your success story? Contact us! 📞\n\n#SuccessStory #TNRBusinessSolutions #{service} #{location}"
+            },
+            'industry-tip': {
+                facebook: "💡 PRO TIP: {tip}\n\nThis simple strategy can make a huge difference for your {industry} business! 💼\n\nWant more expert tips? Follow TNR Business Solutions for daily insights! 📱\n\n#ProTip #TNRBusinessSolutions #{industry} #BusinessTips #{location}",
+                instagram: "💡 PRO TIP ALERT! 💡\n\n{tip}\n\nThis simple strategy can transform your {industry} business! 💼✨\n\nSave this post for later! 📌\n\nWant more tips? Follow us! 👆\n\n#ProTip #TNRBusinessSolutions #{industry} #BusinessTips #MarketingTips",
+                linkedin: "💡 Industry Insight: {tip}\n\nThis strategy has proven effective for {industry} businesses looking to improve their {metric}. 💼\n\nKey implementation steps:\n1. {step1}\n2. {step2}\n3. {step3}\n\nInterested in more industry insights? Let's connect! 🤝\n\n#IndustryInsight #TNRBusinessSolutions #{industry} #BusinessTips",
+                twitter: "💡 PRO TIP: {tip}\n\nSimple but effective for {industry} businesses! 💼\n\nWant more tips? Follow us! 👆\n\n#ProTip #TNRBusinessSolutions #{industry} #BusinessTips"
+            }
+        };
+
+        const hashtagSets = {
+            'digital-marketing': ['#DigitalMarketing', '#MarketingStrategy', '#BusinessGrowth', '#OnlineMarketing', '#MarketingTips', '#SocialMediaMarketing', '#ContentMarketing', '#EmailMarketing', '#PPC', '#SEO'],
+            'insurance': ['#Insurance', '#AutoInsurance', '#HomeInsurance', '#BusinessInsurance', '#LifeInsurance', '#InsuranceAgent', '#InsuranceBroker', '#InsuranceTips', '#Protection', '#Coverage'],
+            'web-design': ['#WebDesign', '#WebsiteDesign', '#WebDevelopment', '#ResponsiveDesign', '#UXDesign', '#UIDesign', '#WebDesigner', '#DigitalDesign', '#CreativeDesign', '#ModernWeb'],
+            'seo': ['#SEO', '#SearchEngineOptimization', '#LocalSEO', '#SEOTips', '#GoogleRankings', '#OrganicTraffic', '#KeywordResearch', '#SEOServices', '#DigitalMarketing', '#OnlineVisibility'],
+            'social-media': ['#SocialMedia', '#SocialMediaMarketing', '#FacebookMarketing', '#InstagramMarketing', '#LinkedInMarketing', '#SocialMediaTips', '#ContentCreation', '#SocialMediaStrategy', '#Engagement', '#SocialMediaManagement'],
+            'local-business': ['#LocalBusiness', '#GreensburgPA', '#WestmorelandCounty', '#Pittsburgh', '#LocalMarketing', '#Community', '#SmallBusiness', '#LocalSEO', '#BusinessSupport', '#LocalEconomy']
+        };
+
+        function switchPlatform(platform) {
+            // Remove active class from all tabs
+            document.querySelectorAll('.platform-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.content-area').forEach(area => area.classList.remove('active'));
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+            document.getElementById(platform).classList.add('active');
+        }
+
+        function generateContent() {
+            const contentType = document.getElementById('contentType').value;
+            const professionType = document.getElementById('professionType').value;
+            const serviceFocus = document.getElementById('serviceFocus').value;
+            const targetAudience = document.getElementById('targetAudience').value;
+            const platform = document.querySelector('.platform-tab.active').textContent.toLowerCase();
+            
+            // Get the appropriate template based on profession type
+            let template;
+            if (professionType !== 'general' && contentTemplates[professionType]) {
+                template = contentTemplates[professionType][platform];
+            } else {
+                template = contentTemplates[contentType][platform];
+            }
+            
+            // Replace placeholders
+            let content = template
+                .replace(/{service}/g, getServiceName(serviceFocus))
+                .replace(/{location}/g, 'Greensburg PA')
+                .replace(/{number}/g, Math.floor(Math.random() * 50) + 20)
+                .replace(/{client}/g, 'Local Business')
+                .replace(/{metric}/g, 'online visibility')
+                .replace(/{percentage}/g, Math.floor(Math.random() * 200) + 50)
+                .replace(/{result1}/g, 'Increased online visibility')
+                .replace(/{result2}/g, 'Higher conversion rates')
+                .replace(/{result3}/g, 'Better customer engagement')
+                .replace(/{tip}/g, getIndustryTip(serviceFocus))
+                .replace(/{business_name}/g, 'TNR Business Solutions')
+                .replace(/{years}/g, Math.floor(Math.random() * 20) + 5)
+                .replace(/{phone}/g, '(412) 499-2987')
+                .replace(/{website}/g, 'www.tnrbusinesssolutions.com')
+                .replace(/{address}/g, '418 Concord Avenue, Greensburg, PA 15601')
+                .replace(/{hours}/g, 'Monday-Friday 9AM-5PM')
+                .replace(/{industry}/g, getIndustryName(serviceFocus))
+                .replace(/{step1}/g, 'Define your goals')
+                .replace(/{step2}/g, 'Research your audience')
+                .replace(/{step3}/g, 'Implement and measure');
+            
+            // Display content
+            document.getElementById('previewContent').textContent = content;
+            document.getElementById('contentPreview').classList.remove('hidden');
+            
+            // Generate hashtags
+            generateHashtagsForContent(serviceFocus);
+        }
+
+        function getServiceName(service) {
+            const services = {
+                'seo': 'SEO Services',
+                'web-design': 'Web Design',
+                'social-media': 'Social Media Management',
+                'insurance': 'Insurance Services',
+                'paid-ads': 'Paid Advertising',
+                'email-marketing': 'Email Marketing'
+            };
+            return services[service] || 'Digital Marketing';
+        }
+
+        function getIndustryName(service) {
+            const industries = {
+                'seo': 'digital marketing',
+                'web-design': 'web development',
+                'social-media': 'social media',
+                'insurance': 'insurance',
+                'paid-ads': 'advertising',
+                'email-marketing': 'email marketing'
+            };
+            return industries[service] || 'business';
+        }
+
+        function getIndustryTip(service) {
+            const tips = {
+                'seo': 'Focus on local keywords to improve your Google rankings',
+                'web-design': 'Make sure your website loads in under 3 seconds',
+                'social-media': 'Post consistently at the same times each day',
+                'insurance': 'Review your coverage annually to ensure adequate protection',
+                'paid-ads': 'Test different ad creatives to find what resonates',
+                'email-marketing': 'Personalize your subject lines to increase open rates'
+            };
+            return tips[service] || 'Focus on your customers\' needs first';
+        }
+
+        function generateHashtags() {
+            const industry = document.getElementById('hashtagIndustry').value;
+            const location = document.getElementById('hashtagLocation').value;
+            
+            const baseHashtags = hashtagSets[industry] || hashtagSets['digital-marketing'];
+            const locationHashtags = ['#GreensburgPA', '#WestmorelandCounty', '#Pittsburgh', '#LocalBusiness'];
+            const generalHashtags = ['#TNRBusinessSolutions', '#BusinessGrowth', '#Marketing', '#Success'];
+            
+            const allHashtags = [...baseHashtags, ...locationHashtags, ...generalHashtags];
+            
+            const hashtagContainer = document.getElementById('hashtagResults');
+            hashtagContainer.innerHTML = '';
+            
+            allHashtags.forEach(hashtag => {
+                const hashtagElement = document.createElement('span');
+                hashtagElement.className = 'hashtag';
+                hashtagElement.textContent = hashtag;
+                hashtagElement.onclick = () => copyToClipboard(hashtag);
+                hashtagContainer.appendChild(hashtagElement);
+            });
+        }
+
+        function generateHashtagsForContent(service) {
+            const industry = service === 'insurance' ? 'insurance' : 'digital-marketing';
+            const baseHashtags = hashtagSets[industry] || hashtagSets['digital-marketing'];
+            const locationHashtags = ['#GreensburgPA', '#WestmorelandCounty', '#LocalBusiness'];
+            const generalHashtags = ['#TNRBusinessSolutions', '#BusinessGrowth'];
+            
+            const allHashtags = [...baseHashtags.slice(0, 5), ...locationHashtags, ...generalHashtags];
+            
+            const hashtagContainer = document.getElementById('hashtagSuggestions');
+            hashtagContainer.innerHTML = '';
+            
+            allHashtags.forEach(hashtag => {
+                const hashtagElement = document.createElement('span');
+                hashtagElement.className = 'hashtag';
+                hashtagElement.textContent = hashtag;
+                hashtagElement.onclick = () => copyToClipboard(hashtag);
+                hashtagContainer.appendChild(hashtagElement);
+            });
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Hashtag copied to clipboard!');
+            });
+        }
+
+        // schedulePost function is now handled by social-media-csv-export.js
+
+        function addClient() {
+            const clientName = document.getElementById('newClientName').value;
+            const services = Array.from(document.getElementById('clientServices').selectedOptions).map(option => option.value);
+            
+            if (!clientName) {
+                alert('Please enter a client name');
+                return;
+            }
+            
+            const clientItem = document.createElement('div');
+            clientItem.className = 'client-item';
+            clientItem.innerHTML = `
+                <div>
+                    <div class="client-name">${clientName}</div>
+                    <div style="font-size: 0.8rem; color: #6c757d;">${services.join(', ')}</div>
+                </div>
+                <span class="client-status status-active">Active</span>
+            `;
+            
+            document.getElementById('clientList').appendChild(clientItem);
+            
+            // Clear form
+            document.getElementById('newClientName').value = '';
+            document.getElementById('clientServices').selectedIndex = -1;
+            
+            alert('Client added successfully!');
+        }
+
+        // exportData function is now handled by social-media-csv-export.js
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set default date/time to tomorrow
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(9, 0, 0, 0);
+            document.getElementById('scheduleDateTime').value = tomorrow.toISOString().slice(0, 16);
+        });
+    </script>
+</body>
+</html>
+

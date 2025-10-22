@@ -1,0 +1,121 @@
+{
+  "timestamp": "2025-10-22T18:05:11.415Z",
+  "summary": {
+    "totalImages": 10,
+    "foundImages": 10,
+    "missingImages": 0,
+    "oversizedImages": 1,
+    "totalSize": 1735323
+  },
+  "details": [
+    {
+      "path": "media/logo.png",
+      "type": "logo",
+      "exists": true,
+      "size": 15395,
+      "needsOptimization": false,
+      "issues": []
+    },
+    {
+      "path": "media/web-design-laptop.jpg",
+      "type": "card",
+      "exists": true,
+      "size": 61083,
+      "needsOptimization": false,
+      "issues": []
+    },
+    {
+      "path": "media/seo-analytics-dashboard.jpg",
+      "type": "card",
+      "exists": true,
+      "size": 75375,
+      "needsOptimization": false,
+      "issues": []
+    },
+    {
+      "path": "media/social-media-marketing.jpg",
+      "type": "card",
+      "exists": true,
+      "size": 73049,
+      "needsOptimization": false,
+      "issues": []
+    },
+    {
+      "path": "media/paid-advertising-dashboard.jpg",
+      "type": "card",
+      "exists": true,
+      "size": 81179,
+      "needsOptimization": false,
+      "issues": []
+    },
+    {
+      "path": "media/auto-insurance-car.jpg",
+      "type": "card",
+      "exists": true,
+      "size": 78755,
+      "needsOptimization": false,
+      "issues": []
+    },
+    {
+      "path": "media/home-insurance-protection.jpg",
+      "type": "card",
+      "exists": true,
+      "size": 60639,
+      "needsOptimization": false,
+      "issues": []
+    },
+    {
+      "path": "media/business-team-meeting.jpg",
+      "type": "card",
+      "exists": true,
+      "size": 95045,
+      "needsOptimization": false,
+      "issues": []
+    },
+    {
+      "path": "media/generated-imagelifeinsurance1.png",
+      "type": "card",
+      "exists": true,
+      "size": 1190428,
+      "needsOptimization": true,
+      "issues": [
+        "File size 1163KB exceeds limit of 98KB"
+      ]
+    },
+    {
+      "path": "media/reviewqrcode.png",
+      "type": "icon",
+      "exists": true,
+      "size": 4375,
+      "needsOptimization": false,
+      "issues": []
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": "HIGH",
+      "category": "File Size",
+      "message": "1 images exceed recommended file size limits",
+      "action": "Compress these images to reduce loading time",
+      "images": [
+        "media/generated-imagelifeinsurance1.png"
+      ]
+    },
+    {
+      "priority": "MEDIUM",
+      "category": "Format Optimization",
+      "message": "8 images could benefit from WebP format",
+      "action": "Convert large images to WebP for better compression",
+      "images": [
+        "media/web-design-laptop.jpg",
+        "media/seo-analytics-dashboard.jpg",
+        "media/social-media-marketing.jpg",
+        "media/paid-advertising-dashboard.jpg",
+        "media/auto-insurance-car.jpg",
+        "media/home-insurance-protection.jpg",
+        "media/business-team-meeting.jpg",
+        "media/generated-imagelifeinsurance1.png"
+      ]
+    }
+  ]
+}

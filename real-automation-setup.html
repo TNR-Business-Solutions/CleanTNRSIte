@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Social Media Automation Setup - TNR Business Solutions</title>
+    <link rel="stylesheet" href="assets/social-media-automation.css">
+    <style>
+        .setup-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .setup-step {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+        }
+        
+        .step-number {
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        
+        .api-key-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-family: monospace;
+        }
+        
+        .test-button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        
+        .test-button:hover {
+            background: #218838;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-connected {
+            background: #28a745;
+        }
+        
+        .status-disconnected {
+            background: #dc3545;
+        }
+        
+        .status-testing {
+            background: #ffc107;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .platform-card {
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .platform-card.connected {
+            border-color: #28a745;
+        }
+        
+        .platform-card.disconnected {
+            border-color: #dc3545;
+        }
+        
+        .api-docs-link {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        
+        .api-docs-link:hover {
+            text-decoration: underline;
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .warning-box h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        
+        .warning-box p {
+            color: #856404;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="setup-container">
+        <div class="header">
+            <h1>🔧 Real Social Media Automation Setup</h1>
+            <p>Connect your social media accounts for actual automation</p>
+        </div>
+
+        <div class="warning-box">
+            <h4>⚠️ Important Security Notice</h4>
+            <p>API keys are stored locally in your browser. Never share these keys or commit them to version control. For production use, implement proper server-side authentication.</p>
+        </div>
+
+        <!-- Step 1: API Keys Configuration -->
+        <div class="setup-step">
+            <h3><span class="step-number">1</span>Configure API Keys</h3>
+            <p>Get API keys from your social media platforms and scheduling tools:</p>
+            
+            <div class="platform-card" id="bufferCard">
+                <h4>📊 Buffer</h4>
+                <p>Social media scheduling platform</p>
+                <input type="password" id="bufferApiKey" class="api-key-input" placeholder="Enter Buffer API Key">
+                <button class="test-button" onclick="testApiKey('buffer')">Test Connection</button>
+                <span class="status-indicator status-disconnected" id="bufferStatus"></span>
+                <span id="bufferMessage">Not connected</span>
+                <br><br>
+                <a href="https://buffer.com/developers" target="_blank" class="api-docs-link">Get API Key →</a>
+            </div>
+
+            <div class="platform-card" id="facebookCard">
+                <h4>📘 Facebook</h4>
+                <p>Facebook Pages API for posting</p>
+                <input type="password" id="facebookAccessToken" class="api-key-input" placeholder="Enter Facebook Access Token">
+                <button class="test-button" onclick="testApiKey('facebook')">Test Connection</button>
+                <span class="status-indicator status-disconnected" id="facebookStatus"></span>
+                <span id="facebookMessage">Not connected</span>
+                <br><br>
+                <a href="https://developers.facebook.com/tools/explorer" target="_blank" class="api-docs-link">Get Access Token →</a>
+            </div>
+
+            <div class="platform-card" id="linkedinCard">
+                <h4>💼 LinkedIn</h4>
+                <p>LinkedIn Company Pages API</p>
+                <input type="password" id="linkedinAccessToken" class="api-key-input" placeholder="Enter LinkedIn Access Token">
+                <button class="test-button" onclick="testApiKey('linkedin')">Test Connection</button>
+                <span class="status-indicator status-disconnected" id="linkedinStatus"></span>
+                <span id="linkedinMessage">Not connected</span>
+                <br><br>
+                <a href="https://www.linkedin.com/developers/apps" target="_blank" class="api-docs-link">Get Access Token →</a>
+            </div>
+
+            <div class="platform-card" id="twitterCard">
+                <h4>🐦 Twitter</h4>
+                <p>Twitter API v2 for posting</p>
+                <input type="password" id="twitterBearerToken" class="api-key-input" placeholder="Enter Twitter Bearer Token">
+                <button class="test-button" onclick="testApiKey('twitter')">Test Connection</button>
+                <span class="status-indicator status-disconnected" id="twitterStatus"></span>
+                <span id="twitterMessage">Not connected</span>
+                <br><br>
+                <a href="https://developer.twitter.com/en/portal/dashboard" target="_blank" class="api-docs-link">Get Bearer Token →</a>
+            </div>
+        </div>
+
+        <!-- Step 2: Zapier Integration -->
+        <div class="setup-step">
+            <h3><span class="step-number">2</span>Zapier/Make.com Integration</h3>
+            <p>Set up automated workflows for advanced automation:</p>
+            
+            <div class="platform-card">
+                <h4>⚡ Zapier Webhook</h4>
+                <p>Connect to Zapier for advanced automation workflows</p>
+                <input type="text" id="zapierWebhookUrl" class="api-key-input" placeholder="Enter Zapier Webhook URL">
+                <button class="test-button" onclick="testZapierWebhook()">Test Webhook</button>
+                <br><br>
+                <a href="https://zapier.com/apps/webhooks/integrations" target="_blank" class="api-docs-link">Create Zapier Webhook →</a>
+            </div>
+
+            <div class="platform-card">
+                <h4>🔧 Make.com (Integromat)</h4>
+                <p>Advanced automation platform</p>
+                <input type="text" id="makeWebhookUrl" class="api-key-input" placeholder="Enter Make.com Webhook URL">
+                <button class="test-button" onclick="testMakeWebhook()">Test Webhook</button>
+                <br><br>
+                <a href="https://www.make.com/en/help/tools/webhooks" target="_blank" class="api-docs-link">Create Make.com Webhook →</a>
+            </div>
+        </div>
+
+        <!-- Step 3: Analytics Setup -->
+        <div class="setup-step">
+            <h3><span class="step-number">3</span>Analytics Integration</h3>
+            <p>Connect analytics tools to track performance:</p>
+            
+            <div class="platform-card">
+                <h4>📈 Google Analytics</h4>
+                <p>Track social media traffic and conversions</p>
+                <input type="text" id="gaTrackingId" class="api-key-input" placeholder="Enter GA4 Measurement ID (G-XXXXXXXXXX)">
+                <button class="test-button" onclick="testGoogleAnalytics()">Test Connection</button>
+                <br><br>
+                <a href="https://analytics.google.com/analytics/web/" target="_blank" class="api-docs-link">Get GA4 ID →</a>
+            </div>
+
+            <div class="platform-card">
+                <h4>📊 Facebook Analytics</h4>
+                <p>Track Facebook and Instagram performance</p>
+                <input type="text" id="fbPixelId" class="api-key-input" placeholder="Enter Facebook Pixel ID">
+                <button class="test-button" onclick="testFacebookPixel()">Test Connection</button>
+                <br><br>
+                <a href="https://business.facebook.com/events_manager" target="_blank" class="api-docs-link">Get Pixel ID →</a>
+            </div>
+        </div>
+
+        <!-- Step 4: Test Real Automation -->
+        <div class="setup-step">
+            <h3><span class="step-number">4</span>Test Real Automation</h3>
+            <p>Test your setup with a real post:</p>
+            
+            <div class="form-group">
+                <label for="testContent">Test Post Content</label>
+                <textarea id="testContent" rows="4" placeholder="Enter test post content...">🚀 Testing real automation from TNR Business Solutions! This is a test post to verify our social media automation is working correctly. #TestPost #Automation #TNRBusinessSolutions</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="testPlatform">Select Platform</label>
+                <select id="testPlatform">
+                    <option value="buffer">Buffer (All Platforms)</option>
+                    <option value="facebook">Facebook</option>
+                    <option value="linkedin">LinkedIn</option>
+                    <option value="twitter">Twitter</option>
+                </select>
+            </div>
+            
+            <button class="btn" onclick="testRealPost()">🚀 Send Test Post</button>
+            <div id="testResults" style="margin-top: 15px;"></div>
+        </div>
+
+        <!-- Step 5: Production Setup -->
+        <div class="setup-step">
+            <h3><span class="step-number">5</span>Production Setup</h3>
+            <p>Configure for production use:</p>
+            
+            <div class="platform-card">
+                <h4>🔒 Security Configuration</h4>
+                <ul>
+                    <li>✅ API keys stored locally (browser only)</li>
+                    <li>✅ HTTPS required for production</li>
+                    <li>✅ Rate limiting implemented</li>
+                    <li>⚠️ Consider server-side authentication for production</li>
+                </ul>
+            </div>
+
+            <div class="platform-card">
+                <h4>📋 Monitoring & Alerts</h4>
+                <ul>
+                    <li>✅ Connection status monitoring</li>
+                    <li>✅ Error logging and alerts</li>
+                    <li>✅ Performance metrics tracking</li>
+                    <li>✅ Automated backup of scheduled posts</li>
+                </ul>
+            </div>
+
+            <button class="btn" onclick="exportConfiguration()">💾 Export Configuration</button>
+            <button class="btn btn-secondary" onclick="importConfiguration()">📁 Import Configuration</button>
+        </div>
+
+        <!-- Navigation -->
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="social-media-automation-dashboard.html" class="btn">← Back to Dashboard</a>
+            <a href="social-media-content-templates.html" class="btn btn-secondary">View Templates →</a>
+        </div>
+    </div>
+
+    <script src="social-media-api-integration.js"></script>
+    <script>
+        // Test API key connection
+        async function testApiKey(platform) {
+            const inputId = platform === 'buffer' ? 'bufferApiKey' : 
+                           platform === 'facebook' ? 'facebookAccessToken' :
+                           platform === 'linkedin' ? 'linkedinAccessToken' : 'twitterBearerToken';
+            
+            const apiKey = document.getElementById(inputId).value;
+            if (!apiKey) {
+                alert('Please enter an API key first');
+                return;
+            }
+
+            // Update UI to show testing
+            const statusElement = document.getElementById(platform + 'Status');
+            const messageElement = document.getElementById(platform + 'Message');
+            const cardElement = document.getElementById(platform + 'Card');
+            
+            statusElement.className = 'status-indicator status-testing';
+            messageElement.textContent = 'Testing connection...';
+            cardElement.className = 'platform-card';
+
+            try {
+                // Update API key
+                window.socialMediaAPI.updateApiKey(platform, apiKey);
+                
+                // Test connection
+                const result = await window.socialMediaAPI.testConnection(platform, apiKey);
+                
+                if (result.success) {
+                    statusElement.className = 'status-indicator status-connected';
+                    messageElement.textContent = 'Connected successfully!';
+                    cardElement.className = 'platform-card connected';
+                } else {
+                    statusElement.className = 'status-indicator status-disconnected';
+                    messageElement.textContent = 'Connection failed: ' + result.error;
+                    cardElement.className = 'platform-card disconnected';
+                }
+            } catch (error) {
+                statusElement.className = 'status-indicator status-disconnected';
+                messageElement.textContent = 'Error: ' + error.message;
+                cardElement.className = 'platform-card disconnected';
+            }
+        }
+
+        // Test Zapier webhook
+        async function testZapierWebhook() {
+            const webhookUrl = document.getElementById('zapierWebhookUrl').value;
+            if (!webhookUrl) {
+                alert('Please enter a webhook URL first');
+                return;
+            }
+
+            try {
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        test: true,
+                        message: 'Testing Zapier webhook connection from TNR Social Media Automation',
+                        timestamp: new Date().toISOString()
+                    })
+                });
+
+                if (response.ok) {
+                    alert('Zapier webhook test successful!');
+                } else {
+                    alert('Zapier webhook test failed: ' + response.status);
+                }
+            } catch (error) {
+                alert('Zapier webhook test error: ' + error.message);
+            }
+        }
+
+        // Test Make.com webhook
+        async function testMakeWebhook() {
+            const webhookUrl = document.getElementById('makeWebhookUrl').value;
+            if (!webhookUrl) {
+                alert('Please enter a webhook URL first');
+                return;
+            }
+
+            try {
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        test: true,
+                        message: 'Testing Make.com webhook connection from TNR Social Media Automation',
+                        timestamp: new Date().toISOString()
+                    })
+                });
+
+                if (response.ok) {
+                    alert('Make.com webhook test successful!');
+                } else {
+                    alert('Make.com webhook test failed: ' + response.status);
+                }
+            } catch (error) {
+                alert('Make.com webhook test error: ' + error.message);
+            }
+        }
+
+        // Test real post
+        async function testRealPost() {
+            const content = document.getElementById('testContent').value;
+            const platform = document.getElementById('testPlatform').value;
+            const resultsDiv = document.getElementById('testResults');
+
+            if (!content) {
+                alert('Please enter test content');
+                return;
+            }
+
+            resultsDiv.innerHTML = '<p>🔄 Sending test post...</p>';
+
+            try {
+                const postData = {
+                    platforms: [platform],
+                    content: content,
+                    scheduledTime: new Date(),
+                    client: 'TNR Business Solutions',
+                    hashtags: extractHashtags(content),
+                    utmSource: platform,
+                    utmMedium: 'social',
+                    utmCampaign: 'test'
+                };
+
+                const result = await window.socialMediaAPI.schedulePost(postData);
+                
+                if (result.success) {
+                    resultsDiv.innerHTML = '<p style="color: green;">✅ Test post sent successfully!</p>';
+                } else {
+                    resultsDiv.innerHTML = '<p style="color: red;">❌ Test post failed: ' + result.errors.join(', ') + '</p>';
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = '<p style="color: red;">❌ Test post error: ' + error.message + '</p>';
+            }
+        }
+
+        // Export configuration
+        function exportConfiguration() {
+            const config = {
+                apiKeys: window.socialMediaAPI.apiKeys,
+                timestamp: new Date().toISOString(),
+                version: '1.0'
+            };
+
+            const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'social-media-config.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Import configuration
+        function importConfiguration() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const config = JSON.parse(e.target.result);
+                            Object.assign(window.socialMediaAPI.apiKeys, config.apiKeys);
+                            window.socialMediaAPI.saveApiKeys();
+                            alert('Configuration imported successfully!');
+                            location.reload();
+                        } catch (error) {
+                            alert('Error importing configuration: ' + error.message);
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
+
+        // Load saved configuration on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load saved API keys into form fields
+            const savedKeys = localStorage.getItem('socialMediaApiKeys');
+            if (savedKeys) {
+                const keys = JSON.parse(savedKeys);
+                if (keys.buffer) document.getElementById('bufferApiKey').value = keys.buffer;
+                if (keys.facebook) document.getElementById('facebookAccessToken').value = keys.facebook;
+                if (keys.linkedin) document.getElementById('linkedinAccessToken').value = keys.linkedin;
+                if (keys.twitter) document.getElementById('twitterBearerToken').value = keys.twitter;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -6,7 +6,15 @@
   "scripts": {
     "start": "node serve-clean.js",
     "dev": "node serve-clean.js",
-    "serve": "node serve-clean.js"
+    "serve": "node serve-clean.js",
+    "build": "node verify-images.js",
+    "verify-images": "node verify-images.js",
+    "test": "node run-tests.js",
+    "test:forms": "node test-production-forms.js",
+    "minify": "node minify-production.js",
+    "optimize-images": "node optimize-images.js",
+    "analytics": "node analytics-monitoring.js",
+    "predeploy": "npm run test && npm run verify-images && npm run minify && npm run optimize-images && npm run analytics"
   },
   "keywords": [
     "digital-marketing",
@@ -22,12 +30,19 @@
     "node": ">=14.0.0"
   },
   "dependencies": {
-    "nodemailer": "^6.9.7",
-    "dotenv": "^16.3.1"
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^5.1.0",
+    "node-fetch": "^3.3.2",
+    "nodemailer": "^6.10.1"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/tnr-business-solutions/website.git"
   },
-  "homepage": "https://www.tnrbusinesssolutions.com"
+  "homepage": "https://www.tnrbusinesssolutions.com",
+  "devDependencies": {
+    "clean-css": "^5.3.3",
+    "terser": "^5.44.0"
+  }
 }

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Form CRM Integration</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .form-container { max-width: 600px; margin: 0 auto; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, textarea, select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .debug-info { background: #f8f9fa; padding: 15px; margin: 20px 0; border-radius: 4px; border-left: 4px solid #007bff; }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1>Test Form CRM Integration</h1>
+        
+        <form id="contact-form">
+            <div class="form-group">
+                <label for="name">Name *</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email *</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">Phone</label>
+                <input type="tel" id="phone" name="phone">
+            </div>
+            
+            <div class="form-group">
+                <label for="company">Company</label>
+                <input type="text" id="company" name="company">
+            </div>
+            
+            <div class="form-group">
+                <label for="message">Message *</label>
+                <textarea id="message" name="message" rows="4" required></textarea>
+            </div>
+            
+            <button type="submit">Submit Test Form</button>
+        </form>
+        
+        <div class="debug-info">
+            <h3>Debug Information</h3>
+            <div id="debug-output">Waiting for form submission...</div>
+        </div>
+        
+        <div class="debug-info">
+            <h3>CRM Data</h3>
+            <div id="crm-output">Loading CRM data...</div>
+        </div>
+    </div>
+
+    <!-- Load scripts in correct order -->
+    <script src="crm-data.js"></script>
+    <script src="email-service.js"></script>
+    <script src="form-integration.js"></script>
+    
+    <script>
+        // Debug script to monitor form submissions and CRM data
+        function updateDebugInfo() {
+            const debugOutput = document.getElementById('debug-output');
+            const crmOutput = document.getElementById('crm-output');
+            
+            // Check if CRM is available
+            const crmAvailable = typeof window.tnrCRM !== 'undefined';
+            const formIntegrationAvailable = typeof window.tnrFormIntegration !== 'undefined';
+            
+            debugOutput.innerHTML = `
+                <p><strong>CRM Available:</strong> <span class="${crmAvailable ? 'success' : 'error'}">${crmAvailable ? 'Yes' : 'No'}</span></p>
+                <p><strong>Form Integration Available:</strong> <span class="${formIntegrationAvailable ? 'success' : 'error'}">${formIntegrationAvailable ? 'Yes' : 'No'}</span></p>
+                <p><strong>Form Submissions in localStorage:</strong> ${localStorage.getItem('tnr_form_submissions') ? JSON.parse(localStorage.getItem('tnr_form_submissions')).length : 0}</p>
+                <p><strong>Leads in CRM:</strong> ${crmAvailable ? window.tnrCRM.leads.length : 'N/A'}</p>
+                <p><strong>Last Submission Time:</strong> ${new Date().toLocaleString()}</p>
+            `;
+            
+            if (crmAvailable) {
+                crmOutput.innerHTML = `
+                    <p><strong>Total Leads:</strong> ${window.tnrCRM.leads.length}</p>
+                    <p><strong>New Leads:</strong> ${window.tnrCRM.leads.filter(l => l.status === 'New').length}</p>
+                    <p><strong>Form Submissions:</strong> ${window.tnrCRM.formSubmissions.length}</p>
+                    <p><strong>Recent Leads:</strong></p>
+                    <ul>
+                        ${window.tnrCRM.leads.slice(-3).map(lead => 
+                            `<li>${lead.name} - ${lead.email} - ${lead.source} - ${lead.status}</li>`
+                        ).join('')}
+                    </ul>
+                `;
+            } else {
+                crmOutput.innerHTML = '<p class="error">CRM not available</p>';
+            }
+        }
+        
+        // Update debug info every second
+        setInterval(updateDebugInfo, 1000);
+        
+        // Initial update
+        updateDebugInfo();
+        
+        // Override the form integration to add debugging
+        document.addEventListener('DOMContentLoaded', function() {
+            // Wait a bit for scripts to load
+            setTimeout(() => {
+                if (window.tnrFormIntegration) {
+                    const originalProcessFormSubmission = window.tnrFormIntegration.processFormSubmission.bind(window.tnrFormIntegration);
+                    
+                    window.tnrFormIntegration.processFormSubmission = function(submission) {
+                        console.log('Form submission processing:', submission);
+                        
+                        // Call original method
+                        const result = originalProcessFormSubmission(submission);
+                        
+                        // Update debug info after processing
+                        setTimeout(updateDebugInfo, 100);
+                        
+                        return result;
+                    };
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

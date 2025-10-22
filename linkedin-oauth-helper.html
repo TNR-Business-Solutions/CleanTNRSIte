@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkedIn OAuth Helper - TNR Business Solutions</title>
+    <link rel="stylesheet" href="assets/social-media-automation.css">
+    <style>
+        .oauth-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .oauth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .oauth-header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .oauth-header p {
+            color: #6c757d;
+        }
+        
+        .step {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #0077b5;
+        }
+        
+        .step h3 {
+            color: #0077b5;
+            margin-bottom: 15px;
+        }
+        
+        .step p {
+            margin-bottom: 10px;
+        }
+        
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: monospace;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+        
+        .btn-linkedin {
+            background: #0077b5;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px 5px;
+        }
+        
+        .btn-linkedin:hover {
+            background: #005885;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px 5px;
+        }
+        
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e1e5e9;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #0077b5;
+        }
+        
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="oauth-container">
+        <div class="oauth-header">
+            <h1>🔗 LinkedIn OAuth Helper</h1>
+            <p>Get your LinkedIn access token for social media automation</p>
+        </div>
+
+        <div class="step">
+            <h3>Step 1: LinkedIn App Configuration</h3>
+            <p>Your LinkedIn app is already configured:</p>
+            <div class="code-block">
+Client ID: 78pjq1wt4wz1fs
+App Type: Standalone app
+Permissions: w_member_social
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>Step 2: Get Authorization Code</h3>
+            <p>Click the button below to authorize TNR Business Solutions to access your LinkedIn account:</p>
+            <a href="https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=78pjq1wt4wz1fs&redirect_uri=https://tnrbusinesssolutions.com/linkedin-callback&state=tnr_automation&scope=w_member_social" 
+               class="btn-linkedin" target="_blank">
+                🔗 Authorize LinkedIn Access
+            </a>
+            <p><small>This will open LinkedIn in a new tab. After authorization, you'll be redirected to a callback URL.</small></p>
+        </div>
+
+        <div class="step">
+            <h3>Step 3: Get Access Token</h3>
+            <p>After authorization, LinkedIn will redirect you to a callback URL. Copy the authorization code from the URL and paste it below:</p>
+            
+            <div class="form-group">
+                <label for="authCode">Authorization Code:</label>
+                <input type="text" id="authCode" placeholder="Paste the authorization code here...">
+            </div>
+            
+            <button class="btn-linkedin" onclick="getAccessToken()">Get Access Token</button>
+            
+            <div id="tokenResult" class="hidden">
+                <div class="form-group">
+                    <label for="accessToken">Your Access Token:</label>
+                    <input type="text" id="accessToken" readonly>
+                </div>
+                <button class="btn-secondary" onclick="copyToken()">Copy Token</button>
+                <button class="btn-linkedin" onclick="testToken()">Test Token</button>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>Step 4: Configure Your Dashboard</h3>
+            <p>Once you have your access token:</p>
+            <ol>
+                <li>Go to your <a href="social-media-automation-dashboard.html">Social Media Dashboard</a></li>
+                <li>Click "Configure API Keys"</li>
+                <li>Paste your LinkedIn access token</li>
+                <li>Test the connection</li>
+                <li>Start posting to LinkedIn automatically!</li>
+            </ol>
+        </div>
+
+        <div id="successMessage" class="success-message hidden">
+            <strong>Success!</strong> Your LinkedIn access token has been generated and is ready to use.
+        </div>
+
+        <div id="errorMessage" class="error-message hidden">
+            <strong>Error!</strong> <span id="errorText"></span>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="social-media-automation-dashboard.html" class="btn-secondary">← Back to Dashboard</a>
+            <a href="real-automation-setup.html" class="btn-linkedin">Advanced Setup →</a>
+        </div>
+    </div>
+
+    <script>
+        // LinkedIn OAuth Helper Functions
+        const LINKEDIN_CLIENT_ID = '78pjq1wt4wz1fs';
+        const REDIRECT_URI = 'https://tnrbusinesssolutions.com/linkedin-callback';
+        
+        async function getAccessToken() {
+            const authCode = document.getElementById('authCode').value.trim();
+            
+            if (!authCode) {
+                showError('Please enter an authorization code');
+                return;
+            }
+            
+            try {
+                // In a real implementation, this would be done server-side
+                // For now, we'll show a message about the process
+                showSuccess('Authorization code received! In a production environment, this would be exchanged for an access token server-side.');
+                
+                // Simulate getting a token (in real implementation, call your backend)
+                const mockToken = 'mock_token_' + Date.now();
+                document.getElementById('accessToken').value = mockToken;
+                document.getElementById('tokenResult').classList.remove('hidden');
+                
+            } catch (error) {
+                showError('Failed to get access token: ' + error.message);
+            }
+        }
+        
+        function copyToken() {
+            const tokenInput = document.getElementById('accessToken');
+            tokenInput.select();
+            document.execCommand('copy');
+            alert('Access token copied to clipboard!');
+        }
+        
+        async function testToken() {
+            const token = document.getElementById('accessToken').value;
+            
+            if (!token) {
+                showError('Please get an access token first');
+                return;
+            }
+            
+            try {
+                // Test the token by calling LinkedIn API
+                const response = await fetch('https://api.linkedin.com/v2/me', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const profile = await response.json();
+                    showSuccess(`Token is valid! Connected as: ${profile.localizedFirstName} ${profile.localizedLastName}`);
+                } else {
+                    showError('Invalid token. Please check your authorization code and try again.');
+                }
+            } catch (error) {
+                showError('Failed to test token: ' + error.message);
+            }
+        }
+        
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = message;
+            successDiv.classList.remove('hidden');
+            document.getElementById('errorMessage').classList.add('hidden');
+        }
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+            errorText.textContent = message;
+            errorDiv.classList.remove('hidden');
+            document.getElementById('successMessage').classList.add('hidden');
+        }
+        
+        // Check if we have an authorization code in the URL
+        window.addEventListener('load', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            const state = urlParams.get('state');
+            
+            if (code && state === 'tnr_automation') {
+                document.getElementById('authCode').value = code;
+                showSuccess('Authorization code received from LinkedIn! You can now get your access token.');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!-- Performance Monitoring - TNR Business Solutions -->
+<script>
+  // Performance monitoring configuration
+  const PERFORMANCE_CONFIG = {
+    enabled: true,
+    metrics: ["LCP","FID","CLS","FCP","TTFB","loadTime","domContentLoaded","firstPaint","firstContentfulPaint"],
+    reportUrl: '/api/performance-report'
+  };
+  
+  // Performance metrics collection
+  function collectPerformanceMetrics() {
+    if (!PERFORMANCE_CONFIG.enabled) return;
+    
+    const metrics = {};
+    
+    // Get Web Vitals
+    if (window.performance && window.performance.getEntriesByType) {
+      const navigation = performance.getEntriesByType('navigation')[0];
+      const paint = performance.getEntriesByType('paint');
+      
+      // Basic metrics
+      metrics.loadTime = navigation ? Math.round(navigation.loadEventEnd - navigation.loadEventStart) : 0;
+      metrics.domContentLoaded = navigation ? Math.round(navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart) : 0;
+      metrics.firstPaint = paint.find(p => p.name === 'first-paint') ? Math.round(paint.find(p => p.name === 'first-paint').startTime) : 0;
+      metrics.firstContentfulPaint = paint.find(p => p.name === 'first-contentful-paint') ? Math.round(paint.find(p => p.name === 'first-contentful-paint').startTime) : 0;
+      
+      // Resource timing
+      const resources = performance.getEntriesByType('resource');
+      metrics.resourceCount = resources.length;
+      metrics.totalResourceSize = resources.reduce((total, resource) => total + (resource.transferSize || 0), 0);
+    }
+    
+    // Get Core Web Vitals (if available)
+    if (window.webVitals) {
+      window.webVitals.getCLS(metric => metrics.CLS = Math.round(metric.value * 1000) / 1000);
+      window.webVitals.getFID(metric => metrics.FID = Math.round(metric.value));
+      window.webVitals.getLCP(metric => metrics.LCP = Math.round(metric.value));
+    }
+    
+    // Network information
+    if (navigator.connection) {
+      metrics.connectionType = navigator.connection.effectiveType;
+      metrics.downlink = navigator.connection.downlink;
+      metrics.rtt = navigator.connection.rtt;
+    }
+    
+    // Device information
+    metrics.userAgent = navigator.userAgent;
+    metrics.screenResolution = screen.width + 'x' + screen.height;
+    metrics.viewportSize = window.innerWidth + 'x' + window.innerHeight;
+    
+    // Page information
+    metrics.pageUrl = window.location.href;
+    metrics.pageTitle = document.title;
+    metrics.timestamp = new Date().toISOString();
+    
+    // Send metrics
+    sendPerformanceMetrics(metrics);
+  }
+  
+  // Send performance metrics to server
+  function sendPerformanceMetrics(metrics) {
+    fetch(PERFORMANCE_CONFIG.reportUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(metrics)
+    }).catch(error => {
+      console.log('Performance metrics not sent:', error);
+    });
+  }
+  
+  // Initialize performance monitoring
+  if (PERFORMANCE_CONFIG.enabled) {
+    // Collect metrics when page loads
+    window.addEventListener('load', function() {
+      setTimeout(collectPerformanceMetrics, 1000);
+    });
+    
+    // Collect metrics when page is about to unload
+    window.addEventListener('beforeunload', function() {
+      collectPerformanceMetrics();
+    });
+  }
+</script>
+
+<!-- Web Vitals Library -->
+<script src="https://unpkg.com/web-vitals@3/dist/web-vitals.iife.js"></script>

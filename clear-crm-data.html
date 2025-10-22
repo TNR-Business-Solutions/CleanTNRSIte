@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clear CRM Data</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 600px;
+            text-align: center;
+        }
+        button { 
+            background: #dc3545; 
+            color: white; 
+            padding: 15px 30px; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-size: 18px;
+            margin: 10px;
+        }
+        button:hover { 
+            background: #c82333; 
+        }
+        .success {
+            color: #28a745;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        .info {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗑️ Clear CRM Data</h1>
+        <p>This will delete all CRM data including:</p>
+        <ul style="text-align: left; display: inline-block;">
+            <li>All form submissions</li>
+            <li>All leads</li>
+            <li>All clients</li>
+            <li>All orders</li>
+        </ul>
+        
+        <div class="info">
+            <p><strong>Current Data:</strong></p>
+            <p id="current-data">Loading...</p>
+        </div>
+        
+        <button onclick="clearAllData()">Clear All CRM Data</button>
+        
+        <div id="result"></div>
+        
+        <p style="margin-top: 30px;">
+            <a href="/admin-dashboard.html">Go to Admin Dashboard</a> | 
+            <a href="/contact.html">Go to Contact Form</a>
+        </p>
+    </div>
+
+    <script>
+        function checkCurrentData() {
+            const submissions = JSON.parse(localStorage.getItem('tnr_form_submissions') || '[]');
+            const leads = JSON.parse(localStorage.getItem('tnr_crm_leads') || '[]');
+            const clients = JSON.parse(localStorage.getItem('tnr_crm_clients') || '[]');
+            const orders = JSON.parse(localStorage.getItem('tnr_crm_orders') || '[]');
+            
+            document.getElementById('current-data').innerHTML = `
+                Form Submissions: ${submissions.length}<br>
+                Leads: ${leads.length}<br>
+                Clients: ${clients.length}<br>
+                Orders: ${orders.length}
+            `;
+        }
+        
+        function clearAllData() {
+            if (confirm('Are you sure you want to delete ALL CRM data? This cannot be undone!')) {
+                // Clear all CRM data from localStorage
+                localStorage.removeItem('tnr_form_submissions');
+                localStorage.removeItem('tnr_crm_leads');
+                localStorage.removeItem('tnr_crm_clients');
+                localStorage.removeItem('tnr_crm_orders');
+                localStorage.removeItem('tnr_crm_formSubmissions');
+                
+                document.getElementById('result').innerHTML = `
+                    <div class="success">
+                        <h2>✅ All CRM Data Cleared!</h2>
+                        <p>All form submissions, leads, clients, and orders have been deleted.</p>
+                        <p>You can now test with a fresh start.</p>
+                        <p><strong>Next Steps:</strong></p>
+                        <ol style="text-align: left; display: inline-block;">
+                            <li>Go to <a href="/contact.html">Contact Form</a></li>
+                            <li>Fill out and submit the form</li>
+                            <li>Go to <a href="/admin-dashboard.html">Admin Dashboard</a></li>
+                            <li>Click "Leads" tab to see the new lead automatically created!</li>
+                        </ol>
+                    </div>
+                `;
+                
+                checkCurrentData();
+            }
+        }
+        
+        // Check current data on page load
+        checkCurrentData();
+        
+        // Update every 2 seconds
+        setInterval(checkCurrentData, 2000);
+    </script>
+</body>
+</html>

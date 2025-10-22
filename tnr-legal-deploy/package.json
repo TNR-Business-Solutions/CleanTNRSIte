@@ -1,0 +1,20 @@
+{
+  "name": "tnr-legal-pages",
+  "version": "1.0.0",
+  "description": "TNR Business Solutions Legal Pages - Privacy Policy and Terms & Conditions",
+  "main": "privacy-policy.html",
+  "scripts": {
+    "build": "echo 'Legal pages are static HTML files'",
+    "start": "echo 'Deploy to Vercel'"
+  },
+  "keywords": [
+    "privacy-policy",
+    "terms-conditions",
+    "legal",
+    "tnr-business-solutions"
+  ],
+  "author": "TNR Business Solutions",
+  "license": "MIT",
+  "devDependencies": {},
+  "dependencies": {}
+}

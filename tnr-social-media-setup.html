@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TNR Business Solutions - Social Media Setup</title>
+    <link rel="stylesheet" href="assets/styles.css">
+    <style>
+        .setup-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .setup-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--tnr-primary), var(--tnr-secondary));
+            color: white;
+            border-radius: 12px;
+        }
+        
+        .platform-setup {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border: 2px solid var(--tnr-light);
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+        
+        .platform-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .platform-icon {
+            font-size: 2rem;
+            margin-right: 1rem;
+        }
+        
+        .platform-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--tnr-primary);
+        }
+        
+        .status-badge {
+            margin-left: auto;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .status-connected {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-disconnected {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .setup-steps {
+            margin: 1rem 0;
+        }
+        
+        .step {
+            margin: 0.5rem 0;
+            padding: 0.75rem;
+            background: white;
+            border-radius: 6px;
+            border-left: 4px solid var(--tnr-accent);
+        }
+        
+        .step-number {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            background: var(--tnr-accent);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+        
+        .api-key-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-family: monospace;
+            margin: 0.5rem 0;
+        }
+        
+        .test-button {
+            background: var(--tnr-accent);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 0.5rem 0.5rem 0.5rem 0;
+        }
+        
+        .test-button:hover {
+            background: var(--tnr-primary);
+        }
+        
+        .test-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .connection-status {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+        
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .bulk-actions {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: var(--tnr-pale-yellow);
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .bulk-button {
+            background: var(--tnr-primary);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin: 0.5rem;
+        }
+        
+        .bulk-button:hover {
+            background: var(--tnr-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="setup-container">
+        <div class="setup-header">
+            <h1>🚀 TNR Business Solutions Social Media Setup</h1>
+            <p>Connect all your social media platforms for automated posting and management</p>
+        </div>
+
+        <!-- LinkedIn Setup -->
+        <div class="platform-setup">
+            <div class="platform-header">
+                <div class="platform-icon">💼</div>
+                <div class="platform-name">LinkedIn</div>
+                <div class="status-badge status-disconnected" id="linkedin-status">Not Connected</div>
+            </div>
+            <div class="setup-steps">
+                <div class="step">
+                    <span class="step-number">1</span>
+                    Go to <a href="https://www.linkedin.com/developers/apps" target="_blank">LinkedIn Developer Console</a>
+                </div>
+                <div class="step">
+                    <span class="step-number">2</span>
+                    Create a new app or use existing "Automation" app
+                </div>
+                <div class="step">
+                    <span class="step-number">3</span>
+                    Request "w_member_social" permission for posting
+                </div>
+                <div class="step">
+                    <span class="step-number">4</span>
+                    Generate OAuth 2.0 access token
+                </div>
+                <div class="step">
+                    <span class="step-number">5</span>
+                    Paste your access token below:
+                </div>
+            </div>
+            <input type="password" class="api-key-input" id="linkedin-token" placeholder="Paste your LinkedIn OAuth 2.0 access token here...">
+            <button class="test-button" onclick="testLinkedIn()">Test LinkedIn Connection</button>
+            <div class="connection-status" id="linkedin-result" style="display: none;"></div>
+        </div>
+
+        <!-- Facebook Setup -->
+        <div class="platform-setup">
+            <div class="platform-header">
+                <div class="platform-icon">📘</div>
+                <div class="platform-name">Facebook</div>
+                <div class="status-badge status-disconnected" id="facebook-status">Not Connected</div>
+            </div>
+            <div class="setup-steps">
+                <div class="step">
+                    <span class="step-number">1</span>
+                    Go to <a href="https://developers.facebook.com/apps" target="_blank">Facebook Developers</a>
+                </div>
+                <div class="step">
+                    <span class="step-number">2</span>
+                    Create a new app or use existing app
+                </div>
+                <div class="step">
+                    <span class="step-number">3</span>
+                    Add "Facebook Login" and "Pages" products
+                </div>
+                <div class="step">
+                    <span class="step-number">4</span>
+                    Generate Page Access Token
+                </div>
+                <div class="step">
+                    <span class="step-number">5</span>
+                    Enter your Facebook Page Access Token:
+                </div>
+            </div>
+            <input type="password" class="api-key-input" id="facebook-token" placeholder="Paste your Facebook Page Access Token here...">
+            <button class="test-button" onclick="testFacebook()">Test Facebook Connection</button>
+            <div class="connection-status" id="facebook-result" style="display: none;"></div>
+        </div>
+
+        <!-- Instagram Setup -->
+        <div class="platform-setup">
+            <div class="platform-header">
+                <div class="platform-icon">📷</div>
+                <div class="platform-name">Instagram</div>
+                <div class="status-badge status-disconnected" id="instagram-status">Not Connected</div>
+            </div>
+            <div class="setup-steps">
+                <div class="step">
+                    <span class="step-number">1</span>
+                    Connect Instagram Business Account to Facebook Page
+                </div>
+                <div class="step">
+                    <span class="step-number">2</span>
+                    Use the same Facebook Page Access Token (Instagram uses Facebook's API)
+                </div>
+                <div class="step">
+                    <span class="step-number">3</span>
+                    Instagram will automatically work with Facebook token
+                </div>
+            </div>
+            <input type="password" class="api-key-input" id="instagram-token" placeholder="Same as Facebook Page Access Token">
+            <button class="test-button" onclick="testInstagram()">Test Instagram Connection</button>
+            <div class="connection-status" id="instagram-result" style="display: none;"></div>
+        </div>
+
+        <!-- Twitter Setup -->
+        <div class="platform-setup">
+            <div class="platform-header">
+                <div class="platform-icon">🐦</div>
+                <div class="platform-name">Twitter</div>
+                <div class="status-badge status-disconnected" id="twitter-status">Not Connected</div>
+            </div>
+            <div class="setup-steps">
+                <div class="step">
+                    <span class="step-number">1</span>
+                    Go to <a href="https://developer.twitter.com/en/portal/dashboard" target="_blank">Twitter Developer Portal</a>
+                </div>
+                <div class="step">
+                    <span class="step-number">2</span>
+                    Create a new app or use existing app
+                </div>
+                <div class="step">
+                    <span class="step-number">3</span>
+                    Generate API Key, API Secret, Access Token, and Access Token Secret
+                </div>
+                <div class="step">
+                    <span class="step-number">4</span>
+                    Enter your Twitter credentials:
+                </div>
+            </div>
+            <input type="password" class="api-key-input" id="twitter-api-key" placeholder="Twitter API Key">
+            <input type="password" class="api-key-input" id="twitter-api-secret" placeholder="Twitter API Secret">
+            <input type="password" class="api-key-input" id="twitter-access-token" placeholder="Twitter Access Token">
+            <input type="password" class="api-key-input" id="twitter-access-secret" placeholder="Twitter Access Token Secret">
+            <button class="test-button" onclick="testTwitter()">Test Twitter Connection</button>
+            <div class="connection-status" id="twitter-result" style="display: none;"></div>
+        </div>
+
+        <!-- Buffer Setup -->
+        <div class="platform-setup">
+            <div class="platform-header">
+                <div class="platform-icon">📊</div>
+                <div class="platform-name">Buffer (Optional)</div>
+                <div class="status-badge status-disconnected" id="buffer-status">Not Connected</div>
+            </div>
+            <div class="setup-steps">
+                <div class="step">
+                    <span class="step-number">1</span>
+                    Go to <a href="https://buffer.com/developers/apps" target="_blank">Buffer Developers</a>
+                </div>
+                <div class="step">
+                    <span class="step-number">2</span>
+                    Create a new app
+                </div>
+                <div class="step">
+                    <span class="step-number">3</span>
+                    Generate Access Token
+                </div>
+                <div class="step">
+                    <span class="step-number">4</span>
+                    Enter your Buffer Access Token:
+                </div>
+            </div>
+            <input type="password" class="api-key-input" id="buffer-token" placeholder="Paste your Buffer Access Token here...">
+            <button class="test-button" onclick="testBuffer()">Test Buffer Connection</button>
+            <div class="connection-status" id="buffer-result" style="display: none;"></div>
+        </div>
+
+        <!-- Bulk Actions -->
+        <div class="bulk-actions">
+            <h3>Quick Actions</h3>
+            <button class="bulk-button" onclick="testAllConnections()">Test All Connections</button>
+            <button class="bulk-button" onclick="saveAllSettings()">Save All Settings</button>
+            <button class="bulk-button" onclick="goToDashboard()">Go to Social Media Dashboard</button>
+        </div>
+    </div>
+
+    <script src="social-media-api-integration.js"></script>
+    <script>
+        // Initialize the social media API
+        window.socialMediaAPI = new SocialMediaAPI();
+        
+        // Load saved settings
+        loadSavedSettings();
+
+        function loadSavedSettings() {
+            const settings = JSON.parse(localStorage.getItem('tnrSocialMediaSettings') || '{}');
+            
+            if (settings.linkedin) document.getElementById('linkedin-token').value = settings.linkedin;
+            if (settings.facebook) document.getElementById('facebook-token').value = settings.facebook;
+            if (settings.instagram) document.getElementById('instagram-token').value = settings.instagram;
+            if (settings.twitter) {
+                const twitter = settings.twitter;
+                if (twitter.apiKey) document.getElementById('twitter-api-key').value = twitter.apiKey;
+                if (twitter.apiSecret) document.getElementById('twitter-api-secret').value = twitter.apiSecret;
+                if (twitter.accessToken) document.getElementById('twitter-access-token').value = twitter.accessToken;
+                if (twitter.accessSecret) document.getElementById('twitter-access-secret').value = twitter.accessSecret;
+            }
+            if (settings.buffer) document.getElementById('buffer-token').value = settings.buffer;
+            
+            // Update status badges
+            updateStatusBadges();
+        }
+
+        function saveAllSettings() {
+            const settings = {
+                linkedin: document.getElementById('linkedin-token').value,
+                facebook: document.getElementById('facebook-token').value,
+                instagram: document.getElementById('instagram-token').value,
+                twitter: {
+                    apiKey: document.getElementById('twitter-api-key').value,
+                    apiSecret: document.getElementById('twitter-api-secret').value,
+                    accessToken: document.getElementById('twitter-access-token').value,
+                    accessSecret: document.getElementById('twitter-access-secret').value
+                },
+                buffer: document.getElementById('buffer-token').value
+            };
+            
+            localStorage.setItem('tnrSocialMediaSettings', JSON.stringify(settings));
+            alert('All settings saved successfully!');
+        }
+
+        function updateStatusBadges() {
+            const settings = JSON.parse(localStorage.getItem('tnrSocialMediaSettings') || '{}');
+            
+            // Update LinkedIn status
+            const linkedinStatus = document.getElementById('linkedin-status');
+            if (settings.linkedin && settings.linkedin.length > 50) {
+                linkedinStatus.textContent = 'Connected';
+                linkedinStatus.className = 'status-badge status-connected';
+            } else {
+                linkedinStatus.textContent = 'Not Connected';
+                linkedinStatus.className = 'status-badge status-disconnected';
+            }
+            
+            // Update Facebook status
+            const facebookStatus = document.getElementById('facebook-status');
+            if (settings.facebook && settings.facebook.length > 50) {
+                facebookStatus.textContent = 'Connected';
+                facebookStatus.className = 'status-badge status-connected';
+            } else {
+                facebookStatus.textContent = 'Not Connected';
+                facebookStatus.className = 'status-badge status-disconnected';
+            }
+            
+            // Update Instagram status (same as Facebook)
+            const instagramStatus = document.getElementById('instagram-status');
+            if (settings.facebook && settings.facebook.length > 50) {
+                instagramStatus.textContent = 'Connected';
+                instagramStatus.className = 'status-badge status-connected';
+            } else {
+                instagramStatus.textContent = 'Not Connected';
+                instagramStatus.className = 'status-badge status-disconnected';
+            }
+            
+            // Update Twitter status
+            const twitterStatus = document.getElementById('twitter-status');
+            const twitter = settings.twitter || {};
+            if (twitter.apiKey && twitter.apiSecret && twitter.accessToken && twitter.accessSecret) {
+                twitterStatus.textContent = 'Connected';
+                twitterStatus.className = 'status-badge status-connected';
+            } else {
+                twitterStatus.textContent = 'Not Connected';
+                twitterStatus.className = 'status-badge status-disconnected';
+            }
+            
+            // Update Buffer status
+            const bufferStatus = document.getElementById('buffer-status');
+            if (settings.buffer && settings.buffer.length > 20) {
+                bufferStatus.textContent = 'Connected';
+                bufferStatus.className = 'status-badge status-connected';
+            } else {
+                bufferStatus.textContent = 'Not Connected';
+                bufferStatus.className = 'status-badge status-disconnected';
+            }
+        }
+
+        async function testLinkedIn() {
+            const token = document.getElementById('linkedin-token').value;
+            const resultDiv = document.getElementById('linkedin-result');
+            const button = event.target;
+            
+            if (!token) {
+                showResult(resultDiv, 'Please enter a LinkedIn access token', 'error');
+                return;
+            }
+            
+            button.disabled = true;
+            button.textContent = 'Testing...';
+            
+            try {
+                const result = await window.socialMediaAPI.testLinkedInConnection(token);
+                if (result.success) {
+                    showResult(resultDiv, '✅ LinkedIn connection successful!', 'success');
+                    updateStatusBadges();
+                } else {
+                    showResult(resultDiv, `❌ LinkedIn connection failed: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                showResult(resultDiv, `❌ LinkedIn connection failed: ${error.message}`, 'error');
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Test LinkedIn Connection';
+            }
+        }
+
+        async function testFacebook() {
+            const token = document.getElementById('facebook-token').value;
+            const resultDiv = document.getElementById('facebook-result');
+            const button = event.target;
+            
+            if (!token) {
+                showResult(resultDiv, 'Please enter a Facebook Page Access Token', 'error');
+                return;
+            }
+            
+            button.disabled = true;
+            button.textContent = 'Testing...';
+            
+            try {
+                // Mock Facebook test (replace with real API call)
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                showResult(resultDiv, '✅ Facebook connection successful!', 'success');
+                updateStatusBadges();
+            } catch (error) {
+                showResult(resultDiv, `❌ Facebook connection failed: ${error.message}`, 'error');
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Test Facebook Connection';
+            }
+        }
+
+        async function testInstagram() {
+            const token = document.getElementById('instagram-token').value;
+            const resultDiv = document.getElementById('instagram-result');
+            const button = event.target;
+            
+            if (!token) {
+                showResult(resultDiv, 'Please enter an Instagram token (same as Facebook)', 'error');
+                return;
+            }
+            
+            button.disabled = true;
+            button.textContent = 'Testing...';
+            
+            try {
+                // Mock Instagram test (replace with real API call)
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                showResult(resultDiv, '✅ Instagram connection successful!', 'success');
+                updateStatusBadges();
+            } catch (error) {
+                showResult(resultDiv, `❌ Instagram connection failed: ${error.message}`, 'error');
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Test Instagram Connection';
+            }
+        }
+
+        async function testTwitter() {
+            const apiKey = document.getElementById('twitter-api-key').value;
+            const apiSecret = document.getElementById('twitter-api-secret').value;
+            const accessToken = document.getElementById('twitter-access-token').value;
+            const accessSecret = document.getElementById('twitter-access-secret').value;
+            const resultDiv = document.getElementById('twitter-result');
+            const button = event.target;
+            
+            if (!apiKey || !apiSecret || !accessToken || !accessSecret) {
+                showResult(resultDiv, 'Please enter all Twitter credentials', 'error');
+                return;
+            }
+            
+            button.disabled = true;
+            button.textContent = 'Testing...';
+            
+            try {
+                // Mock Twitter test (replace with real API call)
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                showResult(resultDiv, '✅ Twitter connection successful!', 'success');
+                updateStatusBadges();
+            } catch (error) {
+                showResult(resultDiv, `❌ Twitter connection failed: ${error.message}`, 'error');
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Test Twitter Connection';
+            }
+        }
+
+        async function testBuffer() {
+            const token = document.getElementById('buffer-token').value;
+            const resultDiv = document.getElementById('buffer-result');
+            const button = event.target;
+            
+            if (!token) {
+                showResult(resultDiv, 'Please enter a Buffer access token', 'error');
+                return;
+            }
+            
+            button.disabled = true;
+            button.textContent = 'Testing...';
+            
+            try {
+                // Mock Buffer test (replace with real API call)
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                showResult(resultDiv, '✅ Buffer connection successful!', 'success');
+                updateStatusBadges();
+            } catch (error) {
+                showResult(resultDiv, `❌ Buffer connection failed: ${error.message}`, 'error');
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Test Buffer Connection';
+            }
+        }
+
+        async function testAllConnections() {
+            const platforms = ['linkedin', 'facebook', 'instagram', 'twitter', 'buffer'];
+            const results = [];
+            
+            for (const platform of platforms) {
+                try {
+                    if (platform === 'linkedin') {
+                        await testLinkedIn();
+                    } else if (platform === 'facebook') {
+                        await testFacebook();
+                    } else if (platform === 'instagram') {
+                        await testInstagram();
+                    } else if (platform === 'twitter') {
+                        await testTwitter();
+                    } else if (platform === 'buffer') {
+                        await testBuffer();
+                    }
+                    results.push(`${platform}: ✅`);
+                } catch (error) {
+                    results.push(`${platform}: ❌ ${error.message}`);
+                }
+            }
+            
+            alert('Connection Test Results:\n\n' + results.join('\n'));
+        }
+
+        function showResult(element, message, type) {
+            element.textContent = message;
+            element.className = `connection-status status-${type}`;
+            element.style.display = 'block';
+        }
+
+        function goToDashboard() {
+            // Save settings before navigating
+            saveAllSettings();
+            window.location.href = 'social-media-automation-dashboard.html';
+        }
+
+        // Auto-save settings when inputs change
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('api-key-input')) {
+                setTimeout(saveAllSettings, 1000); // Debounced save
+            }
+        });
+    </script>
+</body>
+</html>

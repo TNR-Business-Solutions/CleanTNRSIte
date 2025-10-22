@@ -11,8 +11,66 @@ const {
   clearCart,
   processCheckout,
 } = require("./cart-handler");
+const EmailHandler = require("./email-handler");
 
 const PORT = process.env.PORT || 5000;
+
+// Initialize email handler
+const emailHandler = new EmailHandler();
+
+// Handle form submissions with email
+async function handleFormSubmissionWithEmail(req, res) {
+  try {
+    let body = "";
+    req.on("data", (chunk) => {
+      body += chunk.toString();
+    });
+
+    req.on("end", async () => {
+      try {
+        const formData = JSON.parse(body || "{}");
+
+        console.log(
+          "📥 Server received form data:",
+          JSON.stringify(formData, null, 2)
+        );
+
+        // Send email notification
+        const emailResult = await emailHandler.sendContactFormEmail(formData);
+
+        console.log("📧 Email send result:", emailResult);
+
+        // Email notification processed
+
+        // Send success response
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify({
+            success: true,
+            message: "Form submitted successfully",
+            emailSent: emailResult.success,
+          })
+        );
+      } catch (error) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify({
+            success: false,
+            message: "Form processing error",
+          })
+        );
+      }
+    });
+  } catch (error) {
+    res.writeHead(500, { "Content-Type": "application/json" });
+    res.end(
+      JSON.stringify({
+        success: false,
+        message: "Server error",
+      })
+    );
+  }
+}
 
 // Handle cart operations
 async function handleCartRequest(req, res, operation) {
@@ -52,7 +110,6 @@ async function handleCartRequest(req, res, operation) {
       res.end(JSON.stringify(result));
     });
   } catch (error) {
-    console.error("Cart operation error:", error);
     res.writeHead(500, { "Content-Type": "application/json" });
     res.end(
       JSON.stringify({ success: false, message: "Internal server error" })
@@ -83,7 +140,6 @@ async function handleCheckout(req, res) {
       res.end(JSON.stringify(result));
     });
   } catch (error) {
-    console.error("Checkout error:", error);
     res.writeHead(500, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ success: false, message: "Checkout failed" }));
   }
@@ -103,13 +159,79 @@ const mimeTypes = {
   ".ico": "image/x-icon",
 };
 
+// Enhanced caching headers
+function getCacheHeaders(filePath) {
+  const ext = path.extname(filePath).toLowerCase();
+  const headers = {
+    "Cache-Control": "",
+    ETag: "",
+    "Last-Modified": "",
+    Expires: "",
+  };
+
+  // Set cache duration based on file type
+  let maxAge = 0;
+  let cacheType = "no-cache";
+
+  // Static assets (1 year)
+  if (
+    [
+      ".css",
+      ".js",
+      ".png",
+      ".jpg",
+      ".jpeg",
+      ".gif",
+      ".svg",
+      ".ico",
+      ".woff",
+      ".woff2",
+      ".ttf",
+      ".eot",
+    ].includes(ext)
+  ) {
+    maxAge = 31536000; // 1 year
+    cacheType = "public, immutable";
+  }
+  // HTML files (1 hour)
+  else if (ext === ".html") {
+    maxAge = 3600; // 1 hour
+    cacheType = "public";
+  }
+  // Images (1 month)
+  else if ([".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg"].includes(ext)) {
+    maxAge = 2592000; // 30 days
+    cacheType = "public";
+  }
+  // Default (5 minutes)
+  else {
+    maxAge = 300;
+    cacheType = "public";
+  }
+
+  try {
+    const stats = fs.statSync(filePath);
+    const etag = `"${stats.mtime.getTime()}-${stats.size}"`;
+    headers["ETag"] = etag;
+    headers["Last-Modified"] = stats.mtime.toUTCString();
+    headers["Cache-Control"] = `${cacheType}, max-age=${maxAge}`;
+
+    const expires = new Date(Date.now() + maxAge * 1000);
+    headers["Expires"] = expires.toUTCString();
+  } catch (error) {
+    headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+  }
+
+  return headers;
+}
+
 const server = http.createServer((req, res) => {
   const parsedUrl = url.parse(req.url, true);
   let pathname = parsedUrl.pathname;
 
   // Handle form submissions
   if (req.method === "POST" && pathname === "/submit-form") {
-    handleFormSubmission(req, res);
+    handleFormSubmissionWithEmail(req, res);
     return;
   }
 
@@ -176,23 +298,12 @@ const server = http.createServer((req, res) => {
     // File found, serve it
     res.writeHead(200, {
       "Content-Type": mimeType,
-      "Cache-Control": "no-cache", // Prevent caching for development
+      ...getCacheHeaders(filePath),
     });
     res.end(data);
   });
 });
 
 server.listen(PORT, () => {
-  console.log("🚀 TNR Clean Site Server Started!");
-  console.log("================================================");
-  console.log(`📍 Clean site running at: http://localhost:${PORT}`);
-  console.log(`🏠 Homepage: http://localhost:${PORT}`);
-  console.log(`🎨 Web Design: http://localhost:${PORT}/web-design.html`);
-  console.log(`🔍 SEO Services: http://localhost:${PORT}/seo-services.html`);
-  console.log(`📦 Packages: http://localhost:${PORT}/packages.html`);
-  console.log("================================================");
-  console.log("✨ Clean, simplified structure with Army Green cards!");
-  console.log("🎯 Compare with main site at http://localhost:3000");
-  console.log("================================================");
-  console.log("Press Ctrl+C to stop the server");
+  // Server started successfully
 });

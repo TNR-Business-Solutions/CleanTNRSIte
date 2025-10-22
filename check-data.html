@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Check CRM Data</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .data-section { background: #f8f9fa; padding: 15px; margin: 20px 0; border-radius: 4px; }
+        pre { background: #e9ecef; padding: 10px; border-radius: 4px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Check CRM Data</h1>
+    
+    <div class="data-section">
+        <h3>Raw localStorage Data</h3>
+        <div id="raw-data">Loading...</div>
+    </div>
+    
+    <div class="data-section">
+        <h3>CRM Status</h3>
+        <div id="crm-status">Loading...</div>
+    </div>
+
+    <script src="crm-data.js"></script>
+    <script src="email-service.js"></script>
+    <script src="form-integration.js"></script>
+    
+    <script>
+        function checkData() {
+            // Check raw localStorage data
+            const formSubmissions = localStorage.getItem('tnr_form_submissions');
+            const crmLeads = localStorage.getItem('tnr_crm_leads');
+            const crmClients = localStorage.getItem('tnr_crm_clients');
+            const crmOrders = localStorage.getItem('tnr_crm_orders');
+            
+            document.getElementById('raw-data').innerHTML = `
+                <h4>Form Submissions:</h4>
+                <pre>${formSubmissions || 'No data'}</pre>
+                
+                <h4>CRM Leads:</h4>
+                <pre>${crmLeads || 'No data'}</pre>
+                
+                <h4>CRM Clients:</h4>
+                <pre>${crmClients || 'No data'}</pre>
+                
+                <h4>CRM Orders:</h4>
+                <pre>${crmOrders || 'No data'}</pre>
+            `;
+            
+            // Check CRM status
+            const submissions = formSubmissions ? JSON.parse(formSubmissions) : [];
+            const leads = window.tnrCRM ? window.tnrCRM.leads : [];
+            const clients = window.tnrCRM ? window.tnrCRM.clients : [];
+            
+            document.getElementById('crm-status').innerHTML = `
+                <p><strong>Scripts Available:</strong></p>
+                <p>- TNRCRMData: ${typeof window.TNRCRMData !== 'undefined' ? '✅ Yes' : '❌ No'}</p>
+                <p>- tnrCRM: ${window.tnrCRM ? '✅ Yes' : '❌ No'}</p>
+                <p>- tnrFormIntegration: ${typeof window.tnrFormIntegration !== 'undefined' ? '✅ Yes' : '❌ No'}</p>
+                
+                <p><strong>Data Counts:</strong></p>
+                <p>- Form Submissions: ${submissions.length}</p>
+                <p>- Leads: ${leads.length}</p>
+                <p>- Clients: ${clients.length}</p>
+                <p>- New Leads: ${leads.filter(l => l.status === 'New').length}</p>
+                
+                <p><strong>Recent Submissions:</strong></p>
+                <ul>
+                    ${submissions.slice(-5).map(s => `<li>${s.name} - ${s.email} - ${s.source} - Converted: ${s.convertedToLead ? 'Yes' : 'No'}</li>`).join('')}
+                </ul>
+                
+                <p><strong>Recent Leads:</strong></p>
+                <ul>
+                    ${leads.slice(-5).map(l => `<li>${l.name} - ${l.email} - ${l.status} - ${l.source}</li>`).join('')}
+                </ul>
+            `;
+        }
+        
+        // Check data when page loads
+        setTimeout(checkData, 1000);
+        
+        // Update every 2 seconds
+        setInterval(checkData, 2000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "timestamp": "2025-10-22T18:04:07.886Z",
+  "version": "1.0.0",
+  "minifiedFiles": [
+    "assets/styles.min.css",
+    "form-integration.min.js",
+    "cart-handler.min.js",
+    "email-handler.min.js",
+    "email-service.min.js",
+    "crm-data.min.js"
+  ],
+  "buildType": "production"
+}

@@ -1,0 +1,101 @@
+<!-- Google Analytics 4 - TNR Business Solutions -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XXXXXXXXXX', {
+    page_title: document.title,
+    page_location: window.location.href,
+    custom_map: {
+      'custom_parameter_1': 'business_type',
+      'custom_parameter_2': 'service_interest',
+      'custom_parameter_3': 'lead_source'
+    }
+  });
+</script>
+
+<!-- Enhanced E-commerce Tracking -->
+<script>
+  // Track form submissions
+  function trackFormSubmission(formType, formData) {
+    gtag('event', 'form_submit', {
+      event_category: 'Form',
+      event_label: formType,
+      value: 1,
+      business_type: formData.businessType || 'unknown',
+      service_interest: formData.services ? formData.services.join(',') : 'unknown',
+      lead_source: formData.source || 'website'
+    });
+  }
+  
+  // Track button clicks
+  function trackButtonClick(buttonText, buttonLocation) {
+    gtag('event', 'button_click', {
+      event_category: 'Button',
+      event_label: buttonText,
+      button_location: buttonLocation,
+      value: 1
+    });
+  }
+  
+  // Track page views with custom parameters
+  function trackPageView(pageName, pageCategory) {
+    gtag('event', 'page_view', {
+      page_title: pageName,
+      page_location: window.location.href,
+      page_category: pageCategory,
+      business_type: 'digital_marketing_insurance'
+    });
+  }
+  
+  // Track scroll depth
+  function trackScrollDepth() {
+    let maxScroll = 0;
+    const scrollThresholds = [25, 50, 75, 90, 100];
+    
+    window.addEventListener('scroll', function() {
+      const scrollPercent = Math.round((window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100);
+      
+      if (scrollPercent > maxScroll) {
+        maxScroll = scrollPercent;
+        
+        scrollThresholds.forEach(threshold => {
+          if (scrollPercent >= threshold && maxScroll < threshold + 10) {
+            gtag('event', 'scroll_depth', {
+              event_category: 'Engagement',
+              event_label: threshold + '%',
+              value: threshold
+            });
+          }
+        });
+      }
+    });
+  }
+  
+  // Track time on page
+  function trackTimeOnPage() {
+    const startTime = Date.now();
+    
+    window.addEventListener('beforeunload', function() {
+      const timeOnPage = Math.round((Date.now() - startTime) / 1000);
+      
+      gtag('event', 'time_on_page', {
+        event_category: 'Engagement',
+        event_label: 'time_on_page',
+        value: timeOnPage
+      });
+    });
+  }
+  
+  // Initialize tracking
+  document.addEventListener('DOMContentLoaded', function() {
+    trackScrollDepth();
+    trackTimeOnPage();
+    
+    // Track page view
+    const pageName = document.title;
+    const pageCategory = window.location.pathname.split('/')[1] || 'home';
+    trackPageView(pageName, pageCategory);
+  });
+</script>

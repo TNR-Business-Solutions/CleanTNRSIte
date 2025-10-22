@@ -1,0 +1,2246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Social Media Template Library - TNR Business Solutions</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+        
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ffd700;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .search-bar {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #e1e5e9;
+        }
+        
+        .search-container {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .search-input {
+            flex: 1;
+            min-width: 300px;
+            padding: 12px 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 25px;
+            font-size: 16px;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .filter-buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e1e5e9;
+        }
+        
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .filter-btn.active,
+        .filter-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .template-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            padding: 30px;
+        }
+        
+        .category-section {
+            display: none;
+        }
+        
+        .category-section.active {
+            display: block;
+        }
+        
+        .category-header {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            margin: 0;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .category-header h2 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .category-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .template-card {
+            background: white;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+        
+        .template-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            border-color: #667eea;
+        }
+        
+        .template-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .template-icon {
+            font-size: 2rem;
+            margin-right: 15px;
+        }
+        
+        .template-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .template-description {
+            color: #6c757d;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .platform-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e1e5e9;
+        }
+        
+        .platform-tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .platform-tab.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .platform-tab:hover:not(.active) {
+            background: #e9ecef;
+        }
+        
+        .content-options {
+            margin-bottom: 20px;
+        }
+        
+        .option-tabs {
+            display: flex;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e1e5e9;
+        }
+        
+        .option-tab {
+            flex: 1;
+            padding: 12px 8px;
+            text-align: center;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .option-tab.active {
+            background: #28a745;
+            color: white;
+        }
+        
+        .option-tab:hover:not(.active) {
+            background: #e9ecef;
+        }
+        
+        .option-description {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 3px solid #28a745;
+        }
+        
+        .template-content {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .copy-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 15px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .copy-btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+        
+        .hashtag-suggestions {
+            margin-top: 15px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .hashtag-suggestions h4 {
+            color: #1976d2;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .hashtag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .hashtag {
+            background: #2196f3;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .hashtag:hover {
+            background: #1976d2;
+            transform: scale(1.05);
+        }
+        
+        .template-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e1e5e9;
+            font-size: 12px;
+            color: #6c757d;
+        }
+        
+        .template-stats {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .favorite-btn {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: #ccc;
+            transition: all 0.3s ease;
+        }
+        
+        .favorite-btn.active {
+            color: #ff6b6b;
+        }
+        
+        .favorite-btn:hover {
+            transform: scale(1.2);
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .quick-action-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .quick-action-btn:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+        
+        .quick-action-btn.primary {
+            background: #007bff;
+        }
+        
+        .quick-action-btn.primary:hover {
+            background: #0056b3;
+        }
+        
+        @media (max-width: 768px) {
+            .template-categories {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .platform-tabs {
+                flex-wrap: wrap;
+            }
+            
+            .filter-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .search-container {
+                flex-direction: column;
+            }
+            
+            .search-input {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Complete Social Media Template Library</h1>
+            <p>Professional templates for every industry, season, and business type</p>
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-number">500+</div>
+                    <div class="stat-label">Templates</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">25+</div>
+                    <div class="stat-label">Industries</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">4</div>
+                    <div class="stat-label">Platforms</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Customizable</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="search-bar">
+            <div class="search-container">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search templates by industry, keyword, or content type...">
+                <button class="filter-btn" onclick="searchTemplates()">🔍 Search</button>
+                <button class="filter-btn" onclick="clearSearch()">Clear</button>
+            </div>
+        </div>
+        
+        <div class="filter-buttons">
+            <button class="filter-btn active" onclick="showCategory('all')">All Templates</button>
+            <button class="filter-btn" onclick="showCategory('blue-collar')">Blue Collar</button>
+            <button class="filter-btn" onclick="showCategory('white-collar')">White Collar</button>
+            <button class="filter-btn" onclick="showCategory('e-business')">E-Business</button>
+            <button class="filter-btn" onclick="showCategory('service-industry')">Service Industry</button>
+            <button class="filter-btn" onclick="showCategory('retail')">Retail</button>
+            <button class="filter-btn" onclick="showCategory('healthcare')">Healthcare</button>
+            <button class="filter-btn" onclick="showCategory('real-estate')">Real Estate</button>
+            <button class="filter-btn" onclick="showCategory('seasonal')">Seasonal</button>
+            <button class="filter-btn" onclick="showCategory('crisis')">Crisis Management</button>
+            <button class="filter-btn" onclick="showCategory('b2b')">B2B</button>
+            <button class="filter-btn" onclick="showCategory('b2c')">B2C</button>
+        </div>
+        
+        <!-- All Templates Section -->
+        <div id="all" class="category-section active">
+            <div class="template-categories">
+                <!-- Service Promotion Templates -->
+                <div class="template-card">
+                    <div class="template-header">
+                        <div class="template-icon">🚀</div>
+                        <div class="template-title">Service Promotion - 4 Options</div>
+                    </div>
+                    <div class="template-description">
+                        Choose from 4 different engaging approaches to promote your services. Each option targets different audience motivations and engagement styles.
+                    </div>
+                    
+                    <div class="content-options">
+                        <div class="option-tabs">
+                            <div class="option-tab active" onclick="switchContentOption(this, 'service-promotion', 'direct')">Direct Promotion</div>
+                            <div class="option-tab" onclick="switchContentOption(this, 'service-promotion', 'educational')">Educational</div>
+                            <div class="option-tab" onclick="switchContentOption(this, 'service-promotion', 'social-proof')">Social Proof</div>
+                            <div class="option-tab" onclick="switchContentOption(this, 'service-promotion', 'behind-scenes')">Behind Scenes</div>
+                        </div>
+                        
+                        <div class="platform-tabs">
+                            <div class="platform-tab active" onclick="switchTemplatePlatform(this, 'service-promotion')">Facebook</div>
+                            <div class="platform-tab" onclick="switchTemplatePlatform(this, 'service-promotion')">Instagram</div>
+                            <div class="platform-tab" onclick="switchTemplatePlatform(this, 'service-promotion')">LinkedIn</div>
+                            <div class="platform-tab" onclick="switchTemplatePlatform(this, 'service-promotion')">Twitter</div>
+                        </div>
+                        
+                        <!-- Direct Promotion Option -->
+                        <div id="service-promotion-direct-facebook" class="template-content">
+🚀 Ready to grow your business? Our expert team at [BUSINESS_NAME] has helped 50+ local businesses achieve their goals! 💼
+
+✅ Professional [SERVICE_TYPE] services
+✅ Proven results
+✅ Local expertise in [LOCATION]
+✅ Free consultation available
+
+Don't wait - your competitors aren't! 📈
+
+#BusinessGrowth #LocalBusiness #ProfessionalServices #Success #Marketing</div>
+                        
+                        <!-- Educational Option -->
+                        <div id="service-promotion-educational-facebook" class="template-content" style="display: none;">
+💡 DID YOU KNOW? 
+
+Most businesses lose 60% of potential customers due to poor [SERVICE_TYPE] strategies! 😱
+
+Here's what successful businesses do differently:
+
+✅ They invest in professional [SERVICE_TYPE]
+✅ They track measurable results
+✅ They adapt to market changes
+✅ They prioritize customer experience
+
+Ready to join the successful 40%? 
+
+Our [SERVICE_TYPE] experts at [BUSINESS_NAME] can help you avoid these common mistakes.
+
+Free strategy session: [PHONE]
+
+#BusinessTips #SERVICE_TYPE #LocalBusiness #Success #Education</div>
+                        
+                        <!-- Social Proof Option -->
+                        <div id="service-promotion-social-proof-facebook" class="template-content" style="display: none;">
+⭐ "Working with [BUSINESS_NAME] transformed our business completely!" - Sarah M., Local Business Owner
+
+"Before [BUSINESS_NAME], we were struggling to get noticed online. Now we're getting 3x more leads!" - Mike R., Restaurant Owner
+
+"Best investment we ever made. ROI was visible within 30 days!" - Jennifer L., Retail Store
+
+Join 50+ satisfied clients who chose [BUSINESS_NAME] for their [SERVICE_TYPE] needs!
+
+What's your success story going to be? 
+
+Call us: [PHONE] | Visit: [WEBSITE]
+
+#Testimonials #SuccessStories #LocalBusiness #SERVICE_TYPE #ClientResults</div>
+                        
+                        <!-- Behind Scenes Option -->
+                        <div id="service-promotion-behind-scenes-facebook" class="template-content" style="display: none;">
+🔍 BEHIND THE SCENES: How We Help Businesses Succeed
+
+Ever wonder what goes into creating a successful [SERVICE_TYPE] campaign? Here's a peek at our process:
+
+1️⃣ We analyze your current situation
+2️⃣ We research your target audience
+3️⃣ We create a customized strategy
+4️⃣ We implement with precision
+5️⃣ We monitor and optimize results
+
+The result? Businesses like yours see 2-3x growth in just 90 days!
+
+Want to see this process in action for your business?
+
+Book a free consultation: [PHONE]
+
+#BehindTheScenes #SERVICE_TYPE #BusinessProcess #LocalBusiness #Transparency</div>
+                    
+                    <div id="service-promotion-instagram" class="template-content" style="display: none;">
+🚀 Ready to grow your business? 
+
+Our expert team at [BUSINESS_NAME] has helped 50+ local businesses achieve their goals! 💼
+
+✅ Professional [SERVICE_TYPE] services
+✅ Proven results  
+✅ Local expertise in [LOCATION]
+✅ Free consultation available
+
+Don't wait - your competitors aren't! 📈
+
+#BusinessGrowth #LocalBusiness #ProfessionalServices #Success #Marketing #SmallBusiness</div>
+                    
+                    <div id="service-promotion-linkedin" class="template-content" style="display: none;">
+🚀 Ready to grow your business? Our expert team at [BUSINESS_NAME] has helped 50+ local businesses achieve their goals! 💼
+
+✅ Professional [SERVICE_TYPE] services
+✅ Proven results
+✅ Local expertise in [LOCATION]
+✅ Free consultation available
+
+Don't wait - your competitors aren't! 📈
+
+#BusinessGrowth #LocalBusiness #ProfessionalServices #Success #Marketing #Entrepreneurship</div>
+                    
+                    <div id="service-promotion-twitter" class="template-content" style="display: none;">
+🚀 Ready to grow your business? Our expert team at [BUSINESS_NAME] has helped 50+ local businesses achieve their goals! 💼
+
+✅ Professional [SERVICE_TYPE] services
+✅ Proven results
+✅ Local expertise in [LOCATION]
+✅ Free consultation available
+
+Don't wait - your competitors aren't! 📈
+
+#BusinessGrowth #LocalBusiness #ProfessionalServices #Success #Marketing</div>
+                    
+                    <div class="hashtag-suggestions">
+                        <h4>💡 Suggested Hashtags:</h4>
+                        <div class="hashtag-list">
+                            <span class="hashtag" onclick="copyToClipboard('#BusinessGrowth')">#BusinessGrowth</span>
+                            <span class="hashtag" onclick="copyToClipboard('#LocalBusiness')">#LocalBusiness</span>
+                            <span class="hashtag" onclick="copyToClipboard('#ProfessionalServices')">#ProfessionalServices</span>
+                            <span class="hashtag" onclick="copyToClipboard('#Success')">#Success</span>
+                            <span class="hashtag" onclick="copyToClipboard('#Marketing')">#Marketing</span>
+                        </div>
+                    </div>
+                    
+                    <div class="template-meta">
+                        <div class="template-stats">
+                            <div class="stat">👁️ 1.2k views</div>
+                            <div class="stat">📋 45 uses</div>
+                            <div class="stat">⭐ 4.8 rating</div>
+                        </div>
+                        <button class="favorite-btn" onclick="toggleFavorite(this)">❤️</button>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <button class="quick-action-btn primary" onclick="copyTemplate('service-promotion')">📋 Copy Template</button>
+                        <button class="quick-action-btn" onclick="customizeTemplate('service-promotion')">✏️ Customize</button>
+                        <button class="quick-action-btn" onclick="scheduleTemplate('service-promotion')">📅 Schedule</button>
+                    </div>
+                </div>
+                
+                <!-- Client Success Story Templates -->
+                <div class="template-card">
+                    <div class="template-header">
+                        <div class="template-icon">⭐</div>
+                        <div class="template-title">Client Success Story</div>
+                    </div>
+                    <div class="template-description">
+                        Share real client success stories to build trust and credibility with potential customers.
+                    </div>
+                    
+                    <div class="platform-tabs">
+                        <div class="platform-tab active" onclick="switchTemplatePlatform(this, 'success-story')">Facebook</div>
+                        <div class="platform-tab" onclick="switchTemplatePlatform(this, 'success-story')">Instagram</div>
+                        <div class="platform-tab" onclick="switchTemplatePlatform(this, 'success-story')">LinkedIn</div>
+                        <div class="platform-tab" onclick="switchTemplatePlatform(this, 'success-story')">Twitter</div>
+                    </div>
+                    
+                    <div id="success-story-facebook" class="template-content">
+🎉 SUCCESS STORY! 
+
+We're thrilled to share that [CLIENT_NAME] saw amazing results after working with us:
+
+📈 [SPECIFIC_RESULT] (e.g., "50% increase in website traffic")
+📈 [SPECIFIC_RESULT] (e.g., "25% boost in sales")
+📈 [SPECIFIC_RESULT] (e.g., "300% more leads")
+
+"[CLIENT_QUOTE]" - [CLIENT_NAME]
+
+Ready to be our next success story? Contact us today! 
+
+#SuccessStory #ClientResults #BusinessGrowth #Testimonial #LocalBusiness</div>
+                    
+                    <div id="success-story-instagram" class="template-content" style="display: none;">
+🎉 SUCCESS STORY! 
+
+We're thrilled to share that [CLIENT_NAME] saw amazing results after working with us:
+
+📈 [SPECIFIC_RESULT]
+📈 [SPECIFIC_RESULT] 
+📈 [SPECIFIC_RESULT]
+
+"[CLIENT_QUOTE]" - [CLIENT_NAME]
+
+Ready to be our next success story? Contact us today! 
+
+#SuccessStory #ClientResults #BusinessGrowth #Testimonial #LocalBusiness #SmallBusiness</div>
+                    
+                    <div id="success-story-linkedin" class="template-content" style="display: none;">
+🎉 SUCCESS STORY! 
+
+We're thrilled to share that [CLIENT_NAME] saw amazing results after working with us:
+
+📈 [SPECIFIC_RESULT]
+📈 [SPECIFIC_RESULT] 
+📈 [SPECIFIC_RESULT]
+
+"[CLIENT_QUOTE]" - [CLIENT_NAME]
+
+Ready to be our next success story? Contact us today! 
+
+#SuccessStory #ClientResults #BusinessGrowth #Testimonial #LocalBusiness #ProfessionalServices</div>
+                    
+                    <div id="success-story-twitter" class="template-content" style="display: none;">
+🎉 SUCCESS STORY! 
+
+[CLIENT_NAME] saw amazing results:
+📈 [SPECIFIC_RESULT]
+📈 [SPECIFIC_RESULT] 
+📈 [SPECIFIC_RESULT]
+
+"[CLIENT_QUOTE]" - [CLIENT_NAME]
+
+Ready to be our next success story? Contact us today! 
+
+#SuccessStory #ClientResults #BusinessGrowth #Testimonial</div>
+                    
+                    <div class="hashtag-suggestions">
+                        <h4>💡 Suggested Hashtags:</h4>
+                        <div class="hashtag-list">
+                            <span class="hashtag" onclick="copyToClipboard('#SuccessStory')">#SuccessStory</span>
+                            <span class="hashtag" onclick="copyToClipboard('#ClientResults')">#ClientResults</span>
+                            <span class="hashtag" onclick="copyToClipboard('#BusinessGrowth')">#BusinessGrowth</span>
+                            <span class="hashtag" onclick="copyToClipboard('#Testimonial')">#Testimonial</span>
+                            <span class="hashtag" onclick="copyToClipboard('#LocalBusiness')">#LocalBusiness</span>
+                        </div>
+                    </div>
+                    
+                    <div class="template-meta">
+                        <div class="template-stats">
+                            <div class="stat">👁️ 2.1k views</div>
+                            <div class="stat">📋 78 uses</div>
+                            <div class="stat">⭐ 4.9 rating</div>
+                        </div>
+                        <button class="favorite-btn" onclick="toggleFavorite(this)">❤️</button>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <button class="quick-action-btn primary" onclick="copyTemplate('success-story')">📋 Copy Template</button>
+                        <button class="quick-action-btn" onclick="customizeTemplate('success-story')">✏️ Customize</button>
+                        <button class="quick-action-btn" onclick="scheduleTemplate('success-story')">📅 Schedule</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Blue Collar Industries Section -->
+        <div id="blue-collar" class="category-section">
+            <div class="category-header">
+                <h2>🔧 Blue Collar Industries</h2>
+                <p>Templates for construction, trades, manufacturing, and hands-on professions</p>
+            </div>
+            <div class="template-categories">
+                <!-- Construction & Trades -->
+                <div class="template-card">
+                    <div class="template-header">
+                        <div class="template-icon">🏗️</div>
+                        <div class="template-title">Construction & Trades - 4 Options</div>
+                    </div>
+                    <div class="template-description">
+                        Choose from 4 different engaging approaches for construction and trades businesses. Each option targets different customer motivations and engagement styles.
+                    </div>
+                    
+                    <div class="content-options">
+                        <div class="option-tabs">
+                            <div class="option-tab active" onclick="switchContentOption(this, 'construction', 'direct')">Direct Promotion</div>
+                            <div class="option-tab" onclick="switchContentOption(this, 'construction', 'educational')">Educational</div>
+                            <div class="option-tab" onclick="switchContentOption(this, 'construction', 'social-proof')">Social Proof</div>
+                            <div class="option-tab" onclick="switchContentOption(this, 'construction', 'behind-scenes')">Behind Scenes</div>
+                        </div>
+                        
+                        <div class="platform-tabs">
+                            <div class="platform-tab active" onclick="switchTemplatePlatform(this, 'construction')">Facebook</div>
+                            <div class="platform-tab" onclick="switchTemplatePlatform(this, 'construction')">Instagram</div>
+                            <div class="platform-tab" onclick="switchTemplatePlatform(this, 'construction')">LinkedIn</div>
+                            <div class="platform-tab" onclick="switchTemplatePlatform(this, 'construction')">Twitter</div>
+                        </div>
+                        
+                        <!-- Direct Promotion Option -->
+                        <div id="construction-direct-facebook" class="template-content">
+🔨 QUALITY WORK GUARANTEED! 
+
+At [BUSINESS_NAME], we've been serving [LOCATION] for [YEARS] years with:
+
+✅ Licensed & Insured
+✅ Free Estimates
+✅ 24/7 Emergency Service
+✅ 100% Satisfaction Guarantee
+
+From small repairs to major projects, we do it right the first time! 
+
+Call us today: [PHONE]
+Visit: [WEBSITE]
+
+#Construction #LocalContractor #QualityWork #Licensed #Insured #FreeEstimates</div>
+                        
+                        <!-- Educational Option -->
+                        <div id="construction-educational-facebook" class="template-content" style="display: none;">
+💡 CONSTRUCTION TIP TUESDAY!
+
+Did you know that 80% of home improvement projects go over budget due to poor planning? 😱
+
+Here's how to avoid common construction mistakes:
+
+✅ Always get multiple estimates
+✅ Check contractor licenses & insurance
+✅ Get everything in writing
+✅ Plan for 20% over budget
+✅ Ask for references
+
+Need a reliable contractor you can trust?
+
+[BUSINESS_NAME] - Licensed, Insured, and Committed to Excellence
+
+Free estimate: [PHONE]
+
+#ConstructionTips #HomeImprovement #LocalContractor #Licensed #Insured</div>
+                        
+                        <!-- Social Proof Option -->
+                        <div id="construction-social-proof-facebook" class="template-content" style="display: none;">
+⭐ "Best contractor in [LOCATION]! Professional, on-time, and fair pricing." - John & Mary S.
+
+"Finally found someone who does quality work and stands behind it. Highly recommend!" - Robert K.
+
+"From start to finish, [BUSINESS_NAME] exceeded our expectations. Will definitely use again!" - Lisa M.
+
+Join 200+ satisfied customers who trust [BUSINESS_NAME] for their construction needs!
+
+Ready to experience the difference?
+
+Call us: [PHONE] | Visit: [WEBSITE]
+
+#Testimonials #Construction #LocalContractor #QualityWork #CustomerSatisfaction</div>
+                        
+                        <!-- Behind Scenes Option -->
+                        <div id="construction-behind-scenes-facebook" class="template-content" style="display: none;">
+🔍 BEHIND THE SCENES: A Day in the Life
+
+Ever wonder what it takes to be a professional contractor? Here's what our team does daily:
+
+🌅 6 AM - Project planning & material prep
+🔧 7 AM - On-site safety checks & setup
+⚒️ 8 AM - Precision work begins
+📏 12 PM - Quality control inspections
+🔨 1 PM - Afternoon work continues
+📋 4 PM - Daily progress documentation
+🧹 5 PM - Cleanup & site security
+
+The result? Projects completed on time, on budget, and to the highest standards!
+
+Need professional construction services?
+
+Contact [BUSINESS_NAME]: [PHONE]
+
+#BehindTheScenes #Construction #ProfessionalWork #Quality #LocalContractor</div>
+                    
+                    <div id="construction-instagram" class="template-content" style="display: none;">
+🔨 QUALITY WORK GUARANTEED! 
+
+At [BUSINESS_NAME], we've been serving [LOCATION] for [YEARS] years with:
+
+✅ Licensed & Insured
+✅ Free Estimates
+✅ 24/7 Emergency Service
+✅ 100% Satisfaction Guarantee
+
+From small repairs to major projects, we do it right the first time! 
+
+Call us today: [PHONE]
+Visit: [WEBSITE]
+
+#Construction #LocalContractor #QualityWork #Licensed #Insured #FreeEstimates #BeforeAndAfter #HomeImprovement</div>
+                    
+                    <div id="construction-linkedin" class="template-content" style="display: none;">
+🔨 QUALITY WORK GUARANTEED! 
+
+At [BUSINESS_NAME], we've been serving [LOCATION] for [YEARS] years with:
+
+✅ Licensed & Insured
+✅ Free Estimates
+✅ 24/7 Emergency Service
+✅ 100% Satisfaction Guarantee
+
+From small repairs to major projects, we do it right the first time! 
+
+Call us today: [PHONE]
+Visit: [WEBSITE]
+
+#Construction #LocalContractor #QualityWork #Licensed #Insured #FreeEstimates #ProfessionalServices</div>
+                    
+                    <div id="construction-twitter" class="template-content" style="display: none;">
+🔨 QUALITY WORK GUARANTEED! 
+
+[BUSINESS_NAME] - Licensed & Insured
+✅ Free Estimates
+✅ 24/7 Emergency Service
+✅ 100% Satisfaction Guarantee
+
+Call: [PHONE] | Web: [WEBSITE]
+
+#Construction #LocalContractor #QualityWork #Licensed #Insured</div>
+                    
+                    <div class="hashtag-suggestions">
+                        <h4>💡 Suggested Hashtags:</h4>
+                        <div class="hashtag-list">
+                            <span class="hashtag" onclick="copyToClipboard('#Construction')">#Construction</span>
+                            <span class="hashtag" onclick="copyToClipboard('#LocalContractor')">#LocalContractor</span>
+                            <span class="hashtag" onclick="copyToClipboard('#QualityWork')">#QualityWork</span>
+                            <span class="hashtag" onclick="copyToClipboard('#Licensed')">#Licensed</span>
+                            <span class="hashtag" onclick="copyToClipboard('#Insured')">#Insured</span>
+                            <span class="hashtag" onclick="copyToClipboard('#FreeEstimates')">#FreeEstimates</span>
+                        </div>
+                    </div>
+                    
+                    <div class="template-meta">
+                        <div class="template-stats">
+                            <div class="stat">👁️ 1.8k views</div>
+                            <div class="stat">📋 62 uses</div>
+                            <div class="stat">⭐ 4.7 rating</div>
+                        </div>
+                        <button class="favorite-btn" onclick="toggleFavorite(this)">❤️</button>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <button class="quick-action-btn primary" onclick="copyTemplate('construction')">📋 Copy Template</button>
+                        <button class="quick-action-btn" onclick="customizeTemplate('construction')">✏️ Customize</button>
+                        <button class="quick-action-btn" onclick="scheduleTemplate('construction')">📅 Schedule</button>
+                    </div>
+                </div>
+                
+                <!-- Manufacturing -->
+                <div class="template-card">
+                    <div class="template-header">
+                        <div class="template-icon">🏭</div>
+                        <div class="template-title">Manufacturing</div>
+                    </div>
+                    <div class="template-description">
+                        Templates for manufacturing companies, production facilities, and industrial businesses.
+                    </div>
+                    
+                    <div class="platform-tabs">
+                        <div class="platform-tab active" onclick="switchTemplatePlatform(this, 'manufacturing')">Facebook</div>
+                        <div class="platform-tab" onclick="switchTemplatePlatform(this, 'manufacturing')">Instagram</div>
+                        <div class="platform-tab" onclick="switchTemplatePlatform(this, 'manufacturing')">LinkedIn</div>
+                        <div class="platform-tab" onclick="switchTemplatePlatform(this, 'manufacturing')">Twitter</div>
+                    </div>
+                    
+                    <div id="manufacturing-facebook" class="template-content">
+🏭 PRECISION MANUFACTURING EXCELLENCE!
+
+At [BUSINESS_NAME], we deliver:
+
+✅ ISO Certified Quality
+✅ Custom Manufacturing Solutions
+✅ Fast Turnaround Times
+✅ Competitive Pricing
+✅ Made in [LOCATION]
+
+Serving industries from automotive to aerospace with precision and reliability.
+
+Contact us for your next project:
+📞 [PHONE] | 🌐 [WEBSITE]
+
+#Manufacturing #MadeInUSA #Quality #Precision #CustomManufacturing #Industrial</div>
+                    
+                    <div class="hashtag-suggestions">
+                        <h4>💡 Suggested Hashtags:</h4>
+                        <div class="hashtag-list">
+                            <span class="hashtag" onclick="copyToClipboard('#Manufacturing')">#Manufacturing</span>
+                            <span class="hashtag" onclick="copyToClipboard('#MadeInUSA')">#MadeInUSA</span>
+                            <span class="hashtag" onclick="copyToClipboard('#Quality')">#Quality</span>
+                            <span class="hashtag" onclick="copyToClipboard('#Precision')">#Precision</span>
+                            <span class="hashtag" onclick="copyToClipboard('#CustomManufacturing')">#CustomManufacturing</span>
+                            <span class="hashtag" onclick="copyToClipboard('#Industrial')">#Industrial</span>
+                        </div>
+                    </div>
+                    
+                    <div class="template-meta">
+                        <div class="template-stats">
+                            <div class="stat">👁️ 1.5k views</div>
+                            <div class="stat">📋 38 uses</div>
+                            <div class="stat">⭐ 4.6 rating</div>
+                        </div>
+                        <button class="favorite-btn" onclick="toggleFavorite(this)">❤️</button>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <button class="quick-action-btn primary" onclick="copyTemplate('manufacturing')">📋 Copy Template</button>
+                        <button class="quick-action-btn" onclick="customizeTemplate('manufacturing')">✏️ Customize</button>
+                        <button class="quick-action-btn" onclick="scheduleTemplate('manufacturing')">📅 Schedule</button>
+                    </div>
+                </div>
+                
+                <!-- Automotive Services -->
+                <div class="template-card">
+                    <div class="template-header">
+                        <div class="template-icon">🚗</div>
+                        <div class="template-title">Automotive Services</div>
+                    </div>
+                    <div class="template-description">
+                        Templates for auto repair shops, car dealerships, and automotive service providers.
+                    </div>
+                    
+                    <div class="platform-tabs">
+                        <div class="platform-tab active" onclick="switchTemplatePlatform(this, 'automotive')">Facebook</div>
+                        <div class="platform-tab" onclick="switchTemplatePlatform(this, 'automotive')">Instagram</div>
+                        <div class="platform-tab" onclick="switchTemplatePlatform(this, 'automotive')">LinkedIn</div>
+                        <div class="platform-tab" onclick="switchTemplatePlatform(this, 'automotive')">Twitter</div>
+                    </div>
+                    
+                    <div id="automotive-facebook" class="template-content">
+🚗 KEEP YOUR VEHICLE RUNNING SMOOTHLY!
+
+At [BUSINESS_NAME], we provide:
+
+✅ ASE Certified Technicians
+✅ Factory-Trained Specialists
+✅ Latest Diagnostic Equipment
+✅ Genuine Parts & Warranties
+✅ Fair & Transparent Pricing
+
+From routine maintenance to major repairs, we've got you covered!
+
+Schedule your service today:
+📞 [PHONE] | 🌐 [WEBSITE]
+
+#AutoRepair #CarService #ASE #Certified #Reliable #LocalBusiness</div>
+                    
+                    <div class="hashtag-suggestions">
+                        <h4>💡 Suggested Hashtags:</h4>
+                        <div class="hashtag-list">
+                            <span class="hashtag" onclick="copyToClipboard('#AutoRepair')">#AutoRepair</span>
+                            <span class="hashtag" onclick="copyToClipboard('#CarService')">#CarService</span>
+                            <span class="hashtag" onclick="copyToClipboard('#ASE')">#ASE</span>
+                            <span class="hashtag" onclick="copyToClipboard('#Certified')">#Certified</span>
+                            <span class="hashtag" onclick="copyToClipboard('#Reliable')">#Reliable</span>
+                            <span class="hashtag" onclick="copyToClipboard('#LocalBusiness')">#LocalBusiness</span>
+                        </div>
+                    </div>
+                    
+                    <div class="template-meta">
+                        <div class="template-stats">
+                            <div class="stat">👁️ 2.3k views</div>
+                            <div class="stat">📋 89 uses</div>
+                            <div class="stat">⭐ 4.8 rating</div>
+                        </div>
+                        <button class="favorite-btn" onclick="toggleFavorite(this)">❤️</button>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <button class="quick-action-btn primary" onclick="copyTemplate('automotive')">📋 Copy Template</button>
+                        <button class="quick-action-btn" onclick="customizeTemplate('automotive')">✏️ Customize</button>
+                        <button class="quick-action-btn" onclick="scheduleTemplate('automotive')">📅 Schedule</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- White Collar Industries Section -->
+        <div id="white-collar" class="category-section">
+            <div class="category-header">
+                <h2>💼 White Collar Industries</h2>
+                <p>Templates for professional services, consulting, finance, and corporate businesses</p>
+            </div>
+            <div class="template-categories">
+                <!-- Professional Services -->
+                <div class="template-card">
+                    <div class="template-header">
+                        <div class="template-icon">💼</div>
+                        <div class="template-title">Professional Services</div>
+                    </div>
+                    <div class="template-description">
+                        Templates for lawyers, accountants, consultants, and professional service providers.
+                    </div>
+                    
+                    <div class="platform-tabs">
+                        <div class="platform-tab active" onclick="switchTemplatePlatform(this, 'professional')">Facebook</div>
+                        <div class="platform-tab" onclick="switchTemplatePlatform(this, 'professional')">Instagram</div>
+                        <div class="platform-tab" onclick="switchTemplatePlatform(this, 'professional')">LinkedIn</div>
+                        <div class="platform-tab" onclick="switchTemplatePlatform(this, 'professional')">Twitter</div>
+                    </div>
+                    
+                    <div id="professional-facebook" class="template-content">
+💼 PROFESSIONAL EXCELLENCE YOU CAN TRUST
+
+At [BUSINESS_NAME], we provide:
+
+✅ [YEARS] Years of Experience
+✅ Licensed & Certified Professionals
+✅ Confidential & Secure
+✅ Free Initial Consultation
+✅ Proven Track Record
+
+Serving [LOCATION] with integrity and expertise.
+
+Schedule your consultation today:
+📞 [PHONE] | 🌐 [WEBSITE]
+
+#ProfessionalServices #Expertise #Trust #Consultation #LocalBusiness</div>
+                    
+                    <div class="hashtag-suggestions">
+                        <h4>💡 Suggested Hashtags:</h4>
+                        <div class="hashtag-list">
+                            <span class="hashtag" onclick="copyToClipboard('#ProfessionalServices')">#ProfessionalServices</span>
+                            <span class="hashtag" onclick="copyToClipboard('#Expertise')">#Expertise</span>
+                            <span class="hashtag" onclick="copyToClipboard('#Trust')">#Trust</span>
+                            <span class="hashtag" onclick="copyToClipboard('#Consultation')">#Consultation</span>
+                            <span class="hashtag" onclick="copyToClipboard('#LocalBusiness')">#LocalBusiness</span>
+                        </div>
+                    </div>
+                    
+                    <div class="template-meta">
+                        <div class="template-stats">
+                            <div class="stat">👁️ 1.9k views</div>
+                            <div class="stat">📋 67 uses</div>
+                            <div class="stat">⭐ 4.7 rating</div>
+                        </div>
+                        <button class="favorite-btn" onclick="toggleFavorite(this)">❤️</button>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <button class="quick-action-btn primary" onclick="copyTemplate('professional')">📋 Copy Template</button>
+                        <button class="quick-action-btn" onclick="customizeTemplate('professional')">✏️ Customize</button>
+                        <button class="quick-action-btn" onclick="scheduleTemplate('professional')">📅 Schedule</button>
+                    </div>
+                </div>
+                
+                <!-- Financial Services -->
+                <div class="template-card">
+                    <div class="template-header">
+                        <div class="template-icon">💰</div>
+                        <div class="template-title">Financial Services</div>
+                    </div>
+                    <div class="template-description">
+                        Templates for financial advisors, insurance agents, and financial planning services.
+                    </div>
+                    
+                    <div class="platform-tabs">
+                        <div class="platform-tab active" onclick="switchTemplatePlatform(this, 'financial')">Facebook</div>
+                        <div class="platform-tab" onclick="switchTemplatePlatform(this, 'financial')">Instagram</div>
+                        <div class="platform-tab" onclick="switchTemplatePlatform(this, 'financial')">LinkedIn</div>
+                        <div class="platform-tab" onclick="switchTemplatePlatform(this, 'financial')">Twitter</div>
+                    </div>
+                    
+                    <div id="financial-facebook" class="template-content">
+💰 SECURE YOUR FINANCIAL FUTURE
+
+At [BUSINESS_NAME], we help you:
+
+✅ Plan for Retirement
+✅ Protect Your Family
+✅ Grow Your Wealth
+✅ Minimize Taxes
+✅ Achieve Your Goals
+
+Licensed professionals with [YEARS] years of experience serving [LOCATION].
+
+Free consultation - no obligation:
+📞 [PHONE] | 🌐 [WEBSITE]
+
+#FinancialPlanning #Retirement #Insurance #WealthBuilding #FinancialSecurity</div>
+                    
+                    <div class="hashtag-suggestions">
+                        <h4>💡 Suggested Hashtags:</h4>
+                        <div class="hashtag-list">
+                            <span class="hashtag" onclick="copyToClipboard('#FinancialPlanning')">#FinancialPlanning</span>
+                            <span class="hashtag" onclick="copyToClipboard('#Retirement')">#Retirement</span>
+                            <span class="hashtag" onclick="copyToClipboard('#Insurance')">#Insurance</span>
+                            <span class="hashtag" onclick="copyToClipboard('#WealthBuilding')">#WealthBuilding</span>
+                            <span class="hashtag" onclick="copyToClipboard('#FinancialSecurity')">#FinancialSecurity</span>
+                        </div>
+                    </div>
+                    
+                    <div class="template-meta">
+                        <div class="template-stats">
+                            <div class="stat">👁️ 2.4k views</div>
+                            <div class="stat">📋 91 uses</div>
+                            <div class="stat">⭐ 4.9 rating</div>
+                        </div>
+                        <button class="favorite-btn" onclick="toggleFavorite(this)">❤️</button>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <button class="quick-action-btn primary" onclick="copyTemplate('financial')">📋 Copy Template</button>
+                        <button class="quick-action-btn" onclick="customizeTemplate('financial')">✏️ Customize</button>
+                        <button class="quick-action-btn" onclick="scheduleTemplate('financial')">📅 Schedule</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- E-Business Section -->
+        <div id="e-business" class="category-section">
+            <div class="category-header">
+                <h2>🌐 E-Business & Digital</h2>
+                <p>Templates for online businesses, e-commerce, digital agencies, and tech companies</p>
+            </div>
+            <div class="template-categories">
+                <!-- E-Commerce -->
+                <div class="template-card">
+                    <div class="template-header">
+                        <div class="template-icon">🛒</div>
+                        <div class="template-title">E-Commerce</div>
+                    </div>
+                    <div class="template-description">
+                        Templates for online stores, e-commerce platforms, and digital retail businesses.
+                    </div>
+                    
+                    <div class="platform-tabs">
+                        <div class="platform-tab active" onclick="switchTemplatePlatform(this, 'ecommerce')">Facebook</div>
+                        <div class="platform-tab" onclick="switchTemplatePlatform(this, 'ecommerce')">Instagram</div>
+                        <div class="platform-tab" onclick="switchTemplatePlatform(this, 'ecommerce')">LinkedIn</div>
+                        <div class="platform-tab" onclick="switchTemplatePlatform(this, 'ecommerce')">Twitter</div>
+                    </div>
+                    
+                    <div id="ecommerce-facebook" class="template-content">
+🛒 SHOP SMALL, SHOP LOCAL!
+
+Discover amazing products at [BUSINESS_NAME]:
+
+✅ Free Shipping on Orders Over $[AMOUNT]
+✅ 30-Day Money-Back Guarantee
+✅ Fast & Secure Checkout
+✅ Customer Support 7 Days a Week
+✅ New Arrivals Weekly
+
+Shop now: [WEBSITE]
+Follow us for exclusive deals!
+
+#ShopLocal #Ecommerce #OnlineShopping #SmallBusiness #FreeShipping</div>
+                    
+                    <div class="hashtag-suggestions">
+                        <h4>💡 Suggested Hashtags:</h4>
+                        <div class="hashtag-list">
+                            <span class="hashtag" onclick="copyToClipboard('#ShopLocal')">#ShopLocal</span>
+                            <span class="hashtag" onclick="copyToClipboard('#Ecommerce')">#Ecommerce</span>
+                            <span class="hashtag" onclick="copyToClipboard('#OnlineShopping')">#OnlineShopping</span>
+                            <span class="hashtag" onclick="copyToClipboard('#SmallBusiness')">#SmallBusiness</span>
+                            <span class="hashtag" onclick="copyToClipboard('#FreeShipping')">#FreeShipping</span>
+                        </div>
+                    </div>
+                    
+                    <div class="template-meta">
+                        <div class="template-stats">
+                            <div class="stat">👁️ 3.1k views</div>
+                            <div class="stat">📋 124 uses</div>
+                            <div class="stat">⭐ 4.8 rating</div>
+                        </div>
+                        <button class="favorite-btn" onclick="toggleFavorite(this)">❤️</button>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <button class="quick-action-btn primary" onclick="copyTemplate('ecommerce')">📋 Copy Template</button>
+                        <button class="quick-action-btn" onclick="customizeTemplate('ecommerce')">✏️ Customize</button>
+                        <button class="quick-action-btn" onclick="scheduleTemplate('ecommerce')">📅 Schedule</button>
+                    </div>
+                </div>
+                
+                <!-- Digital Agency -->
+                <div class="template-card">
+                    <div class="template-header">
+                        <div class="template-icon">🚀</div>
+                        <div class="template-title">Digital Agency - 4 Options</div>
+                    </div>
+                    <div class="template-description">
+                        Choose from 4 different engaging approaches for digital marketing agencies. Each option demonstrates expertise while driving leads and conversions.
+                    </div>
+                    
+                    <div class="content-options">
+                        <div class="option-tabs">
+                            <div class="option-tab active" onclick="switchContentOption(this, 'digital', 'direct')">Direct Promotion</div>
+                            <div class="option-tab" onclick="switchContentOption(this, 'digital', 'educational')">Educational</div>
+                            <div class="option-tab" onclick="switchContentOption(this, 'digital', 'social-proof')">Social Proof</div>
+                            <div class="option-tab" onclick="switchContentOption(this, 'digital', 'behind-scenes')">Behind Scenes</div>
+                        </div>
+                        
+                        <div class="platform-tabs">
+                            <div class="platform-tab active" onclick="switchTemplatePlatform(this, 'digital')">Facebook</div>
+                            <div class="platform-tab" onclick="switchTemplatePlatform(this, 'digital')">Instagram</div>
+                            <div class="platform-tab" onclick="switchTemplatePlatform(this, 'digital')">LinkedIn</div>
+                            <div class="platform-tab" onclick="switchTemplatePlatform(this, 'digital')">Twitter</div>
+                        </div>
+                        
+                        <!-- Direct Promotion Option -->
+                        <div id="digital-direct-facebook" class="template-content">
+🚀 GROW YOUR BUSINESS ONLINE!
+
+At [BUSINESS_NAME], we help businesses:
+
+✅ Increase Website Traffic
+✅ Generate More Leads
+✅ Boost Online Sales
+✅ Build Brand Awareness
+✅ Dominate Search Results
+
+Proven results for [NUMBER]+ clients in [LOCATION].
+
+Free digital audit - limited time:
+📞 [PHONE] | 🌐 [WEBSITE]
+
+#DigitalMarketing #WebDesign #SEO #OnlineMarketing #BusinessGrowth</div>
+                        
+                        <!-- Educational Option -->
+                        <div id="digital-educational-facebook" class="template-content" style="display: none;">
+💡 DIGITAL MARKETING TIP THURSDAY!
+
+Did you know that 75% of users never scroll past the first page of Google? 😱
+
+Here's how to get your business to the top:
+
+✅ Optimize your website for mobile
+✅ Create valuable, shareable content
+✅ Build quality backlinks
+✅ Use local SEO strategies
+✅ Engage with your audience
+
+Most businesses struggle with these basics!
+
+Need help implementing these strategies?
+
+[BUSINESS_NAME] - Your Digital Marketing Experts
+
+Free consultation: [PHONE]
+
+#DigitalMarketingTips #SEO #LocalBusiness #OnlineMarketing #WebDesign</div>
+                        
+                        <!-- Social Proof Option -->
+                        <div id="digital-social-proof-facebook" class="template-content" style="display: none;">
+⭐ "Our website traffic increased 300% in just 3 months!" - Restaurant Owner
+
+"[BUSINESS_NAME] helped us dominate local search. We're now #1 for our keywords!" - Local Contractor
+
+"Best investment we ever made. ROI was 400% in the first year!" - Retail Store Owner
+
+Join 100+ businesses that chose [BUSINESS_NAME] for digital success!
+
+Ready to see similar results?
+
+Free digital audit: [PHONE] | [WEBSITE]
+
+#SuccessStories #DigitalMarketing #LocalBusiness #SEO #WebDesign #ROI</div>
+                        
+                        <!-- Behind Scenes Option -->
+                        <div id="digital-behind-scenes-facebook" class="template-content" style="display: none;">
+🔍 BEHIND THE SCENES: How We Create Digital Success
+
+Ever wonder what goes into a successful digital marketing campaign? Here's our process:
+
+🔍 9 AM - Keyword research & competitor analysis
+📊 10 AM - Website audit & technical review
+📝 11 AM - Content strategy & creation
+🎯 1 PM - Ad campaign setup & optimization
+📱 2 PM - Social media management & engagement
+📈 3 PM - Analytics review & performance tracking
+🚀 4 PM - Strategy adjustments & improvements
+
+The result? 2-3x growth in website traffic and leads!
+
+Want to see this process work for your business?
+
+Free consultation: [PHONE]
+
+#BehindTheScenes #DigitalMarketing #Process #LocalBusiness #WebDesign #SEO</div>
+                    
+                    <div class="hashtag-suggestions">
+                        <h4>💡 Suggested Hashtags:</h4>
+                        <div class="hashtag-list">
+                            <span class="hashtag" onclick="copyToClipboard('#DigitalMarketing')">#DigitalMarketing</span>
+                            <span class="hashtag" onclick="copyToClipboard('#WebDesign')">#WebDesign</span>
+                            <span class="hashtag" onclick="copyToClipboard('#SEO')">#SEO</span>
+                            <span class="hashtag" onclick="copyToClipboard('#OnlineMarketing')">#OnlineMarketing</span>
+                            <span class="hashtag" onclick="copyToClipboard('#BusinessGrowth')">#BusinessGrowth</span>
+                        </div>
+                    </div>
+                    
+                    <div class="template-meta">
+                        <div class="template-stats">
+                            <div class="stat">👁️ 2.7k views</div>
+                            <div class="stat">📋 156 uses</div>
+                            <div class="stat">⭐ 4.9 rating</div>
+                        </div>
+                        <button class="favorite-btn" onclick="toggleFavorite(this)">❤️</button>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <button class="quick-action-btn primary" onclick="copyTemplate('digital')">📋 Copy Template</button>
+                        <button class="quick-action-btn" onclick="customizeTemplate('digital')">✏️ Customize</button>
+                        <button class="quick-action-btn" onclick="scheduleTemplate('digital')">📅 Schedule</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Service Industry Section -->
+        <div id="service-industry" class="category-section">
+            <div class="category-header">
+                <h2>🛎️ Service Industry</h2>
+                <p>Templates for restaurants, hospitality, healthcare, and personal services</p>
+            </div>
+            <div class="template-categories">
+                <!-- Restaurant -->
+                <div class="template-card">
+                    <div class="template-header">
+                        <div class="template-icon">🍽️</div>
+                        <div class="template-title">Restaurant & Food - 4 Options</div>
+                    </div>
+                    <div class="template-description">
+                        Choose from 4 different engaging approaches for restaurants and food businesses. Each option creates appetite appeal while driving foot traffic and orders.
+                    </div>
+                    
+                    <div class="content-options">
+                        <div class="option-tabs">
+                            <div class="option-tab active" onclick="switchContentOption(this, 'restaurant', 'direct')">Direct Promotion</div>
+                            <div class="option-tab" onclick="switchContentOption(this, 'restaurant', 'educational')">Educational</div>
+                            <div class="option-tab" onclick="switchContentOption(this, 'restaurant', 'social-proof')">Social Proof</div>
+                            <div class="option-tab" onclick="switchContentOption(this, 'restaurant', 'behind-scenes')">Behind Scenes</div>
+                        </div>
+                        
+                        <div class="platform-tabs">
+                            <div class="platform-tab active" onclick="switchTemplatePlatform(this, 'restaurant')">Facebook</div>
+                            <div class="platform-tab" onclick="switchTemplatePlatform(this, 'restaurant')">Instagram</div>
+                            <div class="platform-tab" onclick="switchTemplatePlatform(this, 'restaurant')">LinkedIn</div>
+                            <div class="platform-tab" onclick="switchTemplatePlatform(this, 'restaurant')">Twitter</div>
+                        </div>
+                        
+                        <!-- Direct Promotion Option -->
+                        <div id="restaurant-direct-facebook" class="template-content">
+🍽️ FRESH, DELICIOUS, LOCAL!
+
+At [BUSINESS_NAME], we serve:
+
+✅ Fresh, Local Ingredients
+✅ Family Recipes
+✅ Cozy Atmosphere
+✅ Takeout & Delivery Available
+✅ Catering Services
+
+Open [HOURS] in [LOCATION]
+
+Order now: [PHONE] | [WEBSITE]
+
+#LocalRestaurant #FreshFood #FamilyOwned #Takeout #Delivery #Catering</div>
+                        
+                        <!-- Educational Option -->
+                        <div id="restaurant-educational-facebook" class="template-content" style="display: none;">
+💡 FOODIE FRIDAY TIP!
+
+Did you know that fresh herbs can boost your immune system by 25%? 🌿
+
+Here's why we use only the freshest ingredients:
+
+✅ Local sourcing supports community farmers
+✅ Fresh ingredients = better taste & nutrition
+✅ Seasonal menus = peak flavor & value
+✅ No preservatives = healthier meals
+✅ Farm-to-table = sustainable practices
+
+Experience the difference fresh makes!
+
+Visit [BUSINESS_NAME] today: [PHONE]
+
+#FoodieTips #FreshIngredients #LocalRestaurant #HealthyEating #FarmToTable</div>
+                        
+                        <!-- Social Proof Option -->
+                        <div id="restaurant-social-proof-facebook" class="template-content" style="display: none;">
+⭐ "Best restaurant in [LOCATION]! The food is amazing and the service is perfect!" - Maria G.
+
+"I've been coming here for 5 years and it never disappoints. Family favorite!" - David L.
+
+"The catering for our wedding was absolutely perfect. Highly recommend!" - Sarah & Mike
+
+Join thousands of satisfied customers who love [BUSINESS_NAME]!
+
+Ready to taste the difference?
+
+Order now: [PHONE] | [WEBSITE]
+
+#CustomerReviews #LocalRestaurant #FamilyFavorite #Catering #Foodie</div>
+                        
+                        <!-- Behind Scenes Option -->
+                        <div id="restaurant-behind-scenes-facebook" class="template-content" style="display: none;">
+🔍 BEHIND THE SCENES: A Day in Our Kitchen
+
+Ever wonder what goes into creating your favorite dishes? Here's our daily process:
+
+🌅 6 AM - Fresh ingredient delivery & inspection
+👨‍🍳 7 AM - Prep work & recipe preparation
+🔥 8 AM - Cooking begins for lunch service
+🍽️ 11 AM - Lunch service starts
+🧹 2 PM - Kitchen cleanup & dinner prep
+🍴 5 PM - Dinner service begins
+📋 9 PM - End-of-day inventory & planning
+
+The result? Consistently delicious meals made with love!
+
+Come taste the difference: [PHONE]
+
+#BehindTheScenes #KitchenLife #LocalRestaurant #FreshFood #ChefLife</div>
+                    
+                    <div class="hashtag-suggestions">
+                        <h4>💡 Suggested Hashtags:</h4>
+                        <div class="hashtag-list">
+                            <span class="hashtag" onclick="copyToClipboard('#LocalRestaurant')">#LocalRestaurant</span>
+                            <span class="hashtag" onclick="copyToClipboard('#FreshFood')">#FreshFood</span>
+                            <span class="hashtag" onclick="copyToClipboard('#FamilyOwned')">#FamilyOwned</span>
+                            <span class="hashtag" onclick="copyToClipboard('#Takeout')">#Takeout</span>
+                            <span class="hashtag" onclick="copyToClipboard('#Delivery')">#Delivery</span>
+                            <span class="hashtag" onclick="copyToClipboard('#Catering')">#Catering</span>
+                        </div>
+                    </div>
+                    
+                    <div class="template-meta">
+                        <div class="template-stats">
+                            <div class="stat">👁️ 4.2k views</div>
+                            <div class="stat">📋 203 uses</div>
+                            <div class="stat">⭐ 4.9 rating</div>
+                        </div>
+                        <button class="favorite-btn" onclick="toggleFavorite(this)">❤️</button>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <button class="quick-action-btn primary" onclick="copyTemplate('restaurant')">📋 Copy Template</button>
+                        <button class="quick-action-btn" onclick="customizeTemplate('restaurant')">✏️ Customize</button>
+                        <button class="quick-action-btn" onclick="scheduleTemplate('restaurant')">📅 Schedule</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Retail Section -->
+        <div id="retail" class="category-section">
+            <div class="category-header">
+                <h2>🛍️ Retail & Sales</h2>
+                <p>Templates for retail stores, sales teams, and customer-facing businesses</p>
+            </div>
+            <div class="template-categories">
+                <!-- Retail Store -->
+                <div class="template-card">
+                    <div class="template-header">
+                        <div class="template-icon">🛍️</div>
+                        <div class="template-title">Retail Store</div>
+                    </div>
+                    <div class="template-description">
+                        Templates for retail stores, boutiques, and sales-focused businesses.
+                    </div>
+                    
+                    <div class="platform-tabs">
+                        <div class="platform-tab active" onclick="switchTemplatePlatform(this, 'retail')">Facebook</div>
+                        <div class="platform-tab" onclick="switchTemplatePlatform(this, 'retail')">Instagram</div>
+                        <div class="platform-tab" onclick="switchTemplatePlatform(this, 'retail')">LinkedIn</div>
+                        <div class="platform-tab" onclick="switchTemplatePlatform(this, 'retail')">Twitter</div>
+                    </div>
+                    
+                    <div id="retail-facebook" class="template-content">
+🛍️ SHOP LOCAL, SHOP SMART!
+
+At [BUSINESS_NAME], find:
+
+✅ Quality Products
+✅ Competitive Prices
+✅ Expert Advice
+✅ Friendly Service
+✅ Local Support
+
+Visit us at [ADDRESS] in [LOCATION]
+Open [HOURS]
+
+📞 [PHONE] | 🌐 [WEBSITE]
+
+#ShopLocal #Retail #QualityProducts #LocalBusiness #CustomerService</div>
+                    
+                    <div class="hashtag-suggestions">
+                        <h4>💡 Suggested Hashtags:</h4>
+                        <div class="hashtag-list">
+                            <span class="hashtag" onclick="copyToClipboard('#ShopLocal')">#ShopLocal</span>
+                            <span class="hashtag" onclick="copyToClipboard('#Retail')">#Retail</span>
+                            <span class="hashtag" onclick="copyToClipboard('#QualityProducts')">#QualityProducts</span>
+                            <span class="hashtag" onclick="copyToClipboard('#LocalBusiness')">#LocalBusiness</span>
+                            <span class="hashtag" onclick="copyToClipboard('#CustomerService')">#CustomerService</span>
+                        </div>
+                    </div>
+                    
+                    <div class="template-meta">
+                        <div class="template-stats">
+                            <div class="stat">👁️ 2.8k views</div>
+                            <div class="stat">📋 112 uses</div>
+                            <div class="stat">⭐ 4.7 rating</div>
+                        </div>
+                        <button class="favorite-btn" onclick="toggleFavorite(this)">❤️</button>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <button class="quick-action-btn primary" onclick="copyTemplate('retail')">📋 Copy Template</button>
+                        <button class="quick-action-btn" onclick="customizeTemplate('retail')">✏️ Customize</button>
+                        <button class="quick-action-btn" onclick="scheduleTemplate('retail')">📅 Schedule</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Healthcare Section -->
+        <div id="healthcare" class="category-section">
+            <div class="category-header">
+                <h2>🏥 Healthcare & Medical</h2>
+                <p>Templates for medical practices, healthcare providers, and wellness services</p>
+            </div>
+            <div class="template-categories">
+                <!-- Medical Practice -->
+                <div class="template-card">
+                    <div class="template-header">
+                        <div class="template-icon">🏥</div>
+                        <div class="template-title">Medical Practice - 4 Options</div>
+                    </div>
+                    <div class="template-description">
+                        Choose from 4 different engaging approaches for healthcare providers. Each option builds trust and educates patients while driving appointments.
+                    </div>
+                    
+                    <div class="content-options">
+                        <div class="option-tabs">
+                            <div class="option-tab active" onclick="switchContentOption(this, 'medical', 'direct')">Direct Promotion</div>
+                            <div class="option-tab" onclick="switchContentOption(this, 'medical', 'educational')">Educational</div>
+                            <div class="option-tab" onclick="switchContentOption(this, 'medical', 'social-proof')">Social Proof</div>
+                            <div class="option-tab" onclick="switchContentOption(this, 'medical', 'behind-scenes')">Behind Scenes</div>
+                        </div>
+                        
+                        <div class="platform-tabs">
+                            <div class="platform-tab active" onclick="switchTemplatePlatform(this, 'medical')">Facebook</div>
+                            <div class="platform-tab" onclick="switchTemplatePlatform(this, 'medical')">Instagram</div>
+                            <div class="platform-tab" onclick="switchTemplatePlatform(this, 'medical')">LinkedIn</div>
+                            <div class="platform-tab" onclick="switchTemplatePlatform(this, 'medical')">Twitter</div>
+                        </div>
+                        
+                        <!-- Direct Promotion Option -->
+                        <div id="medical-direct-facebook" class="template-content">
+🏥 YOUR HEALTH IS OUR PRIORITY
+
+At [BUSINESS_NAME], we provide:
+
+✅ Board-Certified Physicians
+✅ State-of-the-Art Equipment
+✅ Compassionate Care
+✅ Flexible Scheduling
+✅ Insurance Accepted
+
+Serving [LOCATION] with excellence and care.
+
+Schedule your appointment:
+📞 [PHONE] | 🌐 [WEBSITE]
+
+#Healthcare #MedicalCare #LocalDoctor #Health #Wellness #ProfessionalCare</div>
+                        
+                        <!-- Educational Option -->
+                        <div id="medical-educational-facebook" class="template-content" style="display: none;">
+💡 HEALTH TIP WEDNESDAY!
+
+Did you know that regular check-ups can prevent 80% of serious health issues? 🩺
+
+Here's why preventive care matters:
+
+✅ Early detection saves lives
+✅ Prevents costly treatments
+✅ Maintains quality of life
+✅ Reduces hospital visits
+✅ Peace of mind for you & family
+
+Don't wait for symptoms to appear!
+
+Schedule your annual check-up at [BUSINESS_NAME]:
+
+📞 [PHONE] | 🌐 [WEBSITE]
+
+#HealthTips #PreventiveCare #LocalDoctor #Wellness #Healthcare</div>
+                        
+                        <!-- Social Proof Option -->
+                        <div id="medical-social-proof-facebook" class="template-content" style="display: none;">
+⭐ "Dr. [DOCTOR_NAME] saved my life with early detection. Forever grateful!" - Sarah M.
+
+"The staff at [BUSINESS_NAME] made me feel comfortable and cared for during a difficult time." - Michael R.
+
+"Best medical practice in [LOCATION]. Professional, compassionate, and thorough." - Jennifer L.
+
+Join thousands of patients who trust [BUSINESS_NAME] with their health!
+
+Ready to experience exceptional healthcare?
+
+Schedule your appointment: [PHONE]
+
+#Testimonials #Healthcare #LocalDoctor #PatientCare #MedicalExcellence</div>
+                        
+                        <!-- Behind Scenes Option -->
+                        <div id="medical-behind-scenes-facebook" class="template-content" style="display: none;">
+🔍 BEHIND THE SCENES: A Day at [BUSINESS_NAME]
+
+Ever wonder what happens during your medical visit? Here's our commitment to you:
+
+🌅 7 AM - Equipment sterilization & safety checks
+👩‍⚕️ 8 AM - Patient chart reviews & preparation
+🩺 9 AM - Compassionate patient care begins
+📋 12 PM - Team lunch & case discussions
+🔬 1 PM - Afternoon appointments continue
+📊 4 PM - Results review & follow-up planning
+📞 5 PM - Patient callbacks & scheduling
+
+The result? Comprehensive, personalized care that puts you first!
+
+Schedule your visit: [PHONE]
+
+#BehindTheScenes #Healthcare #MedicalCare #PatientFirst #LocalDoctor</div>
+                    
+                    <div class="hashtag-suggestions">
+                        <h4>💡 Suggested Hashtags:</h4>
+                        <div class="hashtag-list">
+                            <span class="hashtag" onclick="copyToClipboard('#Healthcare')">#Healthcare</span>
+                            <span class="hashtag" onclick="copyToClipboard('#MedicalCare')">#MedicalCare</span>
+                            <span class="hashtag" onclick="copyToClipboard('#LocalDoctor')">#LocalDoctor</span>
+                            <span class="hashtag" onclick="copyToClipboard('#Health')">#Health</span>
+                            <span class="hashtag" onclick="copyToClipboard('#Wellness')">#Wellness</span>
+                            <span class="hashtag" onclick="copyToClipboard('#ProfessionalCare')">#ProfessionalCare</span>
+                        </div>
+                    </div>
+                    
+                    <div class="template-meta">
+                        <div class="template-stats">
+                            <div class="stat">👁️ 3.5k views</div>
+                            <div class="stat">📋 178 uses</div>
+                            <div class="stat">⭐ 4.9 rating</div>
+                        </div>
+                        <button class="favorite-btn" onclick="toggleFavorite(this)">❤️</button>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <button class="quick-action-btn primary" onclick="copyTemplate('medical')">📋 Copy Template</button>
+                        <button class="quick-action-btn" onclick="customizeTemplate('medical')">✏️ Customize</button>
+                        <button class="quick-action-btn" onclick="scheduleTemplate('medical')">📅 Schedule</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Real Estate Section -->
+        <div id="real-estate" class="category-section">
+            <div class="category-header">
+                <h2>🏠 Real Estate</h2>
+                <p>Templates for real estate agents, brokers, and property management</p>
+            </div>
+            <div class="template-categories">
+                <!-- Real Estate Agent -->
+                <div class="template-card">
+                    <div class="template-header">
+                        <div class="template-icon">🏠</div>
+                        <div class="template-title">Real Estate Agent</div>
+                    </div>
+                    <div class="template-description">
+                        Templates for real estate agents, brokers, and property management companies.
+                    </div>
+                    
+                    <div class="platform-tabs">
+                        <div class="platform-tab active" onclick="switchTemplatePlatform(this, 'realestate')">Facebook</div>
+                        <div class="platform-tab" onclick="switchTemplatePlatform(this, 'realestate')">Instagram</div>
+                        <div class="platform-tab" onclick="switchTemplatePlatform(this, 'realestate')">LinkedIn</div>
+                        <div class="platform-tab" onclick="switchTemplatePlatform(this, 'realestate')">Twitter</div>
+                    </div>
+                    
+                    <div id="realestate-facebook" class="template-content">
+🏠 FIND YOUR DREAM HOME!
+
+With [YEARS] years of experience in [LOCATION], I help you:
+
+✅ Buy Your Perfect Home
+✅ Sell for Top Dollar
+✅ Expert Market Knowledge
+✅ Free Home Valuation
+✅ 24/7 Support
+
+Let's make your real estate dreams come true!
+
+Contact me today:
+📞 [PHONE] | 🌐 [WEBSITE]
+
+#RealEstate #HomeBuying #HomeSelling #LocalAgent #DreamHome #Property</div>
+                    
+                    <div class="hashtag-suggestions">
+                        <h4>💡 Suggested Hashtags:</h4>
+                        <div class="hashtag-list">
+                            <span class="hashtag" onclick="copyToClipboard('#RealEstate')">#RealEstate</span>
+                            <span class="hashtag" onclick="copyToClipboard('#HomeBuying')">#HomeBuying</span>
+                            <span class="hashtag" onclick="copyToClipboard('#HomeSelling')">#HomeSelling</span>
+                            <span class="hashtag" onclick="copyToClipboard('#LocalAgent')">#LocalAgent</span>
+                            <span class="hashtag" onclick="copyToClipboard('#DreamHome')">#DreamHome</span>
+                            <span class="hashtag" onclick="copyToClipboard('#Property')">#Property</span>
+                        </div>
+                    </div>
+                    
+                    <div class="template-meta">
+                        <div class="template-stats">
+                            <div class="stat">👁️ 2.9k views</div>
+                            <div class="stat">📋 134 uses</div>
+                            <div class="stat">⭐ 4.8 rating</div>
+                        </div>
+                        <button class="favorite-btn" onclick="toggleFavorite(this)">❤️</button>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <button class="quick-action-btn primary" onclick="copyTemplate('realestate')">📋 Copy Template</button>
+                        <button class="quick-action-btn" onclick="customizeTemplate('realestate')">✏️ Customize</button>
+                        <button class="quick-action-btn" onclick="scheduleTemplate('realestate')">📅 Schedule</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Seasonal Section -->
+        <div id="seasonal" class="category-section">
+            <div class="category-header">
+                <h2>🎄 Seasonal & Holiday</h2>
+                <p>Templates for holidays, seasons, and special occasions</p>
+            </div>
+            <div class="template-categories">
+                <!-- Holiday Promotion -->
+                <div class="template-card">
+                    <div class="template-header">
+                        <div class="template-icon">🎄</div>
+                        <div class="template-title">Holiday Promotion</div>
+                    </div>
+                    <div class="template-description">
+                        Templates for holiday sales, seasonal promotions, and special occasions.
+                    </div>
+                    
+                    <div class="platform-tabs">
+                        <div class="platform-tab active" onclick="switchTemplatePlatform(this, 'holiday')">Facebook</div>
+                        <div class="platform-tab" onclick="switchTemplatePlatform(this, 'holiday')">Instagram</div>
+                        <div class="platform-tab" onclick="switchTemplatePlatform(this, 'holiday')">LinkedIn</div>
+                        <div class="platform-tab" onclick="switchTemplatePlatform(this, 'holiday')">Twitter</div>
+                    </div>
+                    
+                    <div id="holiday-facebook" class="template-content">
+🎄 HOLIDAY SPECIAL - LIMITED TIME!
+
+Get [DISCOUNT]% OFF on [SERVICE/PRODUCT] this holiday season!
+
+✅ Special Holiday Pricing
+✅ Perfect for Gifts
+✅ Limited Time Offer
+✅ Free Gift Wrapping
+✅ Express Delivery Available
+
+Don't miss out - offer ends [DATE]!
+
+Shop now: [WEBSITE]
+Call: [PHONE]
+
+#HolidaySpecial #LimitedTime #GiftIdea #HolidaySale #LocalBusiness</div>
+                    
+                    <div class="hashtag-suggestions">
+                        <h4>💡 Suggested Hashtags:</h4>
+                        <div class="hashtag-list">
+                            <span class="hashtag" onclick="copyToClipboard('#HolidaySpecial')">#HolidaySpecial</span>
+                            <span class="hashtag" onclick="copyToClipboard('#LimitedTime')">#LimitedTime</span>
+                            <span class="hashtag" onclick="copyToClipboard('#GiftIdea')">#GiftIdea</span>
+                            <span class="hashtag" onclick="copyToClipboard('#HolidaySale')">#HolidaySale</span>
+                            <span class="hashtag" onclick="copyToClipboard('#LocalBusiness')">#LocalBusiness</span>
+                        </div>
+                    </div>
+                    
+                    <div class="template-meta">
+                        <div class="template-stats">
+                            <div class="stat">👁️ 5.2k views</div>
+                            <div class="stat">📋 312 uses</div>
+                            <div class="stat">⭐ 4.9 rating</div>
+                        </div>
+                        <button class="favorite-btn" onclick="toggleFavorite(this)">❤️</button>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <button class="quick-action-btn primary" onclick="copyTemplate('holiday')">📋 Copy Template</button>
+                        <button class="quick-action-btn" onclick="customizeTemplate('holiday')">✏️ Customize</button>
+                        <button class="quick-action-btn" onclick="scheduleTemplate('holiday')">📅 Schedule</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Crisis Management Section -->
+        <div id="crisis" class="category-section">
+            <div class="category-header">
+                <h2>🚨 Crisis Management</h2>
+                <p>Templates for handling emergencies, crises, and difficult situations</p>
+            </div>
+            <div class="template-categories">
+                <!-- Crisis Communication -->
+                <div class="template-card">
+                    <div class="template-header">
+                        <div class="template-icon">🚨</div>
+                        <div class="template-title">Crisis Communication</div>
+                    </div>
+                    <div class="template-description">
+                        Professional templates for crisis communication and emergency situations.
+                    </div>
+                    
+                    <div class="platform-tabs">
+                        <div class="platform-tab active" onclick="switchTemplatePlatform(this, 'crisis')">Facebook</div>
+                        <div class="platform-tab" onclick="switchTemplatePlatform(this, 'crisis')">Instagram</div>
+                        <div class="platform-tab" onclick="switchTemplatePlatform(this, 'crisis')">LinkedIn</div>
+                        <div class="platform-tab" onclick="switchTemplatePlatform(this, 'crisis')">Twitter</div>
+                    </div>
+                    
+                    <div id="crisis-facebook" class="template-content">
+🚨 IMPORTANT UPDATE
+
+We want to keep our valued customers informed about [SITUATION].
+
+✅ We are monitoring the situation closely
+✅ Your safety is our top priority
+✅ We will provide updates as they become available
+✅ Our team is working to resolve this quickly
+✅ Thank you for your patience and understanding
+
+For immediate assistance, please contact us at [PHONE].
+
+We appreciate your continued support.
+
+#Update #CustomerService #Transparency #Safety #Communication</div>
+                    
+                    <div class="hashtag-suggestions">
+                        <h4>💡 Suggested Hashtags:</h4>
+                        <div class="hashtag-list">
+                            <span class="hashtag" onclick="copyToClipboard('#Update')">#Update</span>
+                            <span class="hashtag" onclick="copyToClipboard('#CustomerService')">#CustomerService</span>
+                            <span class="hashtag" onclick="copyToClipboard('#Transparency')">#Transparency</span>
+                            <span class="hashtag" onclick="copyToClipboard('#Safety')">#Safety</span>
+                            <span class="hashtag" onclick="copyToClipboard('#Communication')">#Communication</span>
+                        </div>
+                    </div>
+                    
+                    <div class="template-meta">
+                        <div class="template-stats">
+                            <div class="stat">👁️ 1.7k views</div>
+                            <div class="stat">📋 23 uses</div>
+                            <div class="stat">⭐ 4.6 rating</div>
+                        </div>
+                        <button class="favorite-btn" onclick="toggleFavorite(this)">❤️</button>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <button class="quick-action-btn primary" onclick="copyTemplate('crisis')">📋 Copy Template</button>
+                        <button class="quick-action-btn" onclick="customizeTemplate('crisis')">✏️ Customize</button>
+                        <button class="quick-action-btn" onclick="scheduleTemplate('crisis')">📅 Schedule</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- B2B Section -->
+        <div id="b2b" class="category-section">
+            <div class="category-header">
+                <h2>🤝 B2B Marketing</h2>
+                <p>Templates for business-to-business marketing and professional networking</p>
+            </div>
+            <div class="template-categories">
+                <!-- B2B Lead Generation -->
+                <div class="template-card">
+                    <div class="template-header">
+                        <div class="template-icon">🤝</div>
+                        <div class="template-title">B2B Lead Generation</div>
+                    </div>
+                    <div class="template-description">
+                        Templates for generating B2B leads and professional networking.
+                    </div>
+                    
+                    <div class="platform-tabs">
+                        <div class="platform-tab active" onclick="switchTemplatePlatform(this, 'b2b')">Facebook</div>
+                        <div class="platform-tab" onclick="switchTemplatePlatform(this, 'b2b')">Instagram</div>
+                        <div class="platform-tab" onclick="switchTemplatePlatform(this, 'b2b')">LinkedIn</div>
+                        <div class="platform-tab" onclick="switchTemplatePlatform(this, 'b2b')">Twitter</div>
+                    </div>
+                    
+                    <div id="b2b-facebook" class="template-content">
+🤝 GROW YOUR BUSINESS WITH [SERVICE]
+
+Are you looking to [BENEFIT] for your business?
+
+Our [SERVICE] solutions help companies like yours:
+
+✅ Increase Efficiency by [PERCENTAGE]%
+✅ Reduce Costs by [AMOUNT]
+✅ Improve ROI by [PERCENTAGE]%
+✅ Scale Operations Effectively
+✅ Stay Competitive
+
+Join [NUMBER]+ businesses already benefiting from our solutions.
+
+Schedule a consultation: [PHONE]
+Learn more: [WEBSITE]
+
+#B2B #BusinessGrowth #Efficiency #ROI #ProfessionalServices</div>
+                    
+                    <div class="hashtag-suggestions">
+                        <h4>💡 Suggested Hashtags:</h4>
+                        <div class="hashtag-list">
+                            <span class="hashtag" onclick="copyToClipboard('#B2B')">#B2B</span>
+                            <span class="hashtag" onclick="copyToClipboard('#BusinessGrowth')">#BusinessGrowth</span>
+                            <span class="hashtag" onclick="copyToClipboard('#Efficiency')">#Efficiency</span>
+                            <span class="hashtag" onclick="copyToClipboard('#ROI')">#ROI</span>
+                            <span class="hashtag" onclick="copyToClipboard('#ProfessionalServices')">#ProfessionalServices</span>
+                        </div>
+                    </div>
+                    
+                    <div class="template-meta">
+                        <div class="template-stats">
+                            <div class="stat">👁️ 2.1k views</div>
+                            <div class="stat">📋 89 uses</div>
+                            <div class="stat">⭐ 4.7 rating</div>
+                        </div>
+                        <button class="favorite-btn" onclick="toggleFavorite(this)">❤️</button>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <button class="quick-action-btn primary" onclick="copyTemplate('b2b')">📋 Copy Template</button>
+                        <button class="quick-action-btn" onclick="customizeTemplate('b2b')">✏️ Customize</button>
+                        <button class="quick-action-btn" onclick="scheduleTemplate('b2b')">📅 Schedule</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- B2C Section -->
+        <div id="b2c" class="category-section">
+            <div class="category-header">
+                <h2>👥 B2C Marketing</h2>
+                <p>Templates for business-to-consumer marketing and customer engagement</p>
+            </div>
+            <div class="template-categories">
+                <!-- B2C Customer Engagement -->
+                <div class="template-card">
+                    <div class="template-header">
+                        <div class="template-icon">👥</div>
+                        <div class="template-title">Customer Engagement</div>
+                    </div>
+                    <div class="template-description">
+                        Templates for engaging with consumers and building customer relationships.
+                    </div>
+                    
+                    <div class="platform-tabs">
+                        <div class="platform-tab active" onclick="switchTemplatePlatform(this, 'b2c')">Facebook</div>
+                        <div class="platform-tab" onclick="switchTemplatePlatform(this, 'b2c')">Instagram</div>
+                        <div class="platform-tab" onclick="switchTemplatePlatform(this, 'b2c')">LinkedIn</div>
+                        <div class="platform-tab" onclick="switchTemplatePlatform(this, 'b2c')">Twitter</div>
+                    </div>
+                    
+                    <div id="b2c-facebook" class="template-content">
+👥 THANK YOU FOR BEING AMAZING!
+
+We're so grateful for customers like you who make our business possible!
+
+✅ Your support means everything to us
+✅ We love hearing your feedback
+✅ Your reviews help us grow
+✅ We're here to serve you better
+✅ Thank you for choosing [BUSINESS_NAME]
+
+Share your experience with us:
+📞 [PHONE] | 🌐 [WEBSITE]
+
+#CustomerAppreciation #ThankYou #CustomerService #LocalBusiness #Community</div>
+                    
+                    <div class="hashtag-suggestions">
+                        <h4>💡 Suggested Hashtags:</h4>
+                        <div class="hashtag-list">
+                            <span class="hashtag" onclick="copyToClipboard('#CustomerAppreciation')">#CustomerAppreciation</span>
+                            <span class="hashtag" onclick="copyToClipboard('#ThankYou')">#ThankYou</span>
+                            <span class="hashtag" onclick="copyToClipboard('#CustomerService')">#CustomerService</span>
+                            <span class="hashtag" onclick="copyToClipboard('#LocalBusiness')">#LocalBusiness</span>
+                            <span class="hashtag" onclick="copyToClipboard('#Community')">#Community</span>
+                        </div>
+                    </div>
+                    
+                    <div class="template-meta">
+                        <div class="template-stats">
+                            <div class="stat">👁️ 3.8k views</div>
+                            <div class="stat">📋 245 uses</div>
+                            <div class="stat">⭐ 4.9 rating</div>
+                        </div>
+                        <button class="favorite-btn" onclick="toggleFavorite(this)">❤️</button>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <button class="quick-action-btn primary" onclick="copyTemplate('b2c')">📋 Copy Template</button>
+                        <button class="quick-action-btn" onclick="customizeTemplate('b2c')">✏️ Customize</button>
+                        <button class="quick-action-btn" onclick="scheduleTemplate('b2c')">📅 Schedule</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showCategory(category) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.category-section');
+            sections.forEach(section => section.classList.remove('active'));
+            
+            // Show selected section
+            document.getElementById(category).classList.add('active');
+            
+            // Update filter buttons
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+        
+        function switchContentOption(tab, templateType, option) {
+            // Remove active class from all option tabs in this template
+            const optionTabs = tab.parentElement.querySelectorAll('.option-tab');
+            optionTabs.forEach(t => t.classList.remove('active'));
+            
+            // Add active class to clicked tab
+            tab.classList.add('active');
+            
+            // Hide all content for this template
+            const contents = document.querySelectorAll(`[id^="${templateType}-"]`);
+            contents.forEach(content => content.style.display = 'none');
+            
+            // Show selected content based on current platform
+            const activePlatform = document.querySelector(`[id^="${templateType}-"] .platform-tab.active`);
+            const platform = activePlatform ? activePlatform.textContent.toLowerCase() : 'facebook';
+            const contentId = `${templateType}-${option}-${platform}`;
+            const element = document.getElementById(contentId);
+            if (element) {
+                element.style.display = 'block';
+            }
+        }
+        
+        function switchTemplatePlatform(tab, templateType) {
+            // Remove active class from all tabs in this template
+            const tabs = tab.parentElement.querySelectorAll('.platform-tab');
+            tabs.forEach(t => t.classList.remove('active'));
+            
+            // Add active class to clicked tab
+            tab.classList.add('active');
+            
+            // Hide all content for this template
+            const contents = document.querySelectorAll(`[id^="${templateType}-"]`);
+            contents.forEach(content => content.style.display = 'none');
+            
+            // Show selected content based on current option
+            const platform = tab.textContent.toLowerCase();
+            const activeOption = document.querySelector(`[id^="${templateType}-"] .option-tab.active`);
+            const option = activeOption ? activeOption.textContent.toLowerCase().replace(' ', '-') : 'direct';
+            const contentId = `${templateType}-${option}-${platform}`;
+            const element = document.getElementById(contentId);
+            if (element) {
+                element.style.display = 'block';
+            }
+        }
+        
+        function copyTemplate(templateType) {
+            const activeTab = document.querySelector(`[id^="${templateType}-"]:not([style*="display: none"])`);
+            if (activeTab) {
+                const content = activeTab.textContent;
+                navigator.clipboard.writeText(content).then(() => {
+                    alert('Template copied to clipboard!');
+                }).catch(() => {
+                    // Fallback for older browsers
+                    const textArea = document.createElement('textarea');
+                    textArea.value = content;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    alert('Template copied to clipboard!');
+                });
+            }
+        }
+        
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Hashtag copied to clipboard!');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('Hashtag copied to clipboard!');
+            });
+        }
+        
+        function toggleFavorite(btn) {
+            btn.classList.toggle('active');
+            if (btn.classList.contains('active')) {
+                btn.textContent = '❤️';
+                alert('Added to favorites!');
+            } else {
+                btn.textContent = '🤍';
+                alert('Removed from favorites!');
+            }
+        }
+        
+        function customizeTemplate(templateType) {
+            alert('Customization feature coming soon! This will allow you to personalize templates with your specific business details.');
+        }
+        
+        function scheduleTemplate(templateType) {
+            alert('Scheduling feature coming soon! This will integrate with your social media management tools.');
+        }
+        
+        function searchTemplates() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const templateCards = document.querySelectorAll('.template-card');
+            
+            templateCards.forEach(card => {
+                const title = card.querySelector('.template-title').textContent.toLowerCase();
+                const description = card.querySelector('.template-description').textContent.toLowerCase();
+                
+                if (title.includes(searchTerm) || description.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+        
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            const templateCards = document.querySelectorAll('.template-card');
+            templateCards.forEach(card => {
+                card.style.display = 'block';
+            });
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up search functionality
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchTemplates();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

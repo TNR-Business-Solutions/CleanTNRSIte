@@ -1,0 +1,31 @@
+# Development files
+node_modules/
+*.log
+.env*
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Backup and temporary files
+*.backup
+*.bak
+*.tmp
+*.temp
+
+# Test files
+*test*.html
+image-debug.html
+test-images.html
+
+# Documentation
+*.md
+duplicate-analysis.md
+WIX_*.md
+BUSINESS_*.md
+FORM_*.md
+QUICK_*.md
