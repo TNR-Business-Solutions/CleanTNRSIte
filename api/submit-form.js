@@ -63,7 +63,7 @@ module.exports = async (req, res) => {
       </ul>
       
       <hr>
-      <p><small>This email was sent from the TNR Business Solutions contact form.</small></p>
+      <p><small>This email was sent from the TNR Business Solutions contact form (Updated Template).</small></p>
       <p><small>Submission Time: ${new Date().toLocaleString()}</small></p>
       <p><small>Server Time: ${new Date().toLocaleString()}</small></p>
     `;
