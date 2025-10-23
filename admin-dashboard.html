@@ -1086,6 +1086,12 @@
             loadLeads();
             loadOrders();
             loadFormSubmissions();
+            
+            // Set up periodic refresh every 5 seconds to catch new leads
+            setInterval(function() {
+                updateClientStats();
+                loadLeads(); // Refresh leads display
+            }, 5000);
         }
 
         function loadClients() {

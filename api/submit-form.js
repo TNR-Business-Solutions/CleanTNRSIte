@@ -35,61 +35,32 @@ module.exports = async (req, res) => {
 
     console.log("📥 Serverless function received form data:", formData);
 
-    // Format email content
+    // Format email content with ALL form data
     const emailHtml = `
       <h2>New Contact Form Submission</h2>
       <h3>TNR Business Solutions Website</h3>
       
-      <p><strong>Name:</strong> ${formData.name || "Not provided"}</p>
-      <p><strong>Email:</strong> ${formData.email || "Not provided"}</p>
-      <p><strong>Phone:</strong> ${formData.phone || "Not provided"}</p>
-      <p><strong>Company:</strong> ${formData.company || "Not provided"}</p>
-      <p><strong>Website:</strong> ${formData.website || "Not provided"}</p>
-      <p><strong>Industry:</strong> ${formData.industry || "Not specified"}</p>
-      
-      <p><strong>Services of Interest:</strong> ${
-        Array.isArray(formData.services)
-          ? formData.services.join(", ")
-          : formData.services || "Not specified"
-      }</p>
-      <p><strong>Project Budget:</strong> ${
-        formData.budget || "Not specified"
-      }</p>
-      <p><strong>Project Timeline:</strong> ${
-        formData.timeline || "Not specified"
-      }</p>
-      <p><strong>Preferred Contact Method:</strong> ${
-        formData.contactMethod || "Not specified"
-      }</p>
-      
-      ${
-        formData.insuranceType
-          ? `<p><strong>Insurance Type:</strong> ${formData.insuranceType}</p>`
-          : ""
-      }
-      ${
-        formData.coverageNeeds
-          ? `<p><strong>Coverage Needs:</strong> ${formData.coverageNeeds}</p>`
-          : ""
-      }
-      ${
-        formData.currentInsurance
-          ? `<p><strong>Current Insurance:</strong> ${formData.currentInsurance}</p>`
-          : ""
-      }
-      
-      ${
-        formData.position
-          ? `<p><strong>Position:</strong> ${formData.position}</p>`
-          : ""
-      }
-      
-      <p><strong>Message:</strong><br>${formData.message || "No message"}</p>
-      ${
-        formData.additionalInfo
-          ? `<p><strong>Additional Information:</strong><br>${formData.additionalInfo}</p>`
-          : ""
-      }
+      <h4>Form Details:</h4>
+      <ul>
+        ${Object.entries(formData)
+          .filter(([key, value]) => value && value !== "" && value !== "Not provided" && value !== "Not specified")
+          .map(([key, value]) => {
+            const displayKey = key
+              .replace(/([A-Z])/g, ' $1')
+              .replace(/^./, str => str.toUpperCase())
+              .replace(/([a-z])([A-Z])/g, '$1 $2')
+              .replace(/\b\w/g, l => l.toUpperCase());
+            
+            if (Array.isArray(value)) {
+              return `<li><strong>${displayKey}:</strong> ${value.join(", ")}</li>`;
+            } else if (typeof value === 'object') {
+              return `<li><strong>${displayKey}:</strong> ${JSON.stringify(value)}</li>`;
+            } else {
+              return `<li><strong>${displayKey}:</strong> ${value}</li>`;
+            }
+          })
+          .join('')}
+      </ul>
       
       <hr>
       <p><small>This email was sent from the TNR Business Solutions contact form.</small></p>
