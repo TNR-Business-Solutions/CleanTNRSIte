@@ -1142,7 +1142,7 @@
             }
             
             leadsList.innerHTML = leads.map(lead => {
-                // Create detailed information display
+                // Create comprehensive detailed information display (same as email template)
                 const details = [];
                 
                 // Basic info
@@ -1153,42 +1153,124 @@
                 if (lead.timeline) details.push(`<strong>Timeline:</strong> ${lead.timeline}`);
                 if (lead.contactMethod) details.push(`<strong>Contact Method:</strong> ${lead.contactMethod}`);
                 
-                // Insurance-specific details
+                // Personal details
                 if (lead.dateOfBirth) details.push(`<strong>Date of Birth:</strong> ${lead.dateOfBirth}`);
                 if (lead.maritalStatus) details.push(`<strong>Marital Status:</strong> ${lead.maritalStatus}`);
+                if (lead.gender) details.push(`<strong>Gender:</strong> ${lead.gender}`);
                 if (lead.address) details.push(`<strong>Address:</strong> ${lead.address}`);
+                if (lead.apartment) details.push(`<strong>Apartment/Unit:</strong> ${lead.apartment}`);
                 if (lead.city) details.push(`<strong>City:</strong> ${lead.city}`);
                 if (lead.state) details.push(`<strong>State:</strong> ${lead.state}`);
                 if (lead.zipCode) details.push(`<strong>Zip Code:</strong> ${lead.zipCode}`);
+                
+                // License details
+                if (lead.licenseNumber) details.push(`<strong>License Number:</strong> ${lead.licenseNumber}`);
+                if (lead.licenseState) details.push(`<strong>License State:</strong> ${lead.licenseState}`);
                 
                 // Vehicle details
                 if (lead.vehicleYear) details.push(`<strong>Vehicle Year:</strong> ${lead.vehicleYear}`);
                 if (lead.vehicleMake) details.push(`<strong>Vehicle Make:</strong> ${lead.vehicleMake}`);
                 if (lead.vehicleModel) details.push(`<strong>Vehicle Model:</strong> ${lead.vehicleModel}`);
+                if (lead.vin) details.push(`<strong>VIN:</strong> ${lead.vin}`);
+                if (lead.licensePlate) details.push(`<strong>License Plate:</strong> ${lead.licensePlate}`);
                 if (lead.vehicleUse) details.push(`<strong>Vehicle Use:</strong> ${lead.vehicleUse}`);
                 if (lead.annualMileage) details.push(`<strong>Annual Mileage:</strong> ${lead.annualMileage}`);
                 if (lead.vehicleOwnership) details.push(`<strong>Vehicle Ownership:</strong> ${lead.vehicleOwnership}`);
+                if (lead.garagingAddress) details.push(`<strong>Garaging Address:</strong> ${lead.garagingAddress}`);
+                
+                // Driving history
+                if (lead.yearsLicensed) details.push(`<strong>Years Licensed:</strong> ${lead.yearsLicensed}`);
+                if (lead.accidents) details.push(`<strong>Accidents:</strong> ${lead.accidents}`);
+                if (lead.trafficViolations) details.push(`<strong>Traffic Violations:</strong> ${lead.trafficViolations}`);
+                if (lead.duiDwi) details.push(`<strong>DUI/DWI:</strong> ${lead.duiDwi}`);
+                if (lead.licenseSuspended) details.push(`<strong>License Suspended:</strong> ${lead.licenseSuspended}`);
+                if (lead.currentInsurance) details.push(`<strong>Current Insurance:</strong> ${lead.currentInsurance}`);
+                
+                // Property details (Home Insurance)
+                if (lead.yearBuilt) details.push(`<strong>Year Built:</strong> ${lead.yearBuilt}`);
+                if (lead.propertyType) details.push(`<strong>Property Type:</strong> ${lead.propertyType}`);
+                if (lead.squareFootage) details.push(`<strong>Square Footage:</strong> ${lead.squareFootage}`);
+                if (lead.bedrooms) details.push(`<strong>Bedrooms:</strong> ${lead.bedrooms}`);
+                if (lead.bathrooms) details.push(`<strong>Bathrooms:</strong> ${lead.bathrooms}`);
+                if (lead.constructionType) details.push(`<strong>Construction Type:</strong> ${lead.constructionType}`);
+                if (lead.roofType) details.push(`<strong>Roof Type:</strong> ${lead.roofType}`);
+                if (lead.homeValue) details.push(`<strong>Home Value:</strong> $${lead.homeValue}`);
+                
+                // Life Insurance details
+                if (lead.coverageType) details.push(`<strong>Coverage Type:</strong> ${lead.coverageType}`);
+                if (lead.coverageAmount) details.push(`<strong>Coverage Amount:</strong> $${lead.coverageAmount}`);
+                if (lead.termLength) details.push(`<strong>Term Length:</strong> ${lead.termLength} years`);
+                if (lead.smokingStatus) details.push(`<strong>Smoking Status:</strong> ${lead.smokingStatus}`);
+                if (lead.height) details.push(`<strong>Height:</strong> ${lead.height}`);
+                if (lead.weight) details.push(`<strong>Weight:</strong> ${lead.weight}`);
+                
+                // Health conditions
+                const healthConditions = [];
+                if (lead.heartDisease) healthConditions.push('Heart Disease');
+                if (lead.diabetes) healthConditions.push('Diabetes');
+                if (lead.cancer) healthConditions.push('Cancer');
+                if (lead.highBloodPressure) healthConditions.push('High Blood Pressure');
+                if (lead.depressionAnxiety) healthConditions.push('Depression/Anxiety');
+                if (lead.noneOfAbove) healthConditions.push('None of the above');
+                if (healthConditions.length > 0) details.push(`<strong>Health Conditions:</strong> ${healthConditions.join(', ')}`);
+                
+                // Business Insurance details
+                if (lead.businessAddress) details.push(`<strong>Business Address:</strong> ${lead.businessAddress}`);
+                if (lead.firstName) details.push(`<strong>First Name:</strong> ${lead.firstName}`);
+                if (lead.lastName) details.push(`<strong>Last Name:</strong> ${lead.lastName}`);
+                if (lead.contactEmail) details.push(`<strong>Contact Email:</strong> ${lead.contactEmail}`);
+                if (lead.contactPhone) details.push(`<strong>Contact Phone:</strong> ${lead.contactPhone}`);
+                if (lead.jobTitle) details.push(`<strong>Job Title:</strong> ${lead.jobTitle}`);
+                
+                // Business coverage options
+                const businessCoverage = [];
+                if (lead.generalLiability) businessCoverage.push('General Liability');
+                if (lead.commercialProperty) businessCoverage.push('Commercial Property');
+                if (lead.workersCompensation) businessCoverage.push('Workers Compensation');
+                if (lead.professionalLiability) businessCoverage.push('Professional Liability');
+                if (lead.cyberLiability) businessCoverage.push('Cyber Liability');
+                if (lead.commercialAuto) businessCoverage.push('Commercial Auto');
+                if (lead.directorsOfficers) businessCoverage.push('Directors & Officers');
+                if (lead.otherCoverage) businessCoverage.push('Other');
+                if (businessCoverage.length > 0) details.push(`<strong>Business Coverage Needed:</strong> ${businessCoverage.join(', ')}`);
+                
+                // Umbrella Insurance details
+                if (lead.coverageAmount) details.push(`<strong>Desired Coverage Amount:</strong> ${lead.coverageAmount}`);
+                if (lead.currentPolicies) details.push(`<strong>Current Policies:</strong> ${lead.currentPolicies}`);
+                if (lead.insuranceType) details.push(`<strong>Insurance Type:</strong> ${lead.insuranceType}`);
                 
                 // Coverage details
                 if (lead.coverageLevel) details.push(`<strong>Coverage Level:</strong> ${lead.coverageLevel}`);
                 if (lead.deductible) details.push(`<strong>Deductible:</strong> $${lead.deductible}`);
-                if (lead.roadsideAssistance) details.push(`<strong>Roadside Assistance:</strong> ${lead.roadsideAssistance}`);
-                if (lead.rentalCarCoverage) details.push(`<strong>Rental Car Coverage:</strong> ${lead.rentalCarCoverage}`);
+                
+                // Additional coverage options
+                const additionalCoverage = [];
+                if (lead.roadsideAssistance) additionalCoverage.push('Roadside Assistance');
+                if (lead.rentalCarCoverage) additionalCoverage.push('Rental Car Coverage');
+                if (lead.gapInsurance) additionalCoverage.push('Gap Insurance');
+                if (lead.personalInjuryProtection) additionalCoverage.push('Personal Injury Protection');
+                if (lead.uninsuredMotorist) additionalCoverage.push('Uninsured Motorist');
+                if (lead.underinsuredMotorist) additionalCoverage.push('Underinsured Motorist');
+                if (lead.floodInsurance) additionalCoverage.push('Flood Insurance');
+                if (lead.earthquakeCoverage) additionalCoverage.push('Earthquake Coverage');
+                if (lead.sewerBackupCoverage) additionalCoverage.push('Sewer Backup Coverage');
+                if (lead.identityTheftProtection) additionalCoverage.push('Identity Theft Protection');
+                if (additionalCoverage.length > 0) details.push(`<strong>Additional Coverage:</strong> ${additionalCoverage.join(', ')}`);
                 
                 // Services
                 const servicesText = Array.isArray(lead.services) ? lead.services.join(', ') : lead.services || 'Not specified';
                 
                 return `
-                <div class="client-item">
-                    <div class="client-info">
-                        <h4>${lead.name}</h4>
-                        <p><strong>Email:</strong> ${lead.email} | <strong>Phone:</strong> ${lead.phone}</p>
-                        <p><strong>Services:</strong> ${servicesText}</p>
-                        <p><strong>Date:</strong> ${lead.submissionDate || formatDate(lead.submissionDateTime || lead.date)} | <strong>Source:</strong> ${lead.source}</p>
-                        <p><strong>Message:</strong> ${lead.message || 'No message'}</p>
-                        ${details.length > 0 ? `<div style="margin-top: 10px; padding: 10px; background: #f5f5f5; border-radius: 4px; font-size: 0.9em;">
-                            <strong>Additional Details:</strong><br>
-                            ${details.join('<br>')}
+                <div class="client-item" style="color: black;">
+                    <div class="client-info" style="color: black;">
+                        <h4 style="color: black;">${lead.name}</h4>
+                        <p style="color: black;"><strong>Email:</strong> ${lead.email} | <strong>Phone:</strong> ${lead.phone}</p>
+                        <p style="color: black;"><strong>Services:</strong> ${servicesText}</p>
+                        <p style="color: black;"><strong>Date:</strong> ${lead.submissionDate || formatDate(lead.submissionDateTime || lead.date)} | <strong>Source:</strong> ${lead.source}</p>
+                        <p style="color: black;"><strong>Message:</strong> ${lead.message || 'No message'}</p>
+                        ${details.length > 0 ? `<div style="margin-top: 10px; padding: 10px; background: #f5f5f5; border-radius: 4px; font-size: 0.9em; color: black;">
+                            <strong style="color: black;">Complete Form Details:</strong><br>
+                            <div style="color: black;">${details.join('<br>')}</div>
                         </div>` : ''}
                     </div>
                     <div class="client-actions">
@@ -1237,20 +1319,144 @@
                 return;
             }
             
-            formSubmissionsList.innerHTML = submissions.map(submission => `
-                <div class="client-item">
-                    <div class="client-info">
-                        <h4>${submission.name}</h4>
-                        <p>${submission.email} | ${submission.phone}</p>
-                        <p>Date: ${formatDate(submission.date)} | Source: ${submission.source}</p>
-                        <p>Message: ${submission.message}</p>
+            formSubmissionsList.innerHTML = submissions.map(submission => {
+                // Create comprehensive detailed information display (same as email template)
+                const details = [];
+                
+                // Basic info
+                if (submission.company) details.push(`<strong>Company:</strong> ${submission.company}`);
+                if (submission.industry) details.push(`<strong>Industry:</strong> ${submission.industry}`);
+                if (submission.website) details.push(`<strong>Website:</strong> ${submission.website}`);
+                if (submission.budget) details.push(`<strong>Budget:</strong> ${submission.budget}`);
+                if (submission.timeline) details.push(`<strong>Timeline:</strong> ${submission.timeline}`);
+                if (submission.contactMethod) details.push(`<strong>Contact Method:</strong> ${submission.contactMethod}`);
+                
+                // Personal details
+                if (submission.dateOfBirth) details.push(`<strong>Date of Birth:</strong> ${submission.dateOfBirth}`);
+                if (submission.maritalStatus) details.push(`<strong>Marital Status:</strong> ${submission.maritalStatus}`);
+                if (submission.gender) details.push(`<strong>Gender:</strong> ${submission.gender}`);
+                if (submission.address) details.push(`<strong>Address:</strong> ${submission.address}`);
+                if (submission.apartment) details.push(`<strong>Apartment/Unit:</strong> ${submission.apartment}`);
+                if (submission.city) details.push(`<strong>City:</strong> ${submission.city}`);
+                if (submission.state) details.push(`<strong>State:</strong> ${submission.state}`);
+                if (submission.zipCode) details.push(`<strong>Zip Code:</strong> ${submission.zipCode}`);
+                
+                // License details
+                if (submission.licenseNumber) details.push(`<strong>License Number:</strong> ${submission.licenseNumber}`);
+                if (submission.licenseState) details.push(`<strong>License State:</strong> ${submission.licenseState}`);
+                
+                // Vehicle details
+                if (submission.vehicleYear) details.push(`<strong>Vehicle Year:</strong> ${submission.vehicleYear}`);
+                if (submission.vehicleMake) details.push(`<strong>Vehicle Make:</strong> ${submission.vehicleMake}`);
+                if (submission.vehicleModel) details.push(`<strong>Vehicle Model:</strong> ${submission.vehicleModel}`);
+                if (submission.vin) details.push(`<strong>VIN:</strong> ${submission.vin}`);
+                if (submission.licensePlate) details.push(`<strong>License Plate:</strong> ${submission.licensePlate}`);
+                if (submission.vehicleUse) details.push(`<strong>Vehicle Use:</strong> ${submission.vehicleUse}`);
+                if (submission.annualMileage) details.push(`<strong>Annual Mileage:</strong> ${submission.annualMileage}`);
+                if (submission.vehicleOwnership) details.push(`<strong>Vehicle Ownership:</strong> ${submission.vehicleOwnership}`);
+                if (submission.garagingAddress) details.push(`<strong>Garaging Address:</strong> ${submission.garagingAddress}`);
+                
+                // Driving history
+                if (submission.yearsLicensed) details.push(`<strong>Years Licensed:</strong> ${submission.yearsLicensed}`);
+                if (submission.accidents) details.push(`<strong>Accidents:</strong> ${submission.accidents}`);
+                if (submission.trafficViolations) details.push(`<strong>Traffic Violations:</strong> ${submission.trafficViolations}`);
+                if (submission.duiDwi) details.push(`<strong>DUI/DWI:</strong> ${submission.duiDwi}`);
+                if (submission.licenseSuspended) details.push(`<strong>License Suspended:</strong> ${submission.licenseSuspended}`);
+                if (submission.currentInsurance) details.push(`<strong>Current Insurance:</strong> ${submission.currentInsurance}`);
+                
+                // Property details (Home Insurance)
+                if (submission.yearBuilt) details.push(`<strong>Year Built:</strong> ${submission.yearBuilt}`);
+                if (submission.propertyType) details.push(`<strong>Property Type:</strong> ${submission.propertyType}`);
+                if (submission.squareFootage) details.push(`<strong>Square Footage:</strong> ${submission.squareFootage}`);
+                if (submission.bedrooms) details.push(`<strong>Bedrooms:</strong> ${submission.bedrooms}`);
+                if (submission.bathrooms) details.push(`<strong>Bathrooms:</strong> ${submission.bathrooms}`);
+                if (submission.constructionType) details.push(`<strong>Construction Type:</strong> ${submission.constructionType}`);
+                if (submission.roofType) details.push(`<strong>Roof Type:</strong> ${submission.roofType}`);
+                if (submission.homeValue) details.push(`<strong>Home Value:</strong> $${submission.homeValue}`);
+                
+                // Life Insurance details
+                if (submission.coverageType) details.push(`<strong>Coverage Type:</strong> ${submission.coverageType}`);
+                if (submission.coverageAmount) details.push(`<strong>Coverage Amount:</strong> $${submission.coverageAmount}`);
+                if (submission.termLength) details.push(`<strong>Term Length:</strong> ${submission.termLength} years`);
+                if (submission.smokingStatus) details.push(`<strong>Smoking Status:</strong> ${submission.smokingStatus}`);
+                if (submission.height) details.push(`<strong>Height:</strong> ${submission.height}`);
+                if (submission.weight) details.push(`<strong>Weight:</strong> ${submission.weight}`);
+                
+                // Health conditions
+                const healthConditions = [];
+                if (submission.heartDisease) healthConditions.push('Heart Disease');
+                if (submission.diabetes) healthConditions.push('Diabetes');
+                if (submission.cancer) healthConditions.push('Cancer');
+                if (submission.highBloodPressure) healthConditions.push('High Blood Pressure');
+                if (submission.depressionAnxiety) healthConditions.push('Depression/Anxiety');
+                if (submission.noneOfAbove) healthConditions.push('None of the above');
+                if (healthConditions.length > 0) details.push(`<strong>Health Conditions:</strong> ${healthConditions.join(', ')}`);
+                
+                // Business Insurance details
+                if (submission.businessAddress) details.push(`<strong>Business Address:</strong> ${submission.businessAddress}`);
+                if (submission.firstName) details.push(`<strong>First Name:</strong> ${submission.firstName}`);
+                if (submission.lastName) details.push(`<strong>Last Name:</strong> ${submission.lastName}`);
+                if (submission.contactEmail) details.push(`<strong>Contact Email:</strong> ${submission.contactEmail}`);
+                if (submission.contactPhone) details.push(`<strong>Contact Phone:</strong> ${submission.contactPhone}`);
+                if (submission.jobTitle) details.push(`<strong>Job Title:</strong> ${submission.jobTitle}`);
+                
+                // Business coverage options
+                const businessCoverage = [];
+                if (submission.generalLiability) businessCoverage.push('General Liability');
+                if (submission.commercialProperty) businessCoverage.push('Commercial Property');
+                if (submission.workersCompensation) businessCoverage.push('Workers Compensation');
+                if (submission.professionalLiability) businessCoverage.push('Professional Liability');
+                if (submission.cyberLiability) businessCoverage.push('Cyber Liability');
+                if (submission.commercialAuto) businessCoverage.push('Commercial Auto');
+                if (submission.directorsOfficers) businessCoverage.push('Directors & Officers');
+                if (submission.otherCoverage) businessCoverage.push('Other');
+                if (businessCoverage.length > 0) details.push(`<strong>Business Coverage Needed:</strong> ${businessCoverage.join(', ')}`);
+                
+                // Umbrella Insurance details
+                if (submission.coverageAmount) details.push(`<strong>Desired Coverage Amount:</strong> ${submission.coverageAmount}`);
+                if (submission.currentPolicies) details.push(`<strong>Current Policies:</strong> ${submission.currentPolicies}`);
+                if (submission.insuranceType) details.push(`<strong>Insurance Type:</strong> ${submission.insuranceType}`);
+                
+                // Coverage details
+                if (submission.coverageLevel) details.push(`<strong>Coverage Level:</strong> ${submission.coverageLevel}`);
+                if (submission.deductible) details.push(`<strong>Deductible:</strong> $${submission.deductible}`);
+                
+                // Additional coverage options
+                const additionalCoverage = [];
+                if (submission.roadsideAssistance) additionalCoverage.push('Roadside Assistance');
+                if (submission.rentalCarCoverage) additionalCoverage.push('Rental Car Coverage');
+                if (submission.gapInsurance) additionalCoverage.push('Gap Insurance');
+                if (submission.personalInjuryProtection) additionalCoverage.push('Personal Injury Protection');
+                if (submission.uninsuredMotorist) additionalCoverage.push('Uninsured Motorist');
+                if (submission.underinsuredMotorist) additionalCoverage.push('Underinsured Motorist');
+                if (submission.floodInsurance) additionalCoverage.push('Flood Insurance');
+                if (submission.earthquakeCoverage) additionalCoverage.push('Earthquake Coverage');
+                if (submission.sewerBackupCoverage) additionalCoverage.push('Sewer Backup Coverage');
+                if (submission.identityTheftProtection) additionalCoverage.push('Identity Theft Protection');
+                if (additionalCoverage.length > 0) details.push(`<strong>Additional Coverage:</strong> ${additionalCoverage.join(', ')}`);
+                
+                // Services
+                const servicesText = Array.isArray(submission.services) ? submission.services.join(', ') : submission.services || 'Not specified';
+                
+                return `
+                <div class="client-item" style="color: black;">
+                    <div class="client-info" style="color: black;">
+                        <h4 style="color: black;">${submission.name}</h4>
+                        <p style="color: black;">${submission.email} | ${submission.phone}</p>
+                        <p style="color: black;">Date: ${formatDate(submission.date)} | Source: ${submission.source}</p>
+                        <p style="color: black;">Message: ${submission.message}</p>
+                        ${details.length > 0 ? `<div style="margin-top: 10px; padding: 10px; background: #f5f5f5; border-radius: 4px; font-size: 0.9em; color: black;">
+                            <strong style="color: black;">Complete Form Details:</strong><br>
+                            <div style="color: black;">${details.join('<br>')}</div>
+                        </div>` : ''}
                     </div>
                     <div class="client-actions">
                         <button class="btn-small" onclick="convertSubmissionToLead('${submission.id}')">Convert to Lead</button>
                         <button class="btn-small btn-danger" onclick="deleteSubmission('${submission.id}')">Delete</button>
                     </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
         }
 
         function showAddClientModal() {
