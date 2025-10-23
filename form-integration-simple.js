@@ -44,8 +44,9 @@ class SimpleFormIntegration {
 
     const formData = new FormData(event.target);
 
-    // Collect ALL form data (works for all form types)
+    // Collect ALL form data dynamically
     const submission = {
+      // Core fields (always included)
       name: formData.get("name") || formData.get("fullName") || "",
       email: formData.get("email") || "",
       phone: formData.get("phone") || "",
@@ -78,6 +79,13 @@ class SimpleFormIntegration {
       status: "New",
       date: new Date().toISOString().split("T")[0],
     };
+
+    // Collect ALL other form fields dynamically
+    for (const [key, value] of formData.entries()) {
+      if (!submission.hasOwnProperty(key) && value && value.trim() !== '') {
+        submission[key] = value;
+      }
+    }
 
     console.log("📊 Form data collected:", submission);
 
