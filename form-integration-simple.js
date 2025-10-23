@@ -3,19 +3,13 @@
 
 class SimpleFormIntegration {
   constructor() {
-    this.setupFormHandlers();
-  }
-
-  setupFormHandlers() {
-    // Wait for DOM
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", () => this.initForms());
-    } else {
-      this.initForms();
-    }
+    console.log("🔧 SimpleFormIntegration constructor called");
+    this.initForms();
   }
 
   initForms() {
+    console.log("🔍 initForms called, looking for forms...");
+
     // Handle all form types
     const forms = {
       "contact-form": "Contact Form",
@@ -24,14 +18,24 @@ class SimpleFormIntegration {
       "quote-form": "Quote Request",
     };
 
+    let formsFound = 0;
     Object.keys(forms).forEach((formId) => {
       const form = document.getElementById(formId);
       if (form) {
         const formType = forms[formId];
         form.addEventListener("submit", (e) => this.handleSubmit(e, formType));
-        console.log(`✅ ${formType} handler attached`);
+        console.log(`✅ ${formType} handler attached to #${formId}`);
+        formsFound++;
+      } else {
+        console.log(`⚠️ Form #${formId} not found on this page`);
       }
     });
+
+    if (formsFound === 0) {
+      console.warn("⚠️ No forms found on this page!");
+    } else {
+      console.log(`✅ Total forms initialized: ${formsFound}`);
+    }
   }
 
   async handleSubmit(event, formType = "Contact Form") {
@@ -96,49 +100,58 @@ class SimpleFormIntegration {
   }
 
   createLead(data) {
-    console.log("🔄 createLead called");
+    console.log("🔄 createLead called with data:", data);
+    console.log("🔍 Checking CRM availability...");
     console.log(
-      "🔍 TNRCRMData available?",
-      typeof window.TNRCRMData !== "undefined"
+      "  - TNRCRMData class:",
+      typeof window.TNRCRMData !== "undefined" ? "✅ Available" : "❌ Not found"
     );
-    console.log("🔍 window.tnrCRM exists?", !!window.tnrCRM);
+    console.log(
+      "  - window.tnrCRM instance:",
+      window.tnrCRM ? "✅ Exists" : "❌ Not initialized"
+    );
 
-    // Initialize CRM if needed
+    // Initialize CRM if needed (fallback)
     if (!window.tnrCRM && typeof window.TNRCRMData !== "undefined") {
-      console.log("🏗️ Creating new CRM instance...");
+      console.log("🏗️ CRM not initialized, creating new instance...");
       window.tnrCRM = new window.TNRCRMData();
       console.log("✅ CRM instance created");
     }
 
     if (window.tnrCRM) {
-      console.log("✅ CRM available, creating lead with data:", data);
+      console.log("✅ CRM is ready, creating lead...");
 
       try {
         const lead = window.tnrCRM.addLead(data);
-        console.log("✅ Lead created in CRM:", lead);
+        console.log("✅ Lead created successfully:", lead);
 
-        // Force save
+        // Force save to localStorage
         window.tnrCRM.saveToStorage();
-        console.log("💾 Saved to localStorage");
+        console.log("💾 Lead saved to localStorage");
 
-        // Verify
+        // Verify it was saved
         const savedLeads = localStorage.getItem("tnr_crm_leads");
         const leadsArray = savedLeads ? JSON.parse(savedLeads) : [];
-        console.log("📊 Total leads in localStorage:", leadsArray.length);
-        console.log("📋 All leads:", leadsArray);
+        console.log(`📊 Total leads in localStorage: ${leadsArray.length}`);
+        console.log(
+          "📋 Last lead in storage:",
+          leadsArray[leadsArray.length - 1]
+        );
 
         return lead;
       } catch (error) {
         console.error("❌ Error creating lead:", error);
-        alert("ERROR: " + error.message);
+        console.error("Error stack:", error.stack);
+        alert("ERROR creating lead: " + error.message);
         return null;
       }
     } else {
-      console.error(
-        "❌ CRM not available - TNRCRMData:",
-        typeof window.TNRCRMData
+      console.error("❌ CRITICAL: CRM system not available!");
+      console.error("  - TNRCRMData class:", typeof window.TNRCRMData);
+      console.error("  - window.tnrCRM:", window.tnrCRM);
+      alert(
+        "ERROR: CRM system not loaded. Please refresh the page and try again."
       );
-      alert("ERROR: CRM system not loaded. crm-data.js may not be loading.");
       return null;
     }
   }
@@ -170,8 +183,9 @@ class SimpleFormIntegration {
 if (typeof window !== "undefined") {
   console.log("🚀 form-integration-simple.js loaded");
 
-  // Wait for both DOM and CRM to be ready
+  // Wait for DOM to be fully ready
   if (document.readyState === "loading") {
+    console.log("⏳ Waiting for DOM to load...");
     document.addEventListener("DOMContentLoaded", () => {
       console.log("📄 DOM ready, initializing form integration");
       window.simpleFormIntegration = new SimpleFormIntegration();

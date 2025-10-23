@@ -527,5 +527,17 @@ class TNRCRMData {
 // Make it available globally
 window.TNRCRMData = TNRCRMData;
 
-// Initialize CRM data
-window.tnrCRM = new TNRCRMData();
+// Initialize CRM data when DOM is ready
+if (typeof window !== "undefined") {
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => {
+      console.log("📊 Initializing CRM system...");
+      window.tnrCRM = new TNRCRMData();
+      console.log("✅ CRM system initialized");
+    });
+  } else {
+    console.log("📊 Initializing CRM system...");
+    window.tnrCRM = new TNRCRMData();
+    console.log("✅ CRM system initialized");
+  }
+}
