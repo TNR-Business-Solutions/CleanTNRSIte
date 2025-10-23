@@ -16,158 +16,21 @@ class TNRCRMData {
   }
 
   loadClients() {
-    // Real TNR Business Solutions clients (if any exist)
-    // For now, we'll start with an empty array and add test data
-    return [
-      // Test client for each industry
-      {
-        id: "client-001",
-        name: "Test Construction Company",
-        industry: "Construction",
-        email: "test@construction.com",
-        phone: "(412) 555-0101",
-        address: "123 Main St, Greensburg, PA 15601",
-        status: "Active",
-        joinDate: "2024-01-15",
-        lastContact: "2024-12-15",
-        services: ["Web Design", "SEO Services"],
-        notes: "Test client for construction industry",
-        source: "Website Form",
-      },
-      {
-        id: "client-002",
-        name: "Test Law Firm",
-        industry: "Legal Services",
-        email: "test@lawfirm.com",
-        phone: "(412) 555-0102",
-        address: "456 Oak Ave, Greensburg, PA 15601",
-        status: "Active",
-        joinDate: "2024-02-20",
-        lastContact: "2024-12-10",
-        services: ["Social Media Management", "Content Creation"],
-        notes: "Test client for legal services industry",
-        source: "Referral",
-      },
-      {
-        id: "client-003",
-        name: "Test E-commerce Store",
-        industry: "E-commerce",
-        email: "test@estore.com",
-        phone: "(412) 555-0103",
-        address: "789 Pine St, Greensburg, PA 15601",
-        status: "Active",
-        joinDate: "2024-03-10",
-        lastContact: "2024-12-05",
-        services: ["Paid Advertising", "Email Marketing"],
-        notes: "Test client for e-commerce industry",
-        source: "Google Ads",
-      },
-      {
-        id: "client-004",
-        name: "Test Restaurant",
-        industry: "Food Service",
-        email: "test@restaurant.com",
-        phone: "(412) 555-0104",
-        address: "321 Market St, Greensburg, PA 15601",
-        status: "Active",
-        joinDate: "2024-04-05",
-        lastContact: "2024-12-01",
-        services: ["Social Media Management", "Local SEO"],
-        notes: "Test client for restaurant industry",
-        source: "Facebook",
-      },
-      {
-        id: "client-005",
-        name: "Test Medical Practice",
-        industry: "Healthcare",
-        email: "test@medical.com",
-        phone: "(412) 555-0105",
-        address: "654 Health Dr, Greensburg, PA 15601",
-        status: "Active",
-        joinDate: "2024-05-12",
-        lastContact: "2024-11-28",
-        services: ["Web Design", "Local SEO"],
-        notes: "Test client for healthcare industry",
-        source: "Website Form",
-      },
-    ];
+    // Load clients from localStorage, or start with empty array
+    const stored = localStorage.getItem("tnr_crm_clients");
+    return stored ? JSON.parse(stored) : [];
   }
 
   loadLeads() {
-    // Real leads from form submissions
-    return [
-      // These would be populated from actual form submissions
-    ];
+    // Load leads from localStorage
+    const stored = localStorage.getItem("tnr_crm_leads");
+    return stored ? JSON.parse(stored) : [];
   }
 
   loadOrders() {
-    // Test orders for each industry
-    return [
-      {
-        id: "order-001",
-        clientId: "client-001",
-        clientName: "Test Construction Company",
-        industry: "Construction",
-        service: "Web Design & SEO Package",
-        amount: 2500,
-        status: "Completed",
-        orderDate: "2024-01-15",
-        completionDate: "2024-02-15",
-        description:
-          "Complete website redesign with SEO optimization for construction company",
-      },
-      {
-        id: "order-002",
-        clientId: "client-002",
-        clientName: "Test Law Firm",
-        industry: "Legal Services",
-        service: "Social Media Management",
-        amount: 1200,
-        status: "In Progress",
-        orderDate: "2024-02-20",
-        completionDate: null,
-        description: "Monthly social media management for law firm",
-      },
-      {
-        id: "order-003",
-        clientId: "client-003",
-        clientName: "Test E-commerce Store",
-        industry: "E-commerce",
-        service: "Paid Advertising Campaign",
-        amount: 3000,
-        status: "Completed",
-        orderDate: "2024-03-10",
-        completionDate: "2024-04-10",
-        description:
-          "Google Ads and Facebook advertising campaign for online store",
-      },
-      {
-        id: "order-004",
-        clientId: "client-004",
-        clientName: "Test Restaurant",
-        industry: "Food Service",
-        service: "Local SEO & Social Media",
-        amount: 1800,
-        status: "In Progress",
-        orderDate: "2024-04-05",
-        completionDate: null,
-        description:
-          "Local SEO optimization and social media management for restaurant",
-      },
-      {
-        id: "order-005",
-        clientId: "client-005",
-        clientName: "Test Medical Practice",
-        industry: "Healthcare",
-        service: "Website Design & Local SEO",
-        amount: 2200,
-        status: "Completed",
-        orderDate: "2024-05-12",
-        completionDate: "2024-06-12",
-        description:
-          "Professional website design with local SEO for medical practice",
-      },
-    ];
+    // Load orders from localStorage
+    const stored = localStorage.getItem("tnr_crm_orders");
+    return stored ? JSON.parse(stored) : [];
   }
 
   loadFormSubmissions() {
