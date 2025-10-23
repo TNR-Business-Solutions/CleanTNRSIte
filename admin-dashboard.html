@@ -1465,18 +1465,18 @@
             modal.innerHTML = `
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h3>Add New Client</h3>
+                        <h3 style="color: black;">Add New Client</h3>
                         <span class="close" onclick="closeModal()">&times;</span>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body" style="color: black;">
                         <form id="addClientForm">
                             <div class="form-group">
-                                <label>Client Name *</label>
-                                <input type="text" id="clientName" required>
+                                <label style="color: black;">Client Name *</label>
+                                <input type="text" id="clientName" required style="color: black;">
                             </div>
                             <div class="form-group">
-                                <label>Industry *</label>
-                                <select id="clientIndustry" required>
+                                <label style="color: black;">Industry *</label>
+                                <select id="clientIndustry" required style="color: black;">
                                     <option value="">Select Industry</option>
                                     <option value="Construction">Construction</option>
                                     <option value="Legal Services">Legal Services</option>
@@ -1490,35 +1490,35 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label>Email *</label>
-                                <input type="email" id="clientEmail" required>
+                                <label style="color: black;">Email *</label>
+                                <input type="email" id="clientEmail" required style="color: black;">
                             </div>
                             <div class="form-group">
-                                <label>Phone</label>
-                                <input type="tel" id="clientPhone">
+                                <label style="color: black;">Phone</label>
+                                <input type="tel" id="clientPhone" style="color: black;">
                             </div>
                             <div class="form-group">
-                                <label>Address</label>
-                                <textarea id="clientAddress" rows="3"></textarea>
+                                <label style="color: black;">Address</label>
+                                <textarea id="clientAddress" rows="3" style="color: black;"></textarea>
                             </div>
                             <div class="form-group">
-                                <label>Services</label>
+                                <label style="color: black;">Services</label>
                                 <div class="checkbox-group">
-                                    <label><input type="checkbox" value="Web Design"> Web Design</label>
-                                    <label><input type="checkbox" value="SEO Services"> SEO Services</label>
-                                    <label><input type="checkbox" value="Social Media Management"> Social Media Management</label>
-                                    <label><input type="checkbox" value="Content Creation"> Content Creation</label>
-                                    <label><input type="checkbox" value="Paid Advertising"> Paid Advertising</label>
-                                    <label><input type="checkbox" value="Email Marketing"> Email Marketing</label>
+                                    <label style="color: black;"><input type="checkbox" value="Web Design"> Web Design</label>
+                                    <label style="color: black;"><input type="checkbox" value="SEO Services"> SEO Services</label>
+                                    <label style="color: black;"><input type="checkbox" value="Social Media Management"> Social Media Management</label>
+                                    <label style="color: black;"><input type="checkbox" value="Content Creation"> Content Creation</label>
+                                    <label style="color: black;"><input type="checkbox" value="Paid Advertising"> Paid Advertising</label>
+                                    <label style="color: black;"><input type="checkbox" value="Email Marketing"> Email Marketing</label>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label>Notes</label>
-                                <textarea id="clientNotes" rows="3"></textarea>
+                                <label style="color: black;">Notes</label>
+                                <textarea id="clientNotes" rows="3" style="color: black;"></textarea>
                             </div>
                             <div class="form-group">
-                                <label>Source</label>
-                                <select id="clientSource">
+                                <label style="color: black;">Source</label>
+                                <select id="clientSource" style="color: black;">
                                     <option value="Website Form">Website Form</option>
                                     <option value="Referral">Referral</option>
                                     <option value="Google Ads">Google Ads</option>
@@ -1575,18 +1575,18 @@
             modal.innerHTML = `
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h3>Edit Client</h3>
+                        <h3 style="color: black;">Edit Client</h3>
                         <span class="close" onclick="closeModal()">&times;</span>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body" style="color: black;">
                         <form id="editClientForm">
                             <div class="form-group">
-                                <label>Client Name *</label>
-                                <input type="text" id="editClientName" value="${client.name}" required>
+                                <label style="color: black;">Client Name *</label>
+                                <input type="text" id="editClientName" value="${client.name}" required style="color: black;">
                             </div>
                             <div class="form-group">
-                                <label>Industry *</label>
-                                <select id="editClientIndustry" required>
+                                <label style="color: black;">Industry *</label>
+                                <select id="editClientIndustry" required style="color: black;">
                                     <option value="Construction" ${client.industry === 'Construction' ? 'selected' : ''}>Construction</option>
                                     <option value="Legal Services" ${client.industry === 'Legal Services' ? 'selected' : ''}>Legal Services</option>
                                     <option value="E-commerce" ${client.industry === 'E-commerce' ? 'selected' : ''}>E-commerce</option>
@@ -1599,39 +1599,39 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label>Email *</label>
-                                <input type="email" id="editClientEmail" value="${client.email}" required>
+                                <label style="color: black;">Email *</label>
+                                <input type="email" id="editClientEmail" value="${client.email}" required style="color: black;">
                             </div>
                             <div class="form-group">
-                                <label>Phone</label>
-                                <input type="tel" id="editClientPhone" value="${client.phone}">
+                                <label style="color: black;">Phone</label>
+                                <input type="tel" id="editClientPhone" value="${client.phone}" style="color: black;">
                             </div>
                             <div class="form-group">
-                                <label>Address</label>
-                                <textarea id="editClientAddress" rows="3">${client.address}</textarea>
+                                <label style="color: black;">Address</label>
+                                <textarea id="editClientAddress" rows="3" style="color: black;">${client.address}</textarea>
                             </div>
                             <div class="form-group">
-                                <label>Status</label>
-                                <select id="editClientStatus">
+                                <label style="color: black;">Status</label>
+                                <select id="editClientStatus" style="color: black;">
                                     <option value="Active" ${client.status === 'Active' ? 'selected' : ''}>Active</option>
                                     <option value="Inactive" ${client.status === 'Inactive' ? 'selected' : ''}>Inactive</option>
                                     <option value="Prospect" ${client.status === 'Prospect' ? 'selected' : ''}>Prospect</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label>Services</label>
+                                <label style="color: black;">Services</label>
                                 <div class="checkbox-group">
-                                    <label><input type="checkbox" value="Web Design" ${client.services.includes('Web Design') ? 'checked' : ''}> Web Design</label>
-                                    <label><input type="checkbox" value="SEO Services" ${client.services.includes('SEO Services') ? 'checked' : ''}> SEO Services</label>
-                                    <label><input type="checkbox" value="Social Media Management" ${client.services.includes('Social Media Management') ? 'checked' : ''}> Social Media Management</label>
-                                    <label><input type="checkbox" value="Content Creation" ${client.services.includes('Content Creation') ? 'checked' : ''}> Content Creation</label>
-                                    <label><input type="checkbox" value="Paid Advertising" ${client.services.includes('Paid Advertising') ? 'checked' : ''}> Paid Advertising</label>
-                                    <label><input type="checkbox" value="Email Marketing" ${client.services.includes('Email Marketing') ? 'checked' : ''}> Email Marketing</label>
+                                    <label style="color: black;"><input type="checkbox" value="Web Design" ${client.services.includes('Web Design') ? 'checked' : ''}> Web Design</label>
+                                    <label style="color: black;"><input type="checkbox" value="SEO Services" ${client.services.includes('SEO Services') ? 'checked' : ''}> SEO Services</label>
+                                    <label style="color: black;"><input type="checkbox" value="Social Media Management" ${client.services.includes('Social Media Management') ? 'checked' : ''}> Social Media Management</label>
+                                    <label style="color: black;"><input type="checkbox" value="Content Creation" ${client.services.includes('Content Creation') ? 'checked' : ''}> Content Creation</label>
+                                    <label style="color: black;"><input type="checkbox" value="Paid Advertising" ${client.services.includes('Paid Advertising') ? 'checked' : ''}> Paid Advertising</label>
+                                    <label style="color: black;"><input type="checkbox" value="Email Marketing" ${client.services.includes('Email Marketing') ? 'checked' : ''}> Email Marketing</label>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label>Notes</label>
-                                <textarea id="editClientNotes" rows="3">${client.notes}</textarea>
+                                <label style="color: black;">Notes</label>
+                                <textarea id="editClientNotes" rows="3" style="color: black;">${client.notes}</textarea>
                             </div>
                         </form>
                     </div>
