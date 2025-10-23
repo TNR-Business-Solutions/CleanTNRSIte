@@ -487,10 +487,22 @@
     <!-- Footer -->
     <div id="footer-placeholder"></div>
 
+    <!-- CRM System -->
+    <script src="crm-data.js"></script>
+
     <script>
         // Cart management
+        console.log('🛒 Loading cart from sessionStorage...');
         let cart = JSON.parse(sessionStorage.getItem('cart') || '[]');
-        let sessionId = sessionStorage.getItem('sessionId') || generateSessionId();
+        console.log('📦 Cart loaded:', cart);
+        let sessionId = sessionStorage.getItem('sessionId');
+        
+        if (!sessionId) {
+            sessionId = generateSessionId();
+            sessionStorage.setItem('sessionId', sessionId);
+        }
+        
+        console.log('🔑 Session ID:', sessionId);
 
         function generateSessionId() {
             return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -653,8 +665,11 @@
             };
 
             const paymentInfo = {
-                method: formData.get('paymentMethod')
+                method: formData.get('paymentMethod'),
+                frequency: formData.get('paymentFrequency')
             };
+            
+            console.log('📋 Submitting order:', { customerInfo, paymentInfo, cart });
 
             showLoading(true);
 
@@ -675,11 +690,32 @@
                 const result = await response.json();
 
                 if (result.success) {
+                    // Add order to CRM
+                    if (window.tnrCRM) {
+                        console.log('💼 Adding order to CRM...');
+                        const orderData = {
+                            id: result.orderNumber,
+                            client: `${customerInfo.firstName} ${customerInfo.lastName}`,
+                            clientEmail: customerInfo.email,
+                            services: cart.map(item => item.name).join(', '),
+                            amount: document.getElementById('total').textContent,
+                            status: 'Pending',
+                            date: new Date().toISOString().split('T')[0],
+                            paymentMethod: paymentInfo.method,
+                            paymentFrequency: paymentInfo.frequency
+                        };
+                        window.tnrCRM.addOrder(orderData);
+                        console.log('✅ Order added to CRM:', orderData);
+                    }
+                    
                     showSuccess(`Order confirmed! Order number: ${result.orderNumber}. Check your email for confirmation.`);
                     cart = [];
                     sessionStorage.removeItem('cart');
                     updateCartDisplay();
                     this.reset();
+                    
+                    // Scroll to success message
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 } else {
                     showError(result.message || 'Checkout failed. Please try again.');
                 }

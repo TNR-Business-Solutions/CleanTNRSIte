@@ -98,7 +98,8 @@ module.exports = async (req, res) => {
     `;
 
     // Send email
-    const businessEmail = process.env.BUSINESS_EMAIL || "roy.turner@tnrbusinesssolutions.com";
+    const businessEmail =
+      process.env.BUSINESS_EMAIL || "roy.turner@tnrbusinesssolutions.com";
     const mailOptions = {
       from: `"TNR Business Solutions Contact Form" <${businessEmail}>`,
       to: businessEmail,

@@ -42,18 +42,14 @@ const formatFormData = (formData) => {
     }
   }
 
-  console.log("Formatted email body:", emailBody);
   return emailBody;
 };
 
 // Send email notification
 const sendEmail = async (formData, formType, subject) => {
   try {
-    console.log(`📧 Attempting to send ${formType} email...`);
     const transporter = createTransporter();
-
     const emailBody = formatFormData(formData);
-    console.log("Email body:", emailBody);
 
     const mailOptions = {
       from: process.env.SMTP_USER,
@@ -88,14 +84,10 @@ This email was sent from the TNR Business Solutions website contact form.
       `,
     };
 
-    const result = await transporter.sendMail(mailOptions);
-    console.log(
-      `✅ ${formType} email sent successfully! Message ID: ${result.messageId}`
-    );
+    await transporter.sendMail(mailOptions);
     return { success: true, message: "Email sent successfully" };
   } catch (error) {
-    console.error(`❌ Error sending ${formType} email:`, error.message);
-    return { success: false, message: "Failed to send email" };
+    return { success: false, message: "Failed to send email", error: error.message };
   }
 };
 
@@ -137,7 +129,6 @@ const handleFormSubmission = async (req, res) => {
       res.end(JSON.stringify(result));
     });
   } catch (error) {
-    console.error("Error handling form submission:", error);
     res.writeHead(500, { "Content-Type": "application/json" });
     res.end(
       JSON.stringify({ success: false, message: "Internal server error" })

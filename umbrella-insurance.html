@@ -361,12 +361,90 @@
                 </div>
             </div>
 
-            <!-- Call to Action -->
-            <div style="text-align: center; background: linear-gradient(135deg, var(--tnr-secondary), #5a6d2a); color: white; padding: 3rem; border-radius: 12px;">
-                <h3>Protect Your Assets Today</h3>
-                <p style="font-size: 1.2rem; margin: 1rem 0;">Get a free umbrella insurance quote and ensure your assets are protected beyond your primary policy limits.</p>
-                <a href="contact.html" class="btn" style="background: white; color: var(--tnr-secondary); margin-right: 1rem;">Get Free Quote</a>
-                <a href="tel:4124992987" class="btn btn-secondary" style="border-color: white; color: white;">Call (412) 499-2987</a>
+            <!-- Get a Free Quote Form -->
+            <div style="background: linear-gradient(135deg, var(--tnr-secondary), #5a6d2a); padding: 3rem; border-radius: 12px;">
+                <h3 style="color: white; text-align: center; margin-bottom: 1rem;">Get Your Free Umbrella Insurance Quote</h3>
+                <p style="color: rgba(255, 255, 255, 0.9); text-align: center; margin-bottom: 2rem; font-size: 1.1rem;">Protect your assets with affordable umbrella coverage. Complete the form below for a personalized quote.</p>
+                
+                <form id="insurance-inquiry-form" style="max-width: 800px; margin: 0 auto;">
+                    <!-- Personal Information -->
+                    <div style="background: rgba(255, 255, 255, 0.1); padding: 2rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                        <h4 style="color: var(--tnr-gold); margin-bottom: 1.5rem; text-align: center;">Your Information</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                            <input type="text" name="name" placeholder="Full Name *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="email" name="email" placeholder="Email Address *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <input type="tel" name="phone" placeholder="Phone Number *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="text" name="company" placeholder="Company Name (Optional)" style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                        </div>
+                    </div>
+
+                    <!-- Coverage Details -->
+                    <div style="background: rgba(255, 255, 255, 0.1); padding: 2rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                        <h4 style="color: var(--tnr-gold); margin-bottom: 1.5rem; text-align: center;">Coverage Needs</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                            <select name="coverageAmount" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                                <option value="">Desired Coverage Amount *</option>
+                                <option value="1-million">$1 Million</option>
+                                <option value="2-million">$2 Million</option>
+                                <option value="3-million">$3 Million</option>
+                                <option value="5-million">$5 Million</option>
+                                <option value="not-sure">Not Sure</option>
+                            </select>
+                            <select name="currentPolicies" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                                <option value="">Current Policies You Have *</option>
+                                <option value="home-auto">Home & Auto</option>
+                                <option value="home-auto-business">Home, Auto & Business</option>
+                                <option value="auto-only">Auto Only</option>
+                                <option value="home-only">Home Only</option>
+                                <option value="business-only">Business Only</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <select name="insuranceType" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; width: 100%;">
+                                <option value="">Type of Umbrella Coverage *</option>
+                                <option value="personal">Personal Umbrella</option>
+                                <option value="commercial">Commercial Umbrella</option>
+                                <option value="both">Both Personal & Commercial</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Additional Information -->
+                    <div style="background: rgba(255, 255, 255, 0.1); padding: 2rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                        <h4 style="color: var(--tnr-gold); margin-bottom: 1.5rem; text-align: center;">Additional Details</h4>
+                        <textarea name="message" rows="4" placeholder="Tell us about your coverage needs, assets you want to protect, or any questions you have..." style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; width: 100%; resize: vertical;"></textarea>
+                    </div>
+
+                    <!-- Preferred Contact Method -->
+                    <div style="background: rgba(255, 255, 255, 0.1); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                        <label style="color: white; margin-bottom: 0.5rem; display: block;">Preferred Contact Method:</label>
+                        <div style="display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap;">
+                            <label style="color: white; display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                <input type="radio" name="contactMethod" value="phone" style="cursor: pointer;">
+                                <span>Phone Call</span>
+                            </label>
+                            <label style="color: white; display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                <input type="radio" name="contactMethod" value="email" checked style="cursor: pointer;">
+                                <span>Email</span>
+                            </label>
+                            <label style="color: white; display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                <input type="radio" name="contactMethod" value="text" style="cursor: pointer;">
+                                <span>Text Message</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn" style="width: 100%; background: white; color: var(--tnr-secondary); font-size: 1.1rem; padding: 1rem; border: none; cursor: pointer; transition: all 0.3s ease;">
+                        Get My Free Quote →
+                    </button>
+
+                    <p style="color: rgba(255, 255, 255, 0.8); text-align: center; margin-top: 1rem; font-size: 0.9rem;">
+                        * Required fields. We'll respond within 24 hours with your personalized quote.
+                    </p>
+                </form>
             </div>
         </section>
     </main>
@@ -423,7 +501,10 @@
         </div>
     </footer>
     
-    <!-- Form Handler Script -->
-    <script src="assets/form-handler.js"></script>
+    <!-- CRM System -->
+    <script src="crm-data.js"></script>
+    
+    <!-- Form Integration -->
+    <script src="form-integration-simple.js"></script>
 </body>
 </html>
