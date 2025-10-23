@@ -356,8 +356,8 @@
                             <input type="text" name="company" placeholder="Company Name" style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                            <input type="date" placeholder="Date of Birth *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
-                            <select required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="date" name="dateOfBirth" placeholder="Date of Birth *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <select name="gender" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                                 <option value="">Gender *</option>
                                 <option value="male">Male</option>
                                 <option value="female">Female</option>
@@ -369,14 +369,14 @@
                     <div style="background: rgba(255, 255, 255, 0.05); padding: 2rem; border-radius: 8px; margin-bottom: 2rem;">
                         <h3 style="color: var(--tnr-gold); margin-bottom: 1.5rem; text-align: center;">Coverage Information</h3>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                            <select required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <select name="coverageType" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                                 <option value="">Coverage Type *</option>
                                 <option value="term">Term Life Insurance</option>
                                 <option value="whole">Whole Life Insurance</option>
                                 <option value="universal">Universal Life Insurance</option>
                                 <option value="final-expense">Final Expense Insurance</option>
                             </select>
-                            <select required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <select name="coverageAmount" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                                 <option value="">Coverage Amount *</option>
                                 <option value="100000">$100,000</option>
                                 <option value="250000">$250,000</option>
@@ -388,7 +388,7 @@
                             </select>
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                            <select style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <select name="termLength" style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                                 <option value="">Term Length (if applicable)</option>
                                 <option value="10">10 Years</option>
                                 <option value="15">15 Years</option>
@@ -396,7 +396,7 @@
                                 <option value="25">25 Years</option>
                                 <option value="30">30 Years</option>
                             </select>
-                            <select required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <select name="smokingStatus" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                                 <option value="">Smoking Status *</option>
                                 <option value="non-smoker">Non-Smoker</option>
                                 <option value="former-smoker">Former Smoker</option>
@@ -409,18 +409,18 @@
                     <div style="background: rgba(255, 255, 255, 0.05); padding: 2rem; border-radius: 8px; margin-bottom: 2rem;">
                         <h3 style="color: var(--tnr-gold); margin-bottom: 1.5rem; text-align: center;">Health Information</h3>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                            <input type="text" placeholder="Height (feet, inches)" style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
-                            <input type="text" placeholder="Weight (pounds)" style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="text" name="height" placeholder="Height (feet, inches)" style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="text" name="weight" placeholder="Weight (pounds)" style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                         </div>
                         <div style="margin-bottom: 1rem;">
                             <label style="color: white; display: block; margin-bottom: 0.5rem;">Do you have any of the following conditions? (Check all that apply)</label>
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
-                                <label style="color: white; font-size: 0.9rem;"><input type="checkbox" style="margin-right: 0.5rem;"> Heart Disease</label>
-                                <label style="color: white; font-size: 0.9rem;"><input type="checkbox" style="margin-right: 0.5rem;"> Diabetes</label>
-                                <label style="color: white; font-size: 0.9rem;"><input type="checkbox" style="margin-right: 0.5rem;"> Cancer</label>
-                                <label style="color: white; font-size: 0.9rem;"><input type="checkbox" style="margin-right: 0.5rem;"> High Blood Pressure</label>
-                                <label style="color: white; font-size: 0.9rem;"><input type="checkbox" style="margin-right: 0.5rem;"> Depression/Anxiety</label>
-                                <label style="color: white; font-size: 0.9rem;"><input type="checkbox" style="margin-right: 0.5rem;"> None of the above</label>
+                                <label style="color: white; font-size: 0.9rem;"><input type="checkbox" name="heartDisease" style="margin-right: 0.5rem;"> Heart Disease</label>
+                                <label style="color: white; font-size: 0.9rem;"><input type="checkbox" name="diabetes" style="margin-right: 0.5rem;"> Diabetes</label>
+                                <label style="color: white; font-size: 0.9rem;"><input type="checkbox" name="cancer" style="margin-right: 0.5rem;"> Cancer</label>
+                                <label style="color: white; font-size: 0.9rem;"><input type="checkbox" name="highBloodPressure" style="margin-right: 0.5rem;"> High Blood Pressure</label>
+                                <label style="color: white; font-size: 0.9rem;"><input type="checkbox" name="depressionAnxiety" style="margin-right: 0.5rem;"> Depression/Anxiety</label>
+                                <label style="color: white; font-size: 0.9rem;"><input type="checkbox" name="noneOfAbove" style="margin-right: 0.5rem;"> None of the above</label>
                             </div>
                         </div>
                         <div style="margin-bottom: 1rem;">

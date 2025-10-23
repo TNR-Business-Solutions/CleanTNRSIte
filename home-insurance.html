@@ -414,8 +414,8 @@
                             <input type="text" name="company" placeholder="Company Name" style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                            <input type="date" placeholder="Date of Birth *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
-                            <select required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="date" name="dateOfBirth" placeholder="Date of Birth *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <select name="maritalStatus" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                                 <option value="">Marital Status *</option>
                                 <option value="single">Single</option>
                                 <option value="married">Married</option>
@@ -424,16 +424,16 @@
                             </select>
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                            <input type="text" placeholder="Street Address *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
-                            <input type="text" placeholder="Apartment/Unit (Optional)" style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="text" name="address" placeholder="Street Address *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="text" name="apartment" placeholder="Apartment/Unit (Optional)" style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
-                            <input type="text" placeholder="City *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
-                            <select required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="text" name="city" placeholder="City *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <select name="state" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                                 <option value="">State *</option>
                                 <option value="PA">Pennsylvania</option>
                             </select>
-                            <input type="text" placeholder="ZIP Code *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="text" name="zipCode" placeholder="ZIP Code *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                         </div>
                     </div>
 
@@ -441,8 +441,8 @@
                     <div style="background: rgba(255, 255, 255, 0.05); padding: 2rem; border-radius: 8px; margin-bottom: 2rem;">
                         <h3 style="color: var(--tnr-gold); margin-bottom: 1.5rem; text-align: center;">Property Information</h3>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                            <input type="number" placeholder="Year Built *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
-                            <select required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="number" name="yearBuilt" placeholder="Year Built *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <select name="propertyType" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                                 <option value="">Property Type *</option>
                                 <option value="single-family">Single Family Home</option>
                                 <option value="condo">Condominium</option>
@@ -452,12 +452,12 @@
                             </select>
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                            <input type="number" placeholder="Square Footage *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
-                            <input type="number" placeholder="Number of Bedrooms *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="number" name="squareFootage" placeholder="Square Footage *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="number" name="bedrooms" placeholder="Number of Bedrooms *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                            <input type="number" placeholder="Number of Bathrooms *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
-                            <select required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="number" name="bathrooms" placeholder="Number of Bathrooms *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <select name="constructionType" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                                 <option value="">Construction Type *</option>
                                 <option value="frame">Frame</option>
                                 <option value="brick">Brick</option>
@@ -467,7 +467,7 @@
                             </select>
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                            <select required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <select name="roofType" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                                 <option value="">Roof Type *</option>
                                 <option value="asphalt">Asphalt Shingles</option>
                                 <option value="metal">Metal</option>
@@ -475,7 +475,7 @@
                                 <option value="slate">Slate</option>
                                 <option value="other">Other</option>
                             </select>
-                            <input type="number" placeholder="Estimated Home Value ($) *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="number" name="homeValue" placeholder="Estimated Home Value ($) *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                         </div>
                     </div>
 
@@ -483,29 +483,29 @@
                     <div style="background: rgba(255, 255, 255, 0.05); padding: 2rem; border-radius: 8px; margin-bottom: 2rem;">
                         <h3 style="color: var(--tnr-gold); margin-bottom: 1.5rem; text-align: center;">Coverage Preferences</h3>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                            <select required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <select name="coverageLevel" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                                 <option value="">Desired Coverage Level *</option>
                                 <option value="minimum">Minimum Required</option>
                                 <option value="standard">Standard Coverage</option>
                                 <option value="full">Full Coverage</option>
                                 <option value="premium">Premium Coverage</option>
                             </select>
-                            <input type="number" placeholder="Desired Deductible ($) *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="number" name="deductible" placeholder="Desired Deductible ($) *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                         </div>
                         <div style="margin-bottom: 1rem;">
                             <label style="display: block; margin-bottom: 0.5rem; color: white; font-weight: bold;">Additional Coverage Options (Check all that apply):</label>
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
                                 <label style="display: flex; align-items: center; color: white; font-size: 0.9rem;">
-                                    <input type="checkbox" style="margin-right: 0.5rem;"> Flood Insurance
+                                    <input type="checkbox" name="floodInsurance" style="margin-right: 0.5rem;"> Flood Insurance
                                 </label>
                                 <label style="display: flex; align-items: center; color: white; font-size: 0.9rem;">
-                                    <input type="checkbox" style="margin-right: 0.5rem;"> Earthquake Coverage
+                                    <input type="checkbox" name="earthquakeCoverage" style="margin-right: 0.5rem;"> Earthquake Coverage
                                 </label>
                                 <label style="display: flex; align-items: center; color: white; font-size: 0.9rem;">
-                                    <input type="checkbox" style="margin-right: 0.5rem;"> Sewer Backup Coverage
+                                    <input type="checkbox" name="sewerBackupCoverage" style="margin-right: 0.5rem;"> Sewer Backup Coverage
                                 </label>
                                 <label style="display: flex; align-items: center; color: white; font-size: 0.9rem;">
-                                    <input type="checkbox" style="margin-right: 0.5rem;"> Identity Theft Protection
+                                    <input type="checkbox" name="identityTheftProtection" style="margin-right: 0.5rem;"> Identity Theft Protection
                                 </label>
                                 <label style="display: flex; align-items: center; color: white; font-size: 0.9rem;">
                                     <input type="checkbox" style="margin-right: 0.5rem;"> Water Damage Coverage

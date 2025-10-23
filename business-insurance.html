@@ -434,16 +434,16 @@
                             <input type="tel" name="phone" placeholder="Phone Number" style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                         </div>
                         <div style="margin-bottom: 1rem;">
-                            <input type="text" placeholder="Business Address *" required style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="text" name="businessAddress" placeholder="Business Address *" required style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
-                            <input type="text" placeholder="City *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
-                            <select required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="text" name="city" placeholder="City *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <select name="state" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                                 <option value="">State *</option>
                                 <option value="PA">Pennsylvania</option>
                                 <option value="other">Other</option>
                             </select>
-                            <input type="text" placeholder="ZIP Code *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="text" name="zipCode" placeholder="ZIP Code *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                         </div>
                     </div>
 
@@ -451,15 +451,15 @@
                     <div style="background: rgba(255, 255, 255, 0.05); padding: 2rem; border-radius: 8px; margin-bottom: 2rem;">
                         <h3 style="color: var(--tnr-gold); margin-bottom: 1.5rem; text-align: center;">Contact Information</h3>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                            <input type="text" placeholder="First Name *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
-                            <input type="text" placeholder="Last Name *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="text" name="firstName" placeholder="First Name *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="text" name="lastName" placeholder="Last Name *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                            <input type="email" placeholder="Email Address *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
-                            <input type="tel" placeholder="Phone Number *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="email" name="contactEmail" placeholder="Email Address *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="tel" name="contactPhone" placeholder="Phone Number *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                         </div>
                         <div>
-                            <input type="text" placeholder="Job Title" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="text" name="jobTitle" placeholder="Job Title" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                         </div>
                     </div>
 
@@ -469,14 +469,14 @@
                         <div style="margin-bottom: 1rem;">
                             <label style="color: white; display: block; margin-bottom: 0.5rem;">Types of Coverage Needed (Check all that apply)</label>
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
-                                <label style="color: white; font-size: 0.9rem;"><input type="checkbox" style="margin-right: 0.5rem;"> General Liability</label>
-                                <label style="color: white; font-size: 0.9rem;"><input type="checkbox" style="margin-right: 0.5rem;"> Commercial Property</label>
-                                <label style="color: white; font-size: 0.9rem;"><input type="checkbox" style="margin-right: 0.5rem;"> Workers' Compensation</label>
-                                <label style="color: white; font-size: 0.9rem;"><input type="checkbox" style="margin-right: 0.5rem;"> Professional Liability</label>
-                                <label style="color: white; font-size: 0.9rem;"><input type="checkbox" style="margin-right: 0.5rem;"> Cyber Liability</label>
-                                <label style="color: white; font-size: 0.9rem;"><input type="checkbox" style="margin-right: 0.5rem;"> Commercial Auto</label>
-                                <label style="color: white; font-size: 0.9rem;"><input type="checkbox" style="margin-right: 0.5rem;"> Directors & Officers</label>
-                                <label style="color: white; font-size: 0.9rem;"><input type="checkbox" style="margin-right: 0.5rem;"> Other</label>
+                                <label style="color: white; font-size: 0.9rem;"><input type="checkbox" name="generalLiability" style="margin-right: 0.5rem;"> General Liability</label>
+                                <label style="color: white; font-size: 0.9rem;"><input type="checkbox" name="commercialProperty" style="margin-right: 0.5rem;"> Commercial Property</label>
+                                <label style="color: white; font-size: 0.9rem;"><input type="checkbox" name="workersCompensation" style="margin-right: 0.5rem;"> Workers' Compensation</label>
+                                <label style="color: white; font-size: 0.9rem;"><input type="checkbox" name="professionalLiability" style="margin-right: 0.5rem;"> Professional Liability</label>
+                                <label style="color: white; font-size: 0.9rem;"><input type="checkbox" name="cyberLiability" style="margin-right: 0.5rem;"> Cyber Liability</label>
+                                <label style="color: white; font-size: 0.9rem;"><input type="checkbox" name="commercialAuto" style="margin-right: 0.5rem;"> Commercial Auto</label>
+                                <label style="color: white; font-size: 0.9rem;"><input type="checkbox" name="directorsOfficers" style="margin-right: 0.5rem;"> Directors & Officers</label>
+                                <label style="color: white; font-size: 0.9rem;"><input type="checkbox" name="otherCoverage" style="margin-right: 0.5rem;"> Other</label>
                             </div>
                         </div>
                         <div style="margin-bottom: 1rem;">

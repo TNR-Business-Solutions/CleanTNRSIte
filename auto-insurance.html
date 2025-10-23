@@ -383,8 +383,8 @@
                             <input type="text" name="company" placeholder="Company Name" style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                            <input type="date" placeholder="Date of Birth *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
-                            <select required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="date" name="dateOfBirth" placeholder="Date of Birth *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <select name="maritalStatus" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                                 <option value="">Marital Status *</option>
                                 <option value="single">Single</option>
                                 <option value="married">Married</option>
@@ -393,20 +393,20 @@
                             </select>
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                            <input type="text" placeholder="Street Address *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
-                            <input type="text" placeholder="Apartment/Unit (Optional)" style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="text" name="address" placeholder="Street Address *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="text" name="apartment" placeholder="Apartment/Unit (Optional)" style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                            <input type="text" placeholder="City *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
-                            <select required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="text" name="city" placeholder="City *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <select name="state" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                                 <option value="">State *</option>
                                 <option value="PA">Pennsylvania</option>
                             </select>
-                            <input type="text" placeholder="ZIP Code *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="text" name="zipCode" placeholder="ZIP Code *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                            <input type="text" placeholder="Driver's License Number (Optional)" style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
-                            <select style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="text" name="licenseNumber" placeholder="Driver's License Number (Optional)" style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <select name="licenseState" style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                                 <option value="">License State (Optional)</option>
                                 <option value="PA">Pennsylvania</option>
                                 <option value="other">Other</option>
@@ -418,31 +418,31 @@
                     <div style="background: rgba(255, 255, 255, 0.05); padding: 2rem; border-radius: 8px; margin-bottom: 2rem;">
                         <h3 style="color: var(--tnr-gold); margin-bottom: 1.5rem; text-align: center;">Vehicle Information</h3>
                         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                            <input type="text" placeholder="Vehicle Year *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
-                            <input type="text" placeholder="Make *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
-                            <input type="text" placeholder="Model *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="text" name="vehicleYear" placeholder="Vehicle Year *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="text" name="vehicleMake" placeholder="Make *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="text" name="vehicleModel" placeholder="Model *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                            <input type="text" placeholder="VIN (Optional)" style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
-                            <input type="text" placeholder="License Plate (Optional)" style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="text" name="vin" placeholder="VIN (Optional)" style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="text" name="licensePlate" placeholder="License Plate (Optional)" style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                            <select required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <select name="vehicleUse" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                                 <option value="">Vehicle Use *</option>
                                 <option value="personal">Personal Use</option>
                                 <option value="business">Business Use</option>
                                 <option value="commercial">Commercial Use</option>
                             </select>
-                            <input type="number" placeholder="Annual Mileage *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="number" name="annualMileage" placeholder="Annual Mileage *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                            <select required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <select name="vehicleOwnership" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                                 <option value="">Vehicle Ownership *</option>
                                 <option value="owned">Owned</option>
                                 <option value="leased">Leased</option>
                                 <option value="financed">Financed</option>
                             </select>
-                            <input type="text" placeholder="Garaging Address (if different)" style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="text" name="garagingAddress" placeholder="Garaging Address (if different)" style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                         </div>
                     </div>
 
@@ -450,7 +450,7 @@
                     <div style="background: rgba(255, 255, 255, 0.05); padding: 2rem; border-radius: 8px; margin-bottom: 2rem;">
                         <h3 style="color: var(--tnr-gold); margin-bottom: 1.5rem; text-align: center;">Driving History</h3>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                            <select required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <select name="yearsLicensed" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                                 <option value="">Years Licensed *</option>
                                 <option value="0-1">Less than 1 year</option>
                                 <option value="1-3">1-3 years</option>
@@ -458,7 +458,7 @@
                                 <option value="5-10">5-10 years</option>
                                 <option value="10+">10+ years</option>
                             </select>
-                            <select required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <select name="accidents" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                                 <option value="">Accidents in Last 3 Years *</option>
                                 <option value="0">None</option>
                                 <option value="1">1 Accident</option>
@@ -467,26 +467,26 @@
                             </select>
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                            <select required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <select name="trafficViolations" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                                 <option value="">Traffic Violations in Last 3 Years *</option>
                                 <option value="0">None</option>
                                 <option value="1">1 Violation</option>
                                 <option value="2">2 Violations</option>
                                 <option value="3+">3+ Violations</option>
                             </select>
-                            <select required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <select name="duiDwi" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                                 <option value="">DUI/DWI in Last 5 Years *</option>
                                 <option value="no">No</option>
                                 <option value="yes">Yes</option>
                             </select>
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                            <select required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <select name="licenseSuspended" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                                 <option value="">License Suspended/Revoked *</option>
                                 <option value="no">No</option>
                                 <option value="yes">Yes</option>
                             </select>
-                            <select required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <select name="currentInsurance" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                                 <option value="">Current Insurance *</option>
                                 <option value="yes">Yes, I have current insurance</option>
                                 <option value="no">No, I need new insurance</option>
@@ -498,35 +498,35 @@
                     <div style="background: rgba(255, 255, 255, 0.05); padding: 2rem; border-radius: 8px; margin-bottom: 2rem;">
                         <h3 style="color: var(--tnr-gold); margin-bottom: 1.5rem; text-align: center;">Coverage Preferences</h3>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                            <select required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <select name="coverageLevel" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                                 <option value="">Desired Coverage Level *</option>
                                 <option value="minimum">Minimum Required</option>
                                 <option value="standard">Standard Coverage</option>
                                 <option value="full">Full Coverage</option>
                                 <option value="premium">Premium Coverage</option>
                             </select>
-                            <input type="number" placeholder="Desired Deductible ($) *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                            <input type="number" name="deductible" placeholder="Desired Deductible ($) *" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
                         </div>
                         <div style="margin-bottom: 1rem;">
                             <label style="display: block; margin-bottom: 0.5rem; color: white; font-weight: bold;">Additional Coverage Options (Check all that apply):</label>
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
                                 <label style="display: flex; align-items: center; color: white; font-size: 0.9rem;">
-                                    <input type="checkbox" style="margin-right: 0.5rem;"> Roadside Assistance
+                                    <input type="checkbox" name="roadsideAssistance" style="margin-right: 0.5rem;"> Roadside Assistance
                                 </label>
                                 <label style="display: flex; align-items: center; color: white; font-size: 0.9rem;">
-                                    <input type="checkbox" style="margin-right: 0.5rem;"> Rental Car Coverage
+                                    <input type="checkbox" name="rentalCarCoverage" style="margin-right: 0.5rem;"> Rental Car Coverage
                                 </label>
                                 <label style="display: flex; align-items: center; color: white; font-size: 0.9rem;">
-                                    <input type="checkbox" style="margin-right: 0.5rem;"> Gap Insurance
+                                    <input type="checkbox" name="gapInsurance" style="margin-right: 0.5rem;"> Gap Insurance
                                 </label>
                                 <label style="display: flex; align-items: center; color: white; font-size: 0.9rem;">
-                                    <input type="checkbox" style="margin-right: 0.5rem;"> Personal Injury Protection
+                                    <input type="checkbox" name="personalInjuryProtection" style="margin-right: 0.5rem;"> Personal Injury Protection
                                 </label>
                                 <label style="display: flex; align-items: center; color: white; font-size: 0.9rem;">
-                                    <input type="checkbox" style="margin-right: 0.5rem;"> Uninsured Motorist
+                                    <input type="checkbox" name="uninsuredMotorist" style="margin-right: 0.5rem;"> Uninsured Motorist
                                 </label>
                                 <label style="display: flex; align-items: center; color: white; font-size: 0.9rem;">
-                                    <input type="checkbox" style="margin-right: 0.5rem;"> Underinsured Motorist
+                                    <input type="checkbox" name="underinsuredMotorist" style="margin-right: 0.5rem;"> Underinsured Motorist
                                 </label>
                             </div>
                         </div>
