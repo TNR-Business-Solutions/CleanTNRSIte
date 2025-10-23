@@ -218,7 +218,7 @@ class TNRCRMData {
     return {
       totalClients: this.clients.length,
       activeClients: this.clients.filter((c) => c.status === "Active").length,
-      newLeads: this.leads.filter((l) => l.status === "New").length,
+      newLeads: this.leads.filter((l) => l.status === "New" || l.status === "Viewed").length,
       totalOrders: this.orders.length,
       completedOrders: this.orders.filter((o) => o.status === "Completed")
         .length,

@@ -1075,8 +1075,8 @@
             
             // CRM data loaded successfully
             
-            // Mark leads as viewed when admin dashboard loads
-            window.tnrCRM.markLeadsAsViewed();
+            // Don't automatically mark leads as viewed - let admin decide
+            // window.tnrCRM.markLeadsAsViewed();
             
             // Update statistics
             updateClientStats();
@@ -1141,18 +1141,55 @@
                 return;
             }
             
-            leadsList.innerHTML = leads.map(lead => `
+            leadsList.innerHTML = leads.map(lead => {
+                // Create detailed information display
+                const details = [];
+                
+                // Basic info
+                if (lead.company) details.push(`<strong>Company:</strong> ${lead.company}`);
+                if (lead.industry) details.push(`<strong>Industry:</strong> ${lead.industry}`);
+                if (lead.website) details.push(`<strong>Website:</strong> ${lead.website}`);
+                if (lead.budget) details.push(`<strong>Budget:</strong> ${lead.budget}`);
+                if (lead.timeline) details.push(`<strong>Timeline:</strong> ${lead.timeline}`);
+                if (lead.contactMethod) details.push(`<strong>Contact Method:</strong> ${lead.contactMethod}`);
+                
+                // Insurance-specific details
+                if (lead.dateOfBirth) details.push(`<strong>Date of Birth:</strong> ${lead.dateOfBirth}`);
+                if (lead.maritalStatus) details.push(`<strong>Marital Status:</strong> ${lead.maritalStatus}`);
+                if (lead.address) details.push(`<strong>Address:</strong> ${lead.address}`);
+                if (lead.city) details.push(`<strong>City:</strong> ${lead.city}`);
+                if (lead.state) details.push(`<strong>State:</strong> ${lead.state}`);
+                if (lead.zipCode) details.push(`<strong>Zip Code:</strong> ${lead.zipCode}`);
+                
+                // Vehicle details
+                if (lead.vehicleYear) details.push(`<strong>Vehicle Year:</strong> ${lead.vehicleYear}`);
+                if (lead.vehicleMake) details.push(`<strong>Vehicle Make:</strong> ${lead.vehicleMake}`);
+                if (lead.vehicleModel) details.push(`<strong>Vehicle Model:</strong> ${lead.vehicleModel}`);
+                if (lead.vehicleUse) details.push(`<strong>Vehicle Use:</strong> ${lead.vehicleUse}`);
+                if (lead.annualMileage) details.push(`<strong>Annual Mileage:</strong> ${lead.annualMileage}`);
+                if (lead.vehicleOwnership) details.push(`<strong>Vehicle Ownership:</strong> ${lead.vehicleOwnership}`);
+                
+                // Coverage details
+                if (lead.coverageLevel) details.push(`<strong>Coverage Level:</strong> ${lead.coverageLevel}`);
+                if (lead.deductible) details.push(`<strong>Deductible:</strong> $${lead.deductible}`);
+                if (lead.roadsideAssistance) details.push(`<strong>Roadside Assistance:</strong> ${lead.roadsideAssistance}`);
+                if (lead.rentalCarCoverage) details.push(`<strong>Rental Car Coverage:</strong> ${lead.rentalCarCoverage}`);
+                
+                // Services
+                const servicesText = Array.isArray(lead.services) ? lead.services.join(', ') : lead.services || 'Not specified';
+                
+                return `
                 <div class="client-item">
                     <div class="client-info">
                         <h4>${lead.name}</h4>
-                        <p><strong>Company:</strong> ${lead.company || 'Not provided'} | <strong>Industry:</strong> ${lead.industry || 'Not specified'}</p>
                         <p><strong>Email:</strong> ${lead.email} | <strong>Phone:</strong> ${lead.phone}</p>
-                        <p><strong>Website:</strong> ${lead.website || 'Not provided'} | <strong>Budget:</strong> ${lead.budget || 'Not specified'}</p>
-                        <p><strong>Timeline:</strong> ${lead.timeline || 'Not specified'} | <strong>Contact Method:</strong> ${lead.contactMethod || 'Not specified'}</p>
-                        <p><strong>Services:</strong> ${Array.isArray(lead.services) ? lead.services.join(', ') : lead.services || 'Not specified'}</p>
+                        <p><strong>Services:</strong> ${servicesText}</p>
                         <p><strong>Date:</strong> ${lead.submissionDate || formatDate(lead.submissionDateTime || lead.date)} | <strong>Source:</strong> ${lead.source}</p>
                         <p><strong>Message:</strong> ${lead.message || 'No message'}</p>
-                        ${lead.additionalInfo ? `<p><strong>Additional Info:</strong> ${lead.additionalInfo}</p>` : ''}
+                        ${details.length > 0 ? `<div style="margin-top: 10px; padding: 10px; background: #f5f5f5; border-radius: 4px; font-size: 0.9em;">
+                            <strong>Additional Details:</strong><br>
+                            ${details.join('<br>')}
+                        </div>` : ''}
                     </div>
                     <div class="client-actions">
                         <div class="client-status status-lead">${lead.status}</div>
@@ -1160,7 +1197,8 @@
                         <button class="btn-small btn-danger" onclick="deleteLead('${lead.id}')">Delete</button>
                     </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
         }
 
         function loadOrders() {
