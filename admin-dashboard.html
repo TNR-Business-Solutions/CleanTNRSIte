@@ -691,7 +691,6 @@
                         <h2 class="crm-title">👥 Client Relationship Management</h2>
                         <div>
                             <button class="btn" onclick="showAddClientModal()">+ Add New Client</button>
-                            <button class="btn btn-secondary" onclick="convertFormSubmissions()">Convert Form Submissions</button>
                         </div>
                     </div>
                     
@@ -722,7 +721,6 @@
                         <button class="crm-tab active" onclick="showCrmTab('clients')">All Clients</button>
                         <button class="crm-tab" onclick="showCrmTab('leads')">Leads</button>
                         <button class="crm-tab" onclick="showCrmTab('orders')">Orders</button>
-                        <button class="crm-tab" onclick="showCrmTab('form-submissions')">Form Submissions</button>
                     </div>
                     
                     <div id="clients" class="crm-content active">
@@ -738,14 +736,12 @@
                     </div>
                     
                     <div id="orders" class="crm-content">
+                        <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                            <h3 style="color: var(--tnr-gold); margin: 0;">Order Management</h3>
+                            <button class="btn" onclick="showAddOrderModal()">+ Add New Order</button>
+                        </div>
                         <div class="client-list" id="ordersList">
                             <!-- Orders will be loaded dynamically -->
-                        </div>
-                    </div>
-                    
-                    <div id="form-submissions" class="crm-content">
-                        <div class="client-list" id="formSubmissionsList">
-                            <!-- Form submissions will be loaded dynamically -->
                         </div>
                     </div>
                 </div>
@@ -962,6 +958,7 @@
         </div>
     </div>
 
+    <script src="admin-api-client.js"></script>
     <script src="crm-data.js"></script>
     <script>
         // Tab switching functionality
@@ -1085,7 +1082,6 @@
             loadClients();
             loadLeads();
             loadOrders();
-            loadFormSubmissions();
             
             // Set up periodic refresh every 5 seconds to catch new leads
             setInterval(function() {
@@ -1285,29 +1281,45 @@
 
         function loadOrders() {
             const ordersList = document.getElementById('ordersList');
-            const orders = window.tnrCRM.orders;
+            const orders = window.tnrCRM.orders || [];
             
             if (orders.length === 0) {
-                ordersList.innerHTML = '<div class="no-data">No orders found. Test orders will appear here.</div>';
+                ordersList.innerHTML = '<div class="no-data">No orders found. Click "+ Add New Order" to create your first order.</div>';
                 return;
             }
             
-            ordersList.innerHTML = orders.map(order => `
+            // Sort orders by date (newest first)
+            const sortedOrders = [...orders].sort((a, b) => {
+                const dateA = new Date(a.orderDate || a.date || 0);
+                const dateB = new Date(b.orderDate || b.date || 0);
+                return dateB - dateA;
+            });
+            
+            ordersList.innerHTML = sortedOrders.map(order => {
+                const orderDate = order.orderDate || order.date || 'Not specified';
+                const description = order.description || order.specialRequests || 'No description';
+                const timeline = order.projectTimeline ? `Timeline: ${order.projectTimeline}` : '';
+                const paymentMethod = order.paymentMethod ? `Payment: ${order.paymentMethod}` : '';
+                
+                return `
                 <div class="client-item">
                     <div class="client-info">
-                        <h4>${order.clientName}</h4>
-                        <p>${order.service} | ${order.industry}</p>
-                        <p>Amount: $${order.amount.toLocaleString()} | Status: ${order.status}</p>
-                        <p>Order Date: ${formatDate(order.orderDate)}</p>
-                        <p>Description: ${order.description}</p>
+                        <h4>${order.clientName || 'Unknown Client'}</h4>
+                        <p><strong>Service:</strong> ${order.service || 'Not specified'} ${order.industry ? `| Industry: ${order.industry}` : ''}</p>
+                        <p><strong>Amount:</strong> $${(order.amount || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} | <strong>Status:</strong> ${order.status || 'Pending'}</p>
+                        <p><strong>Order Date:</strong> ${formatDate(orderDate)}</p>
+                        ${timeline ? `<p>${timeline}</p>` : ''}
+                        ${paymentMethod ? `<p>${paymentMethod}</p>` : ''}
+                        <p><strong>Description:</strong> ${description}</p>
                     </div>
                     <div class="client-actions">
-                        <div class="client-status status-${order.status.toLowerCase().replace(' ', '-')}">${order.status}</div>
+                        <div class="client-status status-${(order.status || 'pending').toLowerCase().replace(' ', '-')}">${order.status || 'Pending'}</div>
                         <button class="btn-small" onclick="editOrder('${order.id}')">Edit</button>
                         <button class="btn-small btn-danger" onclick="deleteOrder('${order.id}')">Delete</button>
                     </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
         }
 
         function loadFormSubmissions() {
@@ -1752,6 +1764,275 @@
             return date.toLocaleDateString();
         }
         
+        function showAddOrderModal() {
+            const clients = window.tnrCRM.clients || [];
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 700px;">
+                    <div class="modal-header">
+                        <h3 style="color: white;">Add New Order</h3>
+                        <span class="close" onclick="closeModal()">&times;</span>
+                    </div>
+                    <div class="modal-body" style="color: black;">
+                        <form id="addOrderForm">
+                            <div class="form-group">
+                                <label style="color: black; font-weight: bold;">Client Type *</label>
+                                <select id="clientType" required onchange="toggleClientFields()" style="color: black;">
+                                    <option value="">Select Client Type</option>
+                                    <option value="existing">Existing Client</option>
+                                    <option value="new">New Client</option>
+                                </select>
+                            </div>
+                            
+                            <div id="existingClientSection" style="display: none;">
+                                <div class="form-group">
+                                    <label style="color: black; font-weight: bold;">Select Client *</label>
+                                    <select id="existingClientId" style="color: black;">
+                                        <option value="">Choose a client...</option>
+                                        ${clients.map(client => `<option value="${client.id}" data-name="${client.name}" data-email="${client.email || ''}" data-phone="${client.phone || ''}">${client.name} - ${client.email || 'No email'}</option>`).join('')}
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div id="newClientSection" style="display: none;">
+                                <h4 style="color: var(--tnr-primary); margin-bottom: 1rem;">New Client Information</h4>
+                                <div class="form-group">
+                                    <label style="color: black; font-weight: bold;">Client Name *</label>
+                                    <input type="text" id="newClientName" placeholder="Enter client name" style="color: black;">
+                                </div>
+                                <div class="form-group">
+                                    <label style="color: black; font-weight: bold;">Email</label>
+                                    <input type="email" id="newClientEmail" placeholder="client@example.com" style="color: black;">
+                                </div>
+                                <div class="form-group">
+                                    <label style="color: black; font-weight: bold;">Phone</label>
+                                    <input type="tel" id="newClientPhone" placeholder="(412) 555-1234" style="color: black;">
+                                </div>
+                                <div class="form-group">
+                                    <label style="color: black; font-weight: bold;">Company</label>
+                                    <input type="text" id="newClientCompany" placeholder="Company name (if applicable)" style="color: black;">
+                                </div>
+                            </div>
+                            
+                            <hr style="margin: 1.5rem 0;">
+                            
+                            <h4 style="color: var(--tnr-primary); margin-bottom: 1rem;">Order Details</h4>
+                            
+                            <div class="form-group">
+                                <label style="color: black; font-weight: bold;">Service/Product *</label>
+                                <select id="orderService" required style="color: black;">
+                                    <option value="">Select Service</option>
+                                    <option value="Web Design">Web Design</option>
+                                    <option value="SEO Services">SEO Services</option>
+                                    <option value="Social Media Management">Social Media Management</option>
+                                    <option value="Content Creation">Content Creation</option>
+                                    <option value="Paid Advertising">Paid Advertising</option>
+                                    <option value="Email Marketing">Email Marketing</option>
+                                    <option value="Insurance - Auto">Insurance - Auto</option>
+                                    <option value="Insurance - Home">Insurance - Home</option>
+                                    <option value="Insurance - Business">Insurance - Business</option>
+                                    <option value="Insurance - Life">Insurance - Life</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group" id="customServiceGroup" style="display: none;">
+                                <label style="color: black; font-weight: bold;">Custom Service Name</label>
+                                <input type="text" id="customService" placeholder="Enter service name" style="color: black;">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label style="color: black; font-weight: bold;">Order Amount *</label>
+                                <div style="display: flex; align-items: center;">
+                                    <span style="margin-right: 0.5rem; font-size: 1.2rem;">$</span>
+                                    <input type="number" id="orderAmount" step="0.01" min="0" placeholder="0.00" required style="flex: 1; color: black;">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label style="color: black; font-weight: bold;">Order Status *</label>
+                                <select id="orderStatus" required style="color: black;">
+                                    <option value="Pending">Pending</option>
+                                    <option value="Confirmed">Confirmed</option>
+                                    <option value="In Progress">In Progress</option>
+                                    <option value="Completed">Completed</option>
+                                    <option value="Cancelled">Cancelled</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label style="color: black; font-weight: bold;">Order Description</label>
+                                <textarea id="orderDescription" rows="3" placeholder="Describe the order details, requirements, or special notes..." style="color: black;"></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label style="color: black; font-weight: bold;">Project Timeline</label>
+                                <select id="orderTimeline" style="color: black;">
+                                    <option value="">Select Timeline</option>
+                                    <option value="ASAP">ASAP</option>
+                                    <option value="1 Week">1 Week</option>
+                                    <option value="2 Weeks">2 Weeks</option>
+                                    <option value="1 Month">1 Month</option>
+                                    <option value="2-3 Months">2-3 Months</option>
+                                    <option value="3-6 Months">3-6 Months</option>
+                                    <option value="Ongoing">Ongoing</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label style="color: black; font-weight: bold;">Payment Method</label>
+                                <select id="paymentMethod" style="color: black;">
+                                    <option value="">Select Payment Method</option>
+                                    <option value="Credit Card">Credit Card</option>
+                                    <option value="Debit Card">Debit Card</option>
+                                    <option value="Bank Transfer">Bank Transfer</option>
+                                    <option value="Check">Check</option>
+                                    <option value="Cash">Cash</option>
+                                    <option value="Payment Plan">Payment Plan</option>
+                                    <option value="Pending">Pending</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label style="color: black; font-weight: bold;">Special Requests / Notes</label>
+                                <textarea id="specialRequests" rows="3" placeholder="Any special requests, notes, or additional information..." style="color: black;"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn" onclick="saveNewOrder()">Save Order</button>
+                        <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            // Add change listener for service dropdown
+            document.getElementById('orderService').addEventListener('change', function() {
+                const customGroup = document.getElementById('customServiceGroup');
+                if (this.value === 'Other') {
+                    customGroup.style.display = 'block';
+                    document.getElementById('customService').required = true;
+                } else {
+                    customGroup.style.display = 'none';
+                    document.getElementById('customService').required = false;
+                }
+            });
+        }
+        
+        function toggleClientFields() {
+            const clientType = document.getElementById('clientType').value;
+            const existingSection = document.getElementById('existingClientSection');
+            const newSection = document.getElementById('newClientSection');
+            const existingSelect = document.getElementById('existingClientId');
+            
+            if (clientType === 'existing') {
+                existingSection.style.display = 'block';
+                newSection.style.display = 'none';
+                existingSelect.required = true;
+                document.getElementById('newClientName').required = false;
+            } else if (clientType === 'new') {
+                existingSection.style.display = 'none';
+                newSection.style.display = 'block';
+                existingSelect.required = false;
+                document.getElementById('newClientName').required = true;
+            } else {
+                existingSection.style.display = 'none';
+                newSection.style.display = 'none';
+                existingSelect.required = false;
+                document.getElementById('newClientName').required = false;
+            }
+        }
+        
+        function saveNewOrder() {
+            const clientType = document.getElementById('clientType').value;
+            
+            if (!clientType) {
+                alert('Please select a client type.');
+                return;
+            }
+            
+            let clientName = '';
+            let clientId = null;
+            let clientEmail = '';
+            let clientPhone = '';
+            
+            if (clientType === 'existing') {
+                const selectedOption = document.getElementById('existingClientId').options[document.getElementById('existingClientId').selectedIndex];
+                if (!selectedOption.value) {
+                    alert('Please select a client.');
+                    return;
+                }
+                clientId = selectedOption.value;
+                clientName = selectedOption.getAttribute('data-name');
+                clientEmail = selectedOption.getAttribute('data-email') || '';
+                clientPhone = selectedOption.getAttribute('data-phone') || '';
+            } else {
+                clientName = document.getElementById('newClientName').value.trim();
+                if (!clientName) {
+                    alert('Please enter the client name.');
+                    return;
+                }
+                clientEmail = document.getElementById('newClientEmail').value.trim();
+                clientPhone = document.getElementById('newClientPhone').value.trim();
+                const clientCompany = document.getElementById('newClientCompany').value.trim();
+                
+                // Create new client first
+                const newClient = window.tnrCRM.addClient({
+                    name: clientName,
+                    email: clientEmail,
+                    phone: clientPhone,
+                    company: clientCompany,
+                    industry: 'Not specified',
+                    services: [],
+                    status: 'Active',
+                    source: 'Manual Entry'
+                });
+                clientId = newClient.id;
+            }
+            
+            const service = document.getElementById('orderService').value;
+            const customService = document.getElementById('customService').value;
+            const finalService = (service === 'Other' && customService) ? customService : service;
+            
+            if (!finalService) {
+                alert('Please select or enter a service.');
+                return;
+            }
+            
+            const amount = parseFloat(document.getElementById('orderAmount').value);
+            if (!amount || amount <= 0) {
+                alert('Please enter a valid order amount.');
+                return;
+            }
+            
+            const orderData = {
+                clientName: clientName,
+                clientId: clientId,
+                service: finalService,
+                amount: amount,
+                status: document.getElementById('orderStatus').value,
+                description: document.getElementById('orderDescription').value.trim(),
+                projectTimeline: document.getElementById('orderTimeline').value || null,
+                paymentMethod: document.getElementById('paymentMethod').value || null,
+                specialRequests: document.getElementById('specialRequests').value.trim() || null,
+                customerInfo: {
+                    name: clientName,
+                    email: clientEmail,
+                    phone: clientPhone
+                },
+                industry: 'General',
+                orderDate: new Date().toISOString().split('T')[0]
+            };
+            
+            window.tnrCRM.addOrder(orderData);
+            closeModal();
+            loadOrders();
+            updateClientStats();
+            alert(`Order added successfully! Order #${orderData.id || 'TNR-' + Date.now()}`);
+        }
+
         function convertFormSubmissions() {
             if (!window.tnrCRM) {
                 alert('CRM not initialized');
