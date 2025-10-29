@@ -210,33 +210,51 @@ class SimpleFormIntegration {
 
   async sendToServerWithFiles(form, data) {
     try {
-      // Create FormData to send files
+      // Convert files to base64 for sending in JSON
       const formData = new FormData(form);
-      
-      // Add all text fields to FormData
-      Object.keys(data).forEach(key => {
-        if (key !== 'resume' && key !== 'coverLetter' && data[key]) {
-          formData.append(key, data[key]);
-        }
-      });
-
-      // Add file info to the data object
       const resumeFile = formData.get("resume");
       const coverLetterFile = formData.get("coverLetter");
-      
-      if (resumeFile instanceof File) {
-        data.resumeFileName = resumeFile.name;
-        data.resumeFileSize = resumeFile.size;
-        data.resumeFileType = resumeFile.type;
-      }
-      
-      if (coverLetterFile instanceof File) {
-        data.coverLetterFileName = coverLetterFile.name;
-        data.coverLetterFileSize = coverLetterFile.size;
-        data.coverLetterFileType = coverLetterFile.type;
+
+      // Convert resume to base64 if present (max 10MB)
+      const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+      if (resumeFile && resumeFile instanceof File && resumeFile.size > 0) {
+        if (resumeFile.size > MAX_FILE_SIZE) {
+          alert(`Resume file is too large (${(resumeFile.size / 1024 / 1024).toFixed(2)} MB). Maximum size is 10 MB. Please compress the file and try again.`);
+          console.error("❌ Resume file too large:", resumeFile.size, "bytes");
+        } else {
+          try {
+            data.resumeFileName = resumeFile.name;
+            data.resumeFileSize = resumeFile.size;
+            data.resumeFileType = resumeFile.type;
+            data.resumeFileBase64 = await this.fileToBase64(resumeFile);
+            console.log("✅ Resume file converted to base64:", resumeFile.name, `(${(resumeFile.size / 1024).toFixed(2)} KB)`);
+          } catch (error) {
+            console.error("❌ Error converting resume to base64:", error);
+            alert("Error processing resume file. Please try again.");
+          }
+        }
       }
 
-      // First, send JSON data (includes file metadata)
+      // Convert cover letter to base64 if present (max 10MB)
+      if (coverLetterFile && coverLetterFile instanceof File && coverLetterFile.size > 0) {
+        if (coverLetterFile.size > MAX_FILE_SIZE) {
+          alert(`Cover letter file is too large (${(coverLetterFile.size / 1024 / 1024).toFixed(2)} MB). Maximum size is 10 MB. Please compress the file and try again.`);
+          console.error("❌ Cover letter file too large:", coverLetterFile.size, "bytes");
+        } else {
+          try {
+            data.coverLetterFileName = coverLetterFile.name;
+            data.coverLetterFileSize = coverLetterFile.size;
+            data.coverLetterFileType = coverLetterFile.type;
+            data.coverLetterFileBase64 = await this.fileToBase64(coverLetterFile);
+            console.log("✅ Cover letter file converted to base64:", coverLetterFile.name, `(${(coverLetterFile.size / 1024).toFixed(2)} KB)`);
+          } catch (error) {
+            console.error("❌ Error converting cover letter to base64:", error);
+            alert("Error processing cover letter file. Please try again.");
+          }
+        }
+      }
+
+      // Send JSON data with base64 encoded files
       const jsonResponse = await fetch("/submit-form", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -246,15 +264,26 @@ class SimpleFormIntegration {
       if (jsonResponse.ok) {
         console.log("✅ Email sent successfully with file attachments");
       } else {
-        console.error("❌ Server error:", jsonResponse.statusText);
+        const errorData = await jsonResponse.json().catch(() => ({}));
+        console.error("❌ Server error:", jsonResponse.statusText, errorData);
       }
-
-      // For actual file uploads, you would need a separate endpoint that accepts multipart/form-data
-      // For now, we're sending file metadata in the JSON payload
-      // The email will include the file names and sizes
     } catch (error) {
       console.error("❌ Network error:", error);
     }
+  }
+
+  // Helper function to convert File to base64
+  fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        // Remove the data:application/...;base64, prefix
+        const base64String = reader.result.split(',')[1];
+        resolve(base64String);
+      };
+      reader.onerror = (error) => reject(error);
+      reader.readAsDataURL(file);
+    });
   }
 
   showSuccess() {

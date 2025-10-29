@@ -87,7 +87,7 @@ module.exports = async (req, res) => {
               return `<li><strong>Cover Letter:</strong> ${value}${fileSize}</li>`;
             }
             // Skip file metadata fields (already displayed with filename)
-            if (key.includes('FileSize') || key.includes('FileType')) {
+            if (key.includes('FileSize') || key.includes('FileType') || key.includes('FileBase64')) {
               return '';
             }
             
@@ -106,15 +106,28 @@ module.exports = async (req, res) => {
 
     // Add attachments note for career applications
     if (isCareerApplication && (formData.resumeFileName || formData.coverLetterFileName)) {
-      emailHtml += `
-        <hr>
-        <h4>File Attachments:</h4>
-        <ul>
-          ${formData.resumeFileName ? `<li><strong>Resume:</strong> ${formData.resumeFileName}${formData.resumeFileSize ? ` (${(formData.resumeFileSize / 1024).toFixed(2)} KB)` : ''}</li>` : ''}
-          ${formData.coverLetterFileName ? `<li><strong>Cover Letter:</strong> ${formData.coverLetterFileName}${formData.coverLetterFileSize ? ` (${(formData.coverLetterFileSize / 1024).toFixed(2)} KB)` : ''}</li>` : ''}
-        </ul>
-        <p><em>Note: File attachments were submitted with this application. Please check your CRM or contact the applicant directly to request the files if needed.</em></p>
-      `;
+      const attachedFiles = [];
+      if (formData.resumeFileBase64 && formData.resumeFileName) {
+        attachedFiles.push(`<li><strong>✅ Resume:</strong> ${formData.resumeFileName}${formData.resumeFileSize ? ` (${(formData.resumeFileSize / 1024).toFixed(2)} KB) - ATTACHED TO EMAIL` : ' - ATTACHED TO EMAIL'}</li>`);
+      } else if (formData.resumeFileName) {
+        attachedFiles.push(`<li><strong>⚠️ Resume:</strong> ${formData.resumeFileName} - File upload failed</li>`);
+      }
+      if (formData.coverLetterFileBase64 && formData.coverLetterFileName) {
+        attachedFiles.push(`<li><strong>✅ Cover Letter:</strong> ${formData.coverLetterFileName}${formData.coverLetterFileSize ? ` (${(formData.coverLetterFileSize / 1024).toFixed(2)} KB) - ATTACHED TO EMAIL` : ' - ATTACHED TO EMAIL'}</li>`);
+      } else if (formData.coverLetterFileName) {
+        attachedFiles.push(`<li><strong>⚠️ Cover Letter:</strong> ${formData.coverLetterFileName} - File upload failed</li>`);
+      }
+      
+      if (attachedFiles.length > 0) {
+        emailHtml += `
+          <hr>
+          <h4>File Attachments (Attached to this email):</h4>
+          <ul>
+            ${attachedFiles.join('')}
+          </ul>
+          <p><em>✅ These files are attached to this email and can be downloaded directly.</em></p>
+        `;
+      }
     }
 
     emailHtml += `
@@ -122,6 +135,37 @@ module.exports = async (req, res) => {
       <p><small>This email was sent from the TNR Business Solutions ${isCareerApplication ? 'career application' : 'contact'} form.</small></p>
       <p><small>Submission Time: ${new Date().toLocaleString()}</small></p>
     `;
+
+    // Prepare email attachments
+    const attachments = [];
+    
+    // Add resume as attachment if present
+    if (formData.resumeFileBase64 && formData.resumeFileName) {
+      try {
+        attachments.push({
+          filename: formData.resumeFileName,
+          content: Buffer.from(formData.resumeFileBase64, 'base64'),
+          contentType: formData.resumeFileType || 'application/pdf',
+        });
+        console.log("✅ Resume attached:", formData.resumeFileName);
+      } catch (error) {
+        console.error("❌ Error attaching resume:", error);
+      }
+    }
+
+    // Add cover letter as attachment if present
+    if (formData.coverLetterFileBase64 && formData.coverLetterFileName) {
+      try {
+        attachments.push({
+          filename: formData.coverLetterFileName,
+          content: Buffer.from(formData.coverLetterFileBase64, 'base64'),
+          contentType: formData.coverLetterFileType || 'application/pdf',
+        });
+        console.log("✅ Cover letter attached:", formData.coverLetterFileName);
+      } catch (error) {
+        console.error("❌ Error attaching cover letter:", error);
+      }
+    }
 
     // Send email
     const businessEmail =
@@ -132,6 +176,7 @@ module.exports = async (req, res) => {
       replyTo: formData.email,
       subject: subject,
       html: emailHtml,
+      attachments: attachments.length > 0 ? attachments : undefined,
     };
 
     const info = await transporter.sendMail(mailOptions);
