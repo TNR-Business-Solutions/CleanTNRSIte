@@ -130,51 +130,23 @@
                 
                 <!-- Instagram Content Area -->
                 <div id="instagram" class="content-area">
-                    <div class="form-group">
-                        <label for="contentType">Content Type</label>
-                        <select id="contentType" name="contentType" aria-label="Select content type">
-                            <option value="test-post">🧪 Test Post (First Post)</option>
-                            <option value="service-promotion">Service Promotion</option>
-                            <option value="client-success">Client Success Story</option>
-                            <option value="industry-tip">Industry Tip</option>
-                            <option value="behind-scenes">Behind the Scenes</option>
-                            <option value="testimonial">Customer Testimonial</option>
-                            <option value="how-to">How-To Guide</option>
-                            <option value="question">Engagement Question</option>
-                            <option value="did-you-know">Did You Know</option>
-                            <option value="local-community">Local Community</option>
-                            <option value="seasonal">Seasonal/Holiday</option>
-                        </select>
+                    <div style="padding: 20px; background: #f8f9fa; border-radius: 8px; margin: 20px 0;">
+                        <h4 style="color: #e1306c; margin-bottom: 15px;">📸 Instagram Content Generator</h4>
+                        <p style="color: #666; margin-bottom: 15px;">
+                            Instagram uses the same content generator as Facebook. Switch to the Facebook tab to create content, then use the "Post to Instagram" button.
+                        </p>
+                        <div style="padding: 15px; background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; margin-bottom: 15px;">
+                            <strong>⚠️ Instagram Requirements:</strong>
+                            <ul style="margin: 10px 0 0 20px; color: #856404;">
+                                <li>Images are required (Instagram doesn't allow text-only posts)</li>
+                                <li>Your Instagram Business account must be connected to your Facebook Page</li>
+                                <li>We're working on fixing the API connection</li>
+                            </ul>
+                        </div>
+                        <button class="btn" onclick="switchPlatform('facebook', document.querySelector('.platform-tab'))" style="background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);">
+                            ← Use Facebook Generator (Works for Instagram Too!)
+                        </button>
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="clientBusinessName">Client/Business Name</label>
-                        <input type="text" id="clientBusinessName" placeholder="e.g., TNR Business Solutions" value="TNR Business Solutions">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="professionType">Industry Type</label>
-                        <select id="professionType" name="professionType" aria-label="Select industry type">
-                            <option value="digital-marketing">Digital Marketing Agency</option>
-                            <option value="insurance">Insurance Services</option>
-                            <option value="construction">Construction/Trades</option>
-                            <option value="professional-services">Professional Services (Law, Accounting, Consulting)</option>
-                            <option value="healthcare">Healthcare/Medical</option>
-                            <option value="restaurant">Restaurant/Food Service</option>
-                            <option value="retail">Retail Store</option>
-                            <option value="real-estate">Real Estate</option>
-                            <option value="automotive">Automotive Services</option>
-                            <option value="home-services">Home Services (HVAC, Plumbing, Electric)</option>
-                            <option value="fitness">Fitness/Wellness</option>
-                            <option value="beauty">Beauty/Salon</option>
-                        </select>
-                    </div>
-                    
-                    <button class="btn" onclick="generateContent()">Generate Content</button>
-                    
-                    <p style="margin-top: 20px; padding: 15px; background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; color: #856404;">
-                        ℹ️ <strong>Instagram requires an image!</strong> Make sure to add an image URL after generating content.
-                    </p>
                 </div>
                 
                 <!-- LinkedIn Content Area -->
