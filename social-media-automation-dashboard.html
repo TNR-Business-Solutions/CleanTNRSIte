@@ -323,7 +323,8 @@
         }
         
         async function testMetaToken() {
-            const token = document.getElementById('metaToken').value.trim() || localStorage.getItem('metaPageAccessToken');
+            const tokenInput = document.getElementById('metaToken');
+            const token = (tokenInput ? tokenInput.value.trim() : '') || localStorage.getItem('metaPageAccessToken');
             
             if (!token) {
                 alert('Please paste your token or connect via OAuth first');
@@ -340,23 +341,32 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    document.getElementById('metaStatus').innerHTML = `
-                        ✅ Connected to: ${data.page.name}<br>
-                        ${data.instagram ? `📷 Instagram: @${data.instagram.username}` : ''}
-                    `;
-                    document.getElementById('metaConnected').textContent = '✅';
-                    document.getElementById('configStatus').textContent = '✅ Yes';
-                    alert(`✅ Token Valid!\n\nPage: ${data.page.name}\n${data.instagram ? `Instagram: @${data.instagram.username}` : 'No Instagram connected'}`);
+                    const metaStatus = document.getElementById('metaStatus');
+                    const metaConnected = document.getElementById('metaConnected');
+                    const configStatus = document.getElementById('configStatus');
+                    
+                    if (metaStatus) {
+                        metaStatus.innerHTML = `
+                            ✅ Connected to: ${data.page.name}<br>
+                            ${data.page.instagram_business_account ? `📷 Instagram: @${data.page.instagram_business_account.username || 'Connected'}` : ''}
+                        `;
+                    }
+                    if (metaConnected) metaConnected.textContent = '✅';
+                    if (configStatus) configStatus.textContent = '✅ Yes';
+                    
+                    alert(`✅ Token Valid!\n\nPage: ${data.page.name}\n${data.page.instagram_business_account ? `Instagram: Connected` : 'No Instagram connected'}`);
                 } else {
                     alert('❌ Token Invalid: ' + data.message);
                 }
             } catch (error) {
+                console.error('Token test error:', error);
                 alert('❌ Error testing token: ' + error.message);
             }
         }
         
         function saveMetaToken() {
-            const token = document.getElementById('metaToken').value.trim();
+            const metaTokenInput = document.getElementById('metaToken');
+            const token = metaTokenInput ? metaTokenInput.value.trim() : '';
             if (token) {
                 localStorage.setItem('metaPageAccessToken', token);
                 alert('✅ Token saved! Now test it to verify.');
@@ -476,15 +486,22 @@
         window.addEventListener('DOMContentLoaded', function() {
             const savedToken = localStorage.getItem('metaPageAccessToken');
             if (savedToken) {
-                document.getElementById('metaToken').value = savedToken;
-                testMetaToken();
+                const metaTokenInput = document.getElementById('metaToken');
+                if (metaTokenInput) {
+                    metaTokenInput.value = savedToken;
+                }
+                // Small delay to ensure all DOM elements are ready
+                setTimeout(() => testMetaToken(), 100);
             }
             
             // Set default date/time to tomorrow
             const tomorrow = new Date();
             tomorrow.setDate(tomorrow.getDate() + 1);
             tomorrow.setHours(9, 0, 0, 0);
-            document.getElementById('scheduleDateTime').value = tomorrow.toISOString().slice(0, 16);
+            const scheduleDateTimeInput = document.getElementById('scheduleDateTime');
+            if (scheduleDateTimeInput) {
+                scheduleDateTimeInput.value = tomorrow.toISOString().slice(0, 16);
+            }
         });
         
         // ENHANCED CONTENT TEMPLATES - Diverse, industry-specific, non-repetitive
