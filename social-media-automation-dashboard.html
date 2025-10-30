@@ -348,13 +348,13 @@
                     if (metaStatus) {
                         metaStatus.innerHTML = `
                             ✅ Connected to: ${data.page.name}<br>
-                            ${data.page.instagram_business_account ? `📷 Instagram: @${data.page.instagram_business_account.username || 'Connected'}` : ''}
+                            ${data.instagram ? `📷 Instagram: @${data.instagram.username}` : '❌ No Instagram connected'}
                         `;
                     }
                     if (metaConnected) metaConnected.textContent = '✅';
                     if (configStatus) configStatus.textContent = '✅ Yes';
                     
-                    alert(`✅ Token Valid!\n\nPage: ${data.page.name}\n${data.page.instagram_business_account ? `Instagram: Connected` : 'No Instagram connected'}`);
+                    alert(`✅ Token Valid!\n\nPage: ${data.page.name}\n${data.instagram ? `Instagram: @${data.instagram.username} (${data.instagram.followersCount} followers)` : 'No Instagram connected'}`);
                 } else {
                     alert('❌ Token Invalid: ' + data.message);
                 }
