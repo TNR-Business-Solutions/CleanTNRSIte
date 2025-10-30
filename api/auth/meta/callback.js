@@ -83,16 +83,38 @@ module.exports = async (req, res) => {
     const expiresIn = longLivedResponse.data.expires_in;
 
     // Step 3: Fetch user's managed Facebook Pages
-    console.log('Fetching managed pages...');
+    console.log('Fetching managed pages with token:', longLivedUserToken.substring(0, 20) + '...');
     const pagesResponse = await axios.get('https://graph.facebook.com/v19.0/me/accounts', {
       params: { 
         access_token: longLivedUserToken,
-        fields: 'id,name,access_token,category,instagram_business_account'
+        fields: 'id,name,access_token,category,instagram_business_account',
+        limit: 100
       },
       timeout: 10000
     });
 
+    console.log('Pages API response:', JSON.stringify(pagesResponse.data, null, 2));
     const pages = pagesResponse.data.data || [];
+    console.log('Number of pages found:', pages.length);
+
+    if (pages.length === 0) {
+      console.warn('WARNING: No pages returned from Facebook API');
+      console.warn('User token used:', longLivedUserToken.substring(0, 30) + '...');
+      
+      // Try to get debug info about the token
+      try {
+        const debugResponse = await axios.get('https://graph.facebook.com/v19.0/debug_token', {
+          params: {
+            input_token: longLivedUserToken,
+            access_token: longLivedUserToken
+          },
+          timeout: 10000
+        });
+        console.log('Token debug info:', JSON.stringify(debugResponse.data, null, 2));
+      } catch (debugError) {
+        console.error('Could not debug token:', debugError.message);
+      }
+    }
 
     // Step 4: For each page with Instagram, fetch Instagram account details
     console.log('Fetching Instagram accounts...');
@@ -156,6 +178,12 @@ module.exports = async (req, res) => {
       pageCount: pages.length,
       instagramAccounts: pagesWithInstagram.filter(p => p.instagram_account).length
     });
+
+    // If no pages but authorization succeeded, show special message
+    if (pages.length === 0) {
+      res.setHeader('Content-Type', 'text/html');
+      return res.status(200).send(generateNoPagesHTML(response.authorization.longLivedUserToken));
+    }
 
     // Return formatted HTML response with embedded data
     res.setHeader('Content-Type', 'text/html');
@@ -359,6 +387,120 @@ function generateSuccessHTML(data) {
             URL.revokeObjectURL(url);
         }
     </script>
+</body>
+</html>`;
+}
+
+// HTML generation function for no pages found
+function generateNoPagesHTML(userToken) {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>No Pages Found - TNR Business Solutions</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 { color: #667eea; font-size: 2rem; margin-bottom: 10px; text-align: center; }
+        .warning-badge {
+            background: #fff3cd;
+            color: #856404;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin: 10px 0;
+        }
+        .section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #ffc107;
+        }
+        .section h3 { color: #856404; margin-bottom: 15px; }
+        .btn {
+            padding: 12px 30px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .code { background: #f8f9fa; padding: 15px; border-radius: 8px; font-family: monospace; margin: 10px 0; word-break: break-all; }
+        ol { margin-left: 20px; margin-top: 10px; }
+        li { margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚠️ No Pages Connected</h1>
+        <div style="text-align: center;"><span class="warning-badge">Authorization Successful, But...</span></div>
+        
+        <div class="section">
+            <h3>🤔 What Happened?</h3>
+            <p>Facebook authorized your app successfully, but we couldn't retrieve any Page Access Tokens. This usually happens when:</p>
+            <ol>
+                <li><strong>Pages weren't actually selected during OAuth</strong> - Even though you saw "1 Page selected"</li>
+                <li><strong>Permission timing issue</strong> - Facebook needs a moment to process the permissions</li>
+                <li><strong>Permissions need manual grant in Business Settings</strong></li>
+            </ol>
+        </div>
+        
+        <div class="section">
+            <h3>✅ Solution: Manually Get Your Page Token</h3>
+            <p><strong>Option 1: Use Facebook Graph API Explorer (Recommended)</strong></p>
+            <ol>
+                <li>Go to: <a href="https://developers.facebook.com/tools/explorer/" target="_blank" style="color: #667eea;">developers.facebook.com/tools/explorer/</a></li>
+                <li>Select your app: <strong>TNR Social Automation</strong></li>
+                <li>Click "Generate Access Token"</li>
+                <li>Select permissions: <code>pages_manage_posts</code>, <code>pages_read_engagement</code>, <code>pages_show_list</code>, <code>pages_manage_metadata</code></li>
+                <li>Click "Get Token" → "Get Page Access Token"</li>
+                <li>Select <strong>TNR Business Solutions</strong> page</li>
+                <li>Copy the token and paste it in the dashboard!</li>
+            </ol>
+        </div>
+        
+        <div class="section">
+            <h3>💡 Workaround: Your User Token</h3>
+            <p>We did get your User Access Token. While this won't work for posting, you can use the Graph API Explorer method above.</p>
+            <div class="code">${userToken}</div>
+            <p style="margin-top: 10px; font-size: 14px; color: #666;">This token expires in 60 days and is for debugging only.</p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="/auth/meta" class="btn btn-primary">🔄 Try OAuth Again</a>
+            <a href="https://developers.facebook.com/tools/explorer/" target="_blank" class="btn btn-secondary">🔧 Graph API Explorer</a>
+            <a href="/social-media-automation-dashboard.html" class="btn btn-secondary">🏠 Dashboard</a>
+        </div>
+        
+        <div class="section" style="border-left-color: #17a2b8; background: #d1ecf1;">
+            <h3 style="color: #0c5460;">📞 Need Help?</h3>
+            <p>Check the Vercel function logs for more details about why pages weren't returned. The logs will show the exact Facebook API response.</p>
+        </div>
+    </div>
 </body>
 </html>`;
 }
