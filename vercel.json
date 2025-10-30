@@ -30,6 +30,10 @@
       "destination": "/api/social/post-to-facebook"
     },
     {
+      "source": "/social/post-instagram",
+      "destination": "/api/social/post-to-instagram"
+    },
+    {
       "source": "/social/test",
       "destination": "/api/social/test-token"
     },

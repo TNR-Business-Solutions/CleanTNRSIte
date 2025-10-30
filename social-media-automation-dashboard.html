@@ -114,7 +114,17 @@
                         <h4>Generated Post:</h4>
                         <div id="previewContent"></div>
                         <div class="hashtag-suggestions" id="hashtagSuggestions"></div>
-                        <button class="btn" onclick="postToFacebook()" style="margin-top: 15px;">📤 Post to Facebook</button>
+                        <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+                            <button class="btn" onclick="postToFacebook()" style="flex: 1; min-width: 200px;">📤 Post to Facebook</button>
+                            <button class="btn" onclick="postToInstagram()" style="flex: 1; min-width: 200px; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);">📸 Post to Instagram</button>
+                        </div>
+                        <p style="font-size: 0.9rem; color: #666; margin-top: 10px;">
+                            ℹ️ <strong>Instagram Note:</strong> For best results, add an image URL below before posting to Instagram. Text-only posts work on Facebook but require an image for Instagram.
+                        </p>
+                        <div style="margin-top: 10px;">
+                            <label style="display: block; margin-bottom: 5px; font-size: 0.9rem;">Image URL (optional for Facebook, required for Instagram):</label>
+                            <input type="url" id="postImageUrl" placeholder="https://example.com/image.jpg" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -358,6 +368,7 @@
         
         async function postToFacebook() {
             const content = document.getElementById('previewContent').textContent;
+            const imageUrl = document.getElementById('postImageUrl').value.trim();
             const token = localStorage.getItem('metaPageAccessToken');
             
             if (!token) {
@@ -373,13 +384,20 @@
             }
             
             try {
+                const postData = {
+                    pageAccessToken: token,
+                    message: content
+                };
+                
+                // Add image URL if provided
+                if (imageUrl) {
+                    postData.imageUrl = imageUrl;
+                }
+                
                 const response = await fetch('/api/social/post-to-facebook', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        pageAccessToken: token,
-                        message: content
-                    })
+                    body: JSON.stringify(postData)
                 });
                 
                 const data = await response.json();
@@ -393,6 +411,64 @@
                 }
             } catch (error) {
                 alert('❌ Error posting: ' + error.message);
+            }
+        }
+        
+        async function postToInstagram() {
+            const content = document.getElementById('previewContent').textContent;
+            const imageUrl = document.getElementById('postImageUrl').value.trim();
+            const token = localStorage.getItem('metaPageAccessToken');
+            
+            if (!token) {
+                if (confirm('No token saved. Would you like to connect Facebook now?')) {
+                    connectMeta();
+                }
+                return;
+            }
+            
+            if (!content) {
+                alert('Please generate content first');
+                return;
+            }
+            
+            if (!imageUrl) {
+                alert('⚠️ Instagram requires an image!\n\nPlease add an image URL in the field below the buttons.\n\nExample: https://example.com/yourimage.jpg');
+                return;
+            }
+            
+            if (!confirm('Post this content to Instagram now?\n\nNote: Make sure your Facebook Page is connected to an Instagram Business Account.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/social/post-to-instagram', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        pageAccessToken: token,
+                        message: content,
+                        imageUrl: imageUrl
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('✅ Posted to Instagram successfully!\n\nPost ID: ' + data.postId + '\nAccount: ' + data.instagramAccount);
+                } else {
+                    let errorMsg = '❌ Failed to post to Instagram:\n\n' + data.message;
+                    
+                    if (data.help && data.help.steps) {
+                        errorMsg += '\n\nTo fix this:\n' + data.help.steps.join('\n');
+                    } else if (data.help && data.help.solution) {
+                        errorMsg += '\n\n' + data.help.solution;
+                    }
+                    
+                    alert(errorMsg);
+                }
+            } catch (error) {
+                console.error('Instagram post error:', error);
+                alert('❌ Error posting to Instagram: ' + error.message);
             }
         }
         

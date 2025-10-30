@@ -14,7 +14,7 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const { pageAccessToken, message, pageId } = req.body;
+    const { pageAccessToken, message, pageId, imageUrl } = req.body;
 
     // Validate required fields
     if (!pageAccessToken) {
@@ -50,18 +50,37 @@ module.exports = async (req, res) => {
       console.log('Auto-detected Page ID:', targetPageId, 'Name:', pageInfoResponse.data.name);
     }
 
-    // Create the post
-    console.log('Creating Facebook post...');
-    const postResponse = await axios.post(
-      `https://graph.facebook.com/v19.0/${targetPageId}/feed`,
-      {
-        message: message,
-        access_token: pageAccessToken
-      },
-      {
-        timeout: 15000
-      }
-    );
+    // Create the post (with or without image)
+    let postResponse;
+    
+    if (imageUrl) {
+      // Post with image using /photos endpoint
+      console.log('Creating Facebook photo post...');
+      postResponse = await axios.post(
+        `https://graph.facebook.com/v19.0/${targetPageId}/photos`,
+        {
+          url: imageUrl,
+          caption: message,
+          access_token: pageAccessToken
+        },
+        {
+          timeout: 15000
+        }
+      );
+    } else {
+      // Text-only post using /feed endpoint
+      console.log('Creating Facebook text post...');
+      postResponse = await axios.post(
+        `https://graph.facebook.com/v19.0/${targetPageId}/feed`,
+        {
+          message: message,
+          access_token: pageAccessToken
+        },
+        {
+          timeout: 15000
+        }
+      );
+    }
 
     console.log('Post created successfully:', postResponse.data);
 
