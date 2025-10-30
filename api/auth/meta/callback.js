@@ -358,7 +358,7 @@ function generateSuccessHTML(data) {
         
         <div style="text-align: center; margin-top: 30px;">
             <a href="/gmb-post-generator.html" class="btn btn-primary">📝 Post Generator</a>
-            <a href="/live-automation-demo.html" class="btn btn-secondary">🚀 Dashboard</a>
+            <a href="/social-media-automation-dashboard.html" class="btn btn-secondary">🚀 Dashboard</a>
             <button class="btn btn-secondary" onclick="downloadTokens()">💾 Download</button>
         </div>
     </div>

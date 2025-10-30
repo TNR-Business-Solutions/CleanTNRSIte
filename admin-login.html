@@ -301,13 +301,8 @@
     </div>
 
     <script>
-        // Simple authentication (in production, use proper authentication)
-        const ADMIN_CREDENTIALS = {
-            username: 'admin',
-            password: 'TNR2024!'
-        };
-        
-        document.getElementById('login-form').addEventListener('submit', function(e) {
+        // Secure server-side authentication
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const username = document.getElementById('username').value;
@@ -315,20 +310,34 @@
             
             showLoading(true);
             
-            // Simulate authentication delay
-            setTimeout(() => {
-                if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
-                    // Store authentication in sessionStorage
+            try {
+                const response = await fetch('/api/admin/auth', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Store session token securely
                     sessionStorage.setItem('adminAuthenticated', 'true');
+                    sessionStorage.setItem('adminSessionToken', data.sessionToken);
                     sessionStorage.setItem('adminLoginTime', Date.now().toString());
                     
                     // Redirect to admin dashboard
-                    window.location.href = 'admin-dashboard.html';
+                    window.location.href = data.redirectTo || 'admin-dashboard.html';
                 } else {
-                    showError('Invalid username or password');
+                    showError(data.error || 'Invalid username or password');
                     showLoading(false);
                 }
-            }, 1000);
+            } catch (error) {
+                console.error('Login error:', error);
+                showError('Connection error. Please try again.');
+                showLoading(false);
+            }
         });
         
         function showLoading(show) {

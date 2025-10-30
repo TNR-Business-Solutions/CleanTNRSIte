@@ -32,6 +32,10 @@
     {
       "source": "/social/test",
       "destination": "/api/social/test-token"
+    },
+    {
+      "source": "/admin/auth",
+      "destination": "/api/admin/auth"
     }
   ],
   "headers": [
