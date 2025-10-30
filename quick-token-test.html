@@ -19,6 +19,12 @@
         
         async function testToken() {
             const resultDiv = document.getElementById('result');
+            
+            if (!resultDiv) {
+                console.error('Result div not found');
+                return;
+            }
+            
             resultDiv.innerHTML = '<p>Testing token...</p>';
             
             try {
@@ -39,6 +45,7 @@
                         <p><strong>Category:</strong> ${data.page.category}</p>
                         ${data.instagram ? `<p><strong>Instagram:</strong> @${data.instagram.username} ✅</p>` : '<p><strong>Instagram:</strong> Not connected</p>'}
                         <p style="margin-top: 20px; font-size: 18px; font-weight: bold;">🎉 This token is perfect for posting!</p>
+                        <p style="margin-top: 15px;">✅ Token saved to browser storage automatically!</p>
                     `;
                     
                     // Save it
@@ -50,6 +57,7 @@
                         <h2>❌ Token Issue</h2>
                         <p>${data.message}</p>
                         ${data.help ? `<p><strong>Solution:</strong> ${data.help.solution}</p>` : ''}
+                        ${data.detectedTokenType ? `<p><strong>Detected:</strong> ${data.detectedTokenType}</p>` : ''}
                     `;
                 }
             } catch (error) {
@@ -58,8 +66,12 @@
             }
         }
         
-        // Auto-test on load
-        testToken();
+        // Wait for DOM to load before testing
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', testToken);
+        } else {
+            testToken();
+        }
     </script>
 </body>
 </html>
