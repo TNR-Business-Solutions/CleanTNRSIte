@@ -20,16 +20,51 @@ module.exports = async (req, res) => {
   try {
     console.log('Testing Facebook token...');
 
-    // Get page information
-    const pageResponse = await axios.get('https://graph.facebook.com/v19.0/me', {
+    // First, detect if this is a User token or Page token
+    const detectResponse = await axios.get('https://graph.facebook.com/v19.0/me', {
+      params: {
+        access_token: pageAccessToken,
+        fields: 'id,name'
+      },
+      timeout: 10000
+    });
+
+    // Try to get more details to determine token type
+    const detailsResponse = await axios.get('https://graph.facebook.com/v19.0/me', {
       params: {
         access_token: pageAccessToken,
         fields: 'id,name,category,fan_count,followers_count,instagram_business_account'
       },
       timeout: 10000
+    }).catch(err => {
+      // If category field fails, this is likely a User token
+      if (err.response?.data?.error?.message?.includes('category')) {
+        return { data: { ...detectResponse.data, isUserToken: true } };
+      }
+      throw err;
     });
 
-    const pageInfo = pageResponse.data;
+    const pageInfo = detailsResponse.data;
+    
+    // Check if this is a User token (wrong type)
+    if (pageInfo.isUserToken || !pageInfo.category) {
+      return res.status(400).json({
+        success: false,
+        error: 'Wrong Token Type',
+        message: 'This is a USER token, not a PAGE token!',
+        help: {
+          issue: 'You copied the Long-Lived User Token instead of the Page Access Token',
+          solution: 'Please reconnect to Facebook OAuth and copy the "Page Access Token" (the one under your page name, not at the top)',
+          reconnectUrl: '/auth/meta'
+        },
+        detectedTokenType: 'User Token',
+        userInfo: {
+          id: pageInfo.id,
+          name: pageInfo.name
+        }
+      });
+    }
+    
     console.log('Token is valid for page:', pageInfo.name);
 
     // Check for Instagram connection
