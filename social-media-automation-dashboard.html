@@ -25,7 +25,7 @@
                 </div>
                 
                 <button class="btn" onclick="connectMeta()">🔗 Connect Facebook/Instagram</button>
-                <button class="btn btn-secondary" onclick="testMetaToken()">🧪 Test Token</button>
+                <button class="btn btn-secondary" onclick="window.manualTest = true; testMetaToken()">🧪 Test Token</button>
                 
                 <div class="form-group" style="margin-top: 20px;">
                     <label for="metaToken">Page Access Token (optional - for direct use):</label>
@@ -327,9 +327,11 @@
             const token = (tokenInput ? tokenInput.value.trim() : '') || localStorage.getItem('metaPageAccessToken');
             
             if (!token) {
-                alert('Please paste your token or connect via OAuth first');
+                console.log('No token found');
                 return;
             }
+            
+            console.log('Testing token...');
             
             try {
                 const response = await fetch('/api/social/test-token', {
@@ -339,28 +341,43 @@
                 });
                 
                 const data = await response.json();
+                console.log('Token test result:', data);
                 
                 if (data.success) {
                     const metaStatus = document.getElementById('metaStatus');
                     const metaConnected = document.getElementById('metaConnected');
                     const configStatus = document.getElementById('configStatus');
                     
+                    console.log('Instagram data:', data.instagram);
+                    
                     if (metaStatus) {
-                        metaStatus.innerHTML = `
-                            ✅ Connected to: ${data.page.name}<br>
-                            ${data.instagram ? `📷 Instagram: @${data.instagram.username}` : '❌ No Instagram connected'}
-                        `;
+                        const igStatus = data.instagram 
+                            ? `📷 Instagram: @${data.instagram.username}` 
+                            : '❌ No Instagram connected';
+                        metaStatus.innerHTML = `✅ Connected to: ${data.page.name}<br>${igStatus}`;
+                        console.log('Updated metaStatus:', igStatus);
                     }
                     if (metaConnected) metaConnected.textContent = '✅';
                     if (configStatus) configStatus.textContent = '✅ Yes';
                     
-                    alert(`✅ Token Valid!\n\nPage: ${data.page.name}\n${data.instagram ? `Instagram: @${data.instagram.username} (${data.instagram.followersCount} followers)` : 'No Instagram connected'}`);
+                    // Only show alert if manually clicked (not on auto-load)
+                    if (window.manualTest) {
+                        const igInfo = data.instagram 
+                            ? `Instagram: @${data.instagram.username} (${data.instagram.followersCount || 0} followers)` 
+                            : 'No Instagram connected';
+                        alert(`✅ Token Valid!\n\nPage: ${data.page.name}\n${igInfo}`);
+                    }
                 } else {
-                    alert('❌ Token Invalid: ' + data.message);
+                    console.error('Token invalid:', data.message);
+                    if (window.manualTest) {
+                        alert('❌ Token Invalid: ' + data.message);
+                    }
                 }
             } catch (error) {
                 console.error('Token test error:', error);
-                alert('❌ Error testing token: ' + error.message);
+                if (window.manualTest) {
+                    alert('❌ Error testing token: ' + error.message);
+                }
             }
         }
         
@@ -484,14 +501,18 @@
         
         // Check if we have a saved token on load
         window.addEventListener('DOMContentLoaded', function() {
+            console.log('Dashboard loaded');
             const savedToken = localStorage.getItem('metaPageAccessToken');
             if (savedToken) {
+                console.log('Found saved token, will auto-test...');
                 const metaTokenInput = document.getElementById('metaToken');
                 if (metaTokenInput) {
                     metaTokenInput.value = savedToken;
                 }
+                // Reset manual test flag for auto-test (no alert popup)
+                window.manualTest = false;
                 // Small delay to ensure all DOM elements are ready
-                setTimeout(() => testMetaToken(), 100);
+                setTimeout(() => testMetaToken(), 200);
             }
             
             // Set default date/time to tomorrow
