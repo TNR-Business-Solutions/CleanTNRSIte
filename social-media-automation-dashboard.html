@@ -49,25 +49,40 @@
                     <div class="form-group">
                         <label for="contentType">Content Type</label>
                         <select id="contentType" name="contentType" aria-label="Select content type">
+                            <option value="test-post">🧪 Test Post (First Post)</option>
                             <option value="service-promotion">Service Promotion</option>
                             <option value="client-success">Client Success Story</option>
                             <option value="industry-tip">Industry Tip</option>
                             <option value="behind-scenes">Behind the Scenes</option>
-                            <option value="local-news">Local News</option>
-                            <option value="insurance-tip">Insurance Tip</option>
-                            <option value="marketing-tip">Marketing Tip</option>
+                            <option value="testimonial">Customer Testimonial</option>
+                            <option value="how-to">How-To Guide</option>
+                            <option value="question">Engagement Question</option>
+                            <option value="did-you-know">Did You Know</option>
+                            <option value="local-community">Local Community</option>
+                            <option value="seasonal">Seasonal/Holiday</option>
                         </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="clientBusinessName">Client/Business Name</label>
+                        <input type="text" id="clientBusinessName" placeholder="e.g., TNR Business Solutions" value="TNR Business Solutions">
                     </div>
                     
                     <div class="form-group">
                         <label for="professionType">Industry Type</label>
                         <select id="professionType" name="professionType" aria-label="Select industry type">
-                            <option value="general">General Business</option>
-                            <option value="blue-collar">Blue Collar (Construction, Trades, Manufacturing)</option>
-                            <option value="white-collar">White Collar (Professional Services, Consulting)</option>
-                            <option value="e-business">E-Business (Online, Digital, Tech)</option>
-                            <option value="service-industry">Service Industry (Restaurant, Hospitality, Healthcare)</option>
-                            <option value="retail">Retail & Sales</option>
+                            <option value="digital-marketing">Digital Marketing Agency</option>
+                            <option value="insurance">Insurance Services</option>
+                            <option value="construction">Construction/Trades</option>
+                            <option value="professional-services">Professional Services (Law, Accounting, Consulting)</option>
+                            <option value="healthcare">Healthcare/Medical</option>
+                            <option value="restaurant">Restaurant/Food Service</option>
+                            <option value="retail">Retail Store</option>
+                            <option value="real-estate">Real Estate</option>
+                            <option value="automotive">Automotive Services</option>
+                            <option value="home-services">Home Services (HVAC, Plumbing, Electric)</option>
+                            <option value="fitness">Fitness/Wellness</option>
+                            <option value="beauty">Beauty/Salon</option>
                         </select>
                     </div>
                     
@@ -396,17 +411,99 @@
             document.getElementById('scheduleDateTime').value = tomorrow.toISOString().slice(0, 16);
         });
         
-        // Content templates (same as before)
-        const contentTemplates = {
+        // ENHANCED CONTENT TEMPLATES - Diverse, industry-specific, non-repetitive
+        const contentTemplateLibrary = {
+            'test-post': [
+                "🚀 TESTING! TESTING! 1...2...3...\n\nWe're excited to test our NEW automated social media platform live on {business}!\n\n✨ What this means for you:\n✅ More consistent content\n✅ Better engagement\n✅ Smarter posting times\n✅ Professional quality posts\n\nStay tuned as we bring you even better content! 🎯\n\n#Automation #NewTechnology #Innovation #SocialMediaMarketing",
+                "🎉 BIG NEWS! We're testing cutting-edge automation technology here at {business}!\n\nThis post was created and published using our brand new content generation platform. Pretty cool, right?\n\n🤖 Why we're doing this:\nTo bring you better, more consistent content that actually helps your business grow.\n\nLet us know what you think! Drop a comment below 👇\n\n#TestingInProgress #Innovation #SmartMarketing #TechSavvy",
+                "📢 LIVE TEST IN PROGRESS!\n\n{business} is now testing state-of-the-art social media automation. You're witnessing the future of digital marketing right now! 🚀\n\n💡 What's different?\n• Smarter content\n• Perfect timing\n• Consistent quality\n• Data-driven strategy\n\nExcited to share this journey with you! 🎯\n\n#AutomationTesting #DigitalTransformation #MarketingInnovation #FutureOfMarketing"
+            ],
             'service-promotion': {
-                facebook: "🚀 Ready to grow your {service} in {location}? Our expert team at TNR Business Solutions has helped {number}+ local businesses achieve their goals! 💼\n\n✅ Professional {service} services\n✅ Proven results\n✅ Local expertise\n\nCall (412) 499-2987 for a FREE consultation!\n\n#TNRBusinessSolutions #{service} #{location} #LocalBusiness"
-            },
-            'client-success': {
-                facebook: "🎉 SUCCESS STORY! We're thrilled to share how we helped {client} increase their {metric} by {percentage}%! 📈\n\nOur {service} strategies delivered:\n✅ {result1}\n✅ {result2}\n✅ {result3}\n\nReady for your success story? Contact TNR Business Solutions today!\n\n#SuccessStory #TNRBusinessSolutions #{service} #{location}"
+                'digital-marketing': [
+                    "📈 Is your website getting lost in the crowd?\n\nAt {business}, we specialize in getting local businesses FOUND online. Our SEO strategies have helped businesses in {location} increase their visibility by an average of 250%!\n\n✅ Local SEO optimization\n✅ Google Business Profile management\n✅ Content strategy\n✅ Performance tracking\n\nReady to dominate local search? Let's talk! 📞 {phone}\n\n#LocalSEO #DigitalMarketing #{location} #BusinessGrowth",
+                    "🎯 Your competitors are online. Are you?\n\n{business} helps local businesses build powerful digital presences that drive real results.\n\n💼 Our Services:\n• Website Design & Development\n• Search Engine Optimization\n• Social Media Management\n• Paid Advertising\n• Email Marketing\n\nFree consultation available! Call {phone}\n\n#WebDesign #DigitalStrategy #OnlineMarketing #{location}",
+                    "💡 Throwing money at Facebook ads with no results?\n\nThe problem isn't the platform—it's the strategy. At {business}, we create data-driven campaigns that actually convert.\n\n📊 Our recent campaign results:\n• 42% lower cost per lead\n• 3.2x return on ad spend\n• 89% increase in qualified leads\n\nLet's fix your marketing! 📞 {phone}\n\n#FacebookAds #PaidAdvertising #MarketingStrategy #{location}"
+                ],
+                'insurance': [
+                    "🏠 Protecting what matters most.\n\nAt {business}, we understand that insurance isn't just about policies—it's about peace of mind for you and your family.\n\n🛡️ We offer:\n• Home Insurance\n• Auto Insurance\n• Life Insurance\n• Business Insurance\n• Umbrella Coverage\n\nGet a free quote today: {phone}\nServing {location} with integrity since [year]\n\n#Insurance #Protection #PeaceOfMind #{location}",
+                    "⚠️ When was the last time you reviewed your insurance coverage?\n\nLife changes—and your insurance should too. Marriage, new home, business growth? Let's make sure you're properly protected.\n\n{business} offers FREE policy reviews with no obligation.\n\nCall today: {phone}\n\n#InsuranceReview #ProtectionPlan #LocalInsurance #{location}",
+                    "💼 Business owners: Are you properly insured?\n\n73% of small businesses are underinsured. Don't let a single incident destroy everything you've built.\n\n{business} specializes in:\n• General Liability\n• Workers Compensation  \n• Professional Liability\n• Cyber Insurance\n\nProtect your business today: {phone}\n\n#BusinessInsurance #RiskManagement #{location}"
+                ],
+                'construction': [
+                    "🔨 Quality craftsmanship. Honest pricing. On-time completion.\n\nThat's the {business} difference. We've been building trust in {location} for over [years] years.\n\n✅ Licensed & Insured\n✅ Free Estimates\n✅ Warranty Guaranteed\n✅ Local References Available\n\nCall us today: {phone}\n\n#Construction #Contractor #QualityWork #{location}",
+                    "🏗️ Planning a renovation? Don't settle for the lowest bid.\n\nAt {business}, we believe in doing it right the first time. Our experienced team handles:\n\n• Kitchen & Bath Remodels\n• Home Additions\n• Roofing & Siding\n• Commercial Projects\n\nFree consultation & detailed estimates: {phone}\n\n#HomeImprovement #Renovation #LocalContractor #{location}"
+                ],
+                'professional-services': [
+                    "💼 Expert advice when you need it most.\n\n{business} provides professional {industry} services with a personal touch. Our experienced team is here to guide you through complex decisions.\n\n📞 Schedule a consultation: {phone}\nServing {location} with excellence\n\n#{location} #ProfessionalServices #TrustedAdvisor",
+                    "⚖️ Making the right decision starts with the right advisor.\n\nAt {business}, we combine expertise with accessibility. No question is too small, no challenge too complex.\n\nContact us today: {phone}\n\n#{location} #LocalProfessional #ExpertAdvice"
+                ],
+                'healthcare': [
+                    "🏥 Your health is our priority.\n\nAt {business}, we provide compassionate, comprehensive healthcare for your entire family.\n\n✅ Accepting new patients\n✅ Same-day appointments available\n✅ Most insurance accepted\n\nCall to schedule: {phone}\nServing {location}\n\n#Healthcare #FamilyMedicine #{location}",
+                    "💚 Quality healthcare, delivered with care.\n\n{business} is committed to keeping our {location} community healthy. Modern facilities, experienced staff, and a focus on YOU.\n\nSchedule your appointment: {phone}\n\n#HealthcareProvider #CommunityHealth #{location}"
+                ],
+                'restaurant': [
+                    "🍽️ Fresh ingredients. Bold flavors. Unforgettable experiences.\n\nThat's what you'll find at {business}. Join us for:\n\n• Daily lunch specials\n• Weekend brunch\n• Private events\n• Takeout & delivery\n\nReservations: {phone}\n{location}\n\n#LocalRestaurant #FoodieLife #{location}",
+                    "👨‍🍳 Made from scratch. Served with love.\n\n{business} has been feeding {location} for [years] years. Every dish tells a story, every meal creates a memory.\n\nCome hungry, leave happy! 🍴\nCall: {phone}\n\n#EatLocal #FreshFood #{location}"
+                ],
+                'retail': [
+                    "🛍️ Shop local. Shop {business}.\n\nWhy buy online when you can get personal service, expert advice, and support your local community?\n\nVisit us in {location}!\n📞 {phone}\n\n#ShopLocal #SupportSmallBusiness #{location}",
+                    "✨ New arrivals weekly at {business}!\n\nDiscover unique finds you won't see anywhere else. Plus, our knowledgeable staff is always here to help.\n\nStop by today: {location}\n{phone}\n\n#RetailTherapy #LocalShopping #{location}"
+                ],
+                'real-estate': [
+                    "🏡 Ready to find your dream home?\n\n{business} knows the {location} market inside and out. We'll help you find not just a house, but the perfect place to call home.\n\n📞 Free consultation: {phone}\n\n#RealEstate #HomeSearch #{location} #DreamHome",
+                    "📈 Thinking of selling? Now is the time.\n\n{business} sells homes faster and for more money. Our proven marketing strategy gets results.\n\nFree home valuation: {phone}\nServing {location}\n\n#RealEstate #HomeSelling #{location}"
+                ],
+                'automotive': [
+                    "🚗 Keep your vehicle running like new.\n\n{business} provides honest, reliable automotive service. No upselling. No surprises. Just quality work at fair prices.\n\n✅ All makes & models\n✅ ASE-certified technicians\n✅ Warranty on all work\n\nCall: {phone}\n{location}\n\n#AutoRepair #CarMaintenance #{location}",
+                    "🔧 Car trouble? We've got you covered.\n\n{business} has been keeping {location} vehicles on the road for [years] years. Same-day service available!\n\n📞 {phone}\n\n#AutoService #LocalMechanic #{location}"
+                ],
+                'home-services': [
+                    "🔧 Expert {industry} services when you need them most.\n\n{business} provides fast, reliable service throughout {location}. Licensed, insured, and always professional.\n\n📞 24/7 Emergency Service: {phone}\n\n#HomeServices #LocalPros #{location}",
+                    "🏠 Your home deserves the best.\n\nAt {business}, we treat every job like it's our own home. Quality workmanship, upfront pricing, 100% satisfaction guaranteed.\n\nCall today: {phone}\n{location}\n\n#HomeImprovement #LocalExperts #{location}"
+                ],
+                'fitness': [
+                    "💪 Transform your body. Transform your life.\n\n{business} isn't just a gym—it's a community dedicated to your success. Personal training, group classes, and support every step of the way.\n\nFree trial week: {phone}\n{location}\n\n#Fitness #GymLife #{location} #GetFit",
+                    "🏋️ Your fitness goals are within reach.\n\nAt {business}, we create personalized programs that work for YOUR body and YOUR schedule.\n\nStart your journey today: {phone}\n\n#FitnessJourney #PersonalTraining #{location}"
+                ],
+                'beauty': [
+                    "💇‍♀️ Look good. Feel great.\n\n{business} offers the latest styles and treatments in a relaxing, professional environment.\n\n✨ Services:\n• Hair styling & color\n• Nail services\n• Skin treatments\n• Makeup\n\nBook now: {phone}\n{location}\n\n#BeautySalon #HairSalon #{location}",
+                    "✨ Treat yourself. You deserve it.\n\n{business} is {location}'s premier destination for beauty and relaxation. Our talented team uses only the best products.\n\nAppointments: {phone}\n\n#SelfCare #BeautyTreatment #{location}"
+                ]
             },
             'industry-tip': {
-                facebook: "💡 PRO TIP: {tip}\n\nThis simple strategy can make a huge difference for your {industry} business! 💼\n\nWant more expert tips? Follow TNR Business Solutions for daily insights! 📱\n\n#ProTip #TNRBusinessSolutions #{industry} #BusinessTips #{location}"
-            }
+                'digital-marketing': [
+                    "💡 TIP: 70% of people search for local businesses online before visiting.\n\nIs your business easy to find? Make sure you have:\n✅ Google Business Profile (claimed & optimized)\n✅ Consistent NAP (name, address, phone)\n✅ Recent customer reviews\n✅ Photos & hours updated\n\nNeed help? {business} specializes in local SEO! {phone}\n\n#LocalSEO #MarketingTip #{location}",
+                    "📱 Did you know? Social media posts with images get 2.3x more engagement!\n\nAlways include high-quality photos with your posts. Your customers want to SEE what you offer.\n\n{business} | {phone}\n\n#SocialMediaTips #DigitalMarketing #{location}"
+                ],
+                'insurance': [
+                    "🛡️ INSURANCE TIP: Review your coverage annually.\n\nLife changes—marriage, kids, new home, business growth—can leave you under or over insured.\n\nFree policy review at {business}\nCall: {phone}\n\n#InsuranceTip #ProtectionPlan #{location}",
+                    "⚠️ Don't wait until it's too late!\n\n80% of homes are underinsured. Make sure your coverage keeps pace with property values and replacement costs.\n\n{business} | Free consultation: {phone}\n\n#InsuranceAdvice #{location}"
+                ],
+                'construction': [
+                    "🔨 CONTRACTOR TIP: Get 3 detailed quotes before starting any project.\n\nLook for:\n✅ Itemized estimates\n✅ Timeline & milestones\n✅ Warranty information\n✅ License & insurance proof\n\n{business} | Free estimates: {phone}\n\n#ConstructionTips #Homeowner #{location}"
+                ]
+            },
+            'behind-scenes': [
+                "👋 Meet the team behind {business}!\n\nWe're not just a business—we're your neighbors, friends, and community members. Here's a glimpse of what goes on behind the scenes...\n\n[Perfect spot for team photo]\n\n#{location} #LocalBusiness #MeetTheTeam",
+                "🎬 Behind the scenes at {business} today!\n\nThis is what dedication looks like. Our team works hard every day to bring you the best service possible.\n\nThanks for your continued support, {location}!\n\n#BTS #LocalBusiness #{location}",
+                "☕ Morning at {business}!\n\nBefore we open our doors, there's a lot of prep work. Here's what it takes to serve you with excellence every single day.\n\n#{location} #BehindTheScenes #SmallBusiness"
+            ],
+            'testimonial': [
+                "⭐⭐⭐⭐⭐ \"Absolutely fantastic service!\"\n\n\"I can't say enough good things about {business}. Professional, knowledgeable, and truly care about their customers. Highly recommend!\"\n\n- Happy Customer\n\nWant to be our next success story? {phone}\n\n#CustomerReview #5Stars #{location}",
+                "💬 Real feedback from real customers:\n\n\"{business} exceeded our expectations in every way. Quality work, fair pricing, and amazing customer service!\"\n\nThank you for trusting us with your business!\n\n{phone} | {location}\n\n#Testimonial #HappyCustomers #{location}"
+            ],
+            'question': [
+                "❓ Quick question: What's the #1 challenge facing your business right now?\n\nDrop a comment below—we'd love to hear from you! And if {business} can help, we'll reach out.\n\n{phone} | {location}\n\n#{location} #BusinessTips #CommunityConversation",
+                "🤔 We want to hear from YOU!\n\nWhat topics would you like to see us cover? Marketing tips? Industry news? Behind-the-scenes content?\n\nComment below and let us know! 👇\n\n{business} | {location}\n\n#{location} #Engagement #CommunityFirst"
+            ],
+            'did-you-know': [
+                "📚 DID YOU KNOW?\n\n{business} has been serving {location} for [X] years! That's [X] years of dedication, quality service, and happy customers.\n\nThank you for being part of our journey! 🙏\n\n{phone}\n\n#{location} #LocalBusiness #CommunityStrong",
+                "💡 FUN FACT: We process [number]+ [orders/clients/projects] every month!\n\nThat's a lot of trust placed in {business}, and we don't take it lightly. Thank you, {location}!\n\n{phone}\n\n#{location} #DidYouKnow #LocalSupport"
+            ],
+            'local-community': [
+                "❤️ Community matters.\n\n{business} is proud to support local schools, charities, and events in {location}. When you shop local, you're reinvesting in OUR community.\n\nThank you for your support!\n\n{phone}\n\n#{location} #SupportLocal #CommunityFirst",
+                "🌟 Love where you live? Shop where you live!\n\n{business} has been a proud member of the {location} community for [years]. Every purchase supports local families, schools, and neighborhoods.\n\n{phone}\n\n#ShopLocal #{location} #CommunitySupport"
+            ]
         };
         
         function switchPlatform(platform) {
@@ -418,23 +515,76 @@
         
         function generateContent() {
             const contentType = document.getElementById('contentType').value;
-            const template = contentTemplates[contentType]?.facebook || contentTemplates['service-promotion'].facebook;
+            const industryType = document.getElementById('professionType').value;
+            const businessName = document.getElementById('clientBusinessName').value || 'TNR Business Solutions';
+            const location = 'Greensburg PA'; // Can make this customizable too
+            const phone = '(412) 499-2987'; // Can make this customizable too
             
+            let template;
+            
+            // Handle test post (special case - always random)
+            if (contentType === 'test-post') {
+                const testTemplates = contentTemplateLibrary['test-post'];
+                template = testTemplates[Math.floor(Math.random() * testTemplates.length)];
+            }
+            // Handle service promotions (industry-specific)
+            else if (contentType === 'service-promotion') {
+                const industryTemplates = contentTemplateLibrary[contentType][industryType];
+                if (industryTemplates && industryTemplates.length > 0) {
+                    template = industryTemplates[Math.floor(Math.random() * industryTemplates.length)];
+                } else {
+                    // Fallback to generic
+                    template = "🚀 Looking for quality {industry} services in {location}?\n\n{business} is here to help! Our experienced team delivers professional results you can count on.\n\nContact us today: {phone}\n\n#{location} #LocalBusiness #Professional";
+                }
+            }
+            // Handle industry tips (industry-specific)
+            else if (contentType === 'industry-tip') {
+                const industryTemplates = contentTemplateLibrary[contentType][industryType];
+                if (industryTemplates && industryTemplates.length > 0) {
+                    template = industryTemplates[Math.floor(Math.random() * industryTemplates.length)];
+                } else {
+                    // Generic tip
+                    template = "💡 PRO TIP: Stay consistent with your marketing!\n\nRegular posts, consistent branding, and engaging content build trust with your audience.\n\n{business} | {phone}\n\n#{location} #BusinessTip #MarketingAdvice";
+                }
+            }
+            // Handle non-industry-specific content types
+            else if (contentTemplateLibrary[contentType]) {
+                const templates = contentTemplateLibrary[contentType];
+                template = templates[Math.floor(Math.random() * templates.length)];
+            }
+            // Fallback for missing content types
+            else {
+                template = "🎯 Great things are happening at {business}!\n\nWe're dedicated to providing excellent service to {location} and beyond.\n\nContact us: {phone}\n\n#{location} #LocalBusiness #CommunityFocused";
+            }
+            
+            // Replace placeholders with actual values
             let content = template
-                .replace(/{service}/g, 'Digital Marketing')
-                .replace(/{location}/g, 'Greensburg PA')
-                .replace(/{number}/g, Math.floor(Math.random() * 50) + 20)
-                .replace(/{client}/g, 'Local Business')
-                .replace(/{metric}/g, 'online visibility')
-                .replace(/{percentage}/g, Math.floor(Math.random() * 200) + 50)
-                .replace(/{result1}/g, 'Increased online visibility')
-                .replace(/{result2}/g, 'Higher conversion rates')
-                .replace(/{result3}/g, 'Better customer engagement')
-                .replace(/{tip}/g, 'Focus on local keywords to improve your Google rankings')
-                .replace(/{industry}/g, 'digital marketing');
+                .replace(/{business}/g, businessName)
+                .replace(/{location}/g, location)
+                .replace(/{phone}/g, phone)
+                .replace(/{industry}/g, getIndustryName(industryType))
+                .replace(/#{location}/g, '#' + location.replace(/\s+/g, ''));
             
             document.getElementById('previewContent').textContent = content;
             document.getElementById('contentPreview').classList.remove('hidden');
+        }
+        
+        function getIndustryName(industryType) {
+            const industryNames = {
+                'digital-marketing': 'Digital Marketing',
+                'insurance': 'Insurance',
+                'construction': 'Construction',
+                'professional-services': 'Professional Services',
+                'healthcare': 'Healthcare',
+                'restaurant': 'Restaurant',
+                'retail': 'Retail',
+                'real-estate': 'Real Estate',
+                'automotive': 'Automotive',
+                'home-services': 'Home Services',
+                'fitness': 'Fitness',
+                'beauty': 'Beauty'
+            };
+            return industryNames[industryType] || 'Business';
         }
         
         function generateHashtags() {
