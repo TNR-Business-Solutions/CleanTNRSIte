@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Token Checker</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #1a1a1a; color: #0f0; }
+        input { width: 100%; padding: 10px; margin: 10px 0; background: #000; color: #0f0; border: 1px solid #0f0; }
+        button { padding: 10px 20px; background: #0f0; color: #000; border: none; cursor: pointer; font-weight: bold; }
+        pre { background: #000; padding: 15px; overflow-x: auto; }
+        .error { color: #f00; }
+        .success { color: #0f0; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Facebook/Instagram Token Checker</h1>
+    <p>Paste your Page Access Token:</p>
+    <input type="text" id="token" placeholder="Paste token here...">
+    <button onclick="checkToken()">Check Token</button>
+    <div id="result"></div>
+
+    <script>
+        async function checkToken() {
+            const token = document.getElementById('token').value.trim();
+            const resultDiv = document.getElementById('result');
+            
+            if (!token) {
+                resultDiv.innerHTML = '<p class="error">Please paste a token</p>';
+                return;
+            }
+            
+            resultDiv.innerHTML = '<p>Checking token...</p>';
+            
+            try {
+                // Check what the token can see
+                const response = await fetch(`https://graph.facebook.com/v19.0/me?access_token=${token}&fields=id,name,category,instagram_business_account`);
+                const data = await response.json();
+                
+                console.log('Facebook API Response:', data);
+                
+                let html = '<h2>Raw API Response:</h2>';
+                html += '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                
+                if (data.error) {
+                    html += '<p class="error">❌ Error: ' + data.error.message + '</p>';
+                } else {
+                    html += '<h2>Decoded:</h2>';
+                    html += '<p class="success">✅ Page: ' + data.name + '</p>';
+                    html += '<p class="success">✅ ID: ' + data.id + '</p>';
+                    html += '<p class="success">✅ Category: ' + data.category + '</p>';
+                    
+                    if (data.instagram_business_account) {
+                        html += '<p class="success">✅ Instagram ID: ' + data.instagram_business_account.id + '</p>';
+                        
+                        // Fetch Instagram details
+                        const igResponse = await fetch(`https://graph.facebook.com/v19.0/${data.instagram_business_account.id}?access_token=${token}&fields=id,username,name,followers_count`);
+                        const igData = await igResponse.json();
+                        
+                        console.log('Instagram API Response:', igData);
+                        
+                        html += '<p class="success">✅ Instagram Username: @' + igData.username + '</p>';
+                        html += '<p class="success">✅ Instagram Followers: ' + (igData.followers_count || 0) + '</p>';
+                        html += '<h2>Instagram Data:</h2>';
+                        html += '<pre>' + JSON.stringify(igData, null, 2) + '</pre>';
+                    } else {
+                        html += '<p class="error">❌ No Instagram Business Account connected</p>';
+                        html += '<p>Check Facebook Page Settings → Instagram</p>';
+                    }
+                }
+                
+                resultDiv.innerHTML = html;
+                
+            } catch (error) {
+                resultDiv.innerHTML = '<p class="error">❌ Error: ' + error.message + '</p>';
+                console.error('Error:', error);
+            }
+        }
+    </script>
+</body>
+</html>
+
