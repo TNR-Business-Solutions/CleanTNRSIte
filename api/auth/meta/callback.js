@@ -80,7 +80,7 @@ module.exports = async (req, res) => {
     });
 
     const longLivedUserToken = longLivedResponse.data.access_token;
-    const expiresIn = longLivedResponse.data.expires_in;
+    const expiresIn = longLivedResponse.data.expires_in || 5184000; // Default to 60 days if not provided
 
     // Step 3: Fetch user's managed Facebook Pages
     console.log('Fetching managed pages with token:', longLivedUserToken.substring(0, 20) + '...');
