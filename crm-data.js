@@ -1,18 +1,68 @@
 // TNR Business Solutions CRM Data
 // This file contains real client data and form submissions
+// Now with API support for persistent storage
 
 class TNRCRMData {
   constructor() {
-    this.clients = this.loadClients();
-    this.leads = this.loadLeads();
-    this.orders = this.loadOrders();
-    this.formSubmissions = this.loadFormSubmissions();
+    this.api = null;
+    this.useAPI = false;
+    this.clients = [];
+    this.leads = [];
+    this.orders = [];
+    this.formSubmissions = [];
+
+    // Try to initialize API first, fall back to localStorage
+    this.initialize();
 
     // Check for new form submissions and convert them to leads
     this.checkForNewSubmissions();
 
     // Initialize notification system
     this.initializeNotifications();
+  }
+
+  initialize() {
+    try {
+      if (typeof TNRAdminAPI !== "undefined") {
+        this.api = new TNRAdminAPI();
+        this.useAPI = true;
+        console.log("✅ Using API for data storage");
+        // Load from API asynchronously
+        this.loadFromAPI().catch((err) => {
+          console.error("Failed to load from API:", err);
+          this.loadFromLocalStorage();
+        });
+      } else {
+        console.log("⚠️ API not available, using localStorage");
+        this.loadFromLocalStorage();
+      }
+    } catch (error) {
+      console.error("❌ API initialization failed:", error);
+      this.useAPI = false;
+      this.loadFromLocalStorage();
+    }
+  }
+
+  async loadFromAPI() {
+    if (!this.api) return;
+
+    const [clients, leads, orders] = await Promise.all([
+      this.api.getClients().catch(() => []),
+      this.api.getLeads().catch(() => []),
+      this.api.getOrders().catch(() => []),
+    ]);
+
+    this.clients = clients;
+    this.leads = leads;
+    this.orders = orders;
+    console.log("✅ Data loaded from API");
+  }
+
+  loadFromLocalStorage() {
+    this.clients = this.loadClients();
+    this.leads = this.loadLeads();
+    this.orders = this.loadOrders();
+    this.formSubmissions = this.loadFormSubmissions();
   }
 
   loadClients() {
@@ -120,6 +170,10 @@ class TNRCRMData {
 
   // Client Management Methods
   addClient(clientData) {
+    return this.addClientAsync(clientData);
+  }
+
+  async addClientAsync(clientData) {
     const newClient = {
       id: "client-" + Date.now(),
       ...clientData,
@@ -127,12 +181,42 @@ class TNRCRMData {
       lastContact: new Date().toISOString().split("T")[0],
       status: "Active",
     };
+
+    if (this.useAPI && this.api) {
+      try {
+        const savedClient = await this.api.addClient(newClient);
+        this.clients.push(savedClient);
+        return savedClient;
+      } catch (error) {
+        console.error("Failed to save client to API:", error);
+      }
+    }
+
+    // Fallback to localStorage
     this.clients.push(newClient);
     this.saveToStorage();
     return newClient;
   }
 
   updateClient(clientId, updateData) {
+    return this.updateClientAsync(clientId, updateData);
+  }
+
+  async updateClientAsync(clientId, updateData) {
+    if (this.useAPI && this.api) {
+      try {
+        const updatedClient = await this.api.updateClient(clientId, updateData);
+        const index = this.clients.findIndex((c) => c.id === clientId);
+        if (index !== -1) {
+          this.clients[index] = updatedClient;
+        }
+        return updatedClient;
+      } catch (error) {
+        console.error("Failed to update client via API:", error);
+      }
+    }
+
+    // Fallback to localStorage
     const clientIndex = this.clients.findIndex((c) => c.id === clientId);
     if (clientIndex !== -1) {
       this.clients[clientIndex] = {
@@ -146,6 +230,21 @@ class TNRCRMData {
   }
 
   deleteClient(clientId) {
+    return this.deleteClientAsync(clientId);
+  }
+
+  async deleteClientAsync(clientId) {
+    if (this.useAPI && this.api) {
+      try {
+        await this.api.deleteClient(clientId);
+        this.clients = this.clients.filter((c) => c.id !== clientId);
+        return true;
+      } catch (error) {
+        console.error("Failed to delete client via API:", error);
+      }
+    }
+
+    // Fallback to localStorage
     this.clients = this.clients.filter((c) => c.id !== clientId);
     this.saveToStorage();
   }
@@ -156,12 +255,31 @@ class TNRCRMData {
 
   // Lead Management Methods
   addLead(leadData) {
+    return this.addLeadAsync(leadData);
+  }
+
+  async addLeadAsync(leadData) {
     const newLead = {
       id: "lead-" + Date.now(),
       ...leadData,
       date: new Date().toISOString().split("T")[0],
       status: "New",
     };
+
+    if (this.useAPI && this.api) {
+      try {
+        const savedLead = await this.api.addLead(newLead);
+        this.leads.push(savedLead);
+        console.log(
+          `Added lead to CRM (API): ${savedLead.id} - ${savedLead.name} (${savedLead.email})`
+        );
+        return savedLead;
+      } catch (error) {
+        console.error("Failed to save lead to API:", error);
+      }
+    }
+
+    // Fallback to localStorage
     this.leads.push(newLead);
     console.log(
       `Added lead to CRM: ${newLead.id} - ${newLead.name} (${newLead.email})`
@@ -171,9 +289,25 @@ class TNRCRMData {
   }
 
   convertLeadToClient(leadId) {
+    return this.convertLeadToClientAsync(leadId);
+  }
+
+  async convertLeadToClientAsync(leadId) {
+    if (this.useAPI && this.api) {
+      try {
+        const client = await this.api.convertLeadToClient(leadId);
+        this.leads = this.leads.filter((l) => l.id !== leadId);
+        this.clients.push(client);
+        return client;
+      } catch (error) {
+        console.error("Failed to convert lead via API:", error);
+      }
+    }
+
+    // Fallback to localStorage
     const lead = this.leads.find((l) => l.id === leadId);
     if (lead) {
-      const client = this.addClient({
+      const client = await this.addClient({
         name: lead.name,
         email: lead.email,
         phone: lead.phone,
@@ -218,7 +352,9 @@ class TNRCRMData {
     return {
       totalClients: this.clients.length,
       activeClients: this.clients.filter((c) => c.status === "Active").length,
-      newLeads: this.leads.filter((l) => l.status === "New" || l.status === "Viewed").length,
+      newLeads: this.leads.filter(
+        (l) => l.status === "New" || l.status === "Viewed"
+      ).length,
       totalOrders: this.orders.length,
       completedOrders: this.orders.filter((o) => o.status === "Completed")
         .length,

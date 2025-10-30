@@ -1313,7 +1313,7 @@
                         <p><strong>Description:</strong> ${description}</p>
                     </div>
                     <div class="client-actions">
-                        <div class="client-status status-${(order.status || 'pending').toLowerCase().replace(' ', '-')}">${order.status || 'Pending'}</div>
+                        <div class="client-status status-${(order.status || 'pending').toLowerCase().replace(/\s+/g, '-')}">${order.status || 'Pending'}</div>
                         <button class="btn-small" onclick="editOrder('${order.id}')">Edit</button>
                         <button class="btn-small btn-danger" onclick="deleteOrder('${order.id}')">Delete</button>
                     </div>
@@ -1711,8 +1711,95 @@
         }
 
         function editOrder(orderId) {
-            // Similar to editClient but for orders
-            alert('Order editing functionality will be implemented.');
+            const order = (window.tnrCRM.orders || []).find(o => o.id === orderId);
+            if (!order) {
+                alert('Order not found.');
+                return;
+            }
+
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 700px;">
+                    <div class="modal-header">
+                        <h3 style="color: white;">Edit Order</h3>
+                        <span class="close" onclick="closeModal()">&times;</span>
+                    </div>
+                    <div class="modal-body" style="color: black;">
+                        <form id="editOrderForm">
+                            <div class="form-group">
+                                <label style="color: black; font-weight: bold;">Client</label>
+                                <input type="text" id="editOrderClientName" value="${order.clientName || ''}" style="color: black;" disabled>
+                            </div>
+                            <div class="form-group">
+                                <label style="color: black; font-weight: bold;">Service/Product *</label>
+                                <input type="text" id="editOrderService" value="${order.service || ''}" required style="color: black;">
+                            </div>
+                            <div class="form-group">
+                                <label style="color: black; font-weight: bold;">Order Amount *</label>
+                                <div style="display: flex; align-items: center;">
+                                    <span style="margin-right: 0.5rem; font-size: 1.2rem;">$</span>
+                                    <input type="number" id="editOrderAmount" step="0.01" min="0" value="${order.amount || 0}" required style="flex: 1; color: black;">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label style="color: black; font-weight: bold;">Order Status *</label>
+                                <select id="editOrderStatus" required style="color: black;">
+                                    ${['Pending','Confirmed','In Progress','Completed','Cancelled'].map(s => `<option value="${s}" ${((order.status||'')===s)?'selected':''}>${s}</option>`).join('')}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label style="color: black; font-weight: bold;">Order Description</label>
+                                <textarea id="editOrderDescription" rows="3" style="color: black;">${order.description || ''}</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label style="color: black; font-weight: bold;">Project Timeline</label>
+                                <input type="text" id="editOrderTimeline" value="${order.projectTimeline || ''}" style="color: black;">
+                            </div>
+                            <div class="form-group">
+                                <label style="color: black; font-weight: bold;">Payment Method</label>
+                                <input type="text" id="editOrderPaymentMethod" value="${order.paymentMethod || ''}" style="color: black;">
+                            </div>
+                            <div class="form-group">
+                                <label style="color: black; font-weight: bold;">Special Requests / Notes</label>
+                                <textarea id="editOrderSpecialRequests" rows="3" style="color: black;">${order.specialRequests || ''}</textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn" onclick="saveEditedOrder('${orderId}')">Save Changes</button>
+                        <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function saveEditedOrder(orderId) {
+            const update = {
+                service: document.getElementById('editOrderService').value.trim(),
+                amount: parseFloat(document.getElementById('editOrderAmount').value),
+                status: document.getElementById('editOrderStatus').value,
+                description: document.getElementById('editOrderDescription').value.trim(),
+                projectTimeline: document.getElementById('editOrderTimeline').value.trim() || null,
+                paymentMethod: document.getElementById('editOrderPaymentMethod').value.trim() || null,
+                specialRequests: document.getElementById('editOrderSpecialRequests').value.trim() || null,
+            };
+
+            if (!update.service) {
+                alert('Please enter a service.');
+                return;
+            }
+            if (isNaN(update.amount) || update.amount <= 0) {
+                alert('Please enter a valid order amount.');
+                return;
+            }
+
+            window.tnrCRM.updateOrder(orderId, update);
+            closeModal();
+            loadOrders();
+            updateClientStats();
+            alert('Order updated successfully!');
         }
 
         function deleteOrder(orderId) {

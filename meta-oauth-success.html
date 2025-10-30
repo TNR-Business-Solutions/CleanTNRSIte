@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meta OAuth Success - TNR Business Solutions</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #667eea;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin: 10px 0;
+        }
+        
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .token-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            word-break: break-all;
+            margin: 10px 0;
+            border: 1px solid #e0e0e0;
+            position: relative;
+        }
+        
+        .copy-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        
+        .copy-btn:hover {
+            background: #5568d3;
+        }
+        
+        .page-item {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .page-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .page-info {
+            color: #666;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+        
+        .instagram-badge {
+            display: inline-block;
+            background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+        
+        .next-steps {
+            background: #fff3cd;
+            border: 1px solid #ffeeba;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        
+        .next-steps h3 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+        
+        .next-steps ol {
+            margin-left: 20px;
+            color: #856404;
+        }
+        
+        .next-steps li {
+            margin: 10px 0;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px 5px;
+        }
+        
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px 5px;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎉 Meta OAuth Authorization</h1>
+        </div>
+        
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Processing authorization...</p>
+        </div>
+        
+        <div id="content" style="display: none;"></div>
+    </div>
+    
+    <script>
+        // Get the authorization code from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        const error = urlParams.get('error');
+        const errorDescription = urlParams.get('error_description');
+        
+        if (error) {
+            showError(error, errorDescription);
+        } else if (code) {
+            // Exchange the code for tokens via the API
+            exchangeCodeForTokens(code);
+        } else {
+            showError('Missing Authorization', 'No authorization code received. Please start the OAuth flow again.');
+        }
+        
+        async function exchangeCodeForTokens(code) {
+            try {
+                const response = await fetch(`/api/auth/meta/callback?code=${encodeURIComponent(code)}`);
+                const data = await response.json();
+                
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+                
+                if (data.success) {
+                    showSuccess(data);
+                } else {
+                    showError(data.error || 'Unknown Error', data.message || data.details);
+                }
+            } catch (err) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+                showError('Network Error', err.message);
+            }
+        }
+        
+        function showSuccess(data) {
+            const html = `
+                <div class="status-badge status-success">✅ Authorization Successful!</div>
+                
+                <div class="section">
+                    <h3>📋 Your Access Tokens</h3>
+                    <p style="margin-bottom: 15px;">Save these tokens securely. You'll need them to post to Facebook and Instagram.</p>
+                    
+                    <div style="margin: 20px 0;">
+                        <strong>Long-Lived User Token:</strong>
+                        <div class="token-box" id="userToken">${data.authorization.longLivedUserToken}</div>
+                        <button class="copy-btn" onclick="copyToken('userToken')">📋 Copy User Token</button>
+                        <p style="color: #666; font-size: 14px; margin-top: 10px;">
+                            Expires in ${data.authorization.expiresInDays} days
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h3>📱 Connected Pages (${data.pages.length})</h3>
+                    ${data.pages.map(page => `
+                        <div class="page-item">
+                            <div class="page-name">${page.name}</div>
+                            <div class="page-info">ID: ${page.id}</div>
+                            <div class="page-info">Category: ${page.category}</div>
+                            ${page.hasInstagram ? `<div class="instagram-badge">📷 Instagram Connected: @${page.instagramAccount?.username}</div>` : ''}
+                            
+                            <div style="margin-top: 15px;">
+                                <strong>Page Access Token:</strong>
+                                <div class="token-box" id="pageToken${page.id}">${page.accessToken}</div>
+                                <button class="copy-btn" onclick="copyToken('pageToken${page.id}')">📋 Copy Page Token</button>
+                                <p style="color: #28a745; font-size: 14px; margin-top: 10px;">
+                                    ✅ This token never expires!
+                                </p>
+                            </div>
+                            
+                            ${page.instagramAccount ? `
+                                <div style="margin-top: 15px;">
+                                    <strong>Instagram Account ID:</strong>
+                                    <div class="token-box">${page.instagramAccount.id}</div>
+                                    <p style="color: #666; font-size: 14px; margin-top: 5px;">
+                                        Use this ID with the page token to post to Instagram
+                                    </p>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <div class="next-steps">
+                    <h3>🎯 Next Steps</h3>
+                    <ol>
+                        ${data.nextSteps.map(step => `<li>${step}</li>`).join('')}
+                    </ol>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px;">
+                    <a href="/gmb-post-generator.html" class="btn-primary">📝 Go to Post Generator</a>
+                    <a href="/live-automation-demo.html" class="btn-secondary">🚀 Automation Dashboard</a>
+                    <button class="btn-secondary" onclick="downloadTokens()">💾 Download Tokens</button>
+                </div>
+            `;
+            
+            document.getElementById('content').innerHTML = html;
+        }
+        
+        function showError(error, details) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+            
+            const html = `
+                <div class="status-badge status-error">❌ Authorization Failed</div>
+                
+                <div class="error-message">
+                    <h3 style="margin-bottom: 10px;">${error}</h3>
+                    <p>${details || 'An error occurred during the OAuth flow.'}</p>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px;">
+                    <a href="/api/auth/meta" class="btn-primary">🔄 Try Again</a>
+                    <a href="/" class="btn-secondary">🏠 Go Home</a>
+                </div>
+            `;
+            
+            document.getElementById('content').innerHTML = html;
+        }
+        
+        function copyToken(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = '✅ Copied!';
+                button.style.background = '#28a745';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '';
+                }, 2000);
+            });
+        }
+        
+        function downloadTokens() {
+            const tokens = {
+                userToken: document.getElementById('userToken')?.textContent,
+                pages: []
+            };
+            
+            document.querySelectorAll('.page-item').forEach((page, index) => {
+                const name = page.querySelector('.page-name').textContent;
+                const token = page.querySelector('[id^="pageToken"]').textContent;
+                tokens.pages.push({ name, token });
+            });
+            
+            const blob = new Blob([JSON.stringify(tokens, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'meta-oauth-tokens.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
+

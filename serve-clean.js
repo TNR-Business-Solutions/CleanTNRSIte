@@ -12,6 +12,7 @@ const {
   processCheckout,
 } = require("./cart-handler");
 const EmailHandler = require("./email-handler");
+const crmApiHandler = require("./api/crm-api");
 
 const PORT = process.env.PORT || 5000;
 
@@ -228,6 +229,12 @@ function getCacheHeaders(filePath) {
 const server = http.createServer((req, res) => {
   const parsedUrl = url.parse(req.url, true);
   let pathname = parsedUrl.pathname;
+
+  // Handle CRM API requests
+  if (pathname.startsWith("/api/crm/")) {
+    crmApiHandler(req, res);
+    return;
+  }
 
   // Handle form submissions
   if (req.method === "POST" && pathname === "/submit-form") {

@@ -16,6 +16,14 @@
     {
       "source": "/checkout",
       "destination": "/api/checkout"
+    },
+    {
+      "source": "/auth/meta",
+      "destination": "/api/auth/meta"
+    },
+    {
+      "source": "/auth/meta/callback",
+      "destination": "/api/auth/meta/callback"
     }
   ],
   "headers": [
@@ -77,7 +85,7 @@
       ]
     },
     {
-      "source": "/(api|submit-form|cart|checkout)(.*)",
+      "source": "/(api|submit-form|cart|checkout|auth)(.*)",
       "headers": [
         {
           "key": "Cache-Control",
