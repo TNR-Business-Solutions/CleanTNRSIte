@@ -17,13 +17,13 @@ module.exports = (req, res) => {
   }
 
   // Define required permissions for Facebook/Instagram posting
+  // Note: Instagram posting works through Facebook Pages API
+  // No separate Instagram permissions are needed - just connect Instagram Business Account to Page
   const scopes = [
-    'pages_manage_posts',        // Create, edit and delete posts on Pages
+    'pages_manage_posts',        // Create, edit and delete posts on Pages (includes Instagram)
     'pages_read_engagement',     // Read engagement data on Pages
     'pages_show_list',          // Access the list of Pages a person manages
-    'pages_manage_metadata',    // Manage Page settings
-    'instagram_basic',          // Read Instagram account info
-    'instagram_content_publish' // Publish content to Instagram
+    'pages_manage_metadata'     // Manage Page settings
   ];
 
   // Build Facebook OAuth URL
