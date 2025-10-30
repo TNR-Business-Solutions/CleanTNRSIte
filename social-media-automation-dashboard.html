@@ -127,6 +127,93 @@
                         </div>
                     </div>
                 </div>
+                
+                <!-- Instagram Content Area -->
+                <div id="instagram" class="content-area">
+                    <div class="form-group">
+                        <label for="contentType">Content Type</label>
+                        <select id="contentType" name="contentType" aria-label="Select content type">
+                            <option value="test-post">🧪 Test Post (First Post)</option>
+                            <option value="service-promotion">Service Promotion</option>
+                            <option value="client-success">Client Success Story</option>
+                            <option value="industry-tip">Industry Tip</option>
+                            <option value="behind-scenes">Behind the Scenes</option>
+                            <option value="testimonial">Customer Testimonial</option>
+                            <option value="how-to">How-To Guide</option>
+                            <option value="question">Engagement Question</option>
+                            <option value="did-you-know">Did You Know</option>
+                            <option value="local-community">Local Community</option>
+                            <option value="seasonal">Seasonal/Holiday</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="clientBusinessName">Client/Business Name</label>
+                        <input type="text" id="clientBusinessName" placeholder="e.g., TNR Business Solutions" value="TNR Business Solutions">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="professionType">Industry Type</label>
+                        <select id="professionType" name="professionType" aria-label="Select industry type">
+                            <option value="digital-marketing">Digital Marketing Agency</option>
+                            <option value="insurance">Insurance Services</option>
+                            <option value="construction">Construction/Trades</option>
+                            <option value="professional-services">Professional Services (Law, Accounting, Consulting)</option>
+                            <option value="healthcare">Healthcare/Medical</option>
+                            <option value="restaurant">Restaurant/Food Service</option>
+                            <option value="retail">Retail Store</option>
+                            <option value="real-estate">Real Estate</option>
+                            <option value="automotive">Automotive Services</option>
+                            <option value="home-services">Home Services (HVAC, Plumbing, Electric)</option>
+                            <option value="fitness">Fitness/Wellness</option>
+                            <option value="beauty">Beauty/Salon</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn" onclick="generateContent()">Generate Content</button>
+                    
+                    <p style="margin-top: 20px; padding: 15px; background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; color: #856404;">
+                        ℹ️ <strong>Instagram requires an image!</strong> Make sure to add an image URL after generating content.
+                    </p>
+                </div>
+                
+                <!-- LinkedIn Content Area -->
+                <div id="linkedin" class="content-area">
+                    <div style="text-align: center; padding: 60px 20px; background: #f8f9fa; border-radius: 8px; margin: 20px 0;">
+                        <div style="font-size: 48px; margin-bottom: 20px;">💼</div>
+                        <h3 style="color: #0077b5; margin-bottom: 15px;">LinkedIn Integration Coming Soon!</h3>
+                        <p style="color: #666; margin-bottom: 20px;">
+                            We're working on LinkedIn automation. For now, you can:
+                        </p>
+                        <ul style="text-align: left; max-width: 400px; margin: 0 auto 20px; color: #666;">
+                            <li style="margin-bottom: 10px;">Use Facebook tab to generate professional content</li>
+                            <li style="margin-bottom: 10px;">Copy the generated text</li>
+                            <li style="margin-bottom: 10px;">Post directly to LinkedIn</li>
+                        </ul>
+                        <button class="btn" onclick="switchPlatform('facebook', document.querySelector('.platform-tab'))" style="background: #0077b5;">
+                            ← Generate Content for LinkedIn
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Twitter Content Area -->
+                <div id="twitter" class="content-area">
+                    <div style="text-align: center; padding: 60px 20px; background: #f8f9fa; border-radius: 8px; margin: 20px 0;">
+                        <div style="font-size: 48px; margin-bottom: 20px;">🐦</div>
+                        <h3 style="color: #1da1f2; margin-bottom: 15px;">Twitter/X Integration Coming Soon!</h3>
+                        <p style="color: #666; margin-bottom: 20px;">
+                            Twitter automation is on our roadmap. For now, you can:
+                        </p>
+                        <ul style="text-align: left; max-width: 400px; margin: 0 auto 20px; color: #666;">
+                            <li style="margin-bottom: 10px;">Generate short-form content using Facebook tab</li>
+                            <li style="margin-bottom: 10px;">Edit to fit Twitter's character limit</li>
+                            <li style="margin-bottom: 10px;">Post directly to Twitter/X</li>
+                        </ul>
+                        <button class="btn" onclick="switchPlatform('facebook', document.querySelector('.platform-tab'))" style="background: #1da1f2;">
+                            ← Generate Content for Twitter
+                        </button>
+                    </div>
+                </div>
             </div>
             
             <!-- Post Scheduler -->
