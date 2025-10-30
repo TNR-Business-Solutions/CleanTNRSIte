@@ -24,6 +24,14 @@
     {
       "source": "/auth/meta/callback",
       "destination": "/api/auth/meta/callback"
+    },
+    {
+      "source": "/social/post",
+      "destination": "/api/social/post-to-facebook"
+    },
+    {
+      "source": "/social/test",
+      "destination": "/api/social/test-token"
     }
   ],
   "headers": [

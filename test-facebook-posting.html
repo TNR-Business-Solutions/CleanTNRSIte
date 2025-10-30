@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Facebook Posting - TNR Business Solutions</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+        }
+        
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        
+        .btn:hover {
+            background: #5568d3;
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 12px;
+            display: none;
+        }
+        
+        .result.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            display: block;
+        }
+        
+        .result.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            display: block;
+        }
+        
+        .result h4 {
+            margin-bottom: 10px;
+        }
+        
+        .token-info {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        
+        .token-info div {
+            margin: 8px 0;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .post-link {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background: #1877f2;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+        
+        .post-link:hover {
+            background: #166fe5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Facebook Posting</h1>
+        <p class="subtitle">Test your Facebook Page Access Token and create posts</p>
+        
+        <!-- Step 1: Test Token -->
+        <div class="section">
+            <h3>Step 1: Test Your Token</h3>
+            <div class="form-group">
+                <label for="testToken">Facebook Page Access Token:</label>
+                <input type="text" id="testToken" placeholder="Paste your token here...">
+            </div>
+            <button class="btn" onclick="testToken()">🔍 Test Token</button>
+            
+            <div id="tokenResult" class="result"></div>
+        </div>
+        
+        <!-- Step 2: Create Post -->
+        <div class="section">
+            <h3>Step 2: Create a Test Post</h3>
+            <div class="form-group">
+                <label for="postToken">Facebook Page Access Token:</label>
+                <input type="text" id="postToken" placeholder="Paste your token here...">
+            </div>
+            <div class="form-group">
+                <label for="postMessage">Post Content:</label>
+                <textarea id="postMessage" placeholder="Write your post content here...
+
+Example:
+🚀 Testing our new social media automation system!
+
+This post was created using the TNR Business Solutions automation platform.
+
+#Testing #Automation #SocialMedia"></textarea>
+            </div>
+            <button class="btn" onclick="createPost()">📤 Post to Facebook</button>
+            <button class="btn btn-secondary" onclick="fillExample()">📝 Fill Example</button>
+            
+            <div id="postResult" class="result"></div>
+        </div>
+        
+        <!-- Help Section -->
+        <div class="section">
+            <h3>💡 Tips</h3>
+            <ul style="margin-left: 20px; color: #666;">
+                <li style="margin: 10px 0;">Your token should start with "EAAF..." or similar</li>
+                <li style="margin: 10px 0;">Test the token first to make sure it's valid</li>
+                <li style="margin: 10px 0;">The post will appear on your Facebook Page immediately</li>
+                <li style="margin: 10px 0;">Keep your token secure - don't share it publicly</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        async function testToken() {
+            const token = document.getElementById('testToken').value.trim();
+            const resultDiv = document.getElementById('tokenResult');
+            
+            if (!token) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = '<h4>❌ Error</h4><p>Please paste your token first</p>';
+                return;
+            }
+            
+            resultDiv.innerHTML = '<div class="spinner"></div> Testing token...';
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result';
+            
+            try {
+                const response = await fetch('/api/social/test-token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ pageAccessToken: token })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+                        <h4>✅ Token is Valid!</h4>
+                        <div class="token-info">
+                            <div><strong>Page Name:</strong> ${data.page.name}</div>
+                            <div><strong>Page ID:</strong> ${data.page.id}</div>
+                            <div><strong>Category:</strong> ${data.page.category}</div>
+                            ${data.page.fanCount ? `<div><strong>Fans:</strong> ${data.page.fanCount.toLocaleString()}</div>` : ''}
+                            ${data.instagram ? `
+                                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e0e0e0;">
+                                    <strong>📷 Instagram Connected:</strong>
+                                    <div>Username: @${data.instagram.username}</div>
+                                    <div>Followers: ${data.instagram.followersCount?.toLocaleString() || 'N/A'}</div>
+                                </div>
+                            ` : '<div style="margin-top: 15px; color: #666;">No Instagram account connected</div>'}
+                        </div>
+                        <p style="margin-top: 15px; color: #155724;">Ready to post! Copy this token to the posting section below.</p>
+                    `;
+                    
+                    // Auto-fill the posting token
+                    document.getElementById('postToken').value = token;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `
+                        <h4>❌ Token Invalid</h4>
+                        <p>${data.message || 'The token you provided is not valid.'}</p>
+                        ${data.details ? `<p style="margin-top: 10px; font-size: 14px;">${JSON.stringify(data.details)}</p>` : ''}
+                    `;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `
+                    <h4>❌ Error</h4>
+                    <p>Failed to test token: ${error.message}</p>
+                `;
+            }
+        }
+        
+        async function createPost() {
+            const token = document.getElementById('postToken').value.trim();
+            const message = document.getElementById('postMessage').value.trim();
+            const resultDiv = document.getElementById('postResult');
+            
+            if (!token) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = '<h4>❌ Error</h4><p>Please paste your token first</p>';
+                return;
+            }
+            
+            if (!message) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = '<h4>❌ Error</h4><p>Please write your post content</p>';
+                return;
+            }
+            
+            resultDiv.innerHTML = '<div class="spinner"></div> Creating post...';
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result';
+            
+            try {
+                const response = await fetch('/api/social/post-to-facebook', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        pageAccessToken: token,
+                        message: message
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+                        <h4>🎉 Post Published Successfully!</h4>
+                        <p style="margin: 10px 0;">Your post has been published to Facebook!</p>
+                        <div class="token-info">
+                            <div><strong>Post ID:</strong> ${data.postId}</div>
+                        </div>
+                        <a href="${data.postUrl}" target="_blank" class="post-link">👀 View Post on Facebook</a>
+                        <p style="margin-top: 15px; color: #155724;">✅ Your automation system is working!</p>
+                    `;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `
+                        <h4>❌ Failed to Post</h4>
+                        <p>${data.message || 'Could not create the post.'}</p>
+                        ${data.details ? `<p style="margin-top: 10px; font-size: 14px;">${JSON.stringify(data.details)}</p>` : ''}
+                    `;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `
+                    <h4>❌ Error</h4>
+                    <p>Failed to create post: ${error.message}</p>
+                `;
+            }
+        }
+        
+        function fillExample() {
+            document.getElementById('postMessage').value = `🚀 Testing our new social media automation system!
+
+This post was created using the TNR Business Solutions automation platform.
+
+We're excited to bring automated, professional social media management to businesses in Greensburg, PA and beyond!
+
+#Testing #Automation #SocialMedia #TNRBusinessSolutions #GreensburgPA`;
+        }
+    </script>
+</body>
+</html>
+
