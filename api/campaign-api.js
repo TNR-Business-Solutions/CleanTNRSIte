@@ -101,7 +101,7 @@ module.exports = async function campaignApiHandler(req, res) {
     return;
   }
 
-  const db = await getDatabase();
+  let db;
   let fullPath = req.url;
   const match = fullPath.match(/\/api\/campaigns\/(.*)/);
   const path = match ? match[1] : "";
@@ -115,6 +115,15 @@ module.exports = async function campaignApiHandler(req, res) {
   })();
 
   try {
+    try {
+      db = await getDatabase();
+    } catch (e) {
+      // Fallback for serverless without sqlite
+      db = {
+        getClients: async () => [],
+        getLeads: async () => [],
+      };
+    }
     if (req.method === "GET") {
       if (path === "" || path === "list") {
         // Get all campaigns (simplified - could query DB for stored campaigns)
