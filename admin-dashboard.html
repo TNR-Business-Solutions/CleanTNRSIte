@@ -578,6 +578,8 @@
     </style>
 </head>
 <body>
+    <!-- Header -->
+    <div id="header-placeholder"></div>
     <div class="admin-dashboard">
         <div class="dashboard-container">
             <div class="dashboard-header">
@@ -1109,6 +1111,9 @@
                 <button class="demo-btn" onclick="startLiveDemo()">Start Live Demo</button>
                 <button class="demo-btn" onclick="showAutomationGuide()">View Guide</button>
             </div>
+            
+            <!-- Footer -->
+            <div id="footer-placeholder" style="margin-top: 2rem;"></div>
         </div>
     </div>
 
@@ -1312,14 +1317,43 @@
             alert('Automation Guide:\n\n1. Set up your social media accounts\n2. Choose your industry templates\n3. Customize content with your business details\n4. Schedule posts for optimal times\n5. Monitor performance and adjust strategy\n\nThis system will help you automate 80% of your social media marketing!');
         }
         
+        // Load header/footer includes
+        function loadHeader() {
+            fetch('includes/header.html')
+                .then(r => r.text())
+                .then(html => { document.getElementById('header-placeholder').innerHTML = html; });
+        }
+
+        function loadFooter() {
+            fetch('includes/footer.html')
+                .then(r => r.text())
+                .then(html => { document.getElementById('footer-placeholder').innerHTML = html; });
+        }
+
         // Initialize dashboard
         document.addEventListener('DOMContentLoaded', function() {
             // Admin dashboard loaded successfully
             
             // Simulate real-time updates
             // Initialize CRM data and display
+            loadHeader();
+            loadFooter();
             initializeCRM();
         });
+        // CRM sub-tab switching
+        function showCrmTab(tabName) {
+            const sections = document.querySelectorAll('.crm-content');
+            sections.forEach(sec => sec.classList.remove('active'));
+            const target = document.getElementById(tabName);
+            if (target) target.classList.add('active');
+            if (tabName === 'clients') {
+                loadClients();
+            } else if (tabName === 'leads') {
+                loadLeads();
+            } else if (tabName === 'orders') {
+                loadOrders();
+            }
+        }
 
         // CRM Functions
         function initializeCRM() {
