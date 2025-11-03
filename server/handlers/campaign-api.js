@@ -1,8 +1,8 @@
 // TNR Business Solutions - Email Campaign API
 // Handles email marketing campaigns with rate-limited sending
 
-const TNRDatabase = require("../database");
-const EmailHandler = require("../email-handler");
+const TNRDatabase = require("../../database");
+const EmailHandler = require("../../email-handler");
 const { URL } = require("url");
 
 // Initialize database connection

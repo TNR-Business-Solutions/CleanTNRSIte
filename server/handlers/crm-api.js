@@ -1,7 +1,7 @@
 // TNR Business Solutions - CRM API Endpoints
 // Handles all database operations for the admin dashboard
 
-const TNRDatabase = require("../database");
+const TNRDatabase = require("../../database");
 const { URL } = require("url");
 
 // Initialize database connection

@@ -3,7 +3,7 @@
   "buildCommand": "node verify-images.js",
   "outputDirectory": ".",
   "functions": {
-    "api/**/*.js": {
+    "api/[...all].js": {
       "memory": 1024,
       "maxDuration": 10
     }
