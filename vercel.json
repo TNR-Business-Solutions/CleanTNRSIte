@@ -40,14 +40,6 @@
     {
       "source": "/admin/auth",
       "destination": "/api/admin/auth"
-    },
-    {
-      "source": "/api/campaigns/(.*)",
-      "destination": "/api/campaign-api"
-    },
-    {
-      "source": "/api/crm/(.*)",
-      "destination": "/api/crm-api"
     }
   ],
   "headers": [
