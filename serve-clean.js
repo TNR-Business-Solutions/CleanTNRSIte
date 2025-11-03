@@ -13,6 +13,7 @@ const {
 } = require("./cart-handler");
 const EmailHandler = require("./email-handler");
 const crmApiHandler = require("./api/crm-api");
+const campaignApiHandler = require("./api/campaign-api");
 
 const PORT = process.env.PORT || 5000;
 
@@ -233,6 +234,12 @@ const server = http.createServer((req, res) => {
   // Handle CRM API requests
   if (pathname.startsWith("/api/crm/")) {
     crmApiHandler(req, res);
+    return;
+  }
+
+  // Handle Campaign API requests
+  if (pathname.startsWith("/api/campaigns/")) {
+    campaignApiHandler(req, res);
     return;
   }
 

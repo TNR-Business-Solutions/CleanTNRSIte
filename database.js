@@ -180,9 +180,50 @@ class TNRDatabase {
             completed++;
             if (completed === total) {
               console.log("✅ All database tables created successfully");
-              resolve();
+              // After base tables exist, ensure new columns are present
+              this.ensureSchema()
+                .then(() => resolve())
+                .catch(reject);
             }
           }
+        });
+      });
+    });
+  }
+
+  // Ensure new columns exist without destructive migrations
+  async ensureSchema() {
+    await Promise.all([
+      // Clients
+      this.ensureColumn("clients", "businessType", "TEXT"),
+      this.ensureColumn("clients", "businessName", "TEXT"),
+      this.ensureColumn("clients", "businessAddress", "TEXT"),
+      this.ensureColumn("clients", "interest", "TEXT"),
+      // Leads
+      this.ensureColumn("leads", "businessType", "TEXT"),
+      this.ensureColumn("leads", "businessName", "TEXT"),
+      this.ensureColumn("leads", "businessAddress", "TEXT"),
+      this.ensureColumn("leads", "interest", "TEXT"),
+    ]);
+  }
+
+  ensureColumn(tableName, columnName, columnType) {
+    return new Promise((resolve, reject) => {
+      const checkSql = `PRAGMA table_info(${tableName})`;
+      this.db.all(checkSql, (err, rows) => {
+        if (err) {
+          return reject(err);
+        }
+        const exists = rows && rows.some((r) => r.name === columnName);
+        if (exists) {
+          return resolve();
+        }
+        const alterSql = `ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${columnType}`;
+        this.db.run(alterSql, (alterErr) => {
+          if (alterErr) {
+            return reject(alterErr);
+          }
+          resolve();
         });
       });
     });
@@ -194,8 +235,10 @@ class TNRDatabase {
       const clientId = `client-${Date.now()}`;
       const sql = `INSERT INTO clients (
         id, name, email, phone, company, website, industry, address, city, state, zip,
-        services, status, joinDate, lastContact, notes, source, createdAt, updatedAt
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        services, status, joinDate, lastContact, notes, source,
+        businessType, businessName, businessAddress, interest,
+        createdAt, updatedAt
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
       const values = [
         clientId,
@@ -215,6 +258,10 @@ class TNRDatabase {
         clientData.lastContact || new Date().toISOString().split("T")[0],
         clientData.notes || null,
         clientData.source || "Manual Entry",
+        clientData.businessType || null,
+        clientData.businessName || clientData.company || null,
+        clientData.businessAddress || clientData.address || null,
+        clientData.interest || null,
         new Date().toISOString(),
         new Date().toISOString(),
       ];
@@ -323,8 +370,10 @@ class TNRDatabase {
       const sql = `INSERT INTO leads (
         id, name, email, phone, company, website, industry, services, budget, timeline,
         message, additionalInfo, contactMethod, source, status, date, submissionDate,
-        submissionDateTime, originalSubmissionId, address, city, state, zipCode, notes, createdAt, updatedAt
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        submissionDateTime, originalSubmissionId, address, city, state, zipCode, notes,
+        businessType, businessName, businessAddress, interest,
+        createdAt, updatedAt
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
       const values = [
         leadId,
@@ -351,6 +400,10 @@ class TNRDatabase {
         leadData.state || null,
         leadData.zipCode || null,
         leadData.notes || null,
+        leadData.businessType || null,
+        leadData.businessName || leadData.company || null,
+        leadData.businessAddress || leadData.address || null,
+        leadData.interest || null,
         new Date().toISOString(),
         new Date().toISOString(),
       ];

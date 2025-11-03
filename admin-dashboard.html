@@ -588,6 +588,7 @@
             <div class="dashboard-tabs">
                 <button class="tab-button active" onclick="showTab('overview')">📊 Overview</button>
                 <button class="tab-button" onclick="showTab('crm')">👥 CRM System</button>
+                <button class="tab-button" onclick="showTab('campaigns')">📧 Email Campaigns</button>
                 <button class="tab-button" onclick="showTab('automation')">🤖 Automation</button>
                 <button class="tab-button" onclick="showTab('social')">📱 Social Media</button>
                 <button class="tab-button" onclick="showTab('analytics')">📈 Analytics</button>
@@ -724,12 +725,92 @@
                     </div>
                     
                     <div id="clients" class="crm-content active">
+                        <div style="margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end;">
+                            <div>
+                                <label style="display:block;color:#fff;font-size:12px;">Search</label>
+                                <input id="clientsFilterQ" type="text" placeholder="Name, email, phone..." />
+                            </div>
+                            <div>
+                                <label style="display:block;color:#fff;font-size:12px;">Status</label>
+                                <select id="clientsFilterStatus">
+                                    <option value="">All</option>
+                                    <option value="Active">Active</option>
+                                    <option value="Inactive">Inactive</option>
+                                    <option value="Prospect">Prospect</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display:block;color:#fff;font-size:12px;">Business Type</label>
+                                <input id="clientsFilterBusinessType" type="text" placeholder="e.g., Roofing" />
+                            </div>
+                            <div>
+                                <label style="display:block;color:#fff;font-size:12px;">Source</label>
+                                <input id="clientsFilterSource" type="text" placeholder="e.g., Website" />
+                            </div>
+                            <div>
+                                <label style="display:block;color:#fff;font-size:12px;">Sort</label>
+                                <select id="clientsSort">
+                                    <option value="createdAt">Created</option>
+                                    <option value="name">Name</option>
+                                    <option value="status">Status</option>
+                                </select>
+                                <select id="clientsOrder">
+                                    <option value="desc">Desc</option>
+                                    <option value="asc">Asc</option>
+                                </select>
+                            </div>
+                            <button class="btn" onclick="loadClients()">Apply</button>
+                        </div>
                         <div class="client-list" id="clientsList">
                             <!-- Clients will be loaded dynamically -->
                         </div>
                     </div>
                     
                     <div id="leads" class="crm-content">
+                        <div style="margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end;">
+                            <div>
+                                <label style="display:block;color:#fff;font-size:12px;">Search</label>
+                                <input id="leadsFilterQ" type="text" placeholder="Name, email, phone..." />
+                            </div>
+                            <div>
+                                <label style="display:block;color:#fff;font-size:12px;">Status</label>
+                                <select id="leadsFilterStatus">
+                                    <option value="">All</option>
+                                    <option value="New">New</option>
+                                    <option value="Contacted">Contacted</option>
+                                    <option value="Qualified">Qualified</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display:block;color:#fff;font-size:12px;">Business Type</label>
+                                <input id="leadsFilterBusinessType" type="text" placeholder="e.g., Roofing" />
+                            </div>
+                            <div>
+                                <label style="display:block;color:#fff;font-size:12px;">Source</label>
+                                <input id="leadsFilterSource" type="text" placeholder="e.g., Website" />
+                            </div>
+                            <div>
+                                <label style="display:block;color:#fff;font-size:12px;">Interest</label>
+                                <input id="leadsFilterInterest" type="text" placeholder="e.g., SEO" />
+                            </div>
+                            <div>
+                                <label style="display:block;color:#fff;font-size:12px;">Sort</label>
+                                <select id="leadsSort">
+                                    <option value="createdAt">Created</option>
+                                    <option value="name">Name</option>
+                                    <option value="status">Status</option>
+                                </select>
+                                <select id="leadsOrder">
+                                    <option value="desc">Desc</option>
+                                    <option value="asc">Asc</option>
+                                </select>
+                            </div>
+                            <div style="margin-left:auto; display:flex; gap:8px;">
+                                <input type="file" id="leadsCsvFile" accept=".csv" style="display:none" />
+                                <button class="btn" onclick="document.getElementById('leadsCsvFile').click()">Import Leads (CSV)</button>
+                                <button class="btn" onclick="loadLeads()">Apply</button>
+                            </div>
+                        </div>
                         <div class="client-list" id="leadsList">
                             <!-- Leads will be loaded dynamically -->
                         </div>
@@ -743,6 +824,79 @@
                         <div class="client-list" id="ordersList">
                             <!-- Orders will be loaded dynamically -->
                         </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Email Campaigns Tab -->
+            <div id="campaigns" class="tab-content">
+                <div class="crm-section">
+                    <h2 class="crm-title">📧 Email Marketing Campaigns</h2>
+                    
+                    <div style="background: white; padding: 2rem; border-radius: 8px; margin-bottom: 2rem;">
+                        <h3 style="color: var(--tnr-navy); margin-bottom: 1.5rem;">Create New Campaign</h3>
+                        
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; color: black; margin-bottom: 0.5rem; font-weight: 600;">Campaign Subject</label>
+                            <input type="text" id="campaignSubject" placeholder="Enter email subject (use {{name}} or {{company}} for personalization)" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; color: black;" />
+                        </div>
+                        
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; color: black; margin-bottom: 0.5rem; font-weight: 600;">Email Content (HTML)</label>
+                            <textarea id="campaignHtml" rows="12" placeholder="Enter HTML email content. Use {{name}}, {{email}}, {{company}} for personalization." style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; color: black; font-family: monospace;"></textarea>
+                        </div>
+                        
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; color: black; margin-bottom: 0.5rem; font-weight: 600;">Plain Text (Optional)</label>
+                            <textarea id="campaignText" rows="6" placeholder="Plain text version (auto-generated from HTML if blank)" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; color: black;"></textarea>
+                        </div>
+                        
+                        <div style="margin-bottom: 1.5rem; padding: 1rem; background: #f5f5f5; border-radius: 4px;">
+                            <label style="display: block; color: black; margin-bottom: 0.75rem; font-weight: 600;">Select Audience</label>
+                            
+                            <div style="margin-bottom: 1rem;">
+                                <label style="display: block; color: black; margin-bottom: 0.5rem;">Audience Type</label>
+                                <select id="campaignAudienceType" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; color: black;">
+                                    <option value="leads">Leads</option>
+                                    <option value="clients">Clients</option>
+                                </select>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                                <div>
+                                    <label style="display: block; color: black; margin-bottom: 0.5rem; font-size: 0.9rem;">Search</label>
+                                    <input type="text" id="campaignFilterQ" placeholder="Name, email..." style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; color: black;" />
+                                </div>
+                                <div>
+                                    <label style="display: block; color: black; margin-bottom: 0.5rem; font-size: 0.9rem;">Status</label>
+                                    <input type="text" id="campaignFilterStatus" placeholder="e.g., New, Active" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; color: black;" />
+                                </div>
+                                <div>
+                                    <label style="display: block; color: black; margin-bottom: 0.5rem; font-size: 0.9rem;">Business Type</label>
+                                    <input type="text" id="campaignFilterBusinessType" placeholder="e.g., Roofing" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; color: black;" />
+                                </div>
+                                <div>
+                                    <label style="display: block; color: black; margin-bottom: 0.5rem; font-size: 0.9rem;">Source</label>
+                                    <input type="text" id="campaignFilterSource" placeholder="e.g., Website" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; color: black;" />
+                                </div>
+                                <div id="campaignFilterInterestContainer">
+                                    <label style="display: block; color: black; margin-bottom: 0.5rem; font-size: 0.9rem;">Interest</label>
+                                    <input type="text" id="campaignFilterInterest" placeholder="e.g., SEO" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; color: black;" />
+                                </div>
+                            </div>
+                            
+                            <button class="btn" onclick="previewCampaignAudience()" style="margin-bottom: 1rem;">Preview Audience Count</button>
+                            <div id="campaignAudienceCount" style="padding: 0.75rem; background: white; border-radius: 4px; color: black; display: none;">
+                                <strong>Audience Size: </strong><span id="campaignAudienceCountValue">0</span> recipients
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                            <button class="btn" onclick="sendCampaign()" style="background: var(--tnr-gold); color: var(--tnr-navy); font-weight: 600;">🚀 Send Campaign</button>
+                            <button class="btn" onclick="clearCampaignForm()" style="background: #666;">Clear Form</button>
+                        </div>
+                        
+                        <div id="campaignResult" style="margin-top: 1.5rem; padding: 1rem; border-radius: 4px; display: none;"></div>
                     </div>
                 </div>
             </div>
@@ -1015,8 +1169,118 @@
         }
         
         // Automation Functions
+        async function previewCampaignAudience() {
+            const audienceType = document.getElementById('campaignAudienceType').value;
+            const params = new URLSearchParams();
+            params.set('type', audienceType);
+            
+            const q = document.getElementById('campaignFilterQ').value.trim();
+            const status = document.getElementById('campaignFilterStatus').value.trim();
+            const businessType = document.getElementById('campaignFilterBusinessType').value.trim();
+            const source = document.getElementById('campaignFilterSource').value.trim();
+            const interest = document.getElementById('campaignFilterInterest').value.trim();
+            
+            if (q) params.set('q', q);
+            if (status) params.set('status', status);
+            if (businessType) params.set('businessType', businessType);
+            if (source) params.set('source', source);
+            if (interest) params.set('interest', interest);
+            
+            try {
+                const res = await fetch('/api/campaigns/audience?' + params.toString());
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('campaignAudienceCount').style.display = 'block';
+                    document.getElementById('campaignAudienceCountValue').textContent = data.count || 0;
+                } else {
+                    alert('Error: ' + (data.error || 'Failed to get audience count'));
+                }
+            } catch (e) {
+                alert('Error: ' + e.message);
+            }
+        }
+        
+        async function sendCampaign() {
+            const subject = document.getElementById('campaignSubject').value.trim();
+            const htmlContent = document.getElementById('campaignHtml').value.trim();
+            const textContent = document.getElementById('campaignText').value.trim();
+            const audienceType = document.getElementById('campaignAudienceType').value;
+            
+            if (!subject || !htmlContent) {
+                alert('Please fill in subject and HTML content');
+                return;
+            }
+            
+            const audienceFilters = {};
+            const q = document.getElementById('campaignFilterQ').value.trim();
+            const status = document.getElementById('campaignFilterStatus').value.trim();
+            const businessType = document.getElementById('campaignFilterBusinessType').value.trim();
+            const source = document.getElementById('campaignFilterSource').value.trim();
+            const interest = document.getElementById('campaignFilterInterest').value.trim();
+            
+            if (q) audienceFilters.q = q;
+            if (status) audienceFilters.status = status;
+            if (businessType) audienceFilters.businessType = businessType;
+            if (source) audienceFilters.source = source;
+            if (interest) audienceFilters.interest = interest;
+            
+            if (!confirm(`Are you sure you want to send this campaign? This will send emails using your SMTP provider.`)) {
+                return;
+            }
+            
+            const resultDiv = document.getElementById('campaignResult');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<div style="padding: 1rem; background: #f0f0f0; border-radius: 4px; color: black;">Sending campaign... Please wait.</div>';
+            
+            try {
+                const res = await fetch('/api/campaigns/send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        subject,
+                        htmlContent,
+                        textContent: textContent || null,
+                        audienceFilters: Object.keys(audienceFilters).length > 0 ? audienceFilters : null,
+                        audienceType,
+                    })
+                });
+                
+                const data = await res.json();
+                if (data.success) {
+                    resultDiv.innerHTML = `<div style="padding: 1rem; background: #d4edda; border: 1px solid #c3e6cb; border-radius: 4px; color: #155724;">
+                        <strong>✅ Campaign Sent Successfully!</strong><br>
+                        Sent: ${data.sent || 0} emails<br>
+                        Failed: ${data.failed || 0} emails<br>
+                        Total: ${data.total || 0} recipients
+                        ${data.errors && data.errors.length > 0 ? '<br><small>Errors: ' + data.errors.length + ' (check console for details)</small>' : ''}
+                    </div>`;
+                } else {
+                    resultDiv.innerHTML = `<div style="padding: 1rem; background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 4px; color: #721c24;">
+                        <strong>❌ Campaign Failed:</strong> ${data.error || 'Unknown error'}
+                    </div>`;
+                }
+            } catch (e) {
+                resultDiv.innerHTML = `<div style="padding: 1rem; background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 4px; color: #721c24;">
+                    <strong>❌ Error:</strong> ${e.message}
+                </div>`;
+            }
+        }
+        
+        function clearCampaignForm() {
+            document.getElementById('campaignSubject').value = '';
+            document.getElementById('campaignHtml').value = '';
+            document.getElementById('campaignText').value = '';
+            document.getElementById('campaignFilterQ').value = '';
+            document.getElementById('campaignFilterStatus').value = '';
+            document.getElementById('campaignFilterBusinessType').value = '';
+            document.getElementById('campaignFilterSource').value = '';
+            document.getElementById('campaignFilterInterest').value = '';
+            document.getElementById('campaignAudienceCount').style.display = 'none';
+            document.getElementById('campaignResult').style.display = 'none';
+        }
+        
         function createEmailCampaign() {
-            alert('Email campaign creator will open in a new window. This feature integrates with your email marketing platform.');
+            showTab('campaigns');
         }
         
         function connectSocialAccounts() {
@@ -1090,25 +1354,46 @@
             }, 5000);
         }
 
-        function loadClients() {
+        async function loadClients() {
             const clientsList = document.getElementById('clientsList');
-            const clients = window.tnrCRM.clients;
-            
-            if (clients.length === 0) {
+            clientsList.innerHTML = '<div class="no-data">Loading clients...</div>';
+
+            const params = new URLSearchParams();
+            const q = (document.getElementById('clientsFilterQ')?.value || '').trim();
+            const status = document.getElementById('clientsFilterStatus')?.value || '';
+            const businessType = (document.getElementById('clientsFilterBusinessType')?.value || '').trim();
+            const source = (document.getElementById('clientsFilterSource')?.value || '').trim();
+            const sort = document.getElementById('clientsSort')?.value || 'createdAt';
+            const order = document.getElementById('clientsOrder')?.value || 'desc';
+            if (q) params.set('q', q);
+            if (status) params.set('status', status);
+            if (businessType) params.set('businessType', businessType);
+            if (source) params.set('source', source);
+            params.set('sort', sort);
+            params.set('order', order);
+
+            let clients = [];
+            try {
+                const res = await fetch('/api/crm/clients?' + params.toString());
+                const data = await res.json();
+                if (data.success) clients = data.data || [];
+            } catch (e) {}
+
+            if (!clients || clients.length === 0) {
                 clientsList.innerHTML = '<div class="no-data">No clients found. Add your first client to get started!</div>';
                 return;
             }
-            
+
             clientsList.innerHTML = clients.map(client => `
                 <div class="client-item">
                     <div class="client-info">
                         <h4>${client.name}</h4>
-                        <p>${client.industry} | ${client.email} | ${client.phone}</p>
+                        <p>${client.industry || ''} | ${client.email ? `<a href=\"mailto:${client.email}\">${client.email}</a>` : ''} | ${client.phone ? `<a href=\"tel:${client.phone}\">${client.phone}</a>` : ''}</p>
                         <p>Last Contact: ${formatDate(client.lastContact)} | Source: ${client.source}</p>
-                        <p>Services: ${client.services.join(', ')}</p>
+                        <p>Services: ${(client.services||[]).join(', ')}</p>
                     </div>
                     <div class="client-actions">
-                        <div class="client-status status-${client.status.toLowerCase()}">${client.status}</div>
+                        <div class="client-status status-${(client.status||'').toLowerCase()}">${client.status}</div>
                         <button class="btn-small" onclick="editClient('${client.id}')">Edit</button>
                         <button class="btn-small btn-danger" onclick="deleteClient('${client.id}')">Delete</button>
                     </div>
@@ -1116,27 +1401,38 @@
             `).join('');
         }
 
-        function loadLeads() {
+        async function loadLeads() {
             const leadsList = document.getElementById('leadsList');
-            
-            // Ensure CRM is initialized
-            if (!window.tnrCRM) {
-                // CRM not initialized
-                leadsList.innerHTML = '<div class="no-data">CRM not initialized. Please refresh the page.</div>';
-                return;
-            }
-            
-            // Load fresh data from storage
-            window.tnrCRM.loadFromStorage();
-            const leads = window.tnrCRM.leads;
-            
-            // Loading leads from CRM
-            
-            if (leads.length === 0) {
+            leadsList.innerHTML = '<div class="no-data">Loading leads...</div>';
+
+            const params = new URLSearchParams();
+            const q = (document.getElementById('leadsFilterQ')?.value || '').trim();
+            const status = document.getElementById('leadsFilterStatus')?.value || '';
+            const businessType = (document.getElementById('leadsFilterBusinessType')?.value || '').trim();
+            const source = (document.getElementById('leadsFilterSource')?.value || '').trim();
+            const interest = (document.getElementById('leadsFilterInterest')?.value || '').trim();
+            const sort = document.getElementById('leadsSort')?.value || 'createdAt';
+            const order = document.getElementById('leadsOrder')?.value || 'desc';
+            if (q) params.set('q', q);
+            if (status) params.set('status', status);
+            if (businessType) params.set('businessType', businessType);
+            if (source) params.set('source', source);
+            if (interest) params.set('interest', interest);
+            params.set('sort', sort);
+            params.set('order', order);
+
+            let leads = [];
+            try {
+                const res = await fetch('/api/crm/leads?' + params.toString());
+                const data = await res.json();
+                if (data.success) leads = data.data || [];
+            } catch (e) {}
+
+            if (!leads || leads.length === 0) {
                 leadsList.innerHTML = '<div class="no-data">No leads found. Form submissions will appear here.</div>';
                 return;
             }
-            
+
             leadsList.innerHTML = leads.map(lead => {
                 // Create comprehensive detailed information display (same as email template)
                 const details = [];
@@ -1260,7 +1556,7 @@
                 <div class="client-item" style="color: black;">
                     <div class="client-info" style="color: black;">
                         <h4 style="color: black;">${lead.name}</h4>
-                        <p style="color: black;"><strong>Email:</strong> ${lead.email} | <strong>Phone:</strong> ${lead.phone}</p>
+                        <p style="color: black;"><strong>Email:</strong> ${lead.email ? `<a href=\"mailto:${lead.email}\">${lead.email}</a>` : ''} | <strong>Phone:</strong> ${lead.phone ? `<a href=\"tel:${lead.phone}\">${lead.phone}</a>` : ''}</p>
                         <p style="color: black;"><strong>Services:</strong> ${servicesText}</p>
                         <p style="color: black;"><strong>Date:</strong> ${lead.submissionDate || formatDate(lead.submissionDateTime || lead.date)} | <strong>Source:</strong> ${lead.source}</p>
                         <p style="color: black;"><strong>Message:</strong> ${lead.message || 'No message'}</p>
@@ -1278,6 +1574,64 @@
             `;
             }).join('');
         }
+
+        async function promptImportLeadsCSV() {
+            const example = 'firstName,lastName,phone,email,businessType,businessName,businessAddress,source,interest,notes\nJohn,Doe,4125550000,john@example.com,Roofing,JD Roofing,123 Main St,Website,SEO,"Priority lead"';
+            const csv = window.prompt('Paste CSV with headers:\n(firstName,lastName,phone,email,businessType,businessName,businessAddress,source,interest,notes)', example);
+            if (!csv) return;
+            try {
+                const res = await fetch('/api/crm/import-leads', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ csv })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert('Imported ' + (data.createdCount || 0) + ' leads');
+                    // Refresh leads from API if available; fallback to reload
+                    if (window.tnrCRM && window.tnrCRM.loadFromStorage) {
+                        loadLeads();
+                    }
+                } else {
+                    alert('Import failed: ' + (data.error || 'Unknown error'));
+                }
+            } catch (e) {
+                alert('Import error: ' + e.message);
+            }
+        }
+
+        // File input handler for CSV import with simple preview
+        (function attachCsvHandler(){
+            const input = document.getElementById('leadsCsvFile');
+            if (!input) return;
+            input.addEventListener('change', async function(){
+                const file = this.files && this.files[0];
+                if (!file) return;
+                const text = await file.text();
+                const lines = text.split(/\r?\n/).filter(l=>l.trim().length>0);
+                const preview = lines.slice(0, Math.min(lines.length, 6)).join('\n');
+                const ok = window.confirm('Preview first rows:\n\n' + preview + '\n\nProceed to import?');
+                if (!ok) { this.value=''; return; }
+                try {
+                    const res = await fetch('/api/crm/import-leads', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ csv: text })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        alert('Imported ' + (data.createdCount || 0) + ' leads');
+                        loadLeads();
+                    } else {
+                        alert('Import failed: ' + (data.error || 'Unknown error'));
+                    }
+                } catch (e) {
+                    alert('Import error: ' + e.message);
+                } finally {
+                    this.value = '';
+                }
+            });
+        })();
 
         function loadOrders() {
             const ordersList = document.getElementById('ordersList');

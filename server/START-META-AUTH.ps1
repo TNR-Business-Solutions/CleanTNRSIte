@@ -7,7 +7,7 @@ Write-Host "`n=== TNR Meta Authentication Server ===" -ForegroundColor Cyan
 
 # Kill any existing processes
 Write-Host "Stopping any existing Node/LocalTunnel processes..." -ForegroundColor Yellow
-Get-Process node,lt -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+Get-Process node, lt -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
 
 # Step 1: Start LocalTunnel in background
 Write-Host "`n=== Starting LocalTunnel ===" -ForegroundColor Green
@@ -33,7 +33,7 @@ Write-Host "`n=== Starting Node Server ===" -ForegroundColor Green
 Write-Host "Redirect URI: $redirectUri" -ForegroundColor Yellow
 
 $env:META_APP_ID = "2201740210361183"
-$env:META_APP_SECRET = "0d2b09da0b07236276de7ae1adc05487"
+$env:META_APP_SECRET = "8bb683dbc591772f9fe6dada7e2d792b"
 $env:META_REDIRECT_URI = $redirectUri
 
 Write-Host "Starting server on http://localhost:3000..." -ForegroundColor Cyan

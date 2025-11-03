@@ -305,34 +305,63 @@
             </div>
             
             <!-- Analytics Dashboard -->
-            <div class="card">
-                <h3><span class="card-icon">📊</span>Analytics Dashboard</h3>
-                
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-number">1,247</div>
-                        <div class="stat-label">Total Posts</div>
+            <div class="card" id="facebookInsightsCard">
+                <h3><span class="card-icon">📊</span>Meta Insights (Live)</h3>
+
+                <div id="insightsEmptyState" class="insights-empty">
+                    Connect Facebook to unlock live reach, impression, and engagement analytics.
+                </div>
+
+                <div id="insightsContent" class="insights-content hidden" aria-live="polite">
+                    <div class="insights-header">
+                        <div>
+                            <h4 id="insightsPageName" style="margin-bottom: 4px;">Facebook Page</h4>
+                            <div class="stat-label" id="insightsDateRange">Last 7 days</div>
+                            <div class="stat-label" id="insightsLastUpdated">Not updated yet</div>
+                        </div>
+                        <div class="insights-meta">
+                            <span id="insightsFanCount">Fans: --</span>
+                            <span id="insightsFollowerCount">Followers: --</span>
+                            <span id="insightsInstagramStatus">Instagram: --</span>
+                        </div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-number">15.2K</div>
-                        <div class="stat-label">Total Reach</div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number" id="reachTotal">--</div>
+                            <div class="stat-label">7-Day Reach</div>
+                            <div class="stat-change flat" id="reachChange">Waiting for data…</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="impressionsTotal">--</div>
+                            <div class="stat-label">7-Day Impressions</div>
+                            <div class="stat-change flat" id="impressionsChange">Waiting for data…</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="engagementsTotal">--</div>
+                            <div class="stat-label">Post Engagements</div>
+                            <div class="stat-change flat" id="engagementsChange">Waiting for data…</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="newFollowersTotal">--</div>
+                            <div class="stat-label">New Followers</div>
+                            <div class="stat-change flat" id="newFollowersChange">Waiting for data…</div>
+                        </div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-number">2,341</div>
-                        <div class="stat-label">Engagements</div>
+
+                    <div class="insights-chart" aria-label="7 day reach chart">
+                        <div class="insights-chart-bars" id="insightsChartBars">
+                            <!-- Bars generated dynamically -->
+                        </div>
+                        <div class="insights-chart-axis" id="insightsChartAxis"></div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-number">18.7%</div>
-                        <div class="stat-label">Engagement Rate</div>
+
+                    <div class="insights-summary" id="insightsSummary">
+                        Live insights will appear here once you connect your Facebook Page.
                     </div>
                 </div>
-                
-                <div class="export-options">
-                    <button class="export-btn" onclick="exportToBuffer()">Export to Buffer</button>
-                    <button class="export-btn" onclick="exportToHootsuite()">Export to Hootsuite</button>
-                    <button class="export-btn" onclick="exportToLater()">Export to Later</button>
-                    <button class="export-btn" onclick="exportToWebhook()">Export to Webhook</button>
-                </div>
+
+                <div id="insightsError" class="insights-error hidden"></div>
             </div>
             
             <!-- Content Calendar -->
@@ -418,6 +447,11 @@
                     }
                     if (metaConnected) metaConnected.textContent = '✅';
                     if (configStatus) configStatus.textContent = '✅ Yes';
+
+                    if (data.page?.id) {
+                        localStorage.setItem('metaPageId', data.page.id);
+                    }
+                    loadMetaInsights(token, data.page?.id);
                     
                     // Only show alert if manually clicked (not on auto-load)
                     if (window.manualTest) {
@@ -428,15 +462,219 @@
                     }
                 } else {
                     console.error('Token invalid:', data.message);
+                    showInsightsDisconnected(data.message);
                     if (window.manualTest) {
                         alert('❌ Token Invalid: ' + data.message);
                     }
                 }
             } catch (error) {
                 console.error('Token test error:', error);
+                showInsightsDisconnected(error.message);
                 if (window.manualTest) {
                     alert('❌ Error testing token: ' + error.message);
                 }
+            }
+        }
+        
+        function formatCompactNumber(value) {
+            if (value === null || value === undefined || Number.isNaN(value)) return '--';
+            return Intl.NumberFormat(undefined, { notation: 'compact', maximumFractionDigits: 1 }).format(value);
+        }
+        
+        function formatFullNumber(value) {
+            if (value === null || value === undefined || Number.isNaN(value)) return '--';
+            return Intl.NumberFormat(undefined, { maximumFractionDigits: 0 }).format(Math.round(value));
+        }
+        
+        function formatShortDate(dateString) {
+            const date = new Date(dateString);
+            if (Number.isNaN(date.getTime())) return '';
+            return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+        }
+        
+        function formatTimeStamp(timestamp) {
+            if (!timestamp) return 'Just now';
+            const date = new Date(timestamp);
+            if (Number.isNaN(date.getTime())) return 'Just now';
+            return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+        }
+        
+        function formatDateRange(range) {
+            if (!range?.since || !range?.until) return 'Last 7 days';
+            const since = new Date(range.since);
+            const until = new Date(range.until);
+            if (Number.isNaN(since.getTime()) || Number.isNaN(until.getTime())) return 'Last 7 days';
+            const sinceText = since.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+            const untilText = until.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+            return `${sinceText} – ${untilText}`;
+        }
+        
+        function updateStatCard(numberId, changeId, metric) {
+            const numberEl = document.getElementById(numberId);
+            const changeEl = document.getElementById(changeId);
+
+            if (numberEl) {
+                if (metric && Number.isFinite(metric.total)) {
+                    numberEl.textContent = formatCompactNumber(metric.total);
+                    numberEl.title = `${formatFullNumber(metric.total)} total`;
+                } else {
+                    numberEl.textContent = '--';
+                    numberEl.removeAttribute('title');
+                }
+            }
+
+            if (changeEl) {
+                let text = 'No prior data';
+                let className = 'stat-change flat';
+                if (metric && metric.previous !== null && metric.change !== null) {
+                    const symbol = metric.direction === 'up' ? '▲' : metric.direction === 'down' ? '▼' : '•';
+                    const directionClass = metric.direction === 'up' ? 'positive' : metric.direction === 'down' ? 'negative' : 'flat';
+                    text = `${symbol} ${Math.abs(metric.change)}% vs prev day`;
+                    className = `stat-change ${directionClass}`;
+                }
+                changeEl.textContent = text;
+                changeEl.className = className;
+            }
+        }
+        
+        function renderInsightsChart(series) {
+            const barsEl = document.getElementById('insightsChartBars');
+            const axisEl = document.getElementById('insightsChartAxis');
+            if (!barsEl || !axisEl) return;
+
+            barsEl.innerHTML = '';
+            axisEl.innerHTML = '';
+
+            if (!Array.isArray(series) || !series.length) {
+                const emptyState = document.createElement('p');
+                emptyState.className = 'stat-label';
+                emptyState.style.margin = '0 auto';
+                emptyState.textContent = 'No recent reach data available.';
+                barsEl.appendChild(emptyState);
+                return;
+            }
+
+            const maxValue = Math.max(...series.map(point => point.value));
+            series.forEach(point => {
+                const bar = document.createElement('div');
+                bar.className = 'insights-chart-bar';
+                const height = maxValue === 0 ? 0 : Math.max(4, Math.round((point.value / maxValue) * 100));
+                bar.style.height = `${height}%`;
+                const label = formatShortDate(point.date);
+                bar.title = `${label}: ${formatFullNumber(point.value)}`;
+                bar.setAttribute('aria-label', `${label}: ${formatFullNumber(point.value)}`);
+                barsEl.appendChild(bar);
+
+                const axisLabel = document.createElement('span');
+                axisLabel.textContent = label;
+                axisEl.appendChild(axisLabel);
+            });
+        }
+        
+        function showInsightsDisconnected(message) {
+            const emptyState = document.getElementById('insightsEmptyState');
+            const content = document.getElementById('insightsContent');
+            const errorEl = document.getElementById('insightsError');
+            const card = document.getElementById('facebookInsightsCard');
+
+            if (card) card.classList.remove('loading');
+            if (content) content.classList.add('hidden');
+            if (emptyState) {
+                emptyState.textContent = message || 'Connect Facebook to unlock live analytics.';
+                emptyState.classList.remove('hidden');
+            }
+            if (errorEl) {
+                if (message) {
+                    errorEl.textContent = message;
+                    errorEl.classList.remove('hidden');
+                } else {
+                    errorEl.classList.add('hidden');
+                }
+            }
+        }
+        
+        async function loadMetaInsights(pageAccessToken, pageId) {
+            const card = document.getElementById('facebookInsightsCard');
+            const emptyState = document.getElementById('insightsEmptyState');
+            const content = document.getElementById('insightsContent');
+            const errorEl = document.getElementById('insightsError');
+
+            if (!card || !pageAccessToken) return;
+
+            if (emptyState) {
+                emptyState.textContent = 'Loading live insights…';
+                emptyState.classList.remove('hidden');
+            }
+            if (content) content.classList.add('hidden');
+            if (errorEl) errorEl.classList.add('hidden');
+            card.classList.add('loading');
+
+            try {
+                const response = await fetch('/api/social/get-insights', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pageAccessToken, pageId })
+                });
+
+                const data = await response.json();
+                if (!data.success) {
+                    throw new Error(data.message || 'Unable to fetch insights.');
+                }
+
+                window.metaInsightsData = data;
+
+                if (content) content.classList.remove('hidden');
+                if (emptyState) emptyState.classList.add('hidden');
+                if (errorEl) errorEl.classList.add('hidden');
+                card.classList.remove('loading');
+
+                const pageNameEl = document.getElementById('insightsPageName');
+                if (pageNameEl) pageNameEl.textContent = data.page?.name || 'Facebook Page';
+
+                const dateRangeEl = document.getElementById('insightsDateRange');
+                if (dateRangeEl) dateRangeEl.textContent = `Last ${data.timeseries?.reach?.length || 7} days • ${formatDateRange(data.dateRange)}`;
+
+                const updatedEl = document.getElementById('insightsLastUpdated');
+                if (updatedEl) updatedEl.textContent = `Updated ${formatTimeStamp(data.fetchedAt)}`;
+
+                const fansEl = document.getElementById('insightsFanCount');
+                if (fansEl) fansEl.textContent = data.page?.fanCount !== undefined ? `${formatFullNumber(data.page.fanCount)} Fans` : 'Fans: --';
+
+                const followersEl = document.getElementById('insightsFollowerCount');
+                if (followersEl) followersEl.textContent = data.page?.followersCount !== undefined ? `${formatFullNumber(data.page.followersCount)} Followers` : 'Followers: --';
+
+                const igEl = document.getElementById('insightsInstagramStatus');
+                if (igEl) igEl.textContent = data.page?.hasInstagram ? 'Instagram: Connected' : 'Instagram: Not connected';
+
+                updateStatCard('reachTotal', 'reachChange', data.metrics?.reach);
+                updateStatCard('impressionsTotal', 'impressionsChange', data.metrics?.impressions);
+                updateStatCard('engagementsTotal', 'engagementsChange', data.metrics?.engagements);
+                updateStatCard('newFollowersTotal', 'newFollowersChange', data.metrics?.newFollowers);
+
+                const reachSeries = data.timeseries?.reach?.length ? data.timeseries.reach : data.timeseries?.impressions || [];
+                renderInsightsChart(reachSeries);
+
+                const summaryEl = document.getElementById('insightsSummary');
+                if (summaryEl) {
+                    const summaryParts = [];
+                    if (data.metrics?.reach) summaryParts.push(`${formatFullNumber(data.metrics.reach.total)} reached`);
+                    if (data.metrics?.engagements) summaryParts.push(`${formatFullNumber(data.metrics.engagements.total)} engagements`);
+                    if (data.metrics?.newFollowers) summaryParts.push(`${formatFullNumber(data.metrics.newFollowers.total)} new followers`);
+                    if (typeof data.engagementRate === 'number') summaryParts.push(`Engagement rate ${data.engagementRate}%`);
+                    summaryEl.textContent = summaryParts.length
+                        ? `Past ${reachSeries.length || 7} days: ${summaryParts.join(' · ')}.`
+                        : 'No insights available for this period.';
+                }
+            } catch (error) {
+                console.error('loadMetaInsights error:', error);
+                if (errorEl) {
+                    errorEl.textContent = error.message || 'Unable to load insights. Please verify your Page token includes insights permissions.';
+                    errorEl.classList.remove('hidden');
+                }
+                showInsightsDisconnected(error.message);
+            } finally {
+                const finalCard = document.getElementById('facebookInsightsCard');
+                if (finalCard) finalCard.classList.remove('loading');
             }
         }
         

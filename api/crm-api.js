@@ -2,6 +2,7 @@
 // Handles all database operations for the admin dashboard
 
 const TNRDatabase = require("../database");
+const { URL } = require("url");
 
 // Initialize database connection
 let dbInstance = null;
@@ -38,11 +39,46 @@ module.exports = async function crmApiHandler(req, res) {
   // Extract the path after /api/crm/
   const match = fullPath.match(/\/api\/crm\/(.*)/);
   const path = match ? match[1] : "";
+  const parsedUrl = (() => {
+    try {
+      // Provide a base to satisfy WHATWG URL on Node
+      return new URL(fullPath, "http://localhost");
+    } catch (e) {
+      return null;
+    }
+  })();
 
   try {
     if (req.method === "GET") {
       if (path === "clients" || path === "") {
-        const clients = await db.getClients();
+        let clients = await db.getClients();
+        if (parsedUrl) {
+          const q = (parsedUrl.searchParams.get("q") || "").toLowerCase();
+          const status = parsedUrl.searchParams.get("status");
+          const businessType = parsedUrl.searchParams.get("businessType");
+          const source = parsedUrl.searchParams.get("source");
+          const sort = parsedUrl.searchParams.get("sort") || "createdAt";
+          const order = (parsedUrl.searchParams.get("order") || "desc").toLowerCase();
+
+          if (q) {
+            clients = clients.filter((c) =>
+              [c.name, c.email, c.phone, c.company, c.industry, c.businessType, c.source]
+                .filter(Boolean)
+                .some((v) => String(v).toLowerCase().includes(q))
+            );
+          }
+          if (status) clients = clients.filter((c) => c.status === status);
+          if (businessType) clients = clients.filter((c) => (c.businessType || "") === businessType);
+          if (source) clients = clients.filter((c) => (c.source || "") === source);
+
+          clients.sort((a, b) => {
+            const av = a[sort] ?? "";
+            const bv = b[sort] ?? "";
+            if (av < bv) return order === "asc" ? -1 : 1;
+            if (av > bv) return order === "asc" ? 1 : -1;
+            return 0;
+          });
+        }
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ success: true, data: clients }));
       } else if (path.startsWith("clients/")) {
@@ -56,7 +92,36 @@ module.exports = async function crmApiHandler(req, res) {
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ success: true, data: lead }));
       } else if (path === "leads") {
-        const leads = await db.getLeads();
+        let leads = await db.getLeads();
+        if (parsedUrl) {
+          const q = (parsedUrl.searchParams.get("q") || "").toLowerCase();
+          const status = parsedUrl.searchParams.get("status");
+          const businessType = parsedUrl.searchParams.get("businessType");
+          const source = parsedUrl.searchParams.get("source");
+          const interest = parsedUrl.searchParams.get("interest");
+          const sort = parsedUrl.searchParams.get("sort") || "createdAt";
+          const order = (parsedUrl.searchParams.get("order") || "desc").toLowerCase();
+
+          if (q) {
+            leads = leads.filter((l) =>
+              [l.name, l.email, l.phone, l.company, l.industry, l.businessType, l.source, l.interest]
+                .filter(Boolean)
+                .some((v) => String(v).toLowerCase().includes(q))
+            );
+          }
+          if (status) leads = leads.filter((l) => l.status === status);
+          if (businessType) leads = leads.filter((l) => (l.businessType || "") === businessType);
+          if (source) leads = leads.filter((l) => (l.source || "") === source);
+          if (interest) leads = leads.filter((l) => (l.interest || "") === interest);
+
+          leads.sort((a, b) => {
+            const av = a[sort] ?? "";
+            const bv = b[sort] ?? "";
+            if (av < bv) return order === "asc" ? -1 : 1;
+            if (av > bv) return order === "asc" ? 1 : -1;
+            return 0;
+          });
+        }
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ success: true, data: leads }));
       } else if (path === "orders") {
@@ -68,7 +133,7 @@ module.exports = async function crmApiHandler(req, res) {
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ success: true, data: stats }));
       } else if (path === "social-posts") {
-        const status = url.searchParams.get("status") || null;
+        const status = parsedUrl ? parsedUrl.searchParams.get("status") || null : null;
         const posts = await db.getSocialPosts(status);
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ success: true, data: posts }));
@@ -109,6 +174,51 @@ module.exports = async function crmApiHandler(req, res) {
             const post = await db.saveSocialPost(data);
             res.writeHead(201, { "Content-Type": "application/json" });
             res.end(JSON.stringify({ success: true, data: post }));
+          } else if (path === "import-leads") {
+            // Simple CSV import (expects body.csv as string and optional delimiter)
+            const csv = data.csv;
+            if (!csv || typeof csv !== "string") {
+              res.writeHead(400, { "Content-Type": "application/json" });
+              return res.end(
+                JSON.stringify({ success: false, error: "csv string required" })
+              );
+            }
+            const delimiter = data.delimiter || ",";
+            const lines = csv.split(/\r?\n/).filter((l) => l.trim().length > 0);
+            if (lines.length < 2) {
+              res.writeHead(400, { "Content-Type": "application/json" });
+              return res.end(
+                JSON.stringify({ success: false, error: "CSV must include header and at least one row" })
+              );
+            }
+            const headers = lines[0].split(delimiter).map((h) => h.trim());
+            const required = ["firstName","lastName","phone","email","businessType","businessName","businessAddress","source","interest","notes"];
+            // Proceed even if some are missing; map what we can
+            const created = [];
+            for (let i = 1; i < lines.length; i++) {
+              const cols = lines[i].split(delimiter).map((c) => c.trim());
+              const row = Object.fromEntries(headers.map((h, idx) => [h, cols[idx] ?? ""]));
+              const name = [row.firstName || "", row.lastName || ""].join(" ").trim() || row.name || row.businessName || "";
+              const leadPayload = {
+                name,
+                email: row.email || null,
+                phone: row.phone || null,
+                company: row.businessName || null,
+                website: row.website || null,
+                industry: row.businessType || null,
+                address: row.businessAddress || null,
+                source: row.source || "Imported CSV",
+                notes: row.notes || null,
+                interest: row.interest || null,
+                businessType: row.businessType || null,
+                businessName: row.businessName || null,
+                businessAddress: row.businessAddress || null,
+              };
+              const lead = await db.addLead(leadPayload);
+              created.push(lead);
+            }
+            res.writeHead(201, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ success: true, createdCount: created.length }));
           } else {
             res.writeHead(404, { "Content-Type": "application/json" });
             res.end(
