@@ -27,9 +27,35 @@ module.exports = async (req, res) => {
   }
 
   try {
-    // Parse request body
-    const body = await parseBody(req);
-    const { username, password } = body;
+    // Try to get body - Vercel may have already parsed it, or we need to parse it
+    let body;
+    
+    // Check if req.body exists and is already an object (Vercel auto-parsed)
+    if (req.body && typeof req.body === 'object' && !Array.isArray(req.body)) {
+      body = req.body;
+      console.log('✅ Using Vercel-parsed req.body');
+    } else if (req.body && typeof req.body === 'string') {
+      // Body is a string, parse it
+      try {
+        body = JSON.parse(req.body);
+        console.log('✅ Parsed req.body string');
+      } catch (parseError) {
+        throw new Error('Invalid JSON in request body: ' + parseError.message);
+      }
+    } else {
+      // Need to parse from stream
+      try {
+        body = await parseBody(req);
+        console.log('✅ Parsed body from stream');
+      } catch (parseError) {
+        console.error('Failed to parse body:', parseError);
+        throw new Error('Failed to parse request body: ' + parseError.message);
+      }
+    }
+    
+    console.log('Body received:', { hasUsername: !!body.username, hasPassword: !!body.password, keys: Object.keys(body) });
+    
+    const { username, password } = body || {};
 
     // Validate input
     if (!username || !password) {
