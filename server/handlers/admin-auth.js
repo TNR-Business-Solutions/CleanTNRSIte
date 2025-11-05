@@ -27,36 +27,69 @@ module.exports = async (req, res) => {
   }
 
   try {
-    // Try to get body - Vercel may have already parsed it, or we need to parse it
-    let body;
+    // Read request body - use same pattern as CRM handler
+    // This works reliably in Vercel serverless functions
+    let body = '';
     
-    // Check if req.body exists and is already an object (Vercel auto-parsed)
+    // First check if req.body is already available (Vercel sometimes pre-parses)
     if (req.body && typeof req.body === 'object' && !Array.isArray(req.body)) {
-      body = req.body;
-      console.log('✅ Using Vercel-parsed req.body');
-    } else if (req.body && typeof req.body === 'string') {
-      // Body is a string, parse it
-      try {
-        body = JSON.parse(req.body);
-        console.log('✅ Parsed req.body string');
-      } catch (parseError) {
-        throw new Error('Invalid JSON in request body: ' + parseError.message);
-      }
-    } else {
-      // Need to parse from stream
-      try {
-        body = await parseBody(req);
-        console.log('✅ Parsed body from stream');
-      } catch (parseError) {
-        console.error('Failed to parse body:', parseError);
-        throw new Error('Failed to parse request body: ' + parseError.message);
-      }
+      console.log('✅ Using pre-parsed req.body');
+      const { username, password } = req.body;
+      return await handleAuth(username, password, res);
     }
     
-    console.log('Body received:', { hasUsername: !!body.username, hasPassword: !!body.password, keys: Object.keys(body) });
-    
-    const { username, password } = body || {};
+    // Otherwise, read from stream
+    return new Promise((resolve, reject) => {
+      req.on('data', (chunk) => {
+        body += chunk.toString();
+      });
 
+      req.on('end', async () => {
+        try {
+          const parsedBody = body.trim() ? JSON.parse(body) : {};
+          console.log('✅ Parsed body from stream:', { hasUsername: !!parsedBody.username, hasPassword: !!parsedBody.password });
+          
+          const { username, password } = parsedBody;
+          await handleAuth(username, password, res);
+          resolve();
+        } catch (parseError) {
+          console.error('Body parse error:', parseError);
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({
+            success: false,
+            error: 'Invalid request body',
+            message: parseError.message
+          }));
+          resolve();
+        }
+      });
+
+      req.on('error', (error) => {
+        console.error('Request stream error:', error);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          success: false,
+          error: 'Request error',
+          message: error.message
+        }));
+        resolve();
+      });
+    });
+  } catch (error) {
+    console.error('Auth error:', error);
+    console.error('Error stack:', error.stack);
+    res.writeHead(500, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      success: false,
+      error: 'Internal server error',
+      message: error.message
+    }));
+    return;
+  }
+};
+// Extract auth logic to separate function
+async function handleAuth(username, password, res) {
+  try {
     // Validate input
     if (!username || !password) {
       res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -98,15 +131,14 @@ module.exports = async (req, res) => {
       return;
     }
   } catch (error) {
-    console.error('Auth error:', error);
-    console.error('Error stack:', error.stack);
+    console.error('handleAuth error:', error);
     res.writeHead(500, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({
       success: false,
-      error: 'Internal server error',
+      error: 'Authentication error',
       message: error.message
     }));
     return;
   }
-};
+
 
