@@ -326,6 +326,24 @@
                     body: JSON.stringify({ username, password })
                 });
                 
+                // Check if response is OK before parsing JSON
+                if (!response.ok) {
+                    let errorText = 'Unknown error';
+                    try {
+                        errorText = await response.text();
+                        // Try to parse as JSON if possible
+                        try {
+                            const errorJson = JSON.parse(errorText);
+                            throw new Error(errorJson.error || errorJson.message || `Server error: ${response.status}`);
+                        } catch {
+                            // If not JSON, use the text
+                            throw new Error(`Server error: ${response.status} ${response.statusText}. ${errorText.substring(0, 100)}`);
+                        }
+                    } catch (parseError) {
+                        throw new Error(`Server error: ${response.status} ${response.statusText}`);
+                    }
+                }
+                
                 const data = await response.json();
                 
                 if (data.success) {
@@ -342,7 +360,12 @@
                 }
             } catch (error) {
                 console.error('Login error:', error);
-                showError('Connection error. Please try again.');
+                // Try to parse error response if it's HTML (404 page)
+                if (error.message && error.message.includes('JSON')) {
+                    showError('Server error: API endpoint not found. Please check Vercel deployment.');
+                } else {
+                    showError('Connection error. Please try again.');
+                }
                 showLoading(false);
             }
         });

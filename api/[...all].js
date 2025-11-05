@@ -7,13 +7,29 @@ module.exports = async (req, res) => {
   let pathname = req.url.split('?')[0]; // Remove query string if present
   
   // Handle Vercel's catch-all parameter if available
+  // For catch-all routes like /api/[...all], Vercel passes segments in req.query.all
   if (req.query && req.query.all) {
     // For routes like /api/crm/clients, req.query.all might be "crm/clients"
-    pathname = '/api/' + (Array.isArray(req.query.all) ? req.query.all.join('/') : req.query.all);
+    const allParam = Array.isArray(req.query.all) ? req.query.all.join('/') : req.query.all;
+    pathname = '/api/' + allParam;
+  }
+  
+  // Fallback: if pathname is just /api, try to get from req.url
+  if (pathname === '/api' || pathname === '/api/') {
+    // Try to extract from the original URL
+    const urlMatch = req.url.match(/\/api\/(.+?)(?:\?|$)/);
+    if (urlMatch) {
+      pathname = '/api/' + urlMatch[1];
+    }
   }
   
   // Remove leading /api if present for cleaner routing
   let route = pathname.replace(/^\/api\//, '');
+  
+  // Debug logging (remove in production if needed)
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('API Route Debug:', { pathname, route, query: req.query, url: req.url });
+  }
   
   // Handle CORS globally
   res.setHeader("Access-Control-Allow-Origin", "*");
