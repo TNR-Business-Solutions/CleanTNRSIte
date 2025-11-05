@@ -9,14 +9,12 @@ module.exports = async (req, res) => {
   // Handle Vercel's catch-all parameter if available
   // For catch-all routes like /api/[...all], Vercel passes segments in req.query.all
   if (req.query && req.query.all) {
-    // For routes like /api/crm/clients, req.query.all might be "crm/clients"
+    // For routes like /api/crm/clients, req.query.all might be "crm/clients" or ['crm', 'clients']
     const allParam = Array.isArray(req.query.all) ? req.query.all.join('/') : req.query.all;
     pathname = '/api/' + allParam;
-  }
-  
-  // Fallback: if pathname is just /api, try to get from req.url
-  if (pathname === '/api' || pathname === '/api/') {
-    // Try to extract from the original URL
+  } else {
+    // If req.query.all is not available, extract from req.url
+    // This handles cases where Vercel might structure the request differently
     const urlMatch = req.url.match(/\/api\/(.+?)(?:\?|$)/);
     if (urlMatch) {
       pathname = '/api/' + urlMatch[1];
@@ -26,10 +24,16 @@ module.exports = async (req, res) => {
   // Remove leading /api if present for cleaner routing
   let route = pathname.replace(/^\/api\//, '');
   
-  // Debug logging (remove in production if needed)
-  if (process.env.NODE_ENV !== 'production') {
-    console.log('API Route Debug:', { pathname, route, query: req.query, url: req.url });
-  }
+  // Always log for debugging (will help identify routing issues)
+  console.log('API Route Debug:', { 
+    pathname, 
+    route, 
+    query: req.query, 
+    url: req.url,
+    method: req.method,
+    hasAll: !!req.query?.all,
+    allType: typeof req.query?.all
+  });
   
   // Handle CORS globally
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -67,7 +71,16 @@ module.exports = async (req, res) => {
       return await handler(req, res);
     }
     
-    if (route === 'admin/auth' || route.startsWith('admin/auth')) {
+    // Admin auth route - check early and explicitly
+    if (route === 'admin/auth' || route === 'admin/auth/' || route.startsWith('admin/auth/')) {
+      console.log('Routing to admin-auth handler');
+      const handler = require('../server/handlers/admin-auth');
+      return await handler(req, res);
+    }
+    
+    // Also check if route is just 'admin/auth' without the slash
+    if (route.includes('admin') && route.includes('auth')) {
+      console.log('Detected admin/auth in route, attempting to route');
       const handler = require('../server/handlers/admin-auth');
       return await handler(req, res);
     }
