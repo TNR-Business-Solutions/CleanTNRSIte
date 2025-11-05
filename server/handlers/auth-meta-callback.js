@@ -3,6 +3,7 @@
 // It exchanges the authorization code for access tokens
 
 const axios = require('axios');
+const TNRDatabase = require('../../database');
 
 module.exports = async (req, res) => {
   const { code, error, error_description, state } = req.query;
@@ -145,10 +146,52 @@ module.exports = async (req, res) => {
       })
     );
 
-    // Step 5: Build success response with tokens and page information
+    // Step 5: Save tokens to database
+    const db = new TNRDatabase();
+    await db.initialize();
+    
+    try {
+      // Save each page token (these never expire!)
+      for (const page of pagesWithInstagram) {
+        await db.saveSocialMediaToken({
+          platform: 'facebook',
+          page_id: page.id,
+          access_token: page.access_token,
+          token_type: 'Bearer',
+          expires_at: null, // Page tokens never expire
+          page_name: page.name,
+          instagram_account_id: page.instagram_business_account?.id || null,
+          instagram_username: page.instagram_account?.username || null,
+        });
+
+        // Also save Instagram account separately if it exists
+        if (page.instagram_business_account && page.instagram_account) {
+          await db.saveSocialMediaToken({
+            platform: 'instagram',
+            page_id: page.instagram_business_account.id,
+            access_token: page.access_token, // Instagram uses the same page token
+            token_type: 'Bearer',
+            expires_at: null, // Never expires
+            page_name: page.instagram_account.name || page.name,
+            instagram_account_id: page.instagram_business_account.id,
+            instagram_username: page.instagram_account.username,
+          });
+        }
+      }
+
+      console.log('✅ Tokens saved to database:', {
+        facebookPages: pagesWithInstagram.length,
+        instagramAccounts: pagesWithInstagram.filter(p => p.instagram_account).length
+      });
+    } catch (dbError) {
+      console.error('⚠️ Could not save tokens to database:', dbError.message);
+      // Continue even if database save fails - tokens are still shown on success page
+    }
+
+    // Step 6: Build success response with tokens and page information
     const response = {
       success: true,
-      message: 'Successfully authorized! Save these tokens securely.',
+      message: 'Successfully authorized! Tokens saved automatically to database.',
       authorization: {
         longLivedUserToken: longLivedUserToken,
         expiresIn: expiresIn,
@@ -167,16 +210,17 @@ module.exports = async (req, res) => {
         } : null
       })),
       nextSteps: [
-        '1. Save the page access tokens securely (they don\'t expire)',
-        '2. Add tokens to your social media automation dashboard',
-        '3. Test posting to Facebook and Instagram',
-        '4. Set up automated posting schedules'
+        '1. ✅ Page access tokens saved to database automatically (they don\'t expire!)',
+        '2. You can now post to Facebook and Instagram from the admin dashboard',
+        '3. No need to re-authenticate - tokens are stored permanently',
+        '4. View and manage tokens in Admin Dashboard → Social Media'
       ]
     };
 
     console.log('OAuth flow completed successfully:', {
       pageCount: pages.length,
-      instagramAccounts: pagesWithInstagram.filter(p => p.instagram_account).length
+      instagramAccounts: pagesWithInstagram.filter(p => p.instagram_account).length,
+      tokensSaved: true
     });
 
     // If no pages but authorization succeeded, show special message

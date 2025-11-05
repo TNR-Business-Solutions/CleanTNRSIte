@@ -1,13 +1,52 @@
 const axios = require('axios');
+const TNRDatabase = require('../../database');
 
 module.exports = async (req, res) => {
-  const { pageAccessToken, message, imageUrl } = req.body;
+  const { pageAccessToken, message, imageUrl, pageId, instagramAccountId, useDatabaseToken = true } = req.body;
 
-  if (!pageAccessToken) {
+  // Try to get token from database first, fallback to request body
+  let accessToken = pageAccessToken;
+  let targetInstagramAccountId = instagramAccountId;
+
+  if (useDatabaseToken) {
+    try {
+      const db = new TNRDatabase();
+      await db.initialize();
+      
+      // Get Instagram token from database
+      const token = await db.getSocialMediaToken('instagram', instagramAccountId || null);
+      
+      if (token && token.access_token) {
+        accessToken = token.access_token;
+        if (!targetInstagramAccountId && token.instagram_account_id) {
+          targetInstagramAccountId = token.instagram_account_id;
+        }
+        console.log('✅ Using Instagram token from database:', token.instagram_username || token.page_id);
+      } else {
+        // Try Facebook token if Instagram not found (Instagram uses Facebook page tokens)
+        const fbToken = await db.getSocialMediaToken('facebook', pageId || null);
+        if (fbToken && fbToken.access_token) {
+          accessToken = fbToken.access_token;
+          if (fbToken.instagram_account_id) {
+            targetInstagramAccountId = fbToken.instagram_account_id;
+          }
+          console.log('✅ Using Facebook token for Instagram:', fbToken.page_name || fbToken.page_id);
+        } else {
+          console.log('⚠️ No token found in database, using provided token');
+        }
+      }
+    } catch (dbError) {
+      console.warn('⚠️ Database error, using provided token:', dbError.message);
+      // Continue with provided token if database fails
+    }
+  }
+
+  if (!accessToken) {
     return res.status(400).json({
       success: false,
       error: 'Missing pageAccessToken',
-      message: 'Please provide a Facebook Page Access Token'
+      message: 'Please provide a Facebook Page Access Token or connect your account via OAuth',
+      help: 'Connect your Instagram account at /api/auth/meta or provide pageAccessToken in request'
     });
   }
 
@@ -23,34 +62,40 @@ module.exports = async (req, res) => {
     console.log('Starting Instagram post process...');
     
     // Step 1: Get the Facebook Page's Instagram Business Account ID
-    const pageResponse = await axios.get('https://graph.facebook.com/v19.0/me', {
-      params: {
-        fields: 'id,name,instagram_business_account',
-        access_token: pageAccessToken
-      },
-      timeout: 10000
-    });
-
-    const pageData = pageResponse.data;
-    console.log('Page data:', pageData);
-
-    if (!pageData.instagram_business_account) {
-      return res.status(400).json({
-        success: false,
-        error: 'No Instagram Account',
-        message: 'This Facebook Page is not connected to an Instagram Business Account. Please connect your Instagram account in Facebook Page settings.',
-        help: {
-          steps: [
-            '1. Go to your Facebook Page settings',
-            '2. Click on "Instagram" in the left menu',
-            '3. Connect your Instagram Business Account',
-            '4. Make sure it\'s a Business or Creator account, not Personal'
-          ]
-        }
+    // If we have Instagram account ID from database, use it directly
+    let instagramAccountId = targetInstagramAccountId;
+    
+    if (!instagramAccountId) {
+      // Get the Facebook Page's Instagram Business Account ID
+      const pageResponse = await axios.get('https://graph.facebook.com/v19.0/me', {
+        params: {
+          fields: 'id,name,instagram_business_account',
+          access_token: accessToken
+        },
+        timeout: 10000
       });
-    }
 
-    const instagramAccountId = pageData.instagram_business_account.id;
+      const pageData = pageResponse.data;
+      console.log('Page data:', pageData);
+
+      if (!pageData.instagram_business_account) {
+        return res.status(400).json({
+          success: false,
+          error: 'No Instagram Account',
+          message: 'This Facebook Page is not connected to an Instagram Business Account. Please connect your Instagram account in Facebook Page settings.',
+          help: {
+            steps: [
+              '1. Go to your Facebook Page settings',
+              '2. Click on "Instagram" in the left menu',
+              '3. Connect your Instagram Business Account',
+              '4. Make sure it\'s a Business or Creator account, not Personal'
+            ]
+          }
+        });
+      }
+
+      instagramAccountId = pageData.instagram_business_account.id;
+    }
     console.log('Instagram Account ID:', instagramAccountId);
 
     // Step 2: Check if this is an image post or text post
@@ -64,7 +109,7 @@ module.exports = async (req, res) => {
         {
           image_url: imageUrl,
           caption: message,
-          access_token: pageAccessToken
+          access_token: accessToken
         },
         { timeout: 15000 }
       );
@@ -77,7 +122,7 @@ module.exports = async (req, res) => {
         `https://graph.facebook.com/v19.0/${instagramAccountId}/media_publish`,
         {
           creation_id: creationId,
-          access_token: pageAccessToken
+          access_token: accessToken
         },
         { timeout: 15000 }
       );
@@ -90,7 +135,7 @@ module.exports = async (req, res) => {
         postId: publishResponse.data.id,
         platform: 'instagram',
         type: 'image',
-        instagramAccount: pageData.name
+        instagramAccountId: instagramAccountId
       });
 
     } else {

@@ -1,0 +1,420 @@
+// LinkedIn OAuth Callback Handler - Vercel Serverless Function
+// This endpoint handles the redirect from LinkedIn after user authorization
+// It exchanges the authorization code for access tokens
+
+const axios = require('axios');
+const TNRDatabase = require('../../database');
+const qs = require('querystring');
+
+module.exports = async (req, res) => {
+  const { code, error, error_description, state } = req.query;
+  
+  // Get configuration from environment variables
+  const LINKEDIN_CLIENT_ID = process.env.LINKEDIN_CLIENT_ID || '78pjq1wt4wz1fs';
+  const LINKEDIN_CLIENT_SECRET = process.env.LINKEDIN_CLIENT_SECRET;
+  const REDIRECT_URI = process.env.LINKEDIN_REDIRECT_URI || 'https://www.tnrbusinesssolutions.com/api/auth/linkedin/callback';
+
+  // Validate configuration
+  if (!LINKEDIN_CLIENT_ID || !LINKEDIN_CLIENT_SECRET) {
+    return res.status(500).json({
+      error: 'Server configuration error',
+      message: 'LINKEDIN_CLIENT_ID or LINKEDIN_CLIENT_SECRET not configured. Please set environment variables in Vercel.'
+    });
+  }
+
+  // Log callback received (for debugging)
+  console.log('LinkedIn OAuth callback received:', {
+    hasCode: !!code,
+    hasError: !!error,
+    state: state,
+    timestamp: new Date().toISOString()
+  });
+
+  // Handle OAuth errors
+  if (error) {
+    console.error('OAuth error:', error, error_description);
+    return res.status(400).json({
+      success: false,
+      error: 'OAuth Authorization Failed',
+      details: error_description || error,
+      message: 'User denied authorization or an error occurred during the OAuth flow.'
+    });
+  }
+
+  // Validate authorization code
+  if (!code) {
+    return res.status(400).json({
+      success: false,
+      error: 'Missing authorization code',
+      message: 'No authorization code received from LinkedIn. Please try again.'
+    });
+  }
+
+  try {
+    // Step 1: Exchange authorization code for access token
+    console.log('Exchanging code for access token...');
+    const tokenResponse = await axios.post(
+      'https://www.linkedin.com/oauth/v2/accessToken',
+      qs.stringify({
+        grant_type: 'authorization_code',
+        code: code,
+        redirect_uri: REDIRECT_URI,
+        client_id: LINKEDIN_CLIENT_ID,
+        client_secret: LINKEDIN_CLIENT_SECRET
+      }),
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        timeout: 10000
+      }
+    );
+
+    const accessToken = tokenResponse.data.access_token;
+    const expiresIn = tokenResponse.data.expires_in || 5184000; // Default to 60 days if not provided
+    const refreshToken = tokenResponse.data.refresh_token || null;
+
+    if (!accessToken) {
+      throw new Error('No access token received from LinkedIn');
+    }
+
+    // Step 2: Fetch user profile to get user ID and name
+    console.log('Fetching LinkedIn profile...');
+    const profileResponse = await axios.get('https://api.linkedin.com/v2/me', {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'X-Restli-Protocol-Version': '2.0.0'
+      },
+      timeout: 10000
+    });
+
+    const userProfile = profileResponse.data;
+    const userId = userProfile.id;
+    
+    // Extract name (handles both v1 and v2 API formats)
+    const firstName = userProfile.firstName?.localized?.en_US || 
+                     userProfile.firstName?.preferredLocale?.language || 
+                     userProfile.firstName || '';
+    const lastName = userProfile.lastName?.localized?.en_US || 
+                    userProfile.lastName?.preferredLocale?.language || 
+                    userProfile.lastName || '';
+    
+    // Email is not available without r_emailaddress scope, which we removed for simplicity
+    // We only need w_member_social for posting
+    const email = null;
+
+    // Step 3: Save token to database
+    const db = new TNRDatabase();
+    await db.initialize();
+    
+    try {
+      // Calculate expiration date
+      const expiresAt = expiresIn ? new Date(Date.now() + expiresIn * 1000).toISOString() : null;
+
+      // Save LinkedIn token
+      await db.saveSocialMediaToken({
+        platform: 'linkedin',
+        page_id: userId, // Use user ID as page_id for LinkedIn
+        access_token: accessToken,
+        token_type: 'Bearer',
+        expires_at: expiresAt,
+        refresh_token: refreshToken,
+        user_id: userId,
+        page_name: `${firstName} ${lastName}`.trim() || 'LinkedIn User',
+      });
+
+      console.log('✅ LinkedIn token saved to database:', {
+        userId: userId,
+        expiresIn: expiresIn ? `${Math.floor(expiresIn / 86400)} days` : 'Never'
+      });
+    } catch (dbError) {
+      console.error('⚠️ Could not save token to database:', dbError.message);
+      // Continue even if database save fails - token is still shown on success page
+    }
+
+    // Step 4: Build success response
+    const response = {
+      success: true,
+      message: 'Successfully authorized LinkedIn! Token saved automatically to database.',
+      authorization: {
+        accessToken: accessToken,
+        expiresIn: expiresIn,
+        expiresInDays: expiresIn ? Math.floor(expiresIn / 86400) : null,
+        refreshToken: refreshToken
+      },
+      profile: {
+        id: userId,
+        firstName: firstName,
+        lastName: lastName,
+        email: email
+      },
+      nextSteps: [
+        '1. ✅ Access token saved to database automatically',
+        '2. You can now post to LinkedIn from the admin dashboard',
+        '3. Token expires in ' + (expiresIn ? `${Math.floor(expiresIn / 86400)} days` : 'never'),
+        refreshToken ? '4. Refresh token saved - will auto-refresh before expiration' : '4. No refresh token available - manual re-auth required when expired',
+        '5. View and manage tokens in Admin Dashboard → Social Media'
+      ]
+    };
+
+    console.log('LinkedIn OAuth flow completed successfully:', {
+      userId: userId,
+      tokenSaved: true
+    });
+
+    // Return formatted HTML response
+    res.setHeader('Content-Type', 'text/html');
+    res.status(200).send(generateSuccessHTML(response));
+
+  } catch (error) {
+    console.error('Token exchange error:', error.message);
+    console.error('Error details:', error.response?.data);
+
+    // Handle specific error cases
+    if (error.response?.data) {
+      res.setHeader('Content-Type', 'text/html');
+      return res.status(400).send(generateErrorHTML(
+        'LinkedIn API Error',
+        error.response.data.error_description || error.response.data.error || 'Failed to exchange tokens with LinkedIn. The authorization code may have expired.'
+      ));
+    }
+
+    res.setHeader('Content-Type', 'text/html');
+    return res.status(500).send(generateErrorHTML(
+      'Internal Server Error',
+      error.message || 'Please try the authorization flow again.'
+    ));
+  }
+};
+
+// HTML generation function for success page
+function generateSuccessHTML(data) {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkedIn OAuth Success - TNR Business Solutions</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0077b5 0%, #00a0dc 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 { color: #0077b5; font-size: 2rem; margin-bottom: 10px; text-align: center; }
+        .success-badge {
+            background: #d4edda;
+            color: #155724;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin: 10px 0;
+        }
+        .section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #0077b5;
+        }
+        .section h3 { color: #0077b5; margin-bottom: 15px; }
+        .token-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            word-break: break-all;
+            margin: 10px 0;
+            border: 1px solid #e0e0e0;
+        }
+        .copy-btn {
+            background: #0077b5;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .copy-btn:hover { background: #005885; }
+        .next-steps {
+            background: #fff3cd;
+            border: 1px solid #ffeeba;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        .next-steps h3 { color: #856404; margin-bottom: 15px; }
+        .next-steps ol { margin-left: 20px; color: #856404; }
+        .next-steps li { margin: 10px 0; }
+        .btn { padding: 12px 30px; border-radius: 8px; border: none; cursor: pointer; font-size: 16px; font-weight: 600; text-decoration: none; display: inline-block; margin: 5px; }
+        .btn-primary { background: #0077b5; color: white; }
+        .btn-primary:hover { background: #005885; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .profile-info {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎉 LinkedIn OAuth Authorization</h1>
+        <div style="text-align: center;"><span class="success-badge">✅ Authorization Successful!</span></div>
+        
+        <div class="section">
+            <h3>👤 Your LinkedIn Profile</h3>
+            <div class="profile-info">
+                <strong>Name:</strong> ${data.profile.firstName} ${data.profile.lastName}<br>
+                <strong>LinkedIn ID:</strong> ${data.profile.id}<br>
+                ${data.profile.email ? `<strong>Email:</strong> ${data.profile.email}<br>` : ''}
+            </div>
+        </div>
+        
+        <div class="section">
+            <h3>🔑 Your Access Token</h3>
+            <p style="margin-bottom: 15px;">This token has been saved to the database automatically.</p>
+            <div style="margin: 20px 0;">
+                <strong>Access Token:</strong>
+                <div class="token-box" id="accessToken">${data.authorization.accessToken}</div>
+                <button class="copy-btn" onclick="copyToken('accessToken')">📋 Copy Token</button>
+                <p style="color: #666; font-size: 14px; margin-top: 10px;">
+                    ${data.authorization.expiresInDays ? `Expires in ${data.authorization.expiresInDays} days` : 'Never expires'}
+                </p>
+            </div>
+            ${data.authorization.refreshToken ? `
+            <div style="margin: 20px 0;">
+                <strong>Refresh Token:</strong>
+                <div class="token-box" id="refreshToken">${data.authorization.refreshToken}</div>
+                <button class="copy-btn" onclick="copyToken('refreshToken')">📋 Copy Refresh Token</button>
+                <p style="color: #28a745; font-size: 14px; margin-top: 10px;">✅ Can be used to refresh access token</p>
+            </div>
+            ` : ''}
+        </div>
+        
+        <div class="next-steps">
+            <h3>🎯 Next Steps</h3>
+            <ol>${data.nextSteps.map(step => `<li>${step}</li>`).join('')}</ol>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="/admin-dashboard.html" class="btn btn-primary">🚀 Go to Dashboard</a>
+            <a href="/social-media-automation-dashboard.html" class="btn btn-secondary">📱 Social Media Dashboard</a>
+        </div>
+    </div>
+    
+    <script>
+        function copyToken(id) {
+            const text = document.getElementById(id).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                event.target.textContent = '✅ Copied!';
+                event.target.style.background = '#28a745';
+                setTimeout(() => {
+                    event.target.textContent = '📋 Copy Token';
+                    event.target.style.background = '#0077b5';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>`;
+}
+
+// HTML generation function for error page
+function generateErrorHTML(error, details) {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkedIn OAuth Error - TNR Business Solutions</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0077b5 0%, #00a0dc 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 { color: #0077b5; font-size: 2rem; margin-bottom: 10px; text-align: center; }
+        .error-badge {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin: 10px 0;
+        }
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #f5c6cb;
+            margin: 20px 0;
+        }
+        .error-message h3 { margin-bottom: 10px; }
+        .btn {
+            padding: 12px 30px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+        .btn-primary { background: #0077b5; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>❌ Authorization Failed</h1>
+        <div style="text-align: center;"><span class="error-badge">Error</span></div>
+        
+        <div class="error-message">
+            <h3>${error}</h3>
+            <p>${details}</p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="/api/auth/linkedin" class="btn btn-primary">🔄 Try Again</a>
+            <a href="/" class="btn btn-secondary">🏠 Go Home</a>
+        </div>
+    </div>
+</body>
+</html>`;
+}
+

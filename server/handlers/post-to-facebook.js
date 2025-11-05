@@ -1,7 +1,8 @@
 // Post to Facebook - Vercel Serverless Function
-// Creates a post on a Facebook Page using the Page Access Token
+// Creates a post on a Facebook Page using the Page Access Token from database
 
 const axios = require('axios');
+const TNRDatabase = require('../../database');
 
 module.exports = async (req, res) => {
   // Only accept POST requests
@@ -14,14 +15,42 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const { pageAccessToken, message, pageId, imageUrl } = req.body;
+    const { pageAccessToken, message, pageId, imageUrl, useDatabaseToken = true } = req.body;
+
+    // Try to get token from database first, fallback to request body
+    let accessToken = pageAccessToken;
+    let targetPageId = pageId;
+
+    if (useDatabaseToken) {
+      try {
+        const db = new TNRDatabase();
+        await db.initialize();
+        
+        // Get Facebook token from database
+        const token = await db.getSocialMediaToken('facebook', pageId || null);
+        
+        if (token && token.access_token) {
+          accessToken = token.access_token;
+          if (!targetPageId && token.page_id) {
+            targetPageId = token.page_id;
+          }
+          console.log('✅ Using token from database for page:', token.page_name || token.page_id);
+        } else {
+          console.log('⚠️ No token found in database, using provided token or falling back');
+        }
+      } catch (dbError) {
+        console.warn('⚠️ Database error, using provided token:', dbError.message);
+        // Continue with provided token if database fails
+      }
+    }
 
     // Validate required fields
-    if (!pageAccessToken) {
+    if (!accessToken) {
       return res.status(400).json({
         success: false,
         error: 'Missing page access token',
-        message: 'Please provide a valid Facebook Page Access Token'
+        message: 'Please provide a valid Facebook Page Access Token or connect your account via OAuth',
+        help: 'Connect your Facebook account at /api/auth/meta or provide pageAccessToken in request'
       });
     }
 
@@ -34,13 +63,11 @@ module.exports = async (req, res) => {
     }
 
     // If pageId not provided, get it from the token
-    let targetPageId = pageId;
-    
     if (!targetPageId) {
       // Get page info from token
       const pageInfoResponse = await axios.get('https://graph.facebook.com/v19.0/me', {
         params: {
-          access_token: pageAccessToken,
+          access_token: accessToken,
           fields: 'id,name'
         },
         timeout: 10000
@@ -61,7 +88,7 @@ module.exports = async (req, res) => {
         {
           url: imageUrl,
           caption: message,
-          access_token: pageAccessToken
+          access_token: accessToken
         },
         {
           timeout: 15000
@@ -74,7 +101,7 @@ module.exports = async (req, res) => {
         `https://graph.facebook.com/v19.0/${targetPageId}/feed`,
         {
           message: message,
-          access_token: pageAccessToken
+          access_token: accessToken
         },
         {
           timeout: 15000

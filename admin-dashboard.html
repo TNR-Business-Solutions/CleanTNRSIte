@@ -225,7 +225,20 @@
         }
         
         .crm-content.active {
-            display: block;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+        
+        .client-list {
+            min-height: 200px;
+        }
+        
+        .no-data {
+            padding: 2rem;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1rem;
         }
         
         .client-list {
@@ -592,6 +605,7 @@
                 <button class="tab-button" onclick="showTab('crm')">👥 CRM System</button>
                 <button class="tab-button" onclick="showTab('campaigns')">📧 Email Campaigns</button>
                 <button class="tab-button" onclick="showTab('automation')">🤖 Automation</button>
+                <button class="tab-button" onclick="showTab('email-templates')">📝 Templates</button>
                 <button class="tab-button" onclick="showTab('social')">📱 Social Media</button>
                 <button class="tab-button" onclick="showTab('analytics')">📈 Analytics</button>
                 <button class="tab-button" onclick="showTab('settings')">⚙️ Settings</button>
@@ -906,69 +920,138 @@
             <!-- Automation Tab -->
             <div id="automation" class="tab-content">
                 <div class="crm-section">
-                    <h2 class="crm-title">🤖 Business Automation Workflows</h2>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <h2 class="crm-title">🤖 Business Automation Workflows</h2>
+                        <button class="btn" onclick="showCreateWorkflowModal()" style="background: var(--tnr-gold); color: var(--tnr-navy); font-weight: 600;">+ Create Workflow</button>
+                    </div>
                     
-                    <div class="automation-workflow">
-                        <h3 style="color: var(--tnr-gold); margin-bottom: 1rem;">📧 Email Marketing Automation</h3>
-                        <div class="workflow-step">
-                            <div class="step-number">1</div>
-                            <div class="step-content">
-                                <h4>Lead Capture</h4>
-                                <p>Automatically capture leads from website forms and social media</p>
-                            </div>
-                        </div>
-                        <div class="workflow-step">
-                            <div class="step-number">2</div>
-                            <div class="step-content">
-                                <h4>Welcome Sequence</h4>
-                                <p>Send automated welcome email series to new leads</p>
-                            </div>
-                        </div>
-                        <div class="workflow-step">
-                            <div class="step-number">3</div>
-                            <div class="step-content">
-                                <h4>Nurture Campaign</h4>
-                                <p>Follow up with educational content and service information</p>
-                            </div>
-                        </div>
-                        <div class="workflow-step">
-                            <div class="step-number">4</div>
-                            <div class="step-content">
-                                <h4>Conversion</h4>
-                                <p>Convert leads to clients with targeted offers and consultations</p>
-                            </div>
+                    <div style="background: white; padding: 2rem; border-radius: 8px; margin-bottom: 2rem;">
+                        <h3 style="color: var(--tnr-navy); margin-bottom: 1rem;">Active Workflows</h3>
+                        <div id="workflowsList">
+                            <div style="text-align: center; padding: 2rem; color: #666;">Loading workflows...</div>
                         </div>
                     </div>
                     
                     <div class="automation-workflow">
-                        <h3 style="color: var(--tnr-gold); margin-bottom: 1rem;">📱 Social Media Automation</h3>
+                        <h3 style="color: var(--tnr-gold); margin-bottom: 1rem;">📚 Available Trigger Types</h3>
                         <div class="workflow-step">
-                            <div class="step-number">1</div>
+                            <div class="step-number">🆕</div>
                             <div class="step-content">
-                                <h4>Content Generation</h4>
-                                <p>Automatically generate industry-specific content using AI templates</p>
+                                <h4>New Lead Created</h4>
+                                <p>Trigger when a new lead is added to the CRM</p>
                             </div>
                         </div>
                         <div class="workflow-step">
-                            <div class="step-number">2</div>
+                            <div class="step-number">📧</div>
                             <div class="step-content">
-                                <h4>Platform Optimization</h4>
-                                <p>Optimize content for each social media platform automatically</p>
+                                <h4>Lead Status Changed</h4>
+                                <p>Trigger when a lead's status is updated (e.g., New → Contacted)</p>
                             </div>
                         </div>
                         <div class="workflow-step">
-                            <div class="step-number">3</div>
+                            <div class="step-number">👤</div>
                             <div class="step-content">
-                                <h4>Scheduling</h4>
-                                <p>Schedule posts at optimal times for maximum engagement</p>
+                                <h4>Client Status Changed</h4>
+                                <p>Trigger when a client's status changes (e.g., Prospect → Active)</p>
                             </div>
                         </div>
                         <div class="workflow-step">
-                            <div class="step-number">4</div>
+                            <div class="step-number">📅</div>
                             <div class="step-content">
-                                <h4>Analytics & Optimization</h4>
-                                <p>Track performance and automatically adjust strategy</p>
+                                <h4>Date-Based Trigger</h4>
+                                <p>Trigger on specific dates or after a certain time period</p>
                             </div>
+                        </div>
+                    </div>
+                    
+                    <div class="automation-workflow" style="margin-top: 2rem;">
+                        <h3 style="color: var(--tnr-gold); margin-bottom: 1rem;">⚡ Available Actions</h3>
+                        <div class="workflow-step">
+                            <div class="step-number">📧</div>
+                            <div class="step-content">
+                                <h4>Send Email</h4>
+                                <p>Send automated email to lead/client using templates</p>
+                            </div>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="step-number">🔄</div>
+                            <div class="step-content">
+                                <h4>Update Status</h4>
+                                <p>Automatically update lead/client status</p>
+                            </div>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="step-number">🏷️</div>
+                            <div class="step-content">
+                                <h4>Assign Tag/Category</h4>
+                                <p>Add tags or categories to leads/clients</p>
+                            </div>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="step-number">📝</div>
+                            <div class="step-content">
+                                <h4>Add Note</h4>
+                                <p>Automatically add notes to lead/client record</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Create/Edit Workflow Modal -->
+            <div id="workflowModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; overflow-y: auto;">
+                <div style="background: white; margin: 2rem auto; max-width: 800px; border-radius: 8px; padding: 2rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <h2 style="color: var(--tnr-navy); margin: 0;">Create Workflow</h2>
+                        <button onclick="closeWorkflowModal()" style="background: #dc3545; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">✕ Close</button>
+                    </div>
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">Workflow Name</label>
+                        <input type="text" id="workflowName" placeholder="e.g., Welcome New Leads" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;" />
+                    </div>
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">Trigger Type</label>
+                        <select id="workflowTriggerType" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;" onchange="updateTriggerFields()">
+                            <option value="">Select Trigger...</option>
+                            <option value="new_lead">New Lead Created</option>
+                            <option value="lead_status_change">Lead Status Changed</option>
+                            <option value="client_status_change">Client Status Changed</option>
+                            <option value="date_based">Date-Based Trigger</option>
+                        </select>
+                    </div>
+                    
+                    <div id="triggerFields" style="margin-bottom: 1.5rem; padding: 1rem; background: #f8f9fa; border-radius: 4px; display: none;">
+                        <!-- Trigger-specific fields will be added here -->
+                    </div>
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">Actions</label>
+                        <div id="workflowActions" style="margin-bottom: 1rem;">
+                            <!-- Actions will be added here -->
+                        </div>
+                        <button type="button" onclick="addWorkflowAction()" class="btn" style="background: #28a745; color: white;">+ Add Action</button>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                        <button onclick="closeWorkflowModal()" class="btn" style="background: #666;">Cancel</button>
+                        <button onclick="saveWorkflow()" class="btn" style="background: var(--tnr-gold); color: var(--tnr-navy); font-weight: 600;">💾 Save Workflow</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Email Templates Tab -->
+            <div id="email-templates" class="tab-content">
+                <div class="crm-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <h2 class="crm-title">📧 Email Templates</h2>
+                        <button class="btn" onclick="showCreateTemplateModal()" style="background: var(--tnr-gold); color: var(--tnr-navy); font-weight: 600;">+ Create Template</button>
+                    </div>
+                    
+                    <div style="background: white; padding: 2rem; border-radius: 8px;">
+                        <div id="templatesList">
+                            <div style="text-align: center; padding: 2rem; color: #666;">Loading templates...</div>
                         </div>
                     </div>
                 </div>
@@ -976,6 +1059,28 @@
             
             <!-- Social Media Tab -->
             <div id="social" class="tab-content">
+                <!-- Social Media Token Management -->
+                <div class="crm-section" style="margin-bottom: 2rem;">
+                    <h2 class="crm-title">🔐 Social Media Authentication</h2>
+                    <div style="background: white; padding: 2rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                            <h3 style="color: var(--tnr-navy); margin: 0;">Connected Accounts</h3>
+                            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                <button class="btn" onclick="loadSocialTokens()" style="margin-right: 0.5rem;">🔄 Refresh</button>
+                                <a href="/api/auth/meta" class="btn" style="background: #1877f2; color: white; text-decoration: none;">📘 Connect Facebook/Instagram</a>
+                                <a href="/api/auth/linkedin" class="btn" style="background: #0077b5; color: white; text-decoration: none;">💼 Connect LinkedIn</a>
+                                <a href="/api/auth/twitter" class="btn" style="background: #1DA1F2; color: white; text-decoration: none;">🐦 Connect X (Twitter)</a>
+                            </div>
+                        </div>
+                        <div id="tokensList" style="min-height: 200px;">
+                            <div style="text-align: center; padding: 3rem; color: #666;">
+                                <div style="font-size: 3rem; margin-bottom: 1rem;">⏳</div>
+                                <p>Loading tokens...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="dashboard-grid">
                     <div class="dashboard-card">
                         <div class="card-header">
@@ -1024,49 +1129,15 @@
             <!-- Analytics Tab -->
             <div id="analytics" class="tab-content">
                 <div class="crm-section">
-                    <h2 class="crm-title">📈 Performance Analytics</h2>
-                    
-                    <div class="crm-stats">
-                        <div class="stat-card">
-                            <div class="stat-number">2.4K</div>
-                            <div class="stat-label">Social Media Followers</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">156</div>
-                            <div class="stat-label">Posts This Month</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">8.2K</div>
-                            <div class="stat-label">Total Engagement</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">23</div>
-                            <div class="stat-label">New Leads</div>
-                        </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <h2 class="crm-title">📈 Performance Analytics</h2>
+                        <button class="btn" onclick="loadAnalytics()" style="background: var(--tnr-gold); color: var(--tnr-navy);">🔄 Refresh</button>
                     </div>
                     
-                    <div class="automation-workflow">
-                        <h3 style="color: var(--tnr-gold); margin-bottom: 1rem;">📊 Top Performing Content</h3>
-                        <div class="workflow-step">
-                            <div class="step-number">1</div>
-                            <div class="step-content">
-                                <h4>Educational Posts</h4>
-                                <p>Average engagement: 12.5% | Best performing content type</p>
-                            </div>
-                        </div>
-                        <div class="workflow-step">
-                            <div class="step-number">2</div>
-                            <div class="step-content">
-                                <h4>Behind-the-Scenes</h4>
-                                <p>Average engagement: 9.8% | High authenticity factor</p>
-                            </div>
-                        </div>
-                        <div class="workflow-step">
-                            <div class="step-number">3</div>
-                            <div class="step-content">
-                                <h4>Client Testimonials</h4>
-                                <p>Average engagement: 8.2% | Strong social proof</p>
-                            </div>
+                    <div id="analyticsContent">
+                        <div style="text-align: center; padding: 3rem; color: #666;">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">📊</div>
+                            <p>Loading analytics...</p>
                         </div>
                     </div>
                 </div>
@@ -1135,6 +1206,18 @@
             
             // Add active class to clicked button
             event.target.classList.add('active');
+            
+            // Load data for specific tabs
+            if (tabName === 'social' && !tokensLoaded) {
+                loadSocialTokens();
+                tokensLoaded = true;
+            }
+            if (tabName === 'automation') {
+                loadWorkflows();
+            }
+            if (tabName === 'analytics') {
+                loadAnalytics();
+            }
         }
         
         function showCrmTab(tabName) {
@@ -1345,8 +1428,19 @@
             const sections = document.querySelectorAll('.crm-content');
             sections.forEach(sec => sec.classList.remove('active'));
             const target = document.getElementById(tabName);
-            if (target) target.classList.add('active');
+            if (target) {
+                target.classList.add('active');
+                console.log('✅ Switched to tab:', tabName);
+            }
+            
+            // Update tab buttons
+            document.querySelectorAll('.crm-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event?.target?.classList.add('active');
+            
             if (tabName === 'clients') {
+                console.log('📋 Loading clients...');
                 loadClients();
             } else if (tabName === 'leads') {
                 loadLeads();
@@ -1357,7 +1451,14 @@
 
         // CRM Functions
         function initializeCRM() {
-            // Initializing CRM...
+            console.log('📊 Initializing CRM...');
+            
+            // Ensure clients section is visible and active
+            const clientsSection = document.getElementById('clients');
+            if (clientsSection) {
+                clientsSection.classList.add('active');
+                console.log('✅ Clients section marked as active');
+            }
             
             // Ensure CRM is available
             if (!window.tnrCRM) {
@@ -1377,6 +1478,7 @@
             updateClientStats();
             
             // Load all CRM sections
+            console.log('📋 Loading clients in initializeCRM...');
             loadClients();
             loadLeads();
             loadOrders();
@@ -1409,31 +1511,101 @@
             let clients = [];
             try {
                 const res = await fetch('/api/crm/clients?' + params.toString());
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
                 const data = await res.json();
-                if (data.success) clients = data.data || [];
-            } catch (e) {}
+                if (data.success) {
+                    clients = data.data || [];
+                    console.log('✅ Loaded', clients.length, 'clients');
+                } else {
+                    console.error('❌ API error:', data.error);
+                    clientsList.innerHTML = `<div class="no-data">Error loading clients: ${data.error || 'Unknown error'}</div>`;
+                    return;
+                }
+            } catch (e) {
+                console.error('❌ Error loading clients:', e);
+                clientsList.innerHTML = `<div class="no-data">Error loading clients: ${e.message}</div>`;
+                return;
+            }
 
             if (!clients || clients.length === 0) {
                 clientsList.innerHTML = '<div class="no-data">No clients found. Add your first client to get started!</div>';
                 return;
             }
 
-            clientsList.innerHTML = clients.map(client => `
-                <div class="client-item">
-                    <div class="client-info">
-                        <h4>${client.name}</h4>
-                        <p>${client.industry || ''} | ${client.email ? `<a href=\"mailto:${client.email}\">${client.email}</a>` : ''} | ${client.phone ? `<a href=\"tel:${client.phone}\">${client.phone}</a>` : ''}</p>
-                        <p>Last Contact: ${formatDate(client.lastContact)} | Source: ${client.source}</p>
-                        <p>Services: ${(client.services||[]).join(', ')}</p>
+            console.log('📋 Rendering', clients.length, 'clients');
+            try {
+                clientsList.innerHTML = clients.map((client, index) => {
+                    console.log(`   Client ${index + 1}:`, client.name, client.id);
+                    // Parse services - handle both JSON string and array
+                    let services = [];
+                    try {
+                        if (typeof client.services === 'string') {
+                            // Try to parse as JSON first
+                            if (client.services.trim().startsWith('[') || client.services.trim().startsWith('{')) {
+                                services = JSON.parse(client.services || '[]');
+                            } else {
+                                // If not JSON, treat as comma-separated string
+                                services = client.services.split(',').map(s => s.trim()).filter(s => s);
+                            }
+                        } else if (Array.isArray(client.services)) {
+                            services = client.services;
+                        } else {
+                            services = [];
+                        }
+                    } catch (e) {
+                        // If parsing fails, try as comma-separated string
+                        services = client.services ? String(client.services).split(',').map(s => s.trim()).filter(s => s) : [];
+                    }
+                    
+                    const servicesDisplay = services.length > 0 ? services.join(', ') : 'No services listed';
+                    const clientName = (client.name || 'Unknown').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                    const clientId = (client.id || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                    
+                    return `
+                    <div class="client-item">
+                        <div class="client-info">
+                            <h4>${client.name || 'Unknown'}</h4>
+                            <p>${client.industry || ''} | ${client.email ? `<a href="mailto:${client.email}">${client.email}</a>` : 'No email'} | ${client.phone ? `<a href="tel:${client.phone}">${client.phone}</a>` : 'No phone'}</p>
+                            <p>Last Contact: ${formatDate(client.lastContact || client.lastcontact || '')} | Source: ${client.source || 'Unknown'}</p>
+                            <p>Services: ${servicesDisplay}</p>
+                            ${client.notes ? `<p style="color: #666; font-size: 0.9em;">Notes: ${client.notes}</p>` : ''}
+                        </div>
+                        <div class="client-actions">
+                            <div class="client-status status-${(client.status||'Active').toLowerCase()}">${client.status || 'Active'}</div>
+                            <button class="btn-small" onclick="showActivityTimeline('client', '${clientId}', '${clientName}')">📋 Timeline</button>
+                            <button class="btn-small" onclick="editClient('${clientId}')">Edit</button>
+                            <button class="btn-small btn-danger" onclick="deleteClient('${clientId}')">Delete</button>
+                        </div>
                     </div>
-                    <div class="client-actions">
-                        <div class="client-status status-${(client.status||'').toLowerCase()}">${client.status}</div>
-                        <button class="btn-small" onclick="editClient('${client.id}')">Edit</button>
-                        <button class="btn-small btn-danger" onclick="deleteClient('${client.id}')">Delete</button>
-                    </div>
-                </div>
-            `).join('');
+                    `;
+                }).join('');
+                console.log('✅ Clients HTML rendered successfully');
+                // Force a reflow to ensure display
+                clientsList.offsetHeight;
+            } catch (error) {
+                console.error('❌ Error rendering clients:', error);
+                console.error('   Stack:', error.stack);
+                clientsList.innerHTML = `<div class="no-data" style="color: red; padding: 2rem;">Error displaying clients: ${error.message}<br><small>Check browser console for details</small></div>`;
+            }
         }
+        
+        // Force load clients on page load if CRM tab is active
+        window.addEventListener('load', function() {
+            console.log('🔄 Page loaded, checking CRM tab...');
+            setTimeout(() => {
+                const crmTab = document.getElementById('crm');
+                const clientsSection = document.getElementById('clients');
+                if (crmTab && crmTab.classList.contains('active')) {
+                    console.log('✅ CRM tab is active, loading clients...');
+                    loadClients();
+                } else if (clientsSection && clientsSection.classList.contains('active')) {
+                    console.log('✅ Clients section is active, loading clients...');
+                    loadClients();
+                }
+            }, 500);
+        });
 
         async function loadLeads() {
             const leadsList = document.getElementById('leadsList');
@@ -1601,6 +1773,7 @@
                     </div>
                     <div class="client-actions">
                         <div class="client-status status-lead">${lead.status}</div>
+                        <button class="btn-small" onclick="showActivityTimeline('lead', '${lead.id}', '${lead.name}')">📋 Timeline</button>
                         <button class="btn-small" onclick="convertLeadToClient('${lead.id}')">Convert to Client</button>
                         <button class="btn-small btn-danger" onclick="deleteLead('${lead.id}')">Delete</button>
                     </div>
@@ -2539,6 +2712,999 @@
                 alert('No form submissions found in localStorage');
             }
         }
+
+        // ========== SOCIAL MEDIA TOKEN MANAGEMENT ==========
+        async function loadSocialTokens() {
+            const tokensList = document.getElementById('tokensList');
+            if (!tokensList) return;
+
+            tokensList.innerHTML = '<div style="text-align: center; padding: 2rem; color: #666;">Loading tokens...</div>';
+
+            try {
+                const res = await fetch('/api/social/tokens');
+                const data = await res.json();
+
+                if (!data.success || !data.tokens || data.tokens.length === 0) {
+                    tokensList.innerHTML = `
+                        <div style="text-align: center; padding: 3rem; color: #666;">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">🔗</div>
+                            <p style="margin-bottom: 1rem;"><strong>No connected accounts</strong></p>
+                            <p style="margin-bottom: 1.5rem;">Connect your social media accounts to get started with automated posting.</p>
+                            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center;">
+                                <a href="/api/auth/meta" class="btn" style="background: #1877f2; color: white; text-decoration: none; display: inline-block; padding: 0.75rem 1.5rem; border-radius: 4px;">📘 Connect Facebook/Instagram</a>
+                                <a href="/api/auth/linkedin" class="btn" style="background: #0077b5; color: white; text-decoration: none; display: inline-block; padding: 0.75rem 1.5rem; border-radius: 4px;">💼 Connect LinkedIn</a>
+                                <a href="/api/auth/twitter" class="btn" style="background: #1DA1F2; color: white; text-decoration: none; display: inline-block; padding: 0.75rem 1.5rem; border-radius: 4px;">🐦 Connect X (Twitter)</a>
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                tokensList.innerHTML = data.tokens.map(token => `
+                    <div style="background: #f8f9fa; border: 1px solid #ddd; border-radius: 8px; padding: 1.5rem; margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                            <div style="flex: 1;">
+                                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                                    <span style="font-size: 1.5rem;">${
+                                        token.platform === 'facebook' ? '📘' : 
+                                        token.platform === 'instagram' ? '📷' : 
+                                        token.platform === 'linkedin' ? '💼' : 
+                                        token.platform === 'twitter' ? '🐦' : 
+                                        '🔗'
+                                    }</span>
+                                    <div>
+                                        <h4 style="margin: 0; color: var(--tnr-navy);">${token.page_name || token.platform.charAt(0).toUpperCase() + token.platform.slice(1)}</h4>
+                                        <p style="margin: 0; color: #666; font-size: 0.875rem;">${
+                                            token.platform === 'instagram' && token.instagram_username ? `@${token.instagram_username}` : 
+                                            token.platform === 'twitter' && token.page_name ? token.page_name.split('@')[1] || token.page_name : 
+                                            token.page_id || 'Account'
+                                        }</p>
+                                    </div>
+                                </div>
+                                ${token.instagram_account_id && token.platform === 'instagram' ? `
+                                    <div style="margin-top: 0.5rem; padding: 0.5rem; background: white; border-radius: 4px; font-size: 0.875rem;">
+                                        <strong>Instagram ID:</strong> ${token.instagram_account_id}
+                                    </div>
+                                ` : ''}
+                            </div>
+                            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                <button class="btn-small" onclick="testToken('${token.id}', '${token.platform}')" style="background: #28a745; color: white;">🧪 Test</button>
+                                <button class="btn-small btn-danger" onclick="deleteToken('${token.id}', '${token.page_name || token.platform}')">🗑️ Delete</button>
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem; font-size: 0.875rem; color: #666;">
+                            <div><strong>Platform:</strong> ${token.platform}</div>
+                            <div><strong>Token Status:</strong> <span style="color: ${token.has_token ? '#28a745' : '#dc3545'}">${token.has_token ? '✅ Valid' : '❌ Missing'}</span></div>
+                            <div><strong>Expires:</strong> ${token.expires_at ? new Date(token.expires_at).toLocaleDateString() : 'Never'}</div>
+                            <div><strong>Added:</strong> ${token.created_at ? new Date(token.created_at).toLocaleDateString() : 'N/A'}</div>
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error loading tokens:', error);
+                tokensList.innerHTML = `
+                    <div style="text-align: center; padding: 3rem; color: #dc3545;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">❌</div>
+                        <p><strong>Error loading tokens</strong></p>
+                        <p style="font-size: 0.875rem;">${error.message}</p>
+                        <button class="btn" onclick="loadSocialTokens()" style="margin-top: 1rem;">Try Again</button>
+                    </div>
+                `;
+            }
+        }
+
+        async function testToken(tokenId, platform) {
+            const button = event.target;
+            const originalText = button.textContent;
+            button.textContent = 'Testing...';
+            button.disabled = true;
+
+            try {
+                const res = await fetch('/api/social/tokens?action=test', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tokenId, platform })
+                });
+
+                const data = await res.json();
+                
+                if (data.success && data.valid) {
+                    alert(`✅ Token is valid!\n\n${data.message || 'Connection successful'}`);
+                } else {
+                    alert(`❌ Token is invalid or expired.\n\n${data.error || data.message || 'Please reconnect your account.'}`);
+                }
+            } catch (error) {
+                alert(`❌ Error testing token: ${error.message}`);
+            } finally {
+                button.textContent = originalText;
+                button.disabled = false;
+            }
+        }
+
+        async function deleteToken(tokenId, tokenName) {
+            if (!confirm(`Are you sure you want to delete the token for "${tokenName}"?\n\nYou will need to reconnect to post to this account.`)) {
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/social/tokens?tokenId=${tokenId}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await res.json();
+                
+                if (data.success) {
+                    alert('✅ Token deleted successfully');
+                    loadSocialTokens(); // Refresh the list
+                } else {
+                    alert(`❌ Error: ${data.error || 'Failed to delete token'}`);
+                }
+            } catch (error) {
+                alert(`❌ Error deleting token: ${error.message}`);
+            }
+        }
+
+        // Track if tokens have been loaded
+        let tokensLoaded = false;
+
+        // ========== WORKFLOW MANAGEMENT ==========
+        let workflowActions = [];
+        let editingWorkflowId = null;
+
+        async function loadWorkflows() {
+            const workflowsList = document.getElementById('workflowsList');
+            if (!workflowsList) return;
+
+            try {
+                const res = await fetch('/api/workflows');
+                const data = await res.json();
+
+                if (!data.success || !data.workflows || data.workflows.length === 0) {
+                    workflowsList.innerHTML = `
+                        <div style="text-align: center; padding: 3rem; color: #666;">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">🤖</div>
+                            <p style="margin-bottom: 1rem;"><strong>No workflows created yet</strong></p>
+                            <p style="margin-bottom: 1.5rem;">Create your first automation workflow to get started.</p>
+                            <button class="btn" onclick="showCreateWorkflowModal()" style="background: var(--tnr-gold); color: var(--tnr-navy);">Create Workflow</button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                workflowsList.innerHTML = data.workflows.map(workflow => `
+                    <div style="background: #f8f9fa; border: 1px solid #ddd; border-radius: 8px; padding: 1.5rem; margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                            <div style="flex: 1;">
+                                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                                    <span style="font-size: 1.5rem;">🤖</span>
+                                    <div>
+                                        <h4 style="margin: 0; color: var(--tnr-navy);">${workflow.workflowName}</h4>
+                                        <p style="margin: 0; color: #666; font-size: 0.875rem;">Type: ${workflow.workflowType || 'Custom'}</p>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 0.5rem; padding: 0.5rem; background: white; border-radius: 4px; font-size: 0.875rem;">
+                                    <strong>Trigger:</strong> ${formatTrigger(workflow.trigger)}<br/>
+                                    <strong>Actions:</strong> ${workflow.actions?.length || 0} action(s)
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                <button class="btn-small" onclick="toggleWorkflow('${workflow.id}', ${!workflow.isActive})" style="background: ${workflow.isActive ? '#28a745' : '#6c757d'}; color: white;">
+                                    ${workflow.isActive ? '✅ Active' : '⏸️ Inactive'}
+                                </button>
+                                <button class="btn-small" onclick="editWorkflow('${workflow.id}')" style="background: #007bff; color: white;">✏️ Edit</button>
+                                <button class="btn-small btn-danger" onclick="deleteWorkflow('${workflow.id}', '${workflow.workflowName}')">🗑️ Delete</button>
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem; font-size: 0.875rem; color: #666;">
+                            <div><strong>Status:</strong> <span style="color: ${workflow.isActive ? '#28a745' : '#dc3545'}">${workflow.isActive ? '✅ Active' : '⏸️ Inactive'}</span></div>
+                            <div><strong>Last Run:</strong> ${workflow.lastRun ? new Date(workflow.lastRun).toLocaleString() : 'Never'}</div>
+                            <div><strong>Next Run:</strong> ${workflow.nextRun ? new Date(workflow.nextRun).toLocaleString() : 'N/A'}</div>
+                            <div><strong>Created:</strong> ${workflow.createdAt ? new Date(workflow.createdAt).toLocaleDateString() : 'N/A'}</div>
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error loading workflows:', error);
+                workflowsList.innerHTML = `
+                    <div style="text-align: center; padding: 3rem; color: #dc3545;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">❌</div>
+                        <p><strong>Error loading workflows</strong></p>
+                        <p style="font-size: 0.875rem;">${error.message}</p>
+                        <button class="btn" onclick="loadWorkflows()" style="margin-top: 1rem;">Try Again</button>
+                    </div>
+                `;
+            }
+        }
+
+        function formatTrigger(trigger) {
+            if (!trigger || !trigger.type) return 'Not configured';
+            const types = {
+                'new_lead': 'New Lead Created',
+                'lead_status_change': 'Lead Status Changed',
+                'client_status_change': 'Client Status Changed',
+                'date_based': 'Date-Based'
+            };
+            return types[trigger.type] || trigger.type;
+        }
+
+        function showCreateWorkflowModal() {
+            editingWorkflowId = null;
+            workflowActions = [];
+            document.getElementById('workflowName').value = '';
+            document.getElementById('workflowTriggerType').value = '';
+            document.getElementById('triggerFields').style.display = 'none';
+            document.getElementById('workflowActions').innerHTML = '';
+            document.getElementById('workflowModal').style.display = 'block';
+        }
+
+        function closeWorkflowModal() {
+            document.getElementById('workflowModal').style.display = 'none';
+        }
+
+        function updateTriggerFields() {
+            const triggerType = document.getElementById('workflowTriggerType').value;
+            const triggerFields = document.getElementById('triggerFields');
+            
+            if (!triggerType) {
+                triggerFields.style.display = 'none';
+                return;
+            }
+            
+            triggerFields.style.display = 'block';
+            
+            switch(triggerType) {
+                case 'lead_status_change':
+                    triggerFields.innerHTML = `
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">From Status</label>
+                        <select id="triggerFromStatus" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                            <option value="">Any Status</option>
+                            <option value="New">New</option>
+                            <option value="Contacted">Contacted</option>
+                            <option value="Qualified">Qualified</option>
+                        </select>
+                        <label style="display: block; margin-top: 1rem; margin-bottom: 0.5rem; font-weight: 600;">To Status</label>
+                        <select id="triggerToStatus" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                            <option value="">Any Status</option>
+                            <option value="Contacted">Contacted</option>
+                            <option value="Qualified">Qualified</option>
+                            <option value="Converted">Converted</option>
+                        </select>
+                    `;
+                    break;
+                case 'date_based':
+                    triggerFields.innerHTML = `
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Trigger After</label>
+                        <input type="number" id="triggerDays" placeholder="Number of days" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;" />
+                        <label style="display: block; margin-top: 1rem; margin-bottom: 0.5rem; font-weight: 600;">Based On</label>
+                        <select id="triggerDateField" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                            <option value="createdAt">Lead/Client Created Date</option>
+                            <option value="lastContact">Last Contact Date</option>
+                        </select>
+                    `;
+                    break;
+                default:
+                    triggerFields.innerHTML = '<p style="color: #666; font-size: 0.875rem;">This trigger will fire automatically when the event occurs.</p>';
+            }
+        }
+
+        function addWorkflowAction() {
+            const actionId = `action-${Date.now()}`;
+            workflowActions.push({ id: actionId, type: '', config: {} });
+            renderActions();
+        }
+
+        function removeWorkflowAction(actionId) {
+            workflowActions = workflowActions.filter(a => a.id !== actionId);
+            renderActions();
+        }
+
+        function renderActions() {
+            const container = document.getElementById('workflowActions');
+            if (workflowActions.length === 0) {
+                container.innerHTML = '<p style="color: #666; font-style: italic;">No actions added yet. Click "+ Add Action" to add one.</p>';
+                return;
+            }
+            
+            container.innerHTML = workflowActions.map((action, index) => `
+                <div style="background: #f8f9fa; border: 1px solid #ddd; border-radius: 4px; padding: 1rem; margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                        <strong>Action ${index + 1}</strong>
+                        <button onclick="removeWorkflowAction('${action.id}')" style="background: #dc3545; color: white; border: none; padding: 0.25rem 0.5rem; border-radius: 4px; cursor: pointer; font-size: 0.875rem;">Remove</button>
+                    </div>
+                    <select onchange="updateActionConfig('${action.id}', this.value)" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                        <option value="">Select Action Type...</option>
+                        <option value="send_email" ${action.type === 'send_email' ? 'selected' : ''}>Send Email</option>
+                        <option value="update_status" ${action.type === 'update_status' ? 'selected' : ''}>Update Status</option>
+                        <option value="add_note" ${action.type === 'add_note' ? 'selected' : ''}>Add Note</option>
+                    </select>
+                    <div id="actionConfig-${action.id}" style="margin-top: 0.75rem;">
+                        ${renderActionConfig(action)}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateActionConfig(actionId, actionType) {
+            const action = workflowActions.find(a => a.id === actionId);
+            if (action) {
+                action.type = actionType;
+                action.config = {};
+                renderActions();
+            }
+        }
+
+        function renderActionConfig(action) {
+            if (!action.type) return '';
+            
+            switch(action.type) {
+                case 'send_email':
+                    return `
+                        <label style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem;">Email Subject</label>
+                        <input type="text" id="emailSubject-${action.id}" placeholder="Welcome Email" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 0.5rem;" />
+                        <label style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem;">Email Content</label>
+                        <textarea id="emailContent-${action.id}" rows="4" placeholder="Use {{name}} and {{company}} for personalization" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;"></textarea>
+                    `;
+                case 'update_status':
+                    return `
+                        <label style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem;">New Status</label>
+                        <select id="newStatus-${action.id}" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                            <option value="Contacted">Contacted</option>
+                            <option value="Qualified">Qualified</option>
+                            <option value="Active">Active</option>
+                        </select>
+                    `;
+                case 'add_note':
+                    return `
+                        <label style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem;">Note Content</label>
+                        <textarea id="noteContent-${action.id}" rows="3" placeholder="Automated note from workflow" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;"></textarea>
+                    `;
+                default:
+                    return '';
+            }
+        }
+
+        async function saveWorkflow() {
+            const workflowName = document.getElementById('workflowName').value.trim();
+            const triggerType = document.getElementById('workflowTriggerType').value;
+            
+            if (!workflowName || !triggerType) {
+                alert('Please fill in workflow name and select a trigger type.');
+                return;
+            }
+            
+            if (workflowActions.length === 0) {
+                alert('Please add at least one action to the workflow.');
+                return;
+            }
+            
+            // Build trigger object
+            const trigger = { type: triggerType };
+            if (triggerType === 'lead_status_change') {
+                trigger.fromStatus = document.getElementById('triggerFromStatus')?.value || '';
+                trigger.toStatus = document.getElementById('triggerToStatus')?.value || '';
+            } else if (triggerType === 'date_based') {
+                trigger.days = parseInt(document.getElementById('triggerDays')?.value || 0);
+                trigger.dateField = document.getElementById('triggerDateField')?.value || 'createdAt';
+            }
+            
+            // Build actions array with configs
+            const actions = workflowActions.map(action => {
+                const config = { ...action.config };
+                if (action.type === 'send_email') {
+                    config.subject = document.getElementById(`emailSubject-${action.id}`)?.value || '';
+                    config.content = document.getElementById(`emailContent-${action.id}`)?.value || '';
+                } else if (action.type === 'update_status') {
+                    config.status = document.getElementById(`newStatus-${action.id}`)?.value || '';
+                } else if (action.type === 'add_note') {
+                    config.note = document.getElementById(`noteContent-${action.id}`)?.value || '';
+                }
+                return { type: action.type, config };
+            });
+            
+            const workflowData = {
+                id: editingWorkflowId,
+                workflowName,
+                workflowType: triggerType,
+                trigger,
+                actions,
+                isActive: true
+            };
+            
+            try {
+                const res = await fetch('/api/workflows', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(workflowData)
+                });
+                
+                const data = await res.json();
+                
+                if (data.success) {
+                    alert('✅ Workflow saved successfully!');
+                    closeWorkflowModal();
+                    loadWorkflows();
+                } else {
+                    alert(`❌ Error: ${data.error || 'Failed to save workflow'}`);
+                }
+            } catch (error) {
+                alert(`❌ Error saving workflow: ${error.message}`);
+            }
+        }
+
+        async function toggleWorkflow(workflowId, isActive) {
+            try {
+                const res = await fetch('/api/workflows', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ workflowId, isActive })
+                });
+                
+                const data = await res.json();
+                
+                if (data.success) {
+                    loadWorkflows();
+                } else {
+                    alert(`❌ Error: ${data.error || 'Failed to update workflow'}`);
+                }
+            } catch (error) {
+                alert(`❌ Error: ${error.message}`);
+            }
+        }
+
+        async function deleteWorkflow(workflowId, workflowName) {
+            if (!confirm(`Are you sure you want to delete the workflow "${workflowName}"?`)) {
+                return;
+            }
+            
+            try {
+                const res = await fetch(`/api/workflows?workflowId=${workflowId}`, {
+                    method: 'DELETE'
+                });
+                
+                const data = await res.json();
+                
+                if (data.success) {
+                    alert('✅ Workflow deleted successfully');
+                    loadWorkflows();
+                } else {
+                    alert(`❌ Error: ${data.error || 'Failed to delete workflow'}`);
+                }
+            } catch (error) {
+                alert(`❌ Error deleting workflow: ${error.message}`);
+            }
+        }
+
+        async function editWorkflow(workflowId) {
+            try {
+                const res = await fetch('/api/workflows');
+                const data = await res.json();
+                
+                if (!data.success) {
+                    alert('Error loading workflow');
+                    return;
+                }
+                
+                const workflow = data.workflows.find(w => w.id === workflowId);
+                if (!workflow) {
+                    alert('Workflow not found');
+                    return;
+                }
+                
+                editingWorkflowId = workflowId;
+                document.getElementById('workflowName').value = workflow.workflowName;
+                document.getElementById('workflowTriggerType').value = workflow.trigger?.type || '';
+                updateTriggerFields();
+                
+                workflowActions = (workflow.actions || []).map((action, index) => ({
+                    id: `action-${Date.now()}-${index}`,
+                    type: action.type,
+                    config: action.config || {}
+                }));
+                renderActions();
+                
+                document.getElementById('workflowModal').style.display = 'block';
+            } catch (error) {
+                alert(`Error loading workflow: ${error.message}`);
+            }
+        }
+
+        // ========== ANALYTICS ==========
+        async function loadAnalytics() {
+            const analyticsContent = document.getElementById('analyticsContent');
+            if (!analyticsContent) return;
+
+            analyticsContent.innerHTML = '<div style="text-align: center; padding: 2rem; color: #666;">Loading analytics...</div>';
+
+            try {
+                const res = await fetch('/api/analytics?type=all');
+                const data = await res.json();
+
+                if (!data.success) {
+                    throw new Error(data.error || 'Failed to load analytics');
+                }
+
+                const analytics = data.analytics;
+
+                analyticsContent.innerHTML = `
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                        <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <div style="font-size: 2.5rem; font-weight: 700; color: var(--tnr-navy);">${analytics.overview?.totalClients || 0}</div>
+                            <div style="color: #666; margin-top: 0.5rem;">Total Clients</div>
+                            <div style="color: #28a745; font-size: 0.875rem; margin-top: 0.25rem;">${analytics.overview?.activeClients || 0} active</div>
+                        </div>
+                        <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <div style="font-size: 2.5rem; font-weight: 700; color: var(--tnr-navy);">${analytics.overview?.totalLeads || 0}</div>
+                            <div style="color: #666; margin-top: 0.5rem;">Total Leads</div>
+                            <div style="color: #ffc107; font-size: 0.875rem; margin-top: 0.25rem;">${analytics.overview?.newLeads || 0} new</div>
+                        </div>
+                        <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <div style="font-size: 2.5rem; font-weight: 700; color: var(--tnr-navy);">${analytics.overview?.conversionRate || 0}%</div>
+                            <div style="color: #666; margin-top: 0.5rem;">Conversion Rate</div>
+                            <div style="color: #17a2b8; font-size: 0.875rem; margin-top: 0.25rem;">Leads → Clients</div>
+                        </div>
+                        <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <div style="font-size: 2.5rem; font-weight: 700; color: var(--tnr-navy);">$${((analytics.overview?.totalRevenue || 0) / 1000).toFixed(1)}K</div>
+                            <div style="color: #666; margin-top: 0.5rem;">Total Revenue</div>
+                            <div style="color: #28a745; font-size: 0.875rem; margin-top: 0.25rem;">${analytics.overview?.completedOrders || 0} orders</div>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                        <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <h3 style="color: var(--tnr-navy); margin-bottom: 1rem; font-size: 1.25rem;">📊 Lead Sources</h3>
+                            ${analytics.leadSources && analytics.leadSources.length > 0 ? `
+                                <div>
+                                    ${analytics.leadSources.slice(0, 5).map(source => `
+                                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: #f8f9fa; border-radius: 4px; margin-bottom: 0.5rem;">
+                                            <div>
+                                                <strong>${source.source}</strong>
+                                                <div style="font-size: 0.875rem; color: #666;">${source.count} leads</div>
+                                            </div>
+                                            <div style="font-size: 1.25rem; font-weight: 600; color: var(--tnr-gold);">${source.percentage}%</div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : '<p style="color: #666; font-style: italic;">No lead sources tracked yet</p>'}
+                        </div>
+
+                        <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <h3 style="color: var(--tnr-navy); margin-bottom: 1rem; font-size: 1.25rem;">🏢 Business Types</h3>
+                            ${analytics.businessTypes && analytics.businessTypes.length > 0 ? `
+                                <div>
+                                    ${analytics.businessTypes.slice(0, 5).map(type => `
+                                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: #f8f9fa; border-radius: 4px; margin-bottom: 0.5rem;">
+                                            <div>
+                                                <strong>${type.type}</strong>
+                                            </div>
+                                            <div style="font-size: 1.25rem; font-weight: 600; color: var(--tnr-gold);">${type.count}</div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : '<p style="color: #666; font-style: italic;">No business types tracked yet</p>'}
+                        </div>
+                    </div>
+
+                    <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <h3 style="color: var(--tnr-navy); margin-bottom: 1rem; font-size: 1.25rem;">📈 Recent Activity (Last 30 Days)</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                            <div style="text-align: center; padding: 1rem; background: #f8f9fa; border-radius: 4px;">
+                                <div style="font-size: 2rem; font-weight: 700; color: var(--tnr-navy);">${analytics.recentActivity?.newClients || 0}</div>
+                                <div style="color: #666; margin-top: 0.5rem;">New Clients</div>
+                            </div>
+                            <div style="text-align: center; padding: 1rem; background: #f8f9fa; border-radius: 4px;">
+                                <div style="font-size: 2rem; font-weight: 700; color: var(--tnr-navy);">${analytics.recentActivity?.newLeads || 0}</div>
+                                <div style="color: #666; margin-top: 0.5rem;">New Leads</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+                analyticsContent.innerHTML = `
+                    <div style="text-align: center; padding: 3rem; color: #dc3545;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">❌</div>
+                        <p><strong>Error loading analytics</strong></p>
+                        <p style="font-size: 0.875rem;">${error.message}</p>
+                        <button class="btn" onclick="loadAnalytics()" style="margin-top: 1rem;">Try Again</button>
+                    </div>
+                `;
+            }
+        }
+
+        // ========== ACTIVITY TIMELINE ==========
+        async function showActivityTimeline(entityType, entityId, entityName) {
+            const modal = document.createElement('div');
+            modal.id = 'activityModal';
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; overflow-y: auto; padding: 2rem;';
+            
+            modal.innerHTML = `
+                <div style="background: white; margin: 0 auto; max-width: 800px; border-radius: 8px; padding: 2rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <h2 style="color: var(--tnr-navy); margin: 0;">📋 Activity Timeline - ${entityName}</h2>
+                        <button onclick="closeActivityModal()" style="background: #dc3545; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">✕ Close</button>
+                    </div>
+                    
+                    <button onclick="showAddActivityModal('${entityType}', '${entityId}')" class="btn" style="background: var(--tnr-gold); color: var(--tnr-navy); margin-bottom: 1.5rem;">+ Add Activity</button>
+                    
+                    <div id="activityTimelineContent" style="min-height: 200px;">
+                        <div style="text-align: center; padding: 2rem; color: #666;">Loading activities...</div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            window.currentActivityModal = modal;
+            window.currentActivityEntity = { type: entityType, id: entityId };
+            
+            await loadActivities(entityType, entityId);
+        }
+
+        async function loadActivities(entityType, entityId) {
+            const content = document.getElementById('activityTimelineContent');
+            if (!content) return;
+
+            try {
+                const res = await fetch(`/api/activities?entityType=${entityType}&entityId=${entityId}`);
+                const data = await res.json();
+
+                if (!data.success) {
+                    throw new Error(data.error || 'Failed to load activities');
+                }
+
+                const activities = data.activities || [];
+
+                if (activities.length === 0) {
+                    content.innerHTML = `
+                        <div style="text-align: center; padding: 3rem; color: #666;">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">📋</div>
+                            <p><strong>No activities yet</strong></p>
+                            <p style="font-size: 0.875rem;">Add your first activity to start tracking interactions.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const activityIcons = {
+                    'call': '📞',
+                    'email': '📧',
+                    'meeting': '🤝',
+                    'note': '📝',
+                    'status_change': '🔄',
+                    'workflow': '🤖'
+                };
+
+                content.innerHTML = activities.map(activity => `
+                    <div style="background: #f8f9fa; border-left: 4px solid var(--tnr-gold); padding: 1rem; margin-bottom: 1rem; border-radius: 4px;">
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <div style="flex: 1;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                    <span style="font-size: 1.5rem;">${activityIcons[activity.activityType] || '📌'}</span>
+                                    <div>
+                                        <strong style="color: var(--tnr-navy);">${activity.title || activity.activityType}</strong>
+                                        <div style="font-size: 0.875rem; color: #666; margin-top: 0.25rem;">
+                                            ${new Date(activity.createdAt).toLocaleString()}
+                                        </div>
+                                    </div>
+                                </div>
+                                ${activity.description ? `<p style="color: #333; margin-top: 0.5rem;">${activity.description}</p>` : ''}
+                            </div>
+                            <button onclick="deleteActivity('${activity.id}')" style="background: #dc3545; color: white; border: none; padding: 0.25rem 0.5rem; border-radius: 4px; cursor: pointer; font-size: 0.875rem;">Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error loading activities:', error);
+                content.innerHTML = `
+                    <div style="text-align: center; padding: 3rem; color: #dc3545;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">❌</div>
+                        <p><strong>Error loading activities</strong></p>
+                        <p style="font-size: 0.875rem;">${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function closeActivityModal() {
+            if (window.currentActivityModal) {
+                document.body.removeChild(window.currentActivityModal);
+                window.currentActivityModal = null;
+                window.currentActivityEntity = null;
+            }
+        }
+
+        function showAddActivityModal(entityType, entityId) {
+            const activityType = prompt('Activity Type:\n1. call\n2. email\n3. meeting\n4. note\n5. status_change\n6. workflow', 'note');
+            if (!activityType) return;
+
+            const title = prompt('Title:', '');
+            if (title === null) return;
+
+            const description = prompt('Description (optional):', '');
+
+            addActivity({
+                entityType,
+                entityId,
+                activityType,
+                title,
+                description: description || null
+            });
+        }
+
+        async function addActivity(activityData) {
+            try {
+                const res = await fetch('/api/activities', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(activityData)
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    alert('✅ Activity added successfully!');
+                    if (window.currentActivityEntity) {
+                        await loadActivities(window.currentActivityEntity.type, window.currentActivityEntity.id);
+                    }
+                } else {
+                    alert(`❌ Error: ${data.error || 'Failed to add activity'}`);
+                }
+            } catch (error) {
+                alert(`❌ Error: ${error.message}`);
+            }
+        }
+
+        async function deleteActivity(activityId) {
+            if (!confirm('Are you sure you want to delete this activity?')) return;
+
+            try {
+                const res = await fetch(`/api/activities?activityId=${activityId}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    if (window.currentActivityEntity) {
+                        await loadActivities(window.currentActivityEntity.type, window.currentActivityEntity.id);
+                    }
+                } else {
+                    alert(`❌ Error: ${data.error || 'Failed to delete activity'}`);
+                }
+            } catch (error) {
+                alert(`❌ Error: ${error.message}`);
+            }
+        }
+
+        // ========== EMAIL TEMPLATES ==========
+        async function loadEmailTemplates() {
+            const templatesList = document.getElementById('templatesList');
+            if (!templatesList) return;
+
+            try {
+                const res = await fetch('/api/email-templates');
+                const data = await res.json();
+
+                if (!data.success || !data.templates || data.templates.length === 0) {
+                    templatesList.innerHTML = `
+                        <div style="text-align: center; padding: 3rem; color: #666;">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">📧</div>
+                            <p style="margin-bottom: 1rem;"><strong>No email templates created yet</strong></p>
+                            <p style="margin-bottom: 1.5rem;">Create your first email template to get started.</p>
+                            <button class="btn" onclick="showCreateTemplateModal()" style="background: var(--tnr-gold); color: var(--tnr-navy);">Create Template</button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                templatesList.innerHTML = data.templates.map(template => `
+                    <div style="background: #f8f9fa; border: 1px solid #ddd; border-radius: 8px; padding: 1.5rem; margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                            <div style="flex: 1;">
+                                <h4 style="margin: 0; color: var(--tnr-navy);">${template.templateName}</h4>
+                                <p style="margin: 0.5rem 0; color: #666; font-size: 0.875rem;">
+                                    <strong>Subject:</strong> ${template.subject}<br/>
+                                    ${template.category ? `<strong>Category:</strong> ${template.category}<br/>` : ''}
+                                    <strong>Variables:</strong> ${(template.variables || []).join(', ') || 'None'}
+                                </p>
+                            </div>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button class="btn-small" onclick="editEmailTemplate('${template.id}')" style="background: #007bff; color: white;">✏️ Edit</button>
+                                <button class="btn-small btn-danger" onclick="deleteEmailTemplate('${template.id}', '${template.templateName}')">🗑️ Delete</button>
+                            </div>
+                        </div>
+                        <div style="background: white; padding: 1rem; border-radius: 4px; font-size: 0.875rem; color: #666; max-height: 200px; overflow-y: auto;">
+                            ${template.htmlContent.substring(0, 200)}${template.htmlContent.length > 200 ? '...' : ''}
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error loading templates:', error);
+                templatesList.innerHTML = `
+                    <div style="text-align: center; padding: 3rem; color: #dc3545;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">❌</div>
+                        <p><strong>Error loading templates</strong></p>
+                        <p style="font-size: 0.875rem;">${error.message}</p>
+                        <button class="btn" onclick="loadEmailTemplates()" style="margin-top: 1rem;">Try Again</button>
+                    </div>
+                `;
+            }
+        }
+
+        function showCreateTemplateModal() {
+            const modal = document.createElement('div');
+            modal.id = 'templateModal';
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; overflow-y: auto; padding: 2rem;';
+            
+            modal.innerHTML = `
+                <div style="background: white; margin: 0 auto; max-width: 900px; border-radius: 8px; padding: 2rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <h2 style="color: var(--tnr-navy); margin: 0;">Create Email Template</h2>
+                        <button onclick="closeTemplateModal()" style="background: #dc3545; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">✕ Close</button>
+                    </div>
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Template Name</label>
+                        <input type="text" id="templateName" placeholder="e.g., Welcome Email" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px;" />
+                    </div>
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Category (optional)</label>
+                        <input type="text" id="templateCategory" placeholder="e.g., Welcome, Follow-up" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px;" />
+                    </div>
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Subject</label>
+                        <input type="text" id="templateSubject" placeholder="Welcome to {{company}}!" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px;" />
+                    </div>
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">HTML Content</label>
+                        <textarea id="templateHtmlContent" rows="12" placeholder="<h1>Hello {{name}},</h1><p>Welcome to {{company}}!</p>" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-family: monospace;"></textarea>
+                        <div style="font-size: 0.875rem; color: #666; margin-top: 0.5rem;">
+                            Available variables: <code>{{name}}</code>, <code>{{email}}</code>, <code>{{phone}}</code>, <code>{{company}}</code>, <code>{{businessType}}</code>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                        <button onclick="closeTemplateModal()" class="btn" style="background: #666;">Cancel</button>
+                        <button onclick="saveEmailTemplate()" class="btn" style="background: var(--tnr-gold); color: var(--tnr-navy); font-weight: 600;">💾 Save Template</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            window.currentTemplateModal = modal;
+            window.editingTemplateId = null;
+        }
+
+        function closeTemplateModal() {
+            if (window.currentTemplateModal) {
+                document.body.removeChild(window.currentTemplateModal);
+                window.currentTemplateModal = null;
+                window.editingTemplateId = null;
+            }
+        }
+
+        async function saveEmailTemplate() {
+            const templateName = document.getElementById('templateName').value.trim();
+            const subject = document.getElementById('templateSubject').value.trim();
+            const htmlContent = document.getElementById('templateHtmlContent').value.trim();
+            const category = document.getElementById('templateCategory').value.trim();
+
+            if (!templateName || !subject || !htmlContent) {
+                alert('Please fill in template name, subject, and HTML content.');
+                return;
+            }
+
+            // Extract variables from content
+            const variableMatches = htmlContent.match(/\{\{(\w+)\}\}/g) || [];
+            const variables = [...new Set(variableMatches.map(v => v.replace(/[{}]/g, '')))];
+
+            const templateData = {
+                id: window.editingTemplateId,
+                templateName,
+                subject,
+                htmlContent,
+                category: category || null,
+                variables,
+                isDefault: false
+            };
+
+            try {
+                const res = await fetch('/api/email-templates', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(templateData)
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    alert('✅ Template saved successfully!');
+                    closeTemplateModal();
+                    loadEmailTemplates();
+                } else {
+                    alert(`❌ Error: ${data.error || 'Failed to save template'}`);
+                }
+            } catch (error) {
+                alert(`❌ Error: ${error.message}`);
+            }
+        }
+
+        async function deleteEmailTemplate(templateId, templateName) {
+            if (!confirm(`Are you sure you want to delete the template "${templateName}"?`)) {
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/email-templates?templateId=${templateId}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    alert('✅ Template deleted successfully');
+                    loadEmailTemplates();
+                } else {
+                    alert(`❌ Error: ${data.error || 'Failed to delete template'}`);
+                }
+            } catch (error) {
+                alert(`❌ Error: ${error.message}`);
+            }
+        }
+
+        async function editEmailTemplate(templateId) {
+            try {
+                const res = await fetch(`/api/email-templates?templateId=${templateId}`);
+                const data = await res.json();
+
+                if (!data.success || !data.template) {
+                    alert('Error loading template');
+                    return;
+                }
+
+                const template = data.template;
+                window.editingTemplateId = templateId;
+
+                showCreateTemplateModal();
+
+                // Populate form after modal is created
+                setTimeout(() => {
+                    document.getElementById('templateName').value = template.templateName;
+                    document.getElementById('templateSubject').value = template.subject;
+                    document.getElementById('templateHtmlContent').value = template.htmlContent;
+                    document.getElementById('templateCategory').value = template.category || '';
+                }, 100);
+
+            } catch (error) {
+                alert(`Error loading template: ${error.message}`);
+            }
+        }
+
+        // Update showTab to load templates
+        const originalShowTabFinal = window.showTab;
+        window.showTab = function(tab) {
+            if (originalShowTabFinal) originalShowTabFinal(tab);
+            if (tab === 'social' && !tokensLoaded) {
+                loadSocialTokens();
+                tokensLoaded = true;
+            }
+            if (tab === 'automation') {
+                loadWorkflows();
+            }
+            if (tab === 'analytics') {
+                loadAnalytics();
+            }
+            if (tab === 'email-templates') {
+                loadEmailTemplates();
+            }
+        };
     </script>
 </body>
 </html>

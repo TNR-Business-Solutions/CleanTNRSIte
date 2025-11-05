@@ -3,6 +3,7 @@
 
 const TNRDatabase = require("../../database");
 const { URL } = require("url");
+const workflowExecutor = require("../workflow-executor");
 
 // Initialize database connection
 let dbInstance = null;
@@ -17,38 +18,46 @@ async function getDatabase() {
 
 // CORS headers helper
 function setCorsHeaders(res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS"
-  );
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  // For raw Node.js HTTP, we need to set headers before writing
+  if (!res.headersSent) {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader(
+      "Access-Control-Allow-Methods",
+      "GET, POST, PUT, DELETE, OPTIONS"
+    );
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  }
 }
 
 // CRM API Handler
 module.exports = async function crmApiHandler(req, res) {
-  setCorsHeaders(res);
-
-  if (req.method === "OPTIONS") {
-    res.status(200).end();
-    return;
-  }
-
-  let db;
-  let fullPath = req.url;
-  // Extract the path after /api/crm/
-  const match = fullPath.match(/\/api\/crm\/(.*)/);
-  const path = match ? match[1] : "";
-  const parsedUrl = (() => {
-    try {
-      // Provide a base to satisfy WHATWG URL on Node
-      return new URL(fullPath, "http://localhost");
-    } catch (e) {
-      return null;
-    }
-  })();
-
   try {
+    if (req.method === "OPTIONS") {
+      setCorsHeaders(res);
+      res.writeHead(200);
+      res.end();
+      return;
+    }
+
+    let db;
+    let fullPath = req.url;
+    
+    // Extract the path after /api/crm/
+    const match = fullPath.match(/\/api\/crm\/(.*)/);
+    const path = match ? match[1] : "";
+    
+    console.log("📋 CRM API Request:", req.method, fullPath, "Path:", path);
+    
+    const parsedUrl = (() => {
+      try {
+        // Provide a base to satisfy WHATWG URL on Node
+        return new URL(fullPath, "http://localhost");
+      } catch (e) {
+        console.error("URL parse error:", e);
+        return null;
+      }
+    })();
+
     try {
       db = await getDatabase();
     } catch (e) {
@@ -100,8 +109,10 @@ module.exports = async function crmApiHandler(req, res) {
             return 0;
           });
         }
+        setCorsHeaders(res);
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ success: true, data: clients }));
+        console.log("✅ Clients returned:", clients.length);
       } else if (path.startsWith("clients/")) {
         const id = path.replace("clients/", "");
         const client = await db.getClient(id);
@@ -177,10 +188,50 @@ module.exports = async function crmApiHandler(req, res) {
 
           if (path === "clients") {
             const client = await db.addClient(data);
+            
+            // Send welcome email to new client (non-blocking)
+            try {
+              // Ensure .env is loaded
+              require("dotenv").config();
+              
+              const EmailHandler = require("../../email-handler");
+              const emailHandler = new EmailHandler();
+              
+              console.log("📧 Sending welcome email to:", client.email);
+              console.log("📧 Sending notification to:", process.env.BUSINESS_EMAIL || "Roy.Turner@TNRBusinessSolutions.com");
+              
+              emailHandler.sendWelcomeEmail(client)
+                .then(result => {
+                  if (result.success) {
+                    console.log("✅ Welcome email sent successfully!");
+                    console.log("   Message:", result.message);
+                  } else {
+                    console.error("❌ Failed to send welcome email:", result.error);
+                  }
+                })
+                .catch(err => {
+                  console.error("❌ Error sending welcome email:", err.message);
+                  console.error("   Stack:", err.stack);
+                });
+            } catch (emailError) {
+              console.error("❌ Failed to initialize email handler:", emailError.message);
+              console.error("   Stack:", emailError.stack);
+              console.error("   Make sure SMTP_USER and SMTP_PASS are set in .env file");
+            }
+            
             res.writeHead(201, { "Content-Type": "application/json" });
             res.end(JSON.stringify({ success: true, data: client }));
           } else if (path === "leads") {
             const lead = await db.addLead(data);
+            
+            // Trigger workflows for new lead
+            try {
+              await workflowExecutor.initialize();
+              await workflowExecutor.processNewLead(lead);
+            } catch (wfError) {
+              console.warn('Workflow execution error (non-blocking):', wfError.message);
+            }
+            
             res.writeHead(201, { "Content-Type": "application/json" });
             res.end(JSON.stringify({ success: true, data: lead }));
           } else if (path === "orders") {
@@ -237,6 +288,14 @@ module.exports = async function crmApiHandler(req, res) {
               };
               const lead = await db.addLead(leadPayload);
               created.push(lead);
+              
+              // Trigger workflows for new lead (non-blocking)
+              try {
+                await workflowExecutor.initialize();
+                await workflowExecutor.processNewLead(lead);
+              } catch (wfError) {
+                console.warn('Workflow execution error for imported lead (non-blocking):', wfError.message);
+              }
             }
             res.writeHead(201, { "Content-Type": "application/json" });
             res.end(JSON.stringify({ success: true, createdCount: created.length }));
@@ -263,7 +322,22 @@ module.exports = async function crmApiHandler(req, res) {
           const data = JSON.parse(body);
 
           if (path === "clients") {
+            // Get old client data to detect status changes
+            const oldClient = await db.getClient(data.id);
+            const oldStatus = oldClient?.status;
+            
             const client = await db.updateClient(data.id, data);
+            
+            // Trigger workflows if status changed
+            if (data.status && oldStatus && data.status !== oldStatus) {
+              try {
+                await workflowExecutor.initialize();
+                await workflowExecutor.processStatusChange(client, oldStatus, data.status, 'client');
+              } catch (wfError) {
+                console.warn('Workflow execution error (non-blocking):', wfError.message);
+              }
+            }
+            
             res.writeHead(200, { "Content-Type": "application/json" });
             res.end(JSON.stringify({ success: true, data: client }));
           } else if (path === "orders") {

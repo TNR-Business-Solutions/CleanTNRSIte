@@ -65,13 +65,63 @@ module.exports = async (req, res) => {
       return await handler(req, res);
     }
     
+    if (route.startsWith('auth/linkedin')) {
+      if (route === 'auth/linkedin/callback' || route.endsWith('/callback')) {
+        const handler = require('../server/handlers/auth-linkedin-callback');
+        return await handler(req, res);
+      }
+      const handler = require('../server/handlers/auth-linkedin');
+      return await handler(req, res);
+    }
+    
+    if (route.startsWith('auth/twitter')) {
+      if (route === 'auth/twitter/callback' || route.endsWith('/callback')) {
+        const handler = require('../server/handlers/auth-twitter-callback');
+        return await handler(req, res);
+      }
+      const handler = require('../server/handlers/auth-twitter');
+      return await handler(req, res);
+    }
+    
+    if (route.startsWith('workflows/') || route === 'workflows') {
+      const handler = require('../server/handlers/workflows-api');
+      return await handler(req, res);
+    }
+    
+    if (route.startsWith('analytics/') || route === 'analytics') {
+      const handler = require('../server/handlers/analytics-api');
+      return await handler(req, res);
+    }
+    
+    if (route.startsWith('activities/') || route === 'activities') {
+      const handler = require('../server/handlers/activities-api');
+      return await handler(req, res);
+    }
+    
+    if (route.startsWith('email-templates/') || route === 'email-templates') {
+      const handler = require('../server/handlers/email-templates-api');
+      return await handler(req, res);
+    }
+    
     if (route.startsWith('social/')) {
-      if (route.includes('post-to-facebook') || route === 'social/post') {
+      if (route.includes('tokens') || route === 'social/tokens') {
+        const handler = require('../server/handlers/social-tokens-api');
+        return await handler(req, res);
+      }
+      if (route.includes('post-to-facebook') || route === 'social/post-facebook' || route === 'social/post') {
         const handler = require('../server/handlers/post-to-facebook');
         return await handler(req, res);
       }
       if (route.includes('post-to-instagram') || route === 'social/post-instagram') {
         const handler = require('../server/handlers/post-to-instagram');
+        return await handler(req, res);
+      }
+      if (route.includes('post-to-linkedin') || route === 'social/post-linkedin') {
+        const handler = require('../server/handlers/post-to-linkedin');
+        return await handler(req, res);
+      }
+      if (route.includes('post-to-twitter') || route === 'social/post-twitter') {
+        const handler = require('../server/handlers/post-to-twitter');
         return await handler(req, res);
       }
       if (route.includes('test-token') || route === 'social/test') {
