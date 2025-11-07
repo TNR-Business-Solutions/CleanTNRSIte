@@ -4,7 +4,16 @@
 
 const sqlite3 = require("sqlite3").verbose();
 const path = require("path");
-let postgres; // Lazy-loaded for Vercel Postgres
+
+// Import Vercel Postgres at top level so Vercel bundles it
+let postgres;
+try {
+  postgres = require("@vercel/postgres");
+  console.log('✅ @vercel/postgres module loaded successfully');
+} catch (e) {
+  console.log('ℹ️ @vercel/postgres not available (local development)');
+  postgres = null;
+}
 
 class TNRDatabase {
   constructor() {
@@ -26,13 +35,12 @@ class TNRDatabase {
   async initialize() {
     if (this.usePostgres) {
       try {
-        // Lazy load @vercel/postgres only when needed
         if (!postgres) {
-          postgres = require("@vercel/postgres");
+          throw new Error('@vercel/postgres module not available');
         }
+        
         // @vercel/postgres exports { sql } where sql is a tagged template function
         // Use sql.unsafe() for parameterized queries
-        // Check for different export patterns
         if (postgres.sql) {
           this.postgres = postgres.sql;
         } else if (postgres.unsafe) {
@@ -45,9 +53,13 @@ class TNRDatabase {
         return;
       } catch (err) {
         console.error("❌ Postgres initialization error:", err);
-        throw err;
+        console.error("Falling back to SQLite");
+        // Fall through to SQLite initialization below
+        this.usePostgres = false;
       }
-    } else {
+    }
+    
+    if (!this.usePostgres) {
       // SQLite for local development
       return new Promise((resolve, reject) => {
         this.db = new sqlite3.Database(this.dbPath, (err) => {
