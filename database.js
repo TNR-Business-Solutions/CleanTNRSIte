@@ -88,14 +88,15 @@ class TNRDatabase {
   async query(sql, params = []) {
     if (this.usePostgres) {
       const { sql: convertedSQL, params: convertedParams } = this.convertSQL(sql, params);
-      // Neon uses parameterized queries with $1, $2 format
+      // Neon driver requires sql.query() for parameterized queries
       try {
-        const result = await this.postgres(convertedSQL, convertedParams);
+        const result = await this.postgres.query(convertedSQL, convertedParams);
+        // Neon returns { rows: [...] }
         return result.rows || result || [];
       } catch (err) {
         console.error('Neon query error:', err);
         console.error('SQL:', convertedSQL.substring(0, 100));
-        console.error('Params:', convertedParams.length);
+        console.error('Params:', convertedParams);
         throw err;
       }
     } else {
@@ -128,18 +129,13 @@ class TNRDatabase {
     if (this.usePostgres) {
       const { sql: convertedSQL, params: convertedParams } = this.convertSQL(sql, params);
       try {
-        let result;
-        if (this.postgres && typeof this.postgres.unsafe === 'function') {
-          result = await this.postgres.unsafe(convertedSQL, convertedParams);
-        } else if (this.postgres && typeof this.postgres === 'function' && this.postgres.unsafe) {
-          result = await this.postgres.unsafe(convertedSQL, convertedParams);
-        } else {
-          throw new Error('Postgres client not properly configured for execute');
-        }
+        // Neon driver uses sql.query() for all queries including INSERT/UPDATE/DELETE
+        const result = await this.postgres.query(convertedSQL, convertedParams);
         return { lastID: null, changes: result.rowCount || result.count || 0 };
       } catch (err) {
-        console.error('Postgres execute error:', err);
+        console.error('Neon execute error:', err);
         console.error('SQL:', convertedSQL.substring(0, 100));
+        console.error('Params:', convertedParams);
         throw err;
       }
     } else {
