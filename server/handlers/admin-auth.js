@@ -27,28 +27,38 @@ module.exports = async (req, res) => {
   }
 
   try {
-    // Read request body - use same pattern as CRM handler
-    // This works reliably in Vercel serverless functions
-    let body = '';
+    // Handle request body - Vercel serverless functions may pre-parse
+    let parsedBody = {};
     
-    // First check if req.body is already available (Vercel sometimes pre-parses)
+    // First check if req.body is already available (Vercel pre-parses JSON)
     if (req.body && typeof req.body === 'object' && !Array.isArray(req.body)) {
-      console.log('✅ Using pre-parsed req.body');
-      const { username, password } = req.body;
+      parsedBody = req.body;
+    } else if (typeof req.body === 'string') {
+      // Sometimes Vercel gives us a string
+      try {
+        parsedBody = JSON.parse(req.body);
+      } catch (e) {
+        // If parsing fails, read from stream
+      }
+    }
+    
+    // If we have parsed body, use it
+    if (parsedBody && (parsedBody.username || parsedBody.password)) {
+      const { username, password } = parsedBody;
       return await handleAuth(username, password, res);
     }
     
-    // Otherwise, read from stream
-    return new Promise((resolve, reject) => {
+    // Otherwise, read from stream (for local dev or if Vercel didn't parse)
+    return new Promise((resolve) => {
+      let body = '';
+      
       req.on('data', (chunk) => {
         body += chunk.toString();
       });
 
       req.on('end', async () => {
         try {
-          const parsedBody = body.trim() ? JSON.parse(body) : {};
-          console.log('✅ Parsed body from stream:', { hasUsername: !!parsedBody.username, hasPassword: !!parsedBody.password });
-          
+          parsedBody = body.trim() ? JSON.parse(body) : {};
           const { username, password } = parsedBody;
           await handleAuth(username, password, res);
           resolve();

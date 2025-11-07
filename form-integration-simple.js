@@ -106,8 +106,8 @@ class SimpleFormIntegration {
 
     console.log("📊 Form data collected:", submission);
 
-    // 1. Create lead in CRM (localStorage)
-    this.createLead(submission);
+    // 1. Create lead in CRM (database via API, with localStorage fallback)
+    await this.createLead(submission);
 
     // 2. Send to server for email (with files if career application)
     if (formType === "Career Application") {
@@ -133,60 +133,90 @@ class SimpleFormIntegration {
     return services.length > 0 ? services : [];
   }
 
-  createLead(data) {
+  async createLead(data) {
     console.log("🔄 createLead called with data:", data);
-    console.log("🔍 Checking CRM availability...");
-    console.log(
-      "  - TNRCRMData class:",
-      typeof window.TNRCRMData !== "undefined" ? "✅ Available" : "❌ Not found"
-    );
-    console.log(
-      "  - window.tnrCRM instance:",
-      window.tnrCRM ? "✅ Exists" : "❌ Not initialized"
-    );
+    
+    // First, try to save to database via API (persistent storage)
+    try {
+      console.log("💾 Attempting to save lead to database via API...");
+      const response = await fetch("/api/crm/leads", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
 
-    // Initialize CRM if needed (fallback)
-    if (!window.tnrCRM && typeof window.TNRCRMData !== "undefined") {
-      console.log("🏗️ CRM not initialized, creating new instance...");
-      window.tnrCRM = new window.TNRCRMData();
-      console.log("✅ CRM instance created");
-    }
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          console.log("✅ Lead saved to database:", result.data);
+          // Also save to localStorage as backup
+          this.saveToLocalStorageBackup(result.data);
+          return result.data;
+        } else {
+          throw new Error(result.error || "Failed to save lead");
+        }
+      } else {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+    } catch (apiError) {
+      console.warn("⚠️ API save failed, falling back to localStorage:", apiError);
+      
+      // Fallback to localStorage if API fails
+      console.log("🔍 Checking CRM availability for localStorage fallback...");
+      console.log(
+        "  - TNRCRMData class:",
+        typeof window.TNRCRMData !== "undefined" ? "✅ Available" : "❌ Not found"
+      );
+      console.log(
+        "  - window.tnrCRM instance:",
+        window.tnrCRM ? "✅ Exists" : "❌ Not initialized"
+      );
 
-    if (window.tnrCRM) {
-      console.log("✅ CRM is ready, creating lead...");
+      // Initialize CRM if needed (fallback)
+      if (!window.tnrCRM && typeof window.TNRCRMData !== "undefined") {
+        console.log("🏗️ CRM not initialized, creating new instance...");
+        window.tnrCRM = new window.TNRCRMData();
+        console.log("✅ CRM instance created");
+      }
 
-      try {
-        const lead = window.tnrCRM.addLead(data);
-        console.log("✅ Lead created successfully:", lead);
+      if (window.tnrCRM) {
+        console.log("✅ CRM is ready, creating lead in localStorage...");
 
-        // Force save to localStorage
-        window.tnrCRM.saveToStorage();
-        console.log("💾 Lead saved to localStorage");
+        try {
+          const lead = window.tnrCRM.addLead(data);
+          console.log("✅ Lead created in localStorage:", lead);
 
-        // Verify it was saved
-        const savedLeads = localStorage.getItem("tnr_crm_leads");
-        const leadsArray = savedLeads ? JSON.parse(savedLeads) : [];
-        console.log(`📊 Total leads in localStorage: ${leadsArray.length}`);
-        console.log(
-          "📋 Last lead in storage:",
-          leadsArray[leadsArray.length - 1]
-        );
+          // Force save to localStorage
+          window.tnrCRM.saveToStorage();
+          console.log("💾 Lead saved to localStorage (fallback)");
 
-        return lead;
-      } catch (error) {
-        console.error("❌ Error creating lead:", error);
-        console.error("Error stack:", error.stack);
-        alert("ERROR creating lead: " + error.message);
+          return lead;
+        } catch (error) {
+          console.error("❌ Error creating lead in localStorage:", error);
+          console.error("Error stack:", error.stack);
+          // Don't alert - just log, as this is a fallback
+          return null;
+        }
+      } else {
+        console.error("❌ CRITICAL: Both API and CRM system unavailable!");
+        // Don't alert - form submission will still send email
         return null;
       }
-    } else {
-      console.error("❌ CRITICAL: CRM system not available!");
-      console.error("  - TNRCRMData class:", typeof window.TNRCRMData);
-      console.error("  - window.tnrCRM:", window.tnrCRM);
-      alert(
-        "ERROR: CRM system not loaded. Please refresh the page and try again."
-      );
-      return null;
+    }
+  }
+
+  // Save to localStorage as backup
+  saveToLocalStorageBackup(lead) {
+    try {
+      const stored = localStorage.getItem("tnr_crm_leads");
+      const leads = stored ? JSON.parse(stored) : [];
+      leads.push(lead);
+      localStorage.setItem("tnr_crm_leads", JSON.stringify(leads));
+      console.log("💾 Lead also saved to localStorage as backup");
+    } catch (error) {
+      console.warn("⚠️ Failed to save to localStorage backup:", error);
     }
   }
 

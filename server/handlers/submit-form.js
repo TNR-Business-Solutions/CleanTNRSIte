@@ -12,27 +12,9 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-module.exports = async (req, res) => {
-  // Enable CORS
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
-  // Handle OPTIONS request for CORS
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
-  }
-
-  // Only accept POST requests
-  if (req.method !== "POST") {
-    return res
-      .status(405)
-      .json({ success: false, message: "Method not allowed" });
-  }
-
+// Process form submission and send email
+async function processFormSubmission(formData, res) {
   try {
-    const formData = req.body;
-
     console.log("📥 Serverless function received form data:", formData);
 
     // Determine if this is a career application
@@ -192,7 +174,83 @@ module.exports = async (req, res) => {
     });
   } catch (error) {
     console.error("❌ Error processing form:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to process form submission",
+      error: error.message,
+    });
+  }
+}
 
+module.exports = async (req, res) => {
+  // Enable CORS
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  // Handle OPTIONS request for CORS
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
+  // Only accept POST requests
+  if (req.method !== "POST") {
+    return res
+      .status(405)
+      .json({ success: false, message: "Method not allowed" });
+  }
+
+  try {
+    // Handle request body - Vercel may pre-parse or we need to read stream
+    let formData = {};
+    
+    if (req.body && typeof req.body === 'object' && !Array.isArray(req.body)) {
+      formData = req.body;
+    } else if (typeof req.body === 'string') {
+      try {
+        formData = JSON.parse(req.body);
+      } catch (e) {
+        // Will read from stream below
+      }
+    }
+    
+    // If body not parsed, read from stream
+    if (!formData || Object.keys(formData).length === 0) {
+      return new Promise((resolve) => {
+        let body = '';
+        req.on('data', (chunk) => {
+          body += chunk.toString();
+        });
+        req.on('end', async () => {
+          try {
+            formData = body.trim() ? JSON.parse(body) : {};
+            await processFormSubmission(formData, res);
+            resolve();
+          } catch (parseError) {
+            console.error("❌ Error parsing form data:", parseError);
+            return res.status(400).json({
+              success: false,
+              message: "Invalid form data",
+              error: parseError.message,
+            });
+          }
+        });
+        req.on('error', (error) => {
+          console.error("❌ Request stream error:", error);
+          return res.status(500).json({
+            success: false,
+            message: "Request error",
+            error: error.message,
+          });
+        });
+      });
+    }
+    
+    // Process the form submission
+    await processFormSubmission(formData, res);
+    
+  } catch (error) {
+    console.error("❌ Error in submit-form handler:", error);
     return res.status(500).json({
       success: false,
       message: "Failed to process form submission",
