@@ -5,15 +5,15 @@
 const sqlite3 = require("sqlite3").verbose();
 const path = require("path");
 
-// Import Vercel Postgres - use the sql export directly
-let sql;
+// Import Neon serverless driver (works with Vercel)
+let neon;
 try {
-  const vercelPostgres = require("@vercel/postgres");
-  sql = vercelPostgres.sql;
-  console.log('✅ @vercel/postgres loaded:', !!sql);
+  const { neon: neonDriver } = require("@neondatabase/serverless");
+  neon = neonDriver;
+  console.log('✅ Neon serverless driver loaded successfully');
 } catch (e) {
-  console.log('ℹ️ @vercel/postgres not available (local development):', e.message);
-  sql = null;
+  console.log('ℹ️ Neon driver not available (local development):', e.message);
+  neon = null;
 }
 
 class TNRDatabase {
@@ -32,16 +32,17 @@ class TNRDatabase {
     });
   }
 
-  // Initialize database (auto-detects SQLite or Postgres)
+  // Initialize database (auto-detects SQLite or Neon Postgres)
   async initialize() {
     if (this.usePostgres) {
       try {
-        if (!sql) {
-          throw new Error('@vercel/postgres sql function not available');
+        if (!neon) {
+          throw new Error('Neon driver not available');
         }
         
-        this.postgres = sql;
-        console.log("✅ Using Vercel Postgres database");
+        // Create Neon SQL client
+        this.postgres = neon(process.env.POSTGRES_URL);
+        console.log("✅ Using Neon Postgres database");
         await this.createTables();
         return;
       } catch (err) {
@@ -87,25 +88,12 @@ class TNRDatabase {
   async query(sql, params = []) {
     if (this.usePostgres) {
       const { sql: convertedSQL, params: convertedParams } = this.convertSQL(sql, params);
-      // @vercel/postgres uses sql.unsafe() for raw queries with $1, $2 placeholders
+      // Neon uses parameterized queries with $1, $2 format
       try {
-        if (this.postgres && typeof this.postgres.unsafe === 'function') {
-          const result = await this.postgres.unsafe(convertedSQL, convertedParams);
-          return result.rows || [];
-        } else if (this.postgres && typeof this.postgres === 'function') {
-          // Try as tagged template function with unsafe
-          if (this.postgres.unsafe) {
-            const result = await this.postgres.unsafe(convertedSQL, convertedParams);
-            return result.rows || [];
-          }
-          // Try direct call (may not work, but worth trying)
-          const result = await this.postgres(convertedSQL, ...convertedParams);
-          return result.rows || result || [];
-        } else {
-          throw new Error('Invalid Postgres client configuration');
-        }
+        const result = await this.postgres(convertedSQL, convertedParams);
+        return result.rows || result || [];
       } catch (err) {
-        console.error('Postgres query error:', err);
+        console.error('Neon query error:', err);
         console.error('SQL:', convertedSQL.substring(0, 100));
         console.error('Params:', convertedParams.length);
         throw err;
