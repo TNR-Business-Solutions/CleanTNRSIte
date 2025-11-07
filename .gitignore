@@ -204,3 +204,4 @@ Thumbs.db
 .github\instructions\snyk_rules.instructions.md
 
 .vercel
+# Force redeploy
