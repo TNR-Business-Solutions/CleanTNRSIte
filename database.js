@@ -1,31 +1,162 @@
-// TNR Business Solutions - Database Setup
-// SQLite database for persistent data storage
+// TNR Business Solutions - Dual Database Support
+// Supports SQLite (local development) and Vercel Postgres (production)
+// Auto-detects database type from environment variables
 
 const sqlite3 = require("sqlite3").verbose();
 const path = require("path");
-const fs = require("fs");
+let postgres; // Lazy-loaded for Vercel Postgres
 
 class TNRDatabase {
   constructor() {
     this.db = null;
     this.dbPath = path.join(__dirname, "tnr_database.db");
+    this.usePostgres = !!process.env.POSTGRES_URL;
+    this.postgres = null;
+    
+    // Debug: Log environment detection
+    console.log('🔍 Database initialization:', {
+      hasPostgresUrl: !!process.env.POSTGRES_URL,
+      hasDatabaseUrl: !!process.env.DATABASE_URL,
+      usePostgres: this.usePostgres,
+      nodeEnv: process.env.NODE_ENV
+    });
   }
 
-  // Initialize database
+  // Initialize database (auto-detects SQLite or Postgres)
   async initialize() {
-    return new Promise((resolve, reject) => {
-      this.db = new sqlite3.Database(this.dbPath, (err) => {
-        if (err) {
-          console.error("❌ Database initialization error:", err);
-          reject(err);
-        } else {
-          console.log("✅ Database initialized successfully");
-          this.createTables()
-            .then(() => resolve())
-            .catch(reject);
+    if (this.usePostgres) {
+      try {
+        // Lazy load @vercel/postgres only when needed
+        if (!postgres) {
+          postgres = require("@vercel/postgres");
         }
+        // @vercel/postgres exports { sql } where sql is a tagged template function
+        // Use sql.unsafe() for parameterized queries
+        // Check for different export patterns
+        if (postgres.sql) {
+          this.postgres = postgres.sql;
+        } else if (postgres.unsafe) {
+          this.postgres = postgres;
+        } else {
+          this.postgres = postgres;
+        }
+        console.log("✅ Using Vercel Postgres database");
+        await this.createTables();
+        return;
+      } catch (err) {
+        console.error("❌ Postgres initialization error:", err);
+        throw err;
+      }
+    } else {
+      // SQLite for local development
+      return new Promise((resolve, reject) => {
+        this.db = new sqlite3.Database(this.dbPath, (err) => {
+          if (err) {
+            console.error("❌ Database initialization error:", err);
+            reject(err);
+          } else {
+            console.log("✅ Using SQLite database (local development)");
+            this.createTables()
+              .then(() => resolve())
+              .catch(reject);
+          }
+        });
       });
-    });
+    }
+  }
+
+  // Convert SQL with ? placeholders to Postgres format
+  // For @vercel/postgres, we use tagged template literals: sql`SELECT * FROM table WHERE id = ${value}`
+  // But we'll convert ? to use the template literal approach
+  convertSQL(sql, params = []) {
+    if (!this.usePostgres) return { sql, params };
+    
+    // @vercel/postgres uses tagged template literals, but also supports sql.query() with $1, $2
+    // For compatibility, convert ? to $1, $2 format for query() method
+    let paramIndex = 1;
+    const convertedSQL = sql.replace(/\?/g, () => `$${paramIndex++}`);
+    return { sql: convertedSQL, params };
+  }
+
+  // Unified query executor
+  async query(sql, params = []) {
+    if (this.usePostgres) {
+      const { sql: convertedSQL, params: convertedParams } = this.convertSQL(sql, params);
+      // @vercel/postgres uses sql.unsafe() for raw queries with $1, $2 placeholders
+      try {
+        if (this.postgres && typeof this.postgres.unsafe === 'function') {
+          const result = await this.postgres.unsafe(convertedSQL, convertedParams);
+          return result.rows || [];
+        } else if (this.postgres && typeof this.postgres === 'function') {
+          // Try as tagged template function with unsafe
+          if (this.postgres.unsafe) {
+            const result = await this.postgres.unsafe(convertedSQL, convertedParams);
+            return result.rows || [];
+          }
+          // Try direct call (may not work, but worth trying)
+          const result = await this.postgres(convertedSQL, ...convertedParams);
+          return result.rows || result || [];
+        } else {
+          throw new Error('Invalid Postgres client configuration');
+        }
+      } catch (err) {
+        console.error('Postgres query error:', err);
+        console.error('SQL:', convertedSQL.substring(0, 100));
+        console.error('Params:', convertedParams.length);
+        throw err;
+      }
+    } else {
+      return new Promise((resolve, reject) => {
+        this.db.all(sql, params, (err, rows) => {
+          if (err) reject(err);
+          else resolve(rows || []);
+        });
+      });
+    }
+  }
+
+  // Unified query executor (single row)
+  async queryOne(sql, params = []) {
+    if (this.usePostgres) {
+      const rows = await this.query(sql, params);
+      return rows[0] || null;
+    } else {
+      return new Promise((resolve, reject) => {
+        this.db.get(sql, params, (err, row) => {
+          if (err) reject(err);
+          else resolve(row || null);
+        });
+      });
+    }
+  }
+
+  // Unified execute (INSERT/UPDATE/DELETE)
+  async execute(sql, params = []) {
+    if (this.usePostgres) {
+      const { sql: convertedSQL, params: convertedParams } = this.convertSQL(sql, params);
+      try {
+        let result;
+        if (this.postgres && typeof this.postgres.unsafe === 'function') {
+          result = await this.postgres.unsafe(convertedSQL, convertedParams);
+        } else if (this.postgres && typeof this.postgres === 'function' && this.postgres.unsafe) {
+          result = await this.postgres.unsafe(convertedSQL, convertedParams);
+        } else {
+          throw new Error('Postgres client not properly configured for execute');
+        }
+        return { lastID: null, changes: result.rowCount || result.count || 0 };
+      } catch (err) {
+        console.error('Postgres execute error:', err);
+        console.error('SQL:', convertedSQL.substring(0, 100));
+        throw err;
+      }
+    } else {
+      return new Promise((resolve, reject) => {
+        this.db.run(sql, params, function (err) {
+          if (err) reject(err);
+          else resolve({ lastID: this.lastID, changes: this.changes });
+        });
+      });
+    }
   }
 
   // Create all necessary tables
@@ -50,6 +181,10 @@ class TNRDatabase {
         lastContact TEXT,
         notes TEXT,
         source TEXT,
+        businessType TEXT,
+        businessName TEXT,
+        businessAddress TEXT,
+        interest TEXT,
         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )`,
@@ -80,6 +215,10 @@ class TNRDatabase {
         state TEXT,
         zipCode TEXT,
         notes TEXT,
+        businessType TEXT,
+        businessName TEXT,
+        businessAddress TEXT,
+        interest TEXT,
         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )`,
@@ -165,467 +304,707 @@ class TNRDatabase {
         metadata TEXT,
         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )`,
+
+      // Activity timeline table
+      `CREATE TABLE IF NOT EXISTS activities (
+        id TEXT PRIMARY KEY,
+        entityType TEXT NOT NULL, -- 'client' or 'lead'
+        entityId TEXT NOT NULL,
+        activityType TEXT NOT NULL, -- 'call', 'email', 'meeting', 'note', 'status_change', 'workflow'
+        title TEXT,
+        description TEXT,
+        userId TEXT,
+        metadata TEXT,
+        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )`,
+
+      // Email templates table
+      `CREATE TABLE IF NOT EXISTS email_templates (
+        id TEXT PRIMARY KEY,
+        templateName TEXT NOT NULL,
+        subject TEXT NOT NULL,
+        htmlContent TEXT NOT NULL,
+        textContent TEXT,
+        variables TEXT, -- JSON array of available variables
+        category TEXT,
+        isDefault INTEGER DEFAULT 0,
+        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )`,
+
+      // Social media tokens table (NEW)
+      `CREATE TABLE IF NOT EXISTS social_media_tokens (
+        id TEXT PRIMARY KEY,
+        platform TEXT NOT NULL,
+        page_id TEXT,
+        access_token TEXT NOT NULL,
+        token_type TEXT DEFAULT 'Bearer',
+        expires_at TEXT,
+        refresh_token TEXT,
+        user_id TEXT,
+        page_name TEXT,
+        instagram_account_id TEXT,
+        instagram_username TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )`,
     ];
 
-    return new Promise((resolve, reject) => {
-      let completed = 0;
-      const total = tables.length;
-
-      tables.forEach((sql) => {
-        this.db.run(sql, (err) => {
-          if (err) {
+    if (this.usePostgres) {
+      // Postgres: Use CREATE TABLE IF NOT EXISTS (similar syntax)
+      for (const sql of tables) {
+        try {
+          await this.postgres.query(sql);
+        } catch (err) {
+          // Ignore "already exists" errors
+          if (!err.message.includes("already exists")) {
             console.error("❌ Error creating table:", err.message);
-            reject(err);
-          } else {
-            completed++;
-            if (completed === total) {
-              console.log("✅ All database tables created successfully");
-              // After base tables exist, ensure new columns are present
-              this.ensureSchema()
-                .then(() => resolve())
-                .catch(reject);
+            throw err;
+          }
+        }
+      }
+      console.log("✅ All database tables created successfully");
+    } else {
+      // SQLite
+      return new Promise((resolve, reject) => {
+        let completed = 0;
+        const total = tables.length;
+
+        tables.forEach((sql) => {
+          this.db.run(sql, (err) => {
+            if (err) {
+              console.error("❌ Error creating table:", err.message);
+              reject(err);
+            } else {
+              completed++;
+              if (completed === total) {
+                console.log("✅ All database tables created successfully");
+                resolve();
+              }
             }
-          }
+          });
         });
       });
-    });
+    }
   }
 
-  // Ensure new columns exist without destructive migrations
-  async ensureSchema() {
-    await Promise.all([
-      // Clients
-      this.ensureColumn("clients", "businessType", "TEXT"),
-      this.ensureColumn("clients", "businessName", "TEXT"),
-      this.ensureColumn("clients", "businessAddress", "TEXT"),
-      this.ensureColumn("clients", "interest", "TEXT"),
-      // Leads
-      this.ensureColumn("leads", "businessType", "TEXT"),
-      this.ensureColumn("leads", "businessName", "TEXT"),
-      this.ensureColumn("leads", "businessAddress", "TEXT"),
-      this.ensureColumn("leads", "interest", "TEXT"),
-    ]);
-  }
-
-  ensureColumn(tableName, columnName, columnType) {
-    return new Promise((resolve, reject) => {
-      const checkSql = `PRAGMA table_info(${tableName})`;
-      this.db.all(checkSql, (err, rows) => {
-        if (err) {
-          return reject(err);
-        }
-        const exists = rows && rows.some((r) => r.name === columnName);
-        if (exists) {
-          return resolve();
-        }
-        const alterSql = `ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${columnType}`;
-        this.db.run(alterSql, (alterErr) => {
-          if (alterErr) {
-            return reject(alterErr);
-          }
-          resolve();
-        });
-      });
-    });
-  }
-
-  // Client management methods
+  // ========== CLIENT MANAGEMENT ==========
   async addClient(clientData) {
-    return new Promise((resolve, reject) => {
-      const clientId = `client-${Date.now()}`;
-      const sql = `INSERT INTO clients (
-        id, name, email, phone, company, website, industry, address, city, state, zip,
-        services, status, joinDate, lastContact, notes, source,
-        businessType, businessName, businessAddress, interest,
-        createdAt, updatedAt
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    const clientId = `client-${Date.now()}`;
+    
+    // Match the actual table column order (23 columns)
+    const sql = `INSERT INTO clients (
+      id, name, email, phone, company, website, industry, address, city, state, zip,
+      services, status, joinDate, lastContact, notes, source,
+      createdAt, updatedAt, businessType, businessName, businessAddress, interest
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    
+    // Values in exact column order
+    const values = [
+      clientId,
+      clientData.name,
+      clientData.email || null,
+      clientData.phone || null,
+      clientData.company || null,
+      clientData.website || null,
+      clientData.industry || null,
+      clientData.address || null,
+      clientData.city || null,
+      clientData.state || null,
+      clientData.zip || null,
+      JSON.stringify(clientData.services || []),
+      clientData.status || "Active",
+      clientData.joinDate || new Date().toISOString().split("T")[0],
+      clientData.lastContact || new Date().toISOString().split("T")[0],
+      clientData.notes || null,
+      clientData.source || "Manual Entry",
+      new Date().toISOString(), // createdAt
+      new Date().toISOString(), // updatedAt
+      clientData.businessType || null,
+      clientData.businessName || clientData.company || null,
+      clientData.businessAddress || clientData.address || null,
+      clientData.interest || null,
+    ];
+    
+    // Verify we have 23 values for 23 columns
+    if (values.length !== 23) {
+      console.error(`Value count mismatch: expected 23, got ${values.length}`);
+      throw new Error(`Value count mismatch: expected 23, got ${values.length}`);
+    }
 
-      const values = [
-        clientId,
-        clientData.name,
-        clientData.email || null,
-        clientData.phone || null,
-        clientData.company || null,
-        clientData.website || null,
-        clientData.industry || null,
-        clientData.address || null,
-        clientData.city || null,
-        clientData.state || null,
-        clientData.zip || null,
-        JSON.stringify(clientData.services || []),
-        clientData.status || "Active",
-        clientData.joinDate || new Date().toISOString().split("T")[0],
-        clientData.lastContact || new Date().toISOString().split("T")[0],
-        clientData.notes || null,
-        clientData.source || "Manual Entry",
-        clientData.businessType || null,
-        clientData.businessName || clientData.company || null,
-        clientData.businessAddress || clientData.address || null,
-        clientData.interest || null,
-        new Date().toISOString(),
-        new Date().toISOString(),
-      ];
-
-      this.db.run(sql, values, function (err) {
-        if (err) {
-          reject(err);
-        } else {
-          resolve({ id: clientId, ...clientData });
-        }
-      });
-    });
+    await this.execute(sql, values);
+    return { id: clientId, ...clientData };
   }
 
-  async getClients() {
-    return new Promise((resolve, reject) => {
-      this.db.all(
-        "SELECT * FROM clients ORDER BY createdAt DESC",
-        (err, rows) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(rows.map((row) => this.parseClient(row)));
-          }
-        }
-      );
-    });
+  async getClients(filter = {}) {
+    let sql = "SELECT * FROM clients WHERE 1=1";
+    const params = [];
+
+    if (filter.q) {
+      sql += " AND (name LIKE ? OR email LIKE ? OR company LIKE ?)";
+      const search = `%${filter.q}%`;
+      params.push(search, search, search);
+    }
+    if (filter.status) {
+      sql += " AND status = ?";
+      params.push(filter.status);
+    }
+    if (filter.businessType) {
+      sql += " AND businessType = ?";
+      params.push(filter.businessType);
+    }
+    if (filter.source) {
+      sql += " AND source = ?";
+      params.push(filter.source);
+    }
+
+    const orderBy = filter.sort || "createdAt";
+    const order = filter.order === "asc" ? "ASC" : "DESC";
+    sql += ` ORDER BY ${orderBy} ${order}`;
+
+    const rows = await this.query(sql, params);
+    return rows.map((row) => this.parseClient(row));
   }
 
   async getClient(clientId) {
-    return new Promise((resolve, reject) => {
-      this.db.get(
-        "SELECT * FROM clients WHERE id = ?",
-        [clientId],
-        (err, row) => {
-          if (err) {
-            reject(err);
-          } else if (row) {
-            resolve(this.parseClient(row));
-          } else {
-            resolve(null);
-          }
-        }
-      );
-    });
+    const row = await this.queryOne("SELECT * FROM clients WHERE id = ?", [clientId]);
+    return row ? this.parseClient(row) : null;
   }
 
   async updateClient(clientId, updateData) {
-    return new Promise((resolve, reject) => {
-      const setParts = [];
-      const values = [];
+    const setParts = [];
+    const values = [];
 
-      if (updateData.name) {
-        setParts.push("name = ?");
-        values.push(updateData.name);
+    Object.keys(updateData).forEach((key) => {
+      if (key !== "id" && updateData[key] !== undefined) {
+        setParts.push(`${key} = ?`);
+        values.push(updateData[key]);
       }
-      if (updateData.email) {
-        setParts.push("email = ?");
-        values.push(updateData.email);
-      }
-      if (updateData.phone) {
-        setParts.push("phone = ?");
-        values.push(updateData.phone);
-      }
-      if (updateData.status) {
-        setParts.push("status = ?");
-        values.push(updateData.status);
-      }
-      if (updateData.lastContact) {
-        setParts.push("lastContact = ?");
-        values.push(updateData.lastContact);
-      }
-
-      setParts.push("updatedAt = ?");
-      values.push(new Date().toISOString());
-      values.push(clientId);
-
-      const sql = `UPDATE clients SET ${setParts.join(", ")} WHERE id = ?`;
-
-      this.db.run(sql, values, function (err) {
-        if (err) {
-          reject(err);
-        } else {
-          resolve({ id: clientId, ...updateData });
-        }
-      });
     });
+
+    setParts.push("updatedAt = ?");
+    values.push(new Date().toISOString());
+    values.push(clientId);
+
+    const sql = `UPDATE clients SET ${setParts.join(", ")} WHERE id = ?`;
+    await this.execute(sql, values);
+    return { id: clientId, ...updateData };
   }
 
   async deleteClient(clientId) {
-    return new Promise((resolve, reject) => {
-      this.db.run("DELETE FROM clients WHERE id = ?", [clientId], (err) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(true);
-        }
-      });
-    });
+    await this.execute("DELETE FROM clients WHERE id = ?", [clientId]);
+    return true;
   }
 
-  // Lead management methods
+  // ========== LEAD MANAGEMENT ==========
   async addLead(leadData) {
-    return new Promise((resolve, reject) => {
-      const leadId = `lead-${Date.now()}`;
-      const sql = `INSERT INTO leads (
-        id, name, email, phone, company, website, industry, services, budget, timeline,
-        message, additionalInfo, contactMethod, source, status, date, submissionDate,
-        submissionDateTime, originalSubmissionId, address, city, state, zipCode, notes,
-        businessType, businessName, businessAddress, interest,
-        createdAt, updatedAt
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    const leadId = `lead-${Date.now()}`;
+    const values = [
+      leadId,
+      leadData.name,
+      leadData.email || null,
+      leadData.phone || null,
+      leadData.company || null,
+      leadData.website || null,
+      leadData.industry || null,
+      JSON.stringify(leadData.services || []),
+      leadData.budget || null,
+      leadData.timeline || null,
+      leadData.message || null,
+      leadData.additionalInfo || null,
+      leadData.contactMethod || null,
+      leadData.source || "Website Form",
+      leadData.status || "New",
+      leadData.date || new Date().toISOString().split("T")[0],
+      leadData.submissionDate || null,
+      leadData.submissionDateTime || null,
+      leadData.originalSubmissionId || null,
+      leadData.address || null,
+      leadData.city || null,
+      leadData.state || null,
+      leadData.zipCode || null,
+      leadData.notes || null,
+      leadData.businessType || null,
+      leadData.businessName || leadData.company || null,
+      leadData.businessAddress || leadData.address || null,
+      leadData.interest || null,
+      new Date().toISOString(),
+      new Date().toISOString(),
+    ];
 
-      const values = [
-        leadId,
-        leadData.name,
-        leadData.email || null,
-        leadData.phone || null,
-        leadData.company || null,
-        leadData.website || null,
-        leadData.industry || null,
-        JSON.stringify(leadData.services || []),
-        leadData.budget || null,
-        leadData.timeline || null,
-        leadData.message || null,
-        leadData.additionalInfo || null,
-        leadData.contactMethod || null,
-        leadData.source || "Website Form",
-        leadData.status || "New",
-        leadData.date || new Date().toISOString().split("T")[0],
-        leadData.submissionDate || null,
-        leadData.submissionDateTime || null,
-        leadData.originalSubmissionId || null,
-        leadData.address || null,
-        leadData.city || null,
-        leadData.state || null,
-        leadData.zipCode || null,
-        leadData.notes || null,
-        leadData.businessType || null,
-        leadData.businessName || leadData.company || null,
-        leadData.businessAddress || leadData.address || null,
-        leadData.interest || null,
-        new Date().toISOString(),
-        new Date().toISOString(),
-      ];
+    const sql = `INSERT INTO leads (
+      id, name, email, phone, company, website, industry, services, budget, timeline,
+      message, additionalInfo, contactMethod, source, status, date, submissionDate,
+      submissionDateTime, originalSubmissionId, address, city, state, zipCode, notes,
+      businessType, businessName, businessAddress, interest,
+      createdAt, updatedAt
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
-      this.db.run(sql, values, function (err) {
-        if (err) {
-          reject(err);
-        } else {
-          resolve({ id: leadId, ...leadData });
-        }
-      });
-    });
+    await this.execute(sql, values);
+    return { id: leadId, ...leadData };
   }
 
-  async getLeads() {
-    return new Promise((resolve, reject) => {
-      this.db.all(
-        "SELECT * FROM leads ORDER BY createdAt DESC",
-        (err, rows) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(rows.map((row) => this.parseLead(row)));
-          }
-        }
-      );
-    });
-  }
+  async getLeads(filter = {}) {
+    let sql = "SELECT * FROM leads WHERE 1=1";
+    const params = [];
 
-  async convertLeadToClient(leadId) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const lead = await this.getLead(leadId);
-        if (!lead) {
-          reject(new Error("Lead not found"));
-          return;
-        }
+    if (filter.q) {
+      sql += " AND (name LIKE ? OR email LIKE ? OR company LIKE ?)";
+      const search = `%${filter.q}%`;
+      params.push(search, search, search);
+    }
+    if (filter.status) {
+      sql += " AND status = ?";
+      params.push(filter.status);
+    }
+    if (filter.businessType) {
+      sql += " AND businessType = ?";
+      params.push(filter.businessType);
+    }
+    if (filter.source) {
+      sql += " AND source = ?";
+      params.push(filter.source);
+    }
+    if (filter.interest) {
+      sql += " AND interest = ?";
+      params.push(filter.interest);
+    }
 
-        const clientData = {
-          name: lead.name,
-          email: lead.email,
-          phone: lead.phone,
-          industry: lead.industry,
-          company: lead.company,
-          website: lead.website,
-          address: lead.address,
-          city: lead.city,
-          state: lead.state,
-          zip: lead.zipCode,
-          services: lead.services,
-          notes: lead.message,
-          source: lead.source || "Lead Conversion",
-        };
+    const orderBy = filter.sort || "createdAt";
+    const order = filter.order === "asc" ? "ASC" : "DESC";
+    sql += ` ORDER BY ${orderBy} ${order}`;
 
-        const client = await this.addClient(clientData);
-        await this.deleteLead(leadId);
-        resolve(client);
-      } catch (err) {
-        reject(err);
-      }
-    });
+    const rows = await this.query(sql, params);
+    return rows.map((row) => this.parseLead(row));
   }
 
   async getLead(leadId) {
-    return new Promise((resolve, reject) => {
-      this.db.get("SELECT * FROM leads WHERE id = ?", [leadId], (err, row) => {
-        if (err) {
-          reject(err);
-        } else if (row) {
-          resolve(this.parseLead(row));
-        } else {
-          resolve(null);
-        }
-      });
-    });
+    const row = await this.queryOne("SELECT * FROM leads WHERE id = ?", [leadId]);
+    return row ? this.parseLead(row) : null;
+  }
+
+  async convertLeadToClient(leadId) {
+    const lead = await this.getLead(leadId);
+    if (!lead) throw new Error("Lead not found");
+
+    const clientData = {
+      name: lead.name,
+      email: lead.email,
+      phone: lead.phone,
+      industry: lead.industry,
+      company: lead.company,
+      website: lead.website,
+      address: lead.address,
+      city: lead.city,
+      state: lead.state,
+      zip: lead.zipCode,
+      services: lead.services,
+      notes: lead.message,
+      source: lead.source || "Lead Conversion",
+      businessType: lead.businessType,
+      businessName: lead.businessName,
+      businessAddress: lead.businessAddress,
+      interest: lead.interest,
+    };
+
+    const client = await this.addClient(clientData);
+    await this.deleteLead(leadId);
+    return client;
   }
 
   async deleteLead(leadId) {
-    return new Promise((resolve, reject) => {
-      this.db.run("DELETE FROM leads WHERE id = ?", [leadId], (err) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(true);
-        }
-      });
-    });
+    await this.execute("DELETE FROM leads WHERE id = ?", [leadId]);
+    return true;
   }
 
-  // Order management methods
+  // ========== ORDER MANAGEMENT ==========
   async addOrder(orderData) {
-    return new Promise((resolve, reject) => {
-      const orderId = `order-${Date.now()}`;
-      const sql = `INSERT INTO orders (
-        id, orderNumber, clientName, clientId, customerInfo, items, amount,
-        status, orderDate, description, projectTimeline, specialRequests,
-        invoiceNumber, paymentMethod, createdAt, updatedAt
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    const orderId = `order-${Date.now()}`;
+    const values = [
+      orderId,
+      orderData.orderNumber || `TNR-${Date.now()}`,
+      orderData.clientName,
+      orderData.clientId || null,
+      JSON.stringify(orderData.customerInfo || {}),
+      JSON.stringify(orderData.items || []),
+      orderData.amount || 0,
+      orderData.status || "Pending",
+      orderData.orderDate || new Date().toISOString().split("T")[0],
+      orderData.description || null,
+      orderData.projectTimeline || null,
+      orderData.specialRequests || null,
+      orderData.invoiceNumber || null,
+      orderData.paymentMethod || null,
+      new Date().toISOString(),
+      new Date().toISOString(),
+    ];
 
-      const values = [
-        orderId,
-        orderData.orderNumber || `TNR-${Date.now()}`,
-        orderData.clientName,
-        orderData.clientId || null,
-        JSON.stringify(orderData.customerInfo || {}),
-        JSON.stringify(orderData.items || []),
-        orderData.amount || 0,
-        orderData.status || "Pending",
-        orderData.orderDate || new Date().toISOString().split("T")[0],
-        orderData.description || null,
-        orderData.projectTimeline || null,
-        orderData.specialRequests || null,
-        orderData.invoiceNumber || null,
-        orderData.paymentMethod || null,
-        new Date().toISOString(),
-        new Date().toISOString(),
-      ];
+    const sql = `INSERT INTO orders (
+      id, orderNumber, clientName, clientId, customerInfo, items, amount,
+      status, orderDate, description, projectTimeline, specialRequests,
+      invoiceNumber, paymentMethod, createdAt, updatedAt
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
-      this.db.run(sql, values, function (err) {
-        if (err) {
-          reject(err);
-        } else {
-          resolve({ id: orderId, ...orderData });
-        }
-      });
-    });
+    await this.execute(sql, values);
+    return { id: orderId, ...orderData };
   }
 
   async getOrders() {
-    return new Promise((resolve, reject) => {
-      this.db.all(
-        "SELECT * FROM orders ORDER BY createdAt DESC",
-        (err, rows) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(rows.map((row) => this.parseOrder(row)));
-          }
-        }
-      );
-    });
+    const rows = await this.query("SELECT * FROM orders ORDER BY createdAt DESC");
+    return rows.map((row) => this.parseOrder(row));
   }
 
   async updateOrderStatus(orderId, status) {
-    return new Promise((resolve, reject) => {
-      const sql = `UPDATE orders SET status = ?, updatedAt = ? WHERE id = ?`;
-      this.db.run(sql, [status, new Date().toISOString(), orderId], (err) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(true);
-        }
-      });
-    });
+    await this.execute("UPDATE orders SET status = ?, updatedAt = ? WHERE id = ?", [
+      status,
+      new Date().toISOString(),
+      orderId,
+    ]);
+    return true;
   }
 
   async deleteOrder(orderId) {
-    return new Promise((resolve, reject) => {
-      this.db.run("DELETE FROM orders WHERE id = ?", [orderId], (err) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(true);
-        }
-      });
-    });
+    await this.execute("DELETE FROM orders WHERE id = ?", [orderId]);
+    return true;
   }
 
-  // Social media automation methods
-  async saveSocialPost(postData) {
-    return new Promise((resolve, reject) => {
-      const postId = postData.id || `post-${Date.now()}`;
-      const sql = `INSERT INTO social_media_posts (
-        id, platform, content, scheduledDate, publishedDate, status,
-        clientName, contentType, hashtags, imageUrl, metadata, createdAt, updatedAt
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  // ========== SOCIAL MEDIA TOKEN MANAGEMENT ==========
+  async saveSocialMediaToken(tokenData) {
+    const tokenId = tokenData.id || `token-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const values = [
+      tokenId,
+      tokenData.platform,
+      tokenData.page_id || null,
+      tokenData.access_token,
+      tokenData.token_type || "Bearer",
+      tokenData.expires_at || null,
+      tokenData.refresh_token || null,
+      tokenData.user_id || null,
+      tokenData.page_name || null,
+      tokenData.instagram_account_id || null,
+      tokenData.instagram_username || null,
+      new Date().toISOString(),
+      new Date().toISOString(),
+    ];
 
-      const values = [
-        postId,
-        postData.platform,
-        postData.content,
-        postData.scheduledDate || null,
-        postData.publishedDate || null,
-        postData.status || "draft",
-        postData.clientName || null,
-        postData.contentType || null,
-        postData.hashtags || null,
-        postData.imageUrl || null,
-        JSON.stringify(postData.metadata || {}),
-        new Date().toISOString(),
-        new Date().toISOString(),
-      ];
-
-      this.db.run(sql, values, function (err) {
-        if (err) {
-          reject(err);
-        } else {
-          resolve({ id: postId, ...postData });
-        }
-      });
-    });
-  }
-
-  async getSocialPosts(status = null) {
-    return new Promise((resolve, reject) => {
-      let sql = "SELECT * FROM social_media_posts ORDER BY createdAt DESC";
-      if (status) {
-        sql =
-          "SELECT * FROM social_media_posts WHERE status = ? ORDER BY createdAt DESC";
+    // Check if token exists (by platform and page_id combination)
+    if (tokenData.page_id) {
+      const existing = await this.queryOne(
+        "SELECT * FROM social_media_tokens WHERE platform = ? AND page_id = ?",
+        [tokenData.platform, tokenData.page_id]
+      );
+      if (existing) {
+        // Update existing token
+        const sql = `UPDATE social_media_tokens SET 
+          access_token = ?, token_type = ?, expires_at = ?, refresh_token = ?,
+          user_id = ?, page_name = ?, instagram_account_id = ?, instagram_username = ?,
+          updated_at = ? WHERE platform = ? AND page_id = ?`;
+        await this.execute(sql, [
+          tokenData.access_token,
+          tokenData.token_type || "Bearer",
+          tokenData.expires_at || null,
+          tokenData.refresh_token || null,
+          tokenData.user_id || null,
+          tokenData.page_name || null,
+          tokenData.instagram_account_id || null,
+          tokenData.instagram_username || null,
+          new Date().toISOString(),
+          tokenData.platform,
+          tokenData.page_id,
+        ]);
+        return { id: existing.id, ...tokenData };
       }
+    }
 
-      this.db.all(sql, status ? [status] : [], (err, rows) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(rows.map((row) => this.parseSocialPost(row)));
-        }
-      });
-    });
+    const sql = `INSERT INTO social_media_tokens (
+      id, platform, page_id, access_token, token_type, expires_at, refresh_token,
+      user_id, page_name, instagram_account_id, instagram_username,
+      created_at, updated_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+    await this.execute(sql, values);
+    return { id: tokenId, ...tokenData };
   }
 
-  // Statistics methods
+  async getSocialMediaTokens(platform = null) {
+    let sql = "SELECT * FROM social_media_tokens";
+    const params = [];
+
+    if (platform) {
+      sql += " WHERE platform = ?";
+      params.push(platform);
+    }
+
+    sql += " ORDER BY created_at DESC";
+
+    const rows = await this.query(sql, params);
+    return rows.map((row) => this.parseToken(row));
+  }
+
+  async getSocialMediaToken(platform, pageId = null) {
+    let sql = "SELECT * FROM social_media_tokens WHERE platform = ?";
+    const params = [platform];
+
+    if (pageId) {
+      sql += " AND page_id = ?";
+      params.push(pageId);
+    } else {
+      // Get the first token for this platform if no page_id specified
+      sql += " ORDER BY created_at DESC LIMIT 1";
+    }
+
+    const row = await this.queryOne(sql, params);
+    return row ? this.parseToken(row) : null;
+  }
+
+  async deleteSocialMediaToken(tokenId) {
+    await this.execute("DELETE FROM social_media_tokens WHERE id = ?", [tokenId]);
+    return true;
+  }
+
+  // ========== WORKFLOW MANAGEMENT ==========
+  async saveWorkflow(workflowData) {
+    const workflowId = workflowData.id || `workflow-${Date.now()}`;
+    const values = [
+      workflowId,
+      workflowData.workflowName,
+      workflowData.workflowType,
+      JSON.stringify(workflowData.trigger || {}),
+      JSON.stringify(workflowData.actions || []),
+      workflowData.isActive ? 1 : 0,
+      workflowData.lastRun || null,
+      workflowData.nextRun || null,
+      JSON.stringify(workflowData.metadata || {}),
+      new Date().toISOString(),
+      new Date().toISOString(),
+    ];
+
+    // Check if workflow exists
+    const existing = workflowData.id ? await this.getWorkflow(workflowData.id) : null;
+    
+    if (existing) {
+      // Update existing workflow
+      const sql = `UPDATE automation_workflows SET
+        workflowName = ?, workflowType = ?, trigger = ?, actions = ?,
+        isActive = ?, lastRun = ?, nextRun = ?, metadata = ?, updatedAt = ?
+        WHERE id = ?`;
+      await this.execute(sql, [
+        workflowData.workflowName,
+        workflowData.workflowType,
+        JSON.stringify(workflowData.trigger || {}),
+        JSON.stringify(workflowData.actions || []),
+        workflowData.isActive ? 1 : 0,
+        workflowData.lastRun || null,
+        workflowData.nextRun || null,
+        JSON.stringify(workflowData.metadata || {}),
+        new Date().toISOString(),
+        workflowData.id
+      ]);
+      return { id: workflowData.id, ...workflowData };
+    } else {
+      // Insert new workflow
+      const sql = `INSERT INTO automation_workflows (
+        id, workflowName, workflowType, trigger, actions, isActive,
+        lastRun, nextRun, metadata, createdAt, updatedAt
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+      await this.execute(sql, values);
+      return { id: workflowId, ...workflowData };
+    }
+
+  }
+
+  async getWorkflows(activeOnly = false) {
+    let sql = "SELECT * FROM automation_workflows";
+    const params = [];
+
+    if (activeOnly) {
+      sql += " WHERE isActive = 1";
+    }
+
+    sql += " ORDER BY createdAt DESC";
+
+    const rows = await this.query(sql, params);
+    return rows.map((row) => this.parseWorkflow(row));
+  }
+
+  async getWorkflow(workflowId) {
+    const row = await this.queryOne("SELECT * FROM automation_workflows WHERE id = ?", [workflowId]);
+    return row ? this.parseWorkflow(row) : null;
+  }
+
+  async updateWorkflowStatus(workflowId, isActive) {
+    await this.execute(
+      "UPDATE automation_workflows SET isActive = ?, updatedAt = ? WHERE id = ?",
+      [isActive ? 1 : 0, new Date().toISOString(), workflowId]
+    );
+    return true;
+  }
+
+  async deleteWorkflow(workflowId) {
+    await this.execute("DELETE FROM automation_workflows WHERE id = ?", [workflowId]);
+    return true;
+  }
+
+  async updateWorkflowLastRun(workflowId, lastRun, nextRun = null) {
+    await this.execute(
+      "UPDATE automation_workflows SET lastRun = ?, nextRun = ?, updatedAt = ? WHERE id = ?",
+      [lastRun, nextRun, new Date().toISOString(), workflowId]
+    );
+    return true;
+  }
+
+  parseWorkflow(row) {
+    return {
+      id: row.id,
+      workflowName: row.workflowname || row.workflowName,
+      workflowType: row.workflowtype || row.workflowType,
+      trigger: typeof row.trigger === "string" ? JSON.parse(row.trigger || "{}") : row.trigger,
+      actions: typeof row.actions === "string" ? JSON.parse(row.actions || "[]") : row.actions,
+      isActive: row.isactive === 1 || row.isActive === 1,
+      lastRun: row.lastrun || row.lastRun,
+      nextRun: row.nextrun || row.nextRun,
+      metadata: typeof row.metadata === "string" ? JSON.parse(row.metadata || "{}") : row.metadata,
+      createdAt: row.createdat || row.createdAt,
+      updatedAt: row.updatedat || row.updatedAt,
+    };
+  }
+
+  // ========== ACTIVITY MANAGEMENT ==========
+  async addActivity(activityData) {
+    const activityId = activityData.id || `activity-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const sql = `INSERT INTO activities (
+      id, entityType, entityId, activityType, title, description, userId, metadata, createdAt
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    
+    await this.execute(sql, [
+      activityId,
+      activityData.entityType,
+      activityData.entityId,
+      activityData.activityType,
+      activityData.title || null,
+      activityData.description || null,
+      activityData.userId || null,
+      JSON.stringify(activityData.metadata || {}),
+      new Date().toISOString()
+    ]);
+    
+    return { id: activityId, ...activityData };
+  }
+
+  async getActivities(entityType, entityId) {
+    const sql = `SELECT * FROM activities 
+                 WHERE entityType = ? AND entityId = ? 
+                 ORDER BY createdAt DESC`;
+    const rows = await this.query(sql, [entityType, entityId]);
+    return rows.map((row) => this.parseActivity(row));
+  }
+
+  async deleteActivity(activityId) {
+    await this.execute("DELETE FROM activities WHERE id = ?", [activityId]);
+    return true;
+  }
+
+  parseActivity(row) {
+    return {
+      id: row.id,
+      entityType: row.entitytype || row.entityType,
+      entityId: row.entityid || row.entityId,
+      activityType: row.activitytype || row.activityType,
+      title: row.title,
+      description: row.description,
+      userId: row.userid || row.userId,
+      metadata: typeof row.metadata === "string" ? JSON.parse(row.metadata || "{}") : row.metadata,
+      createdAt: row.createdat || row.createdAt,
+    };
+  }
+
+  // ========== EMAIL TEMPLATE MANAGEMENT ==========
+  async saveEmailTemplate(templateData) {
+    const templateId = templateData.id || `template-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    
+    // Check if template exists
+    const existing = templateData.id ? await this.getEmailTemplate(templateData.id) : null;
+    
+    if (existing) {
+      // Update existing template
+      const sql = `UPDATE email_templates SET
+        templateName = ?, subject = ?, htmlContent = ?, textContent = ?,
+        variables = ?, category = ?, isDefault = ?, updatedAt = ?
+        WHERE id = ?`;
+      await this.execute(sql, [
+        templateData.templateName,
+        templateData.subject,
+        templateData.htmlContent,
+        templateData.textContent || null,
+        JSON.stringify(templateData.variables || []),
+        templateData.category || null,
+        templateData.isDefault ? 1 : 0,
+        new Date().toISOString(),
+        templateData.id
+      ]);
+      return { id: templateData.id, ...templateData };
+    } else {
+      // Insert new template
+      const sql = `INSERT INTO email_templates (
+        id, templateName, subject, htmlContent, textContent, variables, category, isDefault, createdAt, updatedAt
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+      await this.execute(sql, [
+        templateId,
+        templateData.templateName,
+        templateData.subject,
+        templateData.htmlContent,
+        templateData.textContent || null,
+        JSON.stringify(templateData.variables || []),
+        templateData.category || null,
+        templateData.isDefault ? 1 : 0,
+        new Date().toISOString(),
+        new Date().toISOString()
+      ]);
+      return { id: templateId, ...templateData };
+    }
+  }
+
+  async getEmailTemplates(category = null) {
+    let sql = "SELECT * FROM email_templates";
+    const params = [];
+    
+    if (category) {
+      sql += " WHERE category = ?";
+      params.push(category);
+    }
+    
+    sql += " ORDER BY createdAt DESC";
+    
+    const rows = await this.query(sql, params);
+    return rows.map((row) => this.parseEmailTemplate(row));
+  }
+
+  async getEmailTemplate(templateId) {
+    const row = await this.queryOne("SELECT * FROM email_templates WHERE id = ?", [templateId]);
+    return row ? this.parseEmailTemplate(row) : null;
+  }
+
+  async deleteEmailTemplate(templateId) {
+    await this.execute("DELETE FROM email_templates WHERE id = ?", [templateId]);
+    return true;
+  }
+
+  parseEmailTemplate(row) {
+    return {
+      id: row.id,
+      templateName: row.templatename || row.templateName,
+      subject: row.subject,
+      htmlContent: row.htmlcontent || row.htmlContent,
+      textContent: row.textcontent || row.textContent,
+      variables: typeof row.variables === "string" ? JSON.parse(row.variables || "[]") : row.variables,
+      category: row.category,
+      isDefault: row.isdefault === 1 || row.isDefault === 1,
+      createdAt: row.createdat || row.createdAt,
+      updatedAt: row.updatedat || row.updatedAt,
+    };
+  }
+
+  // ========== STATISTICS ==========
   async getStats() {
     const [clients, leads, orders] = await Promise.all([
       this.getClients(),
@@ -643,7 +1022,7 @@ class TNRDatabase {
     };
   }
 
-  // Helper methods to parse data
+  // ========== PARSERS ==========
   parseClient(row) {
     return {
       id: row.id,
@@ -657,12 +1036,16 @@ class TNRDatabase {
       city: row.city,
       state: row.state,
       zip: row.zip,
-      services: JSON.parse(row.services || "[]"),
+      services: typeof row.services === "string" ? JSON.parse(row.services || "[]") : row.services,
       status: row.status,
-      joinDate: row.joinDate,
-      lastContact: row.lastContact,
+      joinDate: row.joindate || row.joinDate,
+      lastContact: row.lastcontact || row.lastContact,
       notes: row.notes,
       source: row.source,
+      businessType: row.businesstype || row.businessType,
+      businessName: row.businessname || row.businessName,
+      businessAddress: row.businessaddress || row.businessAddress,
+      interest: row.interest,
     };
   }
 
@@ -675,76 +1058,89 @@ class TNRDatabase {
       company: row.company,
       website: row.website,
       industry: row.industry,
-      services: JSON.parse(row.services || "[]"),
+      services: typeof row.services === "string" ? JSON.parse(row.services || "[]") : row.services,
       budget: row.budget,
       timeline: row.timeline,
       message: row.message,
-      additionalInfo: row.additionalInfo,
-      contactMethod: row.contactMethod,
+      additionalInfo: row.additionalinfo || row.additionalInfo,
+      contactMethod: row.contactmethod || row.contactMethod,
       source: row.source,
       status: row.status,
       date: row.date,
-      submissionDate: row.submissionDate,
-      submissionDateTime: row.submissionDateTime,
-      originalSubmissionId: row.originalSubmissionId,
+      submissionDate: row.submissiondate || row.submissionDate,
+      submissionDateTime: row.submissiondatetime || row.submissionDateTime,
+      originalSubmissionId: row.originalsubmissionid || row.originalSubmissionId,
       address: row.address,
       city: row.city,
       state: row.state,
-      zipCode: row.zipCode,
+      zipCode: row.zipcode || row.zipCode,
       notes: row.notes,
+      businessType: row.businesstype || row.businessType,
+      businessName: row.businessname || row.businessName,
+      businessAddress: row.businessaddress || row.businessAddress,
+      interest: row.interest,
     };
   }
 
   parseOrder(row) {
     return {
       id: row.id,
-      orderNumber: row.orderNumber,
-      clientName: row.clientName,
-      clientId: row.clientId,
-      customerInfo: JSON.parse(row.customerInfo || "{}"),
-      items: JSON.parse(row.items || "[]"),
+      orderNumber: row.ordernumber || row.orderNumber,
+      clientName: row.clientname || row.clientName,
+      clientId: row.clientid || row.clientId,
+      customerInfo: typeof row.customerinfo === "string" ? JSON.parse(row.customerinfo || "{}") : row.customerinfo || row.customerInfo,
+      items: typeof row.items === "string" ? JSON.parse(row.items || "[]") : row.items,
       amount: row.amount,
       status: row.status,
-      orderDate: row.orderDate,
+      orderDate: row.orderdate || row.orderDate,
       description: row.description,
-      projectTimeline: row.projectTimeline,
-      specialRequests: row.specialRequests,
-      invoiceNumber: row.invoiceNumber,
-      paymentMethod: row.paymentMethod,
+      projectTimeline: row.projecttimeline || row.projectTimeline,
+      specialRequests: row.specialrequests || row.specialRequests,
+      invoiceNumber: row.invoicenumber || row.invoiceNumber,
+      paymentMethod: row.paymentmethod || row.paymentMethod,
     };
   }
 
-  parseSocialPost(row) {
+  parseToken(row) {
     return {
       id: row.id,
       platform: row.platform,
-      content: row.content,
-      scheduledDate: row.scheduledDate,
-      publishedDate: row.publishedDate,
-      status: row.status,
-      clientName: row.clientName,
-      contentType: row.contentType,
-      hashtags: row.hashtags,
-      imageUrl: row.imageUrl,
-      metadata: JSON.parse(row.metadata || "{}"),
+      page_id: row.page_id,
+      access_token: row.access_token,
+      token_type: row.token_type || row.token_type,
+      expires_at: row.expires_at,
+      refresh_token: row.refresh_token,
+      user_id: row.user_id,
+      page_name: row.page_name,
+      instagram_account_id: row.instagram_account_id,
+      instagram_username: row.instagram_username,
+      created_at: row.created_at,
+      updated_at: row.updated_at,
     };
   }
 
   // Close database connection
   close() {
-    return new Promise((resolve, reject) => {
-      if (this.db) {
-        this.db.close((err) => {
-          if (err) {
-            reject(err);
-          } else {
-            console.log("✅ Database connection closed");
-            resolve();
-          }
-        });
-      }
-    });
+    if (this.usePostgres) {
+      // Postgres connections are managed by Vercel
+      return Promise.resolve();
+    } else {
+      return new Promise((resolve, reject) => {
+        if (this.db) {
+          this.db.close((err) => {
+            if (err) reject(err);
+            else {
+              console.log("✅ Database connection closed");
+              resolve();
+            }
+          });
+        } else {
+          resolve();
+        }
+      });
+    }
   }
 }
 
 module.exports = TNRDatabase;
+
