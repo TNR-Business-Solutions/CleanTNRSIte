@@ -416,7 +416,7 @@
             
             if (!token) {
                 console.log('No token found');
-                return;
+                return null;
             }
             
             console.log('Testing token...');
@@ -438,6 +438,20 @@
                     
                     console.log('Instagram data:', data.instagram);
                     
+                    // Check token expiration
+                    if (data.tokenInfo && data.tokenInfo.expires_at) {
+                        const expiresAt = new Date(data.tokenInfo.expires_at * 1000);
+                        const now = new Date();
+                        const daysUntilExpiry = Math.ceil((expiresAt - now) / (1000 * 60 * 60 * 24));
+                        
+                        console.log(`Token expires in ${daysUntilExpiry} days (${expiresAt.toLocaleDateString()})`);
+                        
+                        // Warn if expiring soon
+                        if (daysUntilExpiry < 7 && window.manualTest) {
+                            alert(`⚠️ Token Warning!\n\nYour Facebook token expires in ${daysUntilExpiry} days (${expiresAt.toLocaleDateString()}).\n\nReconnect Facebook soon to avoid interruption.`);
+                        }
+                    }
+                    
                     if (metaStatus) {
                         const igStatus = data.instagram 
                             ? `📷 Instagram: @${data.instagram.username}` 
@@ -451,6 +465,10 @@
                     if (data.page?.id) {
                         localStorage.setItem('metaPageId', data.page.id);
                     }
+                    
+                    // Store Instagram connection status
+                    window.metaConnectionData = data;
+                    
                     loadMetaInsights(token, data.page?.id);
                     
                     // Only show alert if manually clicked (not on auto-load)
@@ -460,12 +478,30 @@
                             : 'No Instagram connected';
                         alert(`✅ Token Valid!\n\nPage: ${data.page.name}\n${igInfo}`);
                     }
+                    
+                    return data; // Return data for use in other functions
                 } else {
                     console.error('Token invalid:', data.message);
+                    
+                    // Handle specific error codes
+                    if (data.errorCode === 190) {
+                        // Token expired or invalidated
+                        console.log('Token expired (code 190), clearing stored token');
+                        localStorage.removeItem('metaPageAccessToken');
+                        localStorage.removeItem('metaPageId');
+                        
+                        if (window.manualTest || data.message.includes('expired')) {
+                            if (confirm('🔴 Your Facebook token has expired!\n\nWould you like to reconnect now?')) {
+                                connectMeta();
+                            }
+                        }
+                    }
+                    
                     showInsightsDisconnected(data.message);
                     if (window.manualTest) {
                         alert('❌ Token Invalid: ' + data.message);
                     }
+                    return null;
                 }
             } catch (error) {
                 console.error('Token test error:', error);
@@ -473,6 +509,7 @@
                 if (window.manualTest) {
                     alert('❌ Error testing token: ' + error.message);
                 }
+                return null;
             }
         }
         
@@ -707,6 +744,15 @@
                 return;
             }
             
+            // Validate token before posting
+            const tokenData = await testMetaToken();
+            if (!tokenData) {
+                if (confirm('❌ Token validation failed!\n\nWould you like to reconnect Facebook now?')) {
+                    connectMeta();
+                }
+                return;
+            }
+            
             try {
                 const postData = {
                     pageAccessToken: token,
@@ -731,10 +777,22 @@
                         window.open(data.postUrl, '_blank');
                     }
                 } else {
-                    alert('❌ Failed to post: ' + data.message);
+                    // Handle specific errors
+                    let errorMsg = '❌ Failed to post to Facebook:\n\n' + data.message;
+                    
+                    if (data.error === 'Missing page access token' || data.message.includes('token')) {
+                        errorMsg += '\n\nYour token may have expired. Try reconnecting Facebook.';
+                        if (confirm(errorMsg + '\n\nReconnect now?')) {
+                            connectMeta();
+                        }
+                        return;
+                    }
+                    
+                    alert(errorMsg);
                 }
             } catch (error) {
-                alert('❌ Error posting: ' + error.message);
+                console.error('Facebook post error:', error);
+                alert('❌ Error posting to Facebook: ' + error.message);
             }
         }
         
@@ -760,7 +818,22 @@
                 return;
             }
             
-            if (!confirm('Post this content to Instagram now?\n\nNote: Make sure your Facebook Page is connected to an Instagram Business Account.')) {
+            // Validate token and check Instagram connection
+            const tokenData = await testMetaToken();
+            if (!tokenData) {
+                if (confirm('❌ Token validation failed!\n\nWould you like to reconnect Facebook now?')) {
+                    connectMeta();
+                }
+                return;
+            }
+            
+            // Check if Instagram is connected
+            if (!tokenData.instagram || !tokenData.instagram.id) {
+                alert('❌ No Instagram Business Account Connected!\n\nTo post to Instagram, you need to:\n\n1. Have an Instagram Business Account\n2. Link it to your Facebook Page\n3. Reconnect via the "Connect Facebook/Instagram" button\n\nFor help: https://www.facebook.com/business/help/898752960195806');
+                return;
+            }
+            
+            if (!confirm(`Post to Instagram now?\n\n✅ Instagram: @${tokenData.instagram.username}\n📷 Image: ${imageUrl.substring(0, 50)}...`)) {
                 return;
             }
             
@@ -778,9 +851,18 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    alert('✅ Posted to Instagram successfully!\n\nPost ID: ' + data.postId + '\nAccount: ' + data.instagramAccount);
+                    alert('✅ Posted to Instagram successfully!\n\n📷 Account: @' + (tokenData.instagram.username || 'Instagram') + '\n📝 Post ID: ' + data.postId);
                 } else {
                     let errorMsg = '❌ Failed to post to Instagram:\n\n' + data.message;
+                    
+                    // Handle specific errors
+                    if (data.error === 'Instagram Not Connected') {
+                        errorMsg = '❌ Instagram Not Connected!\n\n' + data.message + '\n\n' + (data.help?.solution || '');
+                        if (confirm(errorMsg + '\n\nReconnect Facebook now?')) {
+                            connectMeta();
+                        }
+                        return;
+                    }
                     
                     if (data.help && data.help.steps) {
                         errorMsg += '\n\nTo fix this:\n' + data.help.steps.join('\n');
@@ -792,7 +874,7 @@
                 }
             } catch (error) {
                 console.error('Instagram post error:', error);
-                alert('❌ Error posting to Instagram: ' + error.message);
+                alert('❌ Error posting to Instagram: ' + error.message + '\n\nMake sure your Instagram Business Account is connected to your Facebook Page.');
             }
         }
         

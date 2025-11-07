@@ -1,13 +1,19 @@
 const axios = require('axios');
 
 const GRAPH_VERSION = 'v19.0';
+
+// Updated metric definitions for Facebook Graph API v19.0
+// Note: Some metrics were deprecated, using currently valid ones
 const METRIC_DEFINITIONS = {
-  page_reach: { key: 'reach', label: 'Reach (7 days)' },
   page_impressions: { key: 'impressions', label: 'Impressions' },
-  page_post_engagements: { key: 'engagements', label: 'Post Engagements' },
-  page_fan_adds_unique: { key: 'newFollowers', label: 'New Followers' }
+  page_impressions_unique: { key: 'reach', label: 'Reach (Unique Users)' },
+  page_engaged_users: { key: 'engagements', label: 'Engaged Users' },
+  page_fans: { key: 'fanCount', label: 'Total Fans' }
 };
 const METRICS = Object.keys(METRIC_DEFINITIONS);
+
+// Fallback metrics if primary ones fail (for pages with limited permissions)
+const FALLBACK_METRICS = ['page_impressions', 'page_impressions_unique'];
 
 function normalizeValue(raw) {
   if (raw == null) return 0;
@@ -129,6 +135,7 @@ module.exports = async (req, res) => {
         },
         timeout: 10000
       }),
+      // Try to fetch insights, use fallback metrics if full set fails
       axios.get(`https://graph.facebook.com/${GRAPH_VERSION}/${targetPageId}/insights`, {
         params: {
           access_token: pageAccessToken,
@@ -138,6 +145,19 @@ module.exports = async (req, res) => {
           until
         },
         timeout: 10000
+      }).catch(async (error) => {
+        // If insights fail due to invalid metrics, try with fallback set
+        console.log('Primary metrics failed, trying fallback:', error.response?.data?.error?.message);
+        return axios.get(`https://graph.facebook.com/${GRAPH_VERSION}/${targetPageId}/insights`, {
+          params: {
+            access_token: pageAccessToken,
+            metric: FALLBACK_METRICS.join(','),
+            period: 'day',
+            since,
+            until
+          },
+          timeout: 10000
+        });
       })
     ]);
 
@@ -169,10 +189,29 @@ module.exports = async (req, res) => {
     });
 
     const reachTotal = metrics.reach?.total || 0;
+    const impressionsTotal = metrics.impressions?.total || 0;
     const engagementTotal = metrics.engagements?.total || 0;
     const engagementRate = reachTotal > 0
       ? Number(((engagementTotal / reachTotal) * 100).toFixed(2))
       : null;
+
+    // Add new followers calculation (current fans - previous period fans)
+    const currentFans = page.fan_count || 0;
+    const previousFans = metrics.fanCount?.previous || currentFans;
+    const newFollowers = Math.max(0, currentFans - previousFans);
+
+    // Add new followers to metrics if not already there
+    if (!metrics.newFollowers) {
+      metrics.newFollowers = {
+        label: 'New Followers',
+        total: newFollowers,
+        average: Number((newFollowers / days).toFixed(1)),
+        latest: newFollowers,
+        previous: 0,
+        change: newFollowers > 0 ? 100 : 0,
+        direction: newFollowers > 0 ? 'up' : 'flat'
+      };
+    }
 
     return res.status(200).json({
       success: true,
@@ -192,7 +231,8 @@ module.exports = async (req, res) => {
       },
       metrics,
       timeseries,
-      engagementRate
+      engagementRate,
+      newFollowers
     });
   } catch (error) {
     console.error('Facebook insights error:', error.message);
