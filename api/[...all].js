@@ -5,24 +5,24 @@ module.exports = async (req, res) => {
   // Get pathname from request
   // Vercel provides req.url with query string, or we can use the path directly
   let pathname = req.url.split('?')[0]; // Remove query string if present
+  let route = '';
   
-  // Handle Vercel's catch-all parameter if available
+  // Handle Vercel's catch-all parameter - this is the primary way Vercel passes segments
   // For catch-all routes like /api/[...all], Vercel passes segments in req.query.all
-  if (req.query && req.query.all) {
+  if (req.query && req.query.all !== undefined) {
     // For routes like /api/crm/clients, req.query.all might be "crm/clients" or ['crm', 'clients']
     const allParam = Array.isArray(req.query.all) ? req.query.all.join('/') : req.query.all;
+    route = allParam;
     pathname = '/api/' + allParam;
-  } else {
-    // If req.query.all is not available, extract from req.url
+  } else if (req.url) {
+    // Fallback: extract from req.url if query.all is not available
     // This handles cases where Vercel might structure the request differently
     const urlMatch = req.url.match(/\/api\/(.+?)(?:\?|$)/);
     if (urlMatch) {
-      pathname = '/api/' + urlMatch[1];
+      route = urlMatch[1];
+      pathname = '/api/' + route;
     }
   }
-  
-  // Remove leading /api if present for cleaner routing
-  let route = pathname.replace(/^\/api\//, '');
   
   // Always log for debugging (will help identify routing issues)
   console.log('API Route Debug:', { 
@@ -31,8 +31,8 @@ module.exports = async (req, res) => {
     query: req.query, 
     url: req.url,
     method: req.method,
-    hasAll: !!req.query?.all,
-    allType: typeof req.query?.all
+    hasAll: req.query?.all !== undefined,
+    allValue: req.query?.all
   });
   
   // Handle CORS globally
@@ -49,7 +49,9 @@ module.exports = async (req, res) => {
     const fullPath = pathname.startsWith('/api/') ? pathname : '/api' + pathname;
     
     // Route to appropriate handler
-    if (route.startsWith('crm/') || route === 'crm') {
+    // Handle CRM routes - check for 'crm' at the start or as the whole route
+    if (route === 'crm' || route.startsWith('crm/')) {
+      console.log('✅ Routing to CRM API handler');
       const handler = require('../server/handlers/crm-api');
       req.url = fullPath;
       return await handler(req, res);
@@ -163,11 +165,21 @@ module.exports = async (req, res) => {
       }
     }
     
-    // 404 for unknown routes
-    res.status(404).json({ success: false, error: 'Endpoint not found' });
+    // 404 for unknown routes - log what we received
+    console.error('❌ Route not found:', { route, pathname, url: req.url, query: req.query });
+    res.status(404).json({ 
+      success: false, 
+      error: 'Endpoint not found',
+      route: route,
+      pathname: pathname,
+      url: req.url
+    });
     
   } catch (error) {
     console.error('❌ API Router Error:', error);
-    res.status(500).json({ success: false, error: error.message });
+    console.error('Error stack:', error.stack);
+    if (!res.headersSent) {
+      res.status(500).json({ success: false, error: error.message });
+    }
   }
 };

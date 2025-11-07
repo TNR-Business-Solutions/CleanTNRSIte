@@ -16,8 +16,30 @@ module.exports = async (req, res) => {
     return;
   }
 
-  const db = new TNRDatabase();
-  await db.initialize();
+  let db;
+  try {
+    db = new TNRDatabase();
+    await db.initialize();
+  } catch (dbError) {
+    console.error('Database initialization error:', dbError);
+    // Return empty analytics if database fails (SQLite doesn't work on Vercel)
+    if (req.method === 'GET') {
+      return sendJson(res, 200, {
+        success: true,
+        data: {
+          overview: {
+            totalClients: 0,
+            activeClients: 0,
+            newLeads: 0,
+            totalOrders: 0,
+            conversionRate: 0
+          },
+          message: 'Database not available. Please configure POSTGRES_URL for production.'
+        }
+      });
+    }
+    return sendJson(res, 500, { success: false, error: 'Database unavailable' });
+  }
 
   try {
     // GET - Get analytics data
