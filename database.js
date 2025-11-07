@@ -5,14 +5,15 @@
 const sqlite3 = require("sqlite3").verbose();
 const path = require("path");
 
-// Import Vercel Postgres at top level so Vercel bundles it
-let postgres;
+// Import Vercel Postgres - use the sql export directly
+let sql;
 try {
-  postgres = require("@vercel/postgres");
-  console.log('✅ @vercel/postgres module loaded successfully');
+  const vercelPostgres = require("@vercel/postgres");
+  sql = vercelPostgres.sql;
+  console.log('✅ @vercel/postgres loaded:', !!sql);
 } catch (e) {
-  console.log('ℹ️ @vercel/postgres not available (local development)');
-  postgres = null;
+  console.log('ℹ️ @vercel/postgres not available (local development):', e.message);
+  sql = null;
 }
 
 class TNRDatabase {
@@ -35,19 +36,11 @@ class TNRDatabase {
   async initialize() {
     if (this.usePostgres) {
       try {
-        if (!postgres) {
-          throw new Error('@vercel/postgres module not available');
+        if (!sql) {
+          throw new Error('@vercel/postgres sql function not available');
         }
         
-        // @vercel/postgres exports { sql } where sql is a tagged template function
-        // Use sql.unsafe() for parameterized queries
-        if (postgres.sql) {
-          this.postgres = postgres.sql;
-        } else if (postgres.unsafe) {
-          this.postgres = postgres;
-        } else {
-          this.postgres = postgres;
-        }
+        this.postgres = sql;
         console.log("✅ Using Vercel Postgres database");
         await this.createTables();
         return;
