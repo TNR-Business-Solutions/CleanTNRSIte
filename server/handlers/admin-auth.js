@@ -1,8 +1,6 @@
 // Admin Authentication - Vercel Serverless Function
 // Securely validates admin credentials server-side
 
-const { parseBody } = require('./http-utils');
-
 module.exports = async (req, res) => {
   try {
     // Set CORS headers first
