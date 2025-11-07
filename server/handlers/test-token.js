@@ -67,6 +67,22 @@ module.exports = async (req, res) => {
     
     console.log('Token is valid for page:', pageInfo.name);
 
+    // Get token debug info to check expiration
+    let tokenDebugInfo = null;
+    try {
+      const debugResponse = await axios.get('https://graph.facebook.com/v19.0/debug_token', {
+        params: {
+          input_token: pageAccessToken,
+          access_token: pageAccessToken
+        },
+        timeout: 10000
+      });
+      tokenDebugInfo = debugResponse.data.data;
+      console.log('Token expires at:', tokenDebugInfo.expires_at ? new Date(tokenDebugInfo.expires_at * 1000) : 'Never');
+    } catch (debugError) {
+      console.warn('Could not fetch token debug info:', debugError.message);
+    }
+
     // Check for Instagram connection
     let instagramInfo = null;
     if (pageInfo.instagram_business_account) {
@@ -110,7 +126,11 @@ module.exports = async (req, res) => {
       tokenInfo: {
         valid: true,
         canPost: true,
-        scopes: 'Token has necessary permissions'
+        scopes: tokenDebugInfo?.scopes?.join(', ') || 'Token has necessary permissions',
+        expires_at: tokenDebugInfo?.expires_at || 0,
+        data_access_expires_at: tokenDebugInfo?.data_access_expires_at || 0,
+        is_valid: tokenDebugInfo?.is_valid !== false,
+        issued_at: tokenDebugInfo?.issued_at || 0
       }
     });
 

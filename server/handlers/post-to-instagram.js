@@ -2,7 +2,41 @@ const axios = require('axios');
 const TNRDatabase = require('../../database');
 
 module.exports = async (req, res) => {
-  const { pageAccessToken, message, imageUrl, pageId, instagramAccountId, useDatabaseToken = true } = req.body;
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // Handle OPTIONS preflight
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  // Only accept POST requests
+  if (req.method !== 'POST') {
+    return res.status(405).json({
+      success: false,
+      error: 'Method not allowed',
+      message: 'This endpoint only accepts POST requests'
+    });
+  }
+
+  try {
+    // Parse request body if it's a string (Vercel sometimes sends unparsed body)
+    let body = req.body;
+    if (typeof req.body === 'string') {
+      try {
+        body = JSON.parse(req.body);
+      } catch (e) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid JSON',
+          message: 'Request body must be valid JSON'
+        });
+      }
+    }
+    
+    const { pageAccessToken, message, imageUrl, pageId, instagramAccountId, useDatabaseToken = true } = body || {};
 
   // Try to get token from database first, fallback to request body
   let accessToken = pageAccessToken;
@@ -170,7 +204,7 @@ module.exports = async (req, res) => {
       });
     }
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: error.message,
       message: 'An unexpected error occurred while posting to Instagram.'
