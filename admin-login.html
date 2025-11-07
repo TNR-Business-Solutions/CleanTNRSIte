@@ -360,11 +360,21 @@
                 }
             } catch (error) {
                 console.error('Login error:', error);
-                // Try to parse error response if it's HTML (404 page)
+                console.error('Error details:', {
+                    message: error.message,
+                    stack: error.stack,
+                    name: error.name
+                });
+                
+                // Provide more specific error messages
                 if (error.message && error.message.includes('JSON')) {
                     showError('Server error: API endpoint not found. Please check Vercel deployment.');
+                } else if (error.message && error.message.includes('Failed to fetch')) {
+                    showError('Network error: Cannot reach server. Check your internet connection and try again.');
+                } else if (error.message && error.message.includes('404')) {
+                    showError('API endpoint not found. The server may still be deploying. Please wait a moment and try again.');
                 } else {
-                    showError('Connection error. Please try again.');
+                    showError('Connection error: ' + (error.message || 'Please try again.'));
                 }
                 showLoading(false);
             }

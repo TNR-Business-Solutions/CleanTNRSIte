@@ -4,29 +4,29 @@
 const { parseBody } = require('./http-utils');
 
 module.exports = async (req, res) => {
-  // Set CORS headers
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  
-  // Handle OPTIONS preflight
-  if (req.method === 'OPTIONS') {
-    res.writeHead(200);
-    res.end();
-    return;
-  }
-  
-  // Only accept POST requests
-  if (req.method !== 'POST') {
-    res.writeHead(405, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({
-      success: false,
-      error: 'Method not allowed'
-    }));
-    return;
-  }
-
   try {
+    // Set CORS headers first
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    
+    // Handle OPTIONS preflight
+    if (req.method === 'OPTIONS') {
+      res.writeHead(200);
+      res.end();
+      return;
+    }
+    
+    // Only accept POST requests
+    if (req.method !== 'POST') {
+      res.writeHead(405, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        success: false,
+        error: 'Method not allowed'
+      }));
+      return;
+    }
+
     // Handle request body - Vercel serverless functions may pre-parse
     let parsedBody = {};
     
@@ -88,12 +88,14 @@ module.exports = async (req, res) => {
   } catch (error) {
     console.error('Auth error:', error);
     console.error('Error stack:', error.stack);
-    res.writeHead(500, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({
-      success: false,
-      error: 'Internal server error',
-      message: error.message
-    }));
+    if (!res.headersSent) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        success: false,
+        error: 'Internal server error',
+        message: error.message
+      }));
+    }
     return;
   }
 };
