@@ -9,18 +9,31 @@ module.exports = async (req, res) => {
   
   // Handle Vercel's catch-all parameter - this is the primary way Vercel passes segments
   // For catch-all routes like /api/[...all], Vercel passes segments in req.query.all
-  if (req.query && req.query.all !== undefined) {
+  if (req.query && req.query.all !== undefined && req.query.all !== null) {
     // For routes like /api/crm/clients, req.query.all might be "crm/clients" or ['crm', 'clients']
-    const allParam = Array.isArray(req.query.all) ? req.query.all.join('/') : req.query.all;
+    const allParam = Array.isArray(req.query.all) ? req.query.all.join('/') : String(req.query.all);
     route = allParam;
     pathname = '/api/' + allParam;
   } else if (req.url) {
     // Fallback: extract from req.url if query.all is not available
     // This handles cases where Vercel might structure the request differently
-    const urlMatch = req.url.match(/\/api\/(.+?)(?:\?|$)/);
-    if (urlMatch) {
+    // Remove query string first
+    const urlWithoutQuery = req.url.split('?')[0];
+    const urlMatch = urlWithoutQuery.match(/\/api\/(.+)$/);
+    if (urlMatch && urlMatch[1]) {
       route = urlMatch[1];
       pathname = '/api/' + route;
+    } else if (urlWithoutQuery === '/api' || urlWithoutQuery === '/api/') {
+      route = '';
+      pathname = '/api';
+    }
+  }
+  
+  // If route is still empty, try to get it from the path
+  if (!route && pathname) {
+    const match = pathname.match(/\/api\/(.+)$/);
+    if (match) {
+      route = match[1];
     }
   }
   
