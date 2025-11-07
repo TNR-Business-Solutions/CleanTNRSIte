@@ -3,7 +3,14 @@
 
 const TNRDatabase = require("../../database");
 const { URL } = require("url");
-const workflowExecutor = require("../workflow-executor");
+// Workflow executor is optional - only used for automation features
+let workflowExecutor;
+try {
+  workflowExecutor = require("../workflow-executor");
+} catch (e) {
+  console.log("Workflow executor not loaded (optional feature)");
+  workflowExecutor = null;
+}
 
 // Initialize database connection
 let dbInstance = null;
