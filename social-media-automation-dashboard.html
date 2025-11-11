@@ -34,6 +34,26 @@
                 </div>
             </div>
             
+            <!-- Twitter/X OAuth Setup -->
+            <div class="card">
+                <h3><span class="card-icon">🐦</span>Twitter/X Setup</h3>
+                
+                <div id="twitterConnectionStatus">
+                    <div class="connection-status">
+                        <p id="twitterStatusText">Not connected</p>
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="connectTwitter()" style="background: #1da1f2;">🔗 Connect Twitter/X</button>
+                <button class="btn btn-secondary" onclick="testTwitterConnection()">🧪 Test Connection</button>
+                
+                <div class="form-group" style="margin-top: 20px;">
+                    <label for="twitterToken">Bearer Token (optional - for direct use):</label>
+                    <input type="password" id="twitterToken" placeholder="Paste your Bearer Token here...">
+                    <button class="btn" style="margin-top: 10px;" onclick="saveTwitterToken()">💾 Save Token</button>
+                </div>
+            </div>
+            
             <!-- Content Generator -->
             <div class="card">
                 <h3><span class="card-icon">📝</span>Content Generator</h3>
@@ -170,20 +190,32 @@
                 
                 <!-- Twitter Content Area -->
                 <div id="twitter" class="content-area">
-                    <div style="text-align: center; padding: 60px 20px; background: #f8f9fa; border-radius: 8px; margin: 20px 0;">
-                        <div style="font-size: 48px; margin-bottom: 20px;">🐦</div>
-                        <h3 style="color: #1da1f2; margin-bottom: 15px;">Twitter/X Integration Coming Soon!</h3>
-                        <p style="color: #666; margin-bottom: 20px;">
-                            Twitter automation is on our roadmap. For now, you can:
-                        </p>
-                        <ul style="text-align: left; max-width: 400px; margin: 0 auto 20px; color: #666;">
-                            <li style="margin-bottom: 10px;">Generate short-form content using Facebook tab</li>
-                            <li style="margin-bottom: 10px;">Edit to fit Twitter's character limit</li>
-                            <li style="margin-bottom: 10px;">Post directly to Twitter/X</li>
-                        </ul>
-                        <button class="btn" onclick="switchPlatform('facebook', document.querySelector('.platform-tab'))" style="background: #1da1f2;">
-                            ← Generate Content for Twitter
-                        </button>
+                    <div style="padding: 20px;">
+                        <h3 style="color: #1da1f2; margin-bottom: 20px;">🐦 Twitter/X Content</h3>
+                        
+                        <div class="form-group">
+                            <label for="twitterContent">Tweet Content (280 character limit)</label>
+                            <textarea id="twitterContent" name="twitterContent" rows="4" placeholder="What's happening?" maxlength="280" style="font-family: inherit; padding: 12px; border: 1px solid #ddd; border-radius: 4px; width: 100%; resize: vertical;"></textarea>
+                            <div style="text-align: right; margin-top: 5px; color: #666; font-size: 14px;">
+                                <span id="twitterCharCount">0</span>/280 characters
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="twitterHashtags">Hashtags (optional)</label>
+                            <input type="text" id="twitterHashtags" placeholder="#business #marketing #insurance" style="font-family: inherit; padding: 12px; border: 1px solid #ddd; border-radius: 4px; width: 100%;">
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px; margin-top: 20px;">
+                            <button class="btn" onclick="postToTwitter()" style="background: #1da1f2; flex: 1;">
+                                🐦 Post to Twitter/X
+                            </button>
+                            <button class="btn btn-secondary" onclick="testTwitterConnection()">
+                                🧪 Test Connection
+                            </button>
+                        </div>
+                        
+                        <div id="twitterStatus" style="margin-top: 15px; padding: 12px; border-radius: 4px; display: none;"></div>
                     </div>
                 </div>
             </div>
