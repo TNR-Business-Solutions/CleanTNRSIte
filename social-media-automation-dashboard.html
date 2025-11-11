@@ -723,7 +723,21 @@
                     if (statusDiv) {
                         statusDiv.style.background = '#f8d7da';
                         statusDiv.style.color = '#721c24';
-                        statusDiv.textContent = `❌ Failed to post: ${data.message || data.error || 'Unknown error'}`;
+                        
+                        let errorMsg = `❌ Failed to post: ${data.message || data.error || 'Unknown error'}`;
+                        
+                        // Add helpful guidance for permission errors
+                        if (data.help) {
+                            errorMsg += '\n\n' + data.help.title + ':\n';
+                            if (data.help.steps) {
+                                errorMsg += data.help.steps.join('\n');
+                            } else if (data.help.solution) {
+                                errorMsg += data.help.solution;
+                            }
+                        }
+                        
+                        statusDiv.textContent = errorMsg;
+                        statusDiv.style.whiteSpace = 'pre-line';
                     }
                 }
             } catch (error) {
@@ -1664,7 +1678,21 @@
                     if (statusDiv) {
                         statusDiv.style.background = '#f8d7da';
                         statusDiv.style.color = '#721c24';
-                        statusDiv.textContent = `❌ Failed to post: ${data.message || data.error || 'Unknown error'}`;
+                        
+                        let errorMsg = `❌ Failed to post: ${data.message || data.error || 'Unknown error'}`;
+                        
+                        // Add helpful guidance for permission errors
+                        if (data.help) {
+                            errorMsg += '\n\n' + data.help.title + ':\n';
+                            if (data.help.steps) {
+                                errorMsg += data.help.steps.join('\n');
+                            } else if (data.help.solution) {
+                                errorMsg += data.help.solution;
+                            }
+                        }
+                        
+                        statusDiv.textContent = errorMsg;
+                        statusDiv.style.whiteSpace = 'pre-line';
                     }
                 }
             } catch (error) {
