@@ -711,6 +711,20 @@
                     })
                 });
                 
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Save token failed - HTTP error:', response.status, errorText);
+                    try {
+                        const errorData = JSON.parse(errorText);
+                        alert(`❌ Failed to save token: ${errorData.error || errorData.message || 'Server error'}`);
+                        console.error('Error details:', errorData);
+                    } catch (e) {
+                        alert(`❌ Failed to save token: HTTP ${response.status}`);
+                        console.error('Error response:', errorText);
+                    }
+                    return;
+                }
+                
                 const data = await response.json();
                 console.log('Save token response:', data);
                 console.log('Response details:', {
@@ -719,6 +733,7 @@
                     error: data.error,
                     token: data.token
                 });
+                console.log('Full response object:', JSON.stringify(data, null, 2));
                 
                 if (data.success) {
                     alert('✅ Twitter/X token saved successfully!');
