@@ -523,7 +523,11 @@
                     if (statusDiv) {
                         statusDiv.style.background = '#f8d7da';
                         statusDiv.style.color = '#721c24';
-                        statusDiv.textContent = `❌ Connection failed: ${testData.error || testData.message || 'Invalid token'}`;
+                        let errorHtml = `<strong>${testData.message || 'Connection failed'}</strong><br>${testData.error || 'Invalid token'}`;
+                        if (testData.help) {
+                            errorHtml += `<br><br><small style="opacity: 0.8;">💡 ${testData.help}</small>`;
+                        }
+                        statusDiv.innerHTML = errorHtml;
                     }
                     if (statusText) statusText.textContent = 'Connection failed';
                 }
