@@ -168,21 +168,49 @@ module.exports = async (req, res) => {
 
   } catch (error) {
     console.error('Token exchange error:', error.message);
-    console.error('Error details:', error.response?.data);
+    console.error('Error details:', JSON.stringify(error.response?.data, null, 2));
     console.error('Error status:', error.response?.status);
+    console.error('Error headers:', error.response?.headers);
     console.error('Request config:', {
       url: error.config?.url,
       method: error.config?.method,
       redirectUri: REDIRECT_URI,
       hasClientId: !!LINKEDIN_CLIENT_ID,
-      hasClientSecret: !!LINKEDIN_CLIENT_SECRET
+      hasClientSecret: !!LINKEDIN_CLIENT_SECRET,
+      clientIdLength: LINKEDIN_CLIENT_ID?.length || 0,
+      clientSecretLength: LINKEDIN_CLIENT_SECRET?.length || 0
     });
+
+    // Check for missing environment variables first
+    if (!LINKEDIN_CLIENT_SECRET) {
+      res.setHeader('Content-Type', 'text/html');
+      return res.status(500).send(generateErrorHTML(
+        'Configuration Error',
+        'LINKEDIN_CLIENT_SECRET is not set in Vercel environment variables.',
+        [
+          '1. Go to Vercel Dashboard → Your Project → Settings → Environment Variables',
+          '2. Add LINKEDIN_CLIENT_SECRET with your Primary Client Secret',
+          '3. Make sure it\'s set for Production, Preview, and Development',
+          '4. Redeploy your application',
+          '5. Try the authorization flow again'
+        ]
+      ));
+    }
 
     // Handle specific error cases
     if (error.response?.data) {
       const linkedinError = error.response.data;
       const errorCode = linkedinError.error;
-      const errorDescription = linkedinError.error_description || linkedinError.error || 'Unknown error';
+      // Try multiple ways to extract error description
+      const errorDescription = linkedinError.error_description || 
+                               linkedinError.error || 
+                               linkedinError.message ||
+                               linkedinError.detail ||
+                               (typeof linkedinError === 'string' ? linkedinError : 'Unknown error');
+      
+      console.error('LinkedIn error code:', errorCode);
+      console.error('LinkedIn error description:', errorDescription);
+      console.error('Full LinkedIn error response:', JSON.stringify(linkedinError, null, 2));
       
       let errorTitle = 'LinkedIn API Error';
       let errorMessage = errorDescription;
@@ -219,11 +247,32 @@ module.exports = async (req, res) => {
           '5. Click "Update" and try again'
         ];
       } else {
+        // For unknown errors, provide comprehensive troubleshooting
         troubleshooting = [
-          '1. Verify your LinkedIn app settings in Developer Console',
-          '2. Check that LINKEDIN_CLIENT_ID and LINKEDIN_CLIENT_SECRET are set in Vercel',
-          '3. Make sure the redirect URI is added to your LinkedIn app',
-          '4. Try the authorization flow again'
+          '1. **Check Vercel Environment Variables**:',
+          '   - Go to Vercel Dashboard → Settings → Environment Variables',
+          '   - Verify LINKEDIN_CLIENT_ID = 78pjq1wt4wz1fs',
+          '   - Verify LINKEDIN_CLIENT_SECRET is set (use Primary Client Secret)',
+          '   - Verify LINKEDIN_REDIRECT_URI = https://www.tnrbusinesssolutions.com/api/auth/linkedin/callback',
+          '   - Make sure all are set for Production, Preview, and Development',
+          '   - Redeploy after adding/updating variables',
+          '',
+          '2. **Verify LinkedIn App Settings**:',
+          '   - Go to https://www.linkedin.com/developers/apps',
+          '   - Select your app → Auth tab',
+          '   - Under "Authorized redirect URLs", verify:',
+          '     https://www.tnrbusinesssolutions.com/api/auth/linkedin/callback',
+          '   - Must match exactly (including https:// and www.)',
+          '',
+          '3. **Check Vercel Logs**:',
+          '   - Go to Vercel Dashboard → Your Project → Logs',
+          '   - Look for detailed error messages',
+          '   - Check for any configuration issues',
+          '',
+          '4. **Try Again**:',
+          '   - Clear browser cache or use incognito mode',
+          '   - Click "🔄 Try Again" to start fresh',
+          '   - Complete the authorization flow quickly (codes expire fast)'
         ];
       }
 
