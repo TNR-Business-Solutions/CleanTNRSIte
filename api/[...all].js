@@ -147,6 +147,18 @@ module.exports = async (req, res) => {
       return await handler(req, res);
     }
     
+    // Social media token management - handle both /api/social-tokens and /api/social/tokens
+    if (route === 'social-tokens' || route.startsWith('social/tokens') || route === 'social/tokens') {
+      const handler = require('../server/handlers/social-tokens-api');
+      return await handler(req, res);
+    }
+    
+    // Post to Twitter - handle both /api/post-to-twitter and /api/social/post-to-twitter
+    if (route === 'post-to-twitter' || route.includes('post-to-twitter') || route === 'social/post-twitter') {
+      const handler = require('../server/handlers/post-to-twitter');
+      return await handler(req, res);
+    }
+    
     if (route.startsWith('social/')) {
       if (route.includes('tokens') || route === 'social/tokens') {
         const handler = require('../server/handlers/social-tokens-api');
