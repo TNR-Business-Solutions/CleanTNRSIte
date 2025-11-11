@@ -4,16 +4,22 @@
 
 You have generated the following credentials from the X Developer Portal:
 
-### Bearer Token (OAuth 2.0) - **RECOMMENDED** ✅
+### OAuth 2.0 Client Credentials (For OAuth Flow) ✅
+- **Client ID**: `WnRBRW1sWUFBRkRaYmFNTG8wU0Y6MTpjaQ`
+- **Client Secret**: `0bC4qZu82KjWEdyqmd2Olfg5eoNvYTXUma8lXWWYawF06WVQK3`
+
+**These are used for the OAuth 2.0 authorization flow** - when users click "Connect X (Twitter)" in the admin dashboard. Add these to Vercel environment variables.
+
+### Bearer Token (For Direct API Calls) - Alternative
 - **Bearer Token**: `AAAAAAAAAAAAAAAAAAAAAP+Y5QEAAAAAyvMFm/9j+nK3vcqXpCh/nAnyFfE=SDzYcI7JGB3vt8MUVAAsf0G2UzCye1IRCkgHgb259kHPmaYCxc`
 
-**This Bearer Token is the easiest to use** - it works directly with the current implementation and doesn't require OAuth 1.0a signing.
+**This Bearer Token can be used for direct API calls** without OAuth flow. However, it currently has "Read Only" permissions - you'll need to regenerate it after updating app permissions.
 
-### Access Token and Secret (OAuth 1.0a) - Alternative
+### Access Token and Secret (OAuth 1.0a) - Legacy
 - **Access Token**: `1960032716675858433-utRcm0ssHi3jtxwezEmgAbVSKwMJqS`
 - **Access Token Secret**: `Tm025vvA3qSoi4lahlBEWoYbwRAiBkggCFAuM4WQza8MT`
 
-**Note:** OAuth 1.0a tokens require request signing. The Bearer Token is simpler and recommended.
+**Note:** OAuth 1.0a tokens require request signing. OAuth 2.0 (Client ID/Secret) is recommended for new integrations.
 
 ## Option 1: Save Tokens Directly to Database (Recommended)
 
@@ -81,18 +87,28 @@ curl -X POST https://www.tnrbusinesssolutions.com/api/social-tokens \
 
 **Note:** OAuth 1.0a tokens require the `access_token_secret` for request signing, which is not currently stored in the database schema. The Bearer Token approach is recommended as it works immediately with the current implementation.
 
-## Option 2: Add to Vercel Environment Variables
+## Option 2: Add OAuth 2.0 Credentials to Vercel (Required for OAuth Flow)
 
-If you want to use these as fallback tokens, add them to Vercel:
+**IMPORTANT:** You must add these to Vercel for the OAuth 2.0 flow to work:
 
-1. Go to your Vercel project dashboard
-2. Navigate to **Settings** → **Environment Variables**
-3. Add the following variables:
+1. Go to your Vercel project dashboard: https://vercel.com/dashboard
+2. Select your project (`clean-site` or `tnrbusinesssolutions`)
+3. Navigate to **Settings** → **Environment Variables**
+4. Add the following variables to **All Environments** (Production, Preview, Development):
 
-```
-TWITTER_ACCESS_TOKEN=1960032716675858433-utRcm0ssHi3jtxwezEmgAbVSKwMJqS
-TWITTER_ACCESS_TOKEN_SECRET=Tm025vvA3qSoi4lahlBEWoYbwRAiBkggCFAuM4WQza8MT
-```
+| Variable Name | Value | Environment |
+|--------------|-------|-------------|
+| `TWITTER_CLIENT_ID` | `WnRBRW1sWUFBRkRaYmFNTG8wU0Y6MTpjaQ` | Production, Preview, Development |
+| `TWITTER_CLIENT_SECRET` | `0bC4qZu82KjWEdyqmd2Olfg5eoNvYTXUma8lXWWYawF06WVQK3` | Production, Preview, Development |
+| `TWITTER_REDIRECT_URI` | `https://www.tnrbusinesssolutions.com/api/auth/twitter/callback` | Production, Preview, Development |
+
+5. Click **Save** for each variable
+6. **Redeploy** your application (or wait for Vercel to auto-redeploy)
+
+**After adding these:**
+- ✅ Users can click "Connect X (Twitter)" in the admin dashboard
+- ✅ OAuth 2.0 flow will work automatically
+- ✅ Tokens will be saved to the database after authorization
 
 ## Important Notes
 
