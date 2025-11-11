@@ -436,10 +436,215 @@
             sessionStorage.setItem('adminAuthenticated', 'true');
         }
         
+        // Character counter for Twitter
+        document.addEventListener('DOMContentLoaded', function() {
+            const twitterContent = document.getElementById('twitterContent');
+            const twitterCharCount = document.getElementById('twitterCharCount');
+            
+            if (twitterContent && twitterCharCount) {
+                twitterContent.addEventListener('input', function() {
+                    const length = this.value.length;
+                    twitterCharCount.textContent = length;
+                    
+                    if (length > 280) {
+                        twitterCharCount.style.color = '#dc3545';
+                    } else if (length > 250) {
+                        twitterCharCount.style.color = '#ffc107';
+                    } else {
+                        twitterCharCount.style.color = '#666';
+                    }
+                });
+            }
+        });
+        
         // Meta OAuth Functions
         function connectMeta() {
             // Redirect to Meta OAuth flow
             window.location.href = '/auth/meta';
+        }
+        
+        // Twitter/X OAuth Functions
+        function connectTwitter() {
+            // Redirect to Twitter OAuth flow
+            window.location.href = '/api/auth/twitter';
+        }
+        
+        async function testTwitterConnection() {
+            const statusDiv = document.getElementById('twitterStatus');
+            const statusText = document.getElementById('twitterStatusText');
+            
+            try {
+                if (statusDiv) {
+                    statusDiv.style.display = 'block';
+                    statusDiv.style.background = '#fff3cd';
+                    statusDiv.style.color = '#856404';
+                    statusDiv.textContent = 'Testing connection...';
+                }
+                
+                // Get tokens from database
+                const response = await fetch('/api/social-tokens?platform=twitter');
+                const data = await response.json();
+                
+                if (!data.success || !data.tokens || data.tokens.length === 0) {
+                    if (statusDiv) {
+                        statusDiv.style.background = '#f8d7da';
+                        statusDiv.style.color = '#721c24';
+                        statusDiv.textContent = '❌ No Twitter/X token found. Please connect your account first.';
+                    }
+                    if (statusText) statusText.textContent = 'Not connected';
+                    return;
+                }
+                
+                // Test the first token
+                const token = data.tokens[0];
+                const testResponse = await fetch('/api/social-tokens', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'test',
+                        tokenId: token.id,
+                        platform: 'twitter'
+                    })
+                });
+                
+                const testData = await testResponse.json();
+                
+                if (testData.success && testData.valid) {
+                    if (statusDiv) {
+                        statusDiv.style.background = '#d4edda';
+                        statusDiv.style.color = '#155724';
+                        statusDiv.textContent = `✅ Connection successful! Connected as: ${testData.account?.username || token.page_name || 'Twitter User'}`;
+                    }
+                    if (statusText) statusText.innerHTML = `✅ Connected: ${testData.account?.username ? '@' + testData.account.username : token.page_name || 'Twitter User'}`;
+                    if (document.getElementById('twitterConnected')) {
+                        document.getElementById('twitterConnected').textContent = '✅';
+                    }
+                } else {
+                    if (statusDiv) {
+                        statusDiv.style.background = '#f8d7da';
+                        statusDiv.style.color = '#721c24';
+                        statusDiv.textContent = `❌ Connection failed: ${testData.error || testData.message || 'Invalid token'}`;
+                    }
+                    if (statusText) statusText.textContent = 'Connection failed';
+                }
+            } catch (error) {
+                if (statusDiv) {
+                    statusDiv.style.background = '#f8d7da';
+                    statusDiv.style.color = '#721c24';
+                    statusDiv.textContent = `❌ Error: ${error.message}`;
+                }
+                if (statusText) statusText.textContent = 'Error';
+                console.error('Twitter connection test error:', error);
+            }
+        }
+        
+        async function postToTwitter() {
+            const content = document.getElementById('twitterContent')?.value.trim();
+            const hashtags = document.getElementById('twitterHashtags')?.value.trim();
+            const statusDiv = document.getElementById('twitterStatus');
+            
+            if (!content) {
+                alert('Please enter tweet content');
+                return;
+            }
+            
+            // Combine content and hashtags
+            let tweetText = content;
+            if (hashtags) {
+                tweetText += ' ' + hashtags;
+            }
+            
+            // Check character limit
+            if (tweetText.length > 280) {
+                alert(`Tweet is too long (${tweetText.length}/280 characters). Please shorten it.`);
+                return;
+            }
+            
+            try {
+                if (statusDiv) {
+                    statusDiv.style.display = 'block';
+                    statusDiv.style.background = '#fff3cd';
+                    statusDiv.style.color = '#856404';
+                    statusDiv.textContent = 'Posting to Twitter/X...';
+                }
+                
+                const response = await fetch('/api/post-to-twitter', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        text: tweetText,
+                        useDatabaseToken: true
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    if (statusDiv) {
+                        statusDiv.style.background = '#d4edda';
+                        statusDiv.style.color = '#155724';
+                        statusDiv.innerHTML = `✅ Tweet posted successfully!<br><a href="${data.tweetUrl}" target="_blank" style="color: #155724; text-decoration: underline;">View Tweet →</a>`;
+                    }
+                    
+                    // Clear form
+                    const contentEl = document.getElementById('twitterContent');
+                    const hashtagsEl = document.getElementById('twitterHashtags');
+                    const charCountEl = document.getElementById('twitterCharCount');
+                    if (contentEl) contentEl.value = '';
+                    if (hashtagsEl) hashtagsEl.value = '';
+                    if (charCountEl) charCountEl.textContent = '0';
+                } else {
+                    if (statusDiv) {
+                        statusDiv.style.background = '#f8d7da';
+                        statusDiv.style.color = '#721c24';
+                        statusDiv.textContent = `❌ Failed to post: ${data.message || data.error || 'Unknown error'}`;
+                    }
+                }
+            } catch (error) {
+                if (statusDiv) {
+                    statusDiv.style.background = '#f8d7da';
+                    statusDiv.style.color = '#721c24';
+                    statusDiv.textContent = `❌ Error: ${error.message}`;
+                }
+                console.error('Twitter post error:', error);
+            }
+        }
+        
+        async function saveTwitterToken() {
+            const tokenInput = document.getElementById('twitterToken');
+            const token = tokenInput?.value.trim();
+            
+            if (!token) {
+                alert('Please enter a Bearer Token');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/social-tokens', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'save',
+                        platform: 'twitter',
+                        access_token: token,
+                        page_name: 'TNR Business Solutions (@TNRBusinessSol)',
+                        token_type: 'Bearer'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('✅ Twitter/X token saved successfully!');
+                    if (tokenInput) tokenInput.value = '';
+                    testTwitterConnection();
+                } else {
+                    alert(`❌ Failed to save token: ${data.error || data.message}`);
+                }
+            } catch (error) {
+                alert(`❌ Error: ${error.message}`);
+                console.error('Save Twitter token error:', error);
+            }
         }
         
         async function testMetaToken() {
