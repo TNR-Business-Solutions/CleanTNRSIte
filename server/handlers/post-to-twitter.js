@@ -105,16 +105,66 @@ module.exports = async (req, res) => {
   } catch (error) {
     console.error('Twitter/X posting error:', error.message);
     console.error('Error details:', error.response?.data);
+    console.error('Error status:', error.response?.status);
 
     // Handle specific error cases
     if (error.response?.data) {
       const twitterError = error.response.data;
+      const statusCode = error.response.status;
       
-      return res.status(400).json({
+      // Handle permission errors (403 Forbidden)
+      if (statusCode === 403 || twitterError.detail?.includes('not permitted') || 
+          twitterError.title?.includes('not permitted') || 
+          twitterError.detail?.includes('Forbidden')) {
+        return res.status(403).json({
+          success: false,
+          error: 'Permission Denied',
+          message: 'Your Twitter/X token does not have write permissions. The token may be set to "Read Only" instead of "Read and Write".',
+          errorType: 'permission_denied',
+          help: {
+            title: 'How to Fix This',
+            steps: [
+              '1. Go to X Developer Portal: https://developer.twitter.com/en/portal/dashboard',
+              '2. Select your app',
+              '3. Go to "Settings" → "User authentication settings"',
+              '4. Under "App permissions", select "Read and Write"',
+              '5. Click "Save"',
+              '6. Go to "Keys and tokens" tab',
+              '7. Regenerate your Bearer Token',
+              '8. Copy the new Bearer Token and save it in the dashboard'
+            ],
+            solution: 'Your Bearer Token needs "Read and Write" permissions. Update your app settings in the X Developer Portal and regenerate the token.'
+          },
+          details: twitterError
+        });
+      }
+      
+      // Handle 401 Unauthorized (invalid/expired token)
+      if (statusCode === 401) {
+        return res.status(401).json({
+          success: false,
+          error: 'Unauthorized',
+          message: 'Your Twitter/X token is invalid or expired. Please reconnect your account or update your Bearer Token.',
+          errorType: 'unauthorized',
+          help: {
+            title: 'How to Fix This',
+            steps: [
+              '1. Click "Connect Twitter/X" button in the dashboard',
+              '2. Or manually save a new Bearer Token from X Developer Portal',
+              '3. Make sure the token has "Read and Write" permissions'
+            ]
+          },
+          details: twitterError
+        });
+      }
+      
+      // Generic Twitter API error
+      return res.status(statusCode || 400).json({
         success: false,
         error: 'Twitter/X API Error',
         message: twitterError.detail || twitterError.title || 'Failed to post to Twitter/X',
         errorType: twitterError.type,
+        statusCode: statusCode,
         details: twitterError
       });
     }
