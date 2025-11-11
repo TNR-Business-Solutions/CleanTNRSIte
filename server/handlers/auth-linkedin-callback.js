@@ -217,7 +217,7 @@ module.exports = async (req, res) => {
         'LINKEDIN_CLIENT_SECRET is not set in Vercel environment variables. This is required for token exchange.',
         [
           '1. Go to Vercel Dashboard → Your Project → Settings → Environment Variables',
-          '2. Add LINKEDIN_CLIENT_SECRET with your Primary Client Secret: [YOUR_CLIENT_SECRET]',
+          '2. Add LINKEDIN_CLIENT_SECRET with your Primary Client Secret (get from LinkedIn Developer Console)',
           '3. Make sure it\'s set for Production, Preview, and Development',
           '4. Wait 1-2 minutes for Vercel to redeploy',
           '5. Try the authorization flow again'
