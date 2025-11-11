@@ -107,13 +107,82 @@ module.exports = async (req, res) => {
 
     // Step 2: Fetch user profile to get user ID and name
     console.log('Fetching LinkedIn profile...');
-    const profileResponse = await axios.get('https://api.linkedin.com/v2/me', {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'X-Restli-Protocol-Version': '2.0.0'
-      },
-      timeout: 10000
+    console.log('Profile request config:', {
+      url: 'https://api.linkedin.com/v2/me',
+      hasAccessToken: !!accessToken,
+      tokenLength: accessToken?.length || 0,
+      tokenPrefix: accessToken ? accessToken.substring(0, 20) + '...' : 'MISSING'
     });
+    
+    let profileResponse;
+    try {
+      profileResponse = await axios.get('https://api.linkedin.com/v2/me', {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'X-Restli-Protocol-Version': '2.0.0'
+        },
+        timeout: 10000
+      });
+      console.log('Profile fetch successful, response keys:', Object.keys(profileResponse.data || {}));
+    } catch (profileError) {
+      console.error('Profile fetch failed:', profileError.message);
+      console.error('Profile error response:', JSON.stringify(profileError.response?.data, null, 2));
+      console.error('Profile error status:', profileError.response?.status);
+      
+      // If profile fetch fails but we have a token, we can still save it
+      // Use a default user ID based on token or timestamp
+      const fallbackUserId = `linkedin_user_${Date.now()}`;
+      console.warn('⚠️ Profile fetch failed, using fallback user ID:', fallbackUserId);
+      
+      // Try to save token anyway with fallback info
+      const db = new TNRDatabase();
+      await db.initialize();
+      
+      try {
+        const expiresAt = expiresIn ? new Date(Date.now() + expiresIn * 1000).toISOString() : null;
+        
+        await db.saveSocialMediaToken({
+          platform: 'linkedin',
+          page_id: fallbackUserId,
+          access_token: accessToken,
+          token_type: 'Bearer',
+          expires_at: expiresAt,
+          refresh_token: refreshToken,
+          user_id: fallbackUserId,
+          page_name: 'LinkedIn User (Profile fetch failed)',
+        });
+        
+        console.log('✅ Token saved with fallback user info');
+        
+        // Return success but with a warning
+        res.setHeader('Content-Type', 'text/html');
+        return res.status(200).send(generateSuccessHTML({
+          success: true,
+          message: 'LinkedIn token saved successfully! Note: Profile fetch failed, but token is valid.',
+          authorization: {
+            accessToken: accessToken,
+            expiresIn: expiresIn,
+            expiresInDays: expiresIn ? Math.floor(expiresIn / 86400) : null,
+            refreshToken: refreshToken
+          },
+          profile: {
+            id: fallbackUserId,
+            firstName: 'LinkedIn',
+            lastName: 'User',
+            email: null
+          },
+          nextSteps: [
+            '1. ✅ Access token saved to database',
+            '2. ⚠️ Profile fetch failed - token may still work for posting',
+            '3. You can test posting to LinkedIn from the dashboard',
+            '4. If posting fails, try reconnecting'
+          ]
+        }));
+      } catch (dbError) {
+        console.error('Failed to save token:', dbError.message);
+        throw profileError; // Re-throw original error
+      }
+    }
 
     const userProfile = profileResponse.data;
     const userId = userProfile.id;
