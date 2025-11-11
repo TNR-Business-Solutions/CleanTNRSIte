@@ -169,20 +169,82 @@ module.exports = async (req, res) => {
   } catch (error) {
     console.error('Token exchange error:', error.message);
     console.error('Error details:', error.response?.data);
+    console.error('Error status:', error.response?.status);
+    console.error('Request config:', {
+      url: error.config?.url,
+      method: error.config?.method,
+      redirectUri: REDIRECT_URI,
+      hasClientId: !!LINKEDIN_CLIENT_ID,
+      hasClientSecret: !!LINKEDIN_CLIENT_SECRET
+    });
 
     // Handle specific error cases
     if (error.response?.data) {
+      const linkedinError = error.response.data;
+      const errorCode = linkedinError.error;
+      const errorDescription = linkedinError.error_description || linkedinError.error || 'Unknown error';
+      
+      let errorTitle = 'LinkedIn API Error';
+      let errorMessage = errorDescription;
+      let troubleshooting = [];
+
+      // Handle specific LinkedIn error codes
+      if (errorCode === 'invalid_grant' || errorDescription.includes('expired') || errorDescription.includes('invalid')) {
+        errorTitle = 'Authorization Code Error';
+        errorMessage = 'The authorization code is invalid or has expired. Authorization codes expire quickly and can only be used once.';
+        troubleshooting = [
+          '1. Click "🔄 Try Again" to start a fresh authorization',
+          '2. Complete the authorization flow quickly (don\'t wait too long)',
+          '3. Make sure you\'re clicking "Allow" on LinkedIn immediately',
+          '4. Don\'t refresh or go back during the authorization process'
+        ];
+      } else if (errorCode === 'invalid_client' || errorDescription.includes('client')) {
+        errorTitle = 'Client Credentials Error';
+        errorMessage = 'LinkedIn client ID or client secret is incorrect.';
+        troubleshooting = [
+          '1. Check your LINKEDIN_CLIENT_ID in Vercel environment variables',
+          '2. Check your LINKEDIN_CLIENT_SECRET in Vercel environment variables',
+          '3. Make sure there are no extra spaces or characters',
+          '4. Redeploy your application after updating environment variables'
+        ];
+      } else if (errorCode === 'redirect_uri_mismatch' || errorDescription.includes('redirect') || errorDescription.includes('URI')) {
+        errorTitle = 'Redirect URI Mismatch';
+        errorMessage = 'The redirect URI doesn\'t match what\'s configured in LinkedIn.';
+        troubleshooting = [
+          '1. Go to LinkedIn Developer Console: https://www.linkedin.com/developers/apps',
+          '2. Select your app → Auth tab',
+          '3. Under "Authorized redirect URLs", add exactly:',
+          `   ${REDIRECT_URI}`,
+          '4. Make sure it matches exactly (including https:// and www.)',
+          '5. Click "Update" and try again'
+        ];
+      } else {
+        troubleshooting = [
+          '1. Verify your LinkedIn app settings in Developer Console',
+          '2. Check that LINKEDIN_CLIENT_ID and LINKEDIN_CLIENT_SECRET are set in Vercel',
+          '3. Make sure the redirect URI is added to your LinkedIn app',
+          '4. Try the authorization flow again'
+        ];
+      }
+
       res.setHeader('Content-Type', 'text/html');
       return res.status(400).send(generateErrorHTML(
-        'LinkedIn API Error',
-        error.response.data.error_description || error.response.data.error || 'Failed to exchange tokens with LinkedIn. The authorization code may have expired.'
+        errorTitle,
+        errorMessage,
+        troubleshooting,
+        errorCode
       ));
     }
 
     res.setHeader('Content-Type', 'text/html');
     return res.status(500).send(generateErrorHTML(
       'Internal Server Error',
-      error.message || 'Please try the authorization flow again.'
+      error.message || 'Please try the authorization flow again.',
+      [
+        '1. Check Vercel logs for more details',
+        '2. Verify environment variables are set correctly',
+        '3. Try the authorization flow again'
+      ]
     ));
   }
 };
@@ -339,7 +401,7 @@ function generateSuccessHTML(data) {
 }
 
 // HTML generation function for error page
-function generateErrorHTML(error, details) {
+function generateErrorHTML(error, details, troubleshooting = [], errorCode = null) {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -361,7 +423,7 @@ function generateErrorHTML(error, details) {
             background: white;
             border-radius: 20px;
             padding: 40px;
-            max-width: 600px;
+            max-width: 700px;
             width: 100%;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
@@ -384,6 +446,34 @@ function generateErrorHTML(error, details) {
             margin: 20px 0;
         }
         .error-message h3 { margin-bottom: 10px; }
+        .troubleshooting {
+            background: #fff3cd;
+            border: 1px solid #ffeeba;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .troubleshooting h3 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+        .troubleshooting ol {
+            margin-left: 20px;
+            color: #856404;
+        }
+        .troubleshooting li {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        .error-code {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 14px;
+            margin-top: 10px;
+            color: #495057;
+        }
         .btn {
             padding: 12px 30px;
             border-radius: 8px;
@@ -396,6 +486,7 @@ function generateErrorHTML(error, details) {
             margin: 5px;
         }
         .btn-primary { background: #0077b5; color: white; }
+        .btn-primary:hover { background: #005885; }
         .btn-secondary { background: #6c757d; color: white; }
     </style>
 </head>
@@ -407,10 +498,21 @@ function generateErrorHTML(error, details) {
         <div class="error-message">
             <h3>${error}</h3>
             <p>${details}</p>
+            ${errorCode ? `<div class="error-code">Error Code: ${errorCode}</div>` : ''}
         </div>
+        
+        ${troubleshooting.length > 0 ? `
+        <div class="troubleshooting">
+            <h3>🔧 How to Fix This</h3>
+            <ol>
+                ${troubleshooting.map(step => `<li>${step}</li>`).join('')}
+            </ol>
+        </div>
+        ` : ''}
         
         <div style="text-align: center; margin-top: 30px;">
             <a href="/api/auth/linkedin" class="btn btn-primary">🔄 Try Again</a>
+            <a href="/admin-dashboard.html" class="btn btn-secondary">📊 Admin Dashboard</a>
             <a href="/" class="btn btn-secondary">🏠 Go Home</a>
         </div>
     </div>
