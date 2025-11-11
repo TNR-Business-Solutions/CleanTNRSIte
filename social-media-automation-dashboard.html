@@ -262,7 +262,7 @@
                 </div>
                 
                 <!-- Twitter Content Area -->
-                <div id="twitter" class="content-area">
+                <div id="twitter" class="content-area" style="display: none;">
                     <div class="form-group">
                         <label for="contentTypeTwitter">Content Type</label>
                         <select id="contentTypeTwitter" name="contentTypeTwitter" aria-label="Select content type">
@@ -1442,11 +1442,22 @@
         };
         
         function switchPlatform(platform, element) {
+            // Remove active class from all tabs
             document.querySelectorAll('.platform-tab').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.content-area').forEach(area => area.classList.remove('active'));
+            // Hide all content areas
+            document.querySelectorAll('.content-area').forEach(area => {
+                area.classList.remove('active');
+                area.style.display = 'none';
+            });
+            // Activate clicked tab
             if (element) element.classList.add('active');
+            // Show target content area
             const targetArea = document.getElementById(platform);
-            if (targetArea) targetArea.classList.add('active');
+            if (targetArea) {
+                targetArea.classList.add('active');
+                targetArea.style.display = 'block';
+            }
+            console.log('Switched to platform:', platform, 'Target area found:', !!targetArea);
         }
         
         function generateContent() {
