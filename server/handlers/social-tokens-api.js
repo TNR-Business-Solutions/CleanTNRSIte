@@ -169,6 +169,52 @@ module.exports = async (req, res) => {
         }
       }
 
+      // POST - Save token manually (for OAuth 1.0a tokens or manual entry)
+      if (action === 'save') {
+        const { platform, access_token, access_token_secret, page_id, page_name, user_id, expires_at } = body;
+
+        if (!platform || !access_token) {
+          sendJson(res, 400, {
+            success: false,
+            error: 'platform and access_token are required'
+          });
+          return;
+        }
+
+        // Extract user ID from Twitter access token if not provided
+        // Twitter OAuth 1.0a tokens have format: USERID-TOKEN
+        let extractedUserId = user_id;
+        if (platform === 'twitter' && !extractedUserId && access_token.includes('-')) {
+          extractedUserId = access_token.split('-')[0];
+        }
+
+        // Save token to database
+        const tokenData = {
+          platform: platform,
+          access_token: access_token,
+          page_id: page_id || extractedUserId || null,
+          user_id: extractedUserId || user_id || null,
+          page_name: page_name || `Twitter User (${extractedUserId || 'Manual'})`,
+          expires_at: expires_at || null,
+          // Note: access_token_secret is not stored in current schema
+          // For OAuth 1.0a, we'd need to add this field to the database
+        };
+
+        await db.saveSocialMediaToken(tokenData);
+
+        sendJson(res, 200, {
+          success: true,
+          message: 'Token saved successfully',
+          token: {
+            platform: platform,
+            page_id: tokenData.page_id,
+            page_name: tokenData.page_name,
+            user_id: tokenData.user_id
+          }
+        });
+        return;
+      }
+
       // POST - Get token for posting (returns full token securely)
       if (query.action === 'get') {
         const { platform, pageId } = body;
