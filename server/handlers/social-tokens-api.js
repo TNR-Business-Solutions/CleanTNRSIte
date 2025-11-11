@@ -157,14 +157,14 @@ module.exports = async (req, res) => {
               message: "✅ Twitter/X token is valid",
             });
             return;
-          } else {
-            sendJson(res, 400, {
-              success: false,
-              error: `Token testing for ${platform} not yet implemented`,
-            });
-            return;
-          }
-          } catch (testError) {
+            } else {
+              sendJson(res, 400, {
+                success: false,
+                error: `Token testing for ${platform} not yet implemented`,
+              });
+              return;
+            }
+        } catch (testError) {
             // Provide more detailed error information
             let errorMessage = "❌ Token is invalid or expired";
             let errorDetails = testError.message;
