@@ -4,10 +4,16 @@
 
 You have generated the following credentials from the X Developer Portal:
 
+### Bearer Token (OAuth 2.0) - **RECOMMENDED** ✅
+- **Bearer Token**: `AAAAAAAAAAAAAAAAAAAAAP+Y5QEAAAAAyvMFm/9j+nK3vcqXpCh/nAnyFfE=SDzYcI7JGB3vt8MUVAAsf0G2UzCye1IRCkgHgb259kHPmaYCxc`
+
+**This Bearer Token is the easiest to use** - it works directly with the current implementation and doesn't require OAuth 1.0a signing.
+
+### Access Token and Secret (OAuth 1.0a) - Alternative
 - **Access Token**: `1960032716675858433-utRcm0ssHi3jtxwezEmgAbVSKwMJqS`
 - **Access Token Secret**: `Tm025vvA3qSoi4lahlBEWoYbwRAiBkggCFAuM4WQza8MT`
 
-These are **OAuth 1.0a tokens** that can be used directly for posting to Twitter/X.
+**Note:** OAuth 1.0a tokens require request signing. The Bearer Token is simpler and recommended.
 
 ## Option 1: Save Tokens Directly to Database (Recommended)
 
@@ -18,8 +24,48 @@ You can save these tokens directly to the database using the admin dashboard or 
 2. Navigate to the "Social Media" tab
 3. Click "Connect X (Twitter)" - this will save your tokens
 
-### Via API (Manual Save):
-You can use the social tokens API to save them using curl:
+### Via API (Manual Save) - Bearer Token (Recommended):
+
+**Using curl:**
+```bash
+curl -X POST https://www.tnrbusinesssolutions.com/api/social-tokens \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "save",
+    "platform": "twitter",
+    "access_token": "AAAAAAAAAAAAAAAAAAAAAP+Y5QEAAAAAyvMFm/9j+nK3vcqXpCh/nAnyFfE=SDzYcI7JGB3vt8MUVAAsf0G2UzCye1IRCkgHgb259kHPmaYCxc",
+    "page_name": "TNR Business Solutions (@TNRBusinessSol)",
+    "token_type": "Bearer"
+  }'
+```
+
+**Using JavaScript (browser console or Node.js):**
+```javascript
+fetch('https://www.tnrbusinesssolutions.com/api/social-tokens', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    action: 'save',
+    platform: 'twitter',
+    access_token: 'AAAAAAAAAAAAAAAAAAAAAP+Y5QEAAAAAyvMFm/9j+nK3vcqXpCh/nAnyFfE=SDzYcI7JGB3vt8MUVAAsf0G2UzCye1IRCkgHgb259kHPmaYCxc',
+    page_name: 'TNR Business Solutions (@TNRBusinessSol)',
+    token_type: 'Bearer'
+  })
+})
+.then(r => r.json())
+.then(data => {
+  console.log('✅ Token saved!', data);
+  alert('Twitter/X token saved successfully!');
+})
+.catch(err => {
+  console.error('❌ Error:', err);
+  alert('Error saving token: ' + err.message);
+});
+```
+
+### Via API (Manual Save) - OAuth 1.0a Tokens (Alternative):
+
+If you prefer to use the Access Token and Secret:
 
 ```bash
 curl -X POST https://www.tnrbusinesssolutions.com/api/social-tokens \
@@ -33,25 +79,7 @@ curl -X POST https://www.tnrbusinesssolutions.com/api/social-tokens \
   }'
 ```
 
-Or using JavaScript fetch:
-
-```javascript
-fetch('https://www.tnrbusinesssolutions.com/api/social-tokens', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    action: 'save',
-    platform: 'twitter',
-    access_token: '1960032716675858433-utRcm0ssHi3jtxwezEmgAbVSKwMJqS',
-    page_name: 'TNR Business Solutions',
-    user_id: '1960032716675858433'
-  })
-})
-.then(r => r.json())
-.then(console.log);
-```
-
-**Note:** The `access_token_secret` is not currently stored in the database schema. If you need OAuth 1.0a signing (which requires the secret), we'll need to update the database schema first. For now, we'll try using the access_token as a Bearer token (OAuth 2.0 style).
+**Note:** OAuth 1.0a tokens require the `access_token_secret` for request signing, which is not currently stored in the database schema. The Bearer Token approach is recommended as it works immediately with the current implementation.
 
 ## Option 2: Add to Vercel Environment Variables
 
@@ -100,12 +128,16 @@ Or use the admin dashboard's social media posting interface.
 
 ## Token Permissions
 
-Your tokens have **Read Only** permissions as shown in the X Developer Portal. To post tweets, you need to:
+⚠️ **IMPORTANT:** Your tokens currently have **Read Only** permissions as shown in the X Developer Portal. To post tweets, you need to:
 
-1. Go to your X Developer Portal
-2. Navigate to your app's settings
-3. Update the app permissions to include **Read and Write** access
-4. Regenerate your Access Token and Secret with the new permissions
+1. Go to your X Developer Portal: https://developer.twitter.com/en/portal/dashboard
+2. Navigate to your app: **TNR_Business_Automation**
+3. Go to **Settings** → **User authentication settings**
+4. Under **App permissions**, change from **Read** to **Read and Write**
+5. **Regenerate your Bearer Token** (or Access Token and Secret) with the new permissions
+6. Save the new token using the instructions above
+
+**Current Status:** Your Bearer Token has Read Only permissions - it can read tweets but cannot post. You must update permissions and regenerate the token to enable posting.
 
 ## Troubleshooting
 
