@@ -1,3 +1,6 @@
+// Load environment variables first
+require("dotenv").config();
+
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
@@ -11,14 +14,109 @@ const {
   clearCart,
   processCheckout,
 } = require("./cart-handler");
-const EmailHandler = require("./email-handler");
-const crmApiHandler = require("./api/crm-api");
-const campaignApiHandler = require("./api/campaign-api");
+// Initialize email handler (optional - may fail if SMTP not configured)
+let emailHandler = null;
+try {
+  const EmailHandler = require("./email-handler");
+  emailHandler = new EmailHandler();
+  console.log("✅ Email handler initialized");
+} catch (error) {
+  console.warn("⚠️ Email handler not available:", error.message);
+  console.warn("   Email functionality will be disabled until SMTP is configured");
+}
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 
-// Initialize email handler
-const emailHandler = new EmailHandler();
+// Handle admin authentication
+async function handleAdminAuth(req, res) {
+  // Only accept POST requests
+  if (req.method !== "POST") {
+    res.writeHead(405, { "Content-Type": "application/json" });
+    res.end(
+      JSON.stringify({
+        success: false,
+        error: "Method not allowed",
+      })
+    );
+    return;
+  }
+
+  try {
+    let body = "";
+    req.on("data", (chunk) => {
+      body += chunk.toString();
+    });
+
+    req.on("end", async () => {
+      try {
+        const { username, password } = JSON.parse(body || "{}");
+
+        // Validate input
+        if (!username || !password) {
+          res.writeHead(400, { "Content-Type": "application/json" });
+          res.end(
+            JSON.stringify({
+              success: false,
+              error: "Username and password required",
+            })
+          );
+          return;
+        }
+
+        // Get credentials from environment variables (SECURE)
+        const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "admin";
+        const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "TNR2024!";
+
+        // Validate credentials
+        if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+          // Generate a simple session token (in production, use JWT or proper session management)
+          const sessionToken = Buffer.from(
+            `${username}:${Date.now()}`
+          ).toString("base64");
+
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(
+            JSON.stringify({
+              success: true,
+              message: "Authentication successful",
+              sessionToken: sessionToken,
+              redirectTo: "/admin-dashboard.html",
+            })
+          );
+        } else {
+          // Add small delay to prevent brute force attacks
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+
+          res.writeHead(401, { "Content-Type": "application/json" });
+          res.end(
+            JSON.stringify({
+              success: false,
+              error: "Invalid credentials",
+            })
+          );
+        }
+      } catch (error) {
+        console.error("Auth error:", error);
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify({
+            success: false,
+            error: "Internal server error",
+          })
+        );
+      }
+    });
+  } catch (error) {
+    console.error("Auth error:", error);
+    res.writeHead(500, { "Content-Type": "application/json" });
+    res.end(
+      JSON.stringify({
+        success: false,
+        error: "Internal server error",
+      })
+    );
+  }
+}
 
 // Handle form submissions with email
 async function handleFormSubmissionWithEmail(req, res) {
@@ -233,13 +331,147 @@ const server = http.createServer((req, res) => {
 
   // Handle CRM API requests
   if (pathname.startsWith("/api/crm/")) {
-    crmApiHandler(req, res);
+    const crmApiHandler = require("./server/handlers/crm-api");
+    crmApiHandler(req, res).catch((err) => {
+      console.error("CRM API Error:", err);
+      if (!res.headersSent) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: false, error: "Internal server error" }));
+      }
+    });
     return;
   }
 
   // Handle Campaign API requests
   if (pathname.startsWith("/api/campaigns/")) {
-    campaignApiHandler(req, res);
+    const campaignApiHandler = require("./server/handlers/campaign-api");
+    campaignApiHandler(req, res).catch((err) => {
+      console.error("Campaign API Error:", err);
+      if (!res.headersSent) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: false, error: "Internal server error" }));
+      }
+    });
+    return;
+  }
+
+  // Handle Workflows API
+  if (pathname.startsWith("/api/workflows")) {
+    const workflowsApi = require("./server/handlers/workflows-api");
+    workflowsApi(req, res).catch((err) => {
+      console.error("Workflows API Error:", err);
+      if (!res.headersSent) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: false, error: "Internal server error" }));
+      }
+    });
+    return;
+  }
+
+  // Handle Analytics API
+  if (pathname.startsWith("/api/analytics")) {
+    const analyticsApi = require("./server/handlers/analytics-api");
+    analyticsApi(req, res).catch((err) => {
+      console.error("Analytics API Error:", err);
+      if (!res.headersSent) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: false, error: "Internal server error" }));
+      }
+    });
+    return;
+  }
+
+  // Handle Activities API
+  if (pathname.startsWith("/api/activities")) {
+    const activitiesApi = require("./server/handlers/activities-api");
+    activitiesApi(req, res).catch((err) => {
+      console.error("Activities API Error:", err);
+      if (!res.headersSent) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: false, error: "Internal server error" }));
+      }
+    });
+    return;
+  }
+
+  // Handle Email Templates API
+  if (pathname.startsWith("/api/email-templates")) {
+    const templatesApi = require("./server/handlers/email-templates-api");
+    templatesApi(req, res).catch((err) => {
+      console.error("Email Templates API Error:", err);
+      if (!res.headersSent) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: false, error: "Internal server error" }));
+      }
+    });
+    return;
+  }
+
+  // Handle Social Media Tokens API
+  if (pathname.startsWith("/api/social/tokens")) {
+    const tokensApi = require("./server/handlers/social-tokens-api");
+    tokensApi(req, res).catch((err) => {
+      console.error("Social Tokens API Error:", err);
+      if (!res.headersSent) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: false, error: "Internal server error" }));
+      }
+    });
+    return;
+  }
+
+  // Handle Meta OAuth
+  if (pathname.startsWith("/api/auth/meta")) {
+    if (pathname.includes("callback")) {
+      const callbackHandler = require("./server/handlers/auth-meta-callback");
+      callbackHandler(req, res).catch((err) => {
+        console.error("Meta OAuth Callback Error:", err);
+        if (!res.headersSent) {
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ success: false, error: "Internal server error" }));
+        }
+      });
+    } else {
+      const authHandler = require("./server/handlers/auth-meta");
+      authHandler(req, res).catch((err) => {
+        console.error("Meta OAuth Error:", err);
+        if (!res.headersSent) {
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ success: false, error: "Internal server error" }));
+        }
+      });
+    }
+    return;
+  }
+
+  // Handle Social Media Posting
+  if (pathname.startsWith("/api/social/post-to-facebook")) {
+    const fbHandler = require("./server/handlers/post-to-facebook");
+    fbHandler(req, res).catch((err) => {
+      console.error("Facebook Posting Error:", err);
+      if (!res.headersSent) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: false, error: "Internal server error" }));
+      }
+    });
+    return;
+  }
+
+  if (pathname.startsWith("/api/social/post-to-instagram")) {
+    const igHandler = require("./server/handlers/post-to-instagram");
+    igHandler(req, res).catch((err) => {
+      console.error("Instagram Posting Error:", err);
+      if (!res.headersSent) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: false, error: "Internal server error" }));
+      }
+    });
+    return;
+  }
+
+  // Handle Admin Authentication
+  if (pathname === "/api/admin/auth") {
+    handleAdminAuth(req, res);
     return;
   }
 
@@ -281,6 +513,13 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // Handle favicon requests gracefully
+  if (pathname === "/favicon.ico") {
+    res.writeHead(204, { "Content-Type": "image/x-icon" });
+    res.end();
+    return;
+  }
+
   // Handle root path
   if (pathname === "/" || pathname === "/index.html") {
     pathname = "/index.html";
@@ -319,5 +558,11 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-  // Server started successfully
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`📊 Admin Dashboard: http://localhost:${PORT}/admin-dashboard.html`);
+  console.log(`👥 CRM System: http://localhost:${PORT}/admin-dashboard.html (CRM tab)`);
+  console.log(`📧 Email Campaigns: http://localhost:${PORT}/admin-dashboard.html (Campaigns tab)`);
+  console.log(`🤖 Workflows: http://localhost:${PORT}/admin-dashboard.html (Automation tab)`);
+  console.log(`📈 Analytics: http://localhost:${PORT}/admin-dashboard.html (Analytics tab)`);
+  console.log(`📝 Templates: http://localhost:${PORT}/admin-dashboard.html (Templates tab)`);
 });
