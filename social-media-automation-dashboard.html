@@ -263,31 +263,80 @@
                 
                 <!-- Twitter Content Area -->
                 <div id="twitter" class="content-area">
-                    <div style="padding: 20px;">
-                        <h3 style="color: #1da1f2; margin-bottom: 20px;">🐦 Twitter/X Content</h3>
-                        
-                        <div class="form-group">
-                            <label for="twitterContent">Tweet Content (280 character limit)</label>
-                            <textarea id="twitterContent" name="twitterContent" rows="4" placeholder="What's happening?" maxlength="280" style="font-family: inherit; padding: 12px; border: 1px solid #ddd; border-radius: 4px; width: 100%; resize: vertical;"></textarea>
-                            <div style="text-align: right; margin-top: 5px; color: #666; font-size: 14px;">
-                                <span id="twitterCharCount">0</span>/280 characters
-                            </div>
+                    <div class="form-group">
+                        <label for="contentTypeTwitter">Content Type</label>
+                        <select id="contentTypeTwitter" name="contentTypeTwitter" aria-label="Select content type">
+                            <option value="test-post">🧪 Test Post (First Post)</option>
+                            <option value="service-promotion">Service Promotion</option>
+                            <option value="client-success">Client Success Story</option>
+                            <option value="industry-tip">Industry Tip</option>
+                            <option value="behind-scenes">Behind the Scenes</option>
+                            <option value="testimonial">Customer Testimonial</option>
+                            <option value="how-to">How-To Guide</option>
+                            <option value="question">Engagement Question</option>
+                            <option value="did-you-know">Did You Know</option>
+                            <option value="local-community">Local Community</option>
+                            <option value="seasonal">Seasonal/Holiday</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="clientBusinessNameTwitter">Client/Business Name</label>
+                        <input type="text" id="clientBusinessNameTwitter" placeholder="e.g., TNR Business Solutions" value="TNR Business Solutions">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="professionTypeTwitter">Industry Type</label>
+                        <select id="professionTypeTwitter" name="professionTypeTwitter" aria-label="Select industry type">
+                            <option value="digital-marketing">Digital Marketing Agency</option>
+                            <option value="insurance">Insurance Services</option>
+                            <option value="construction">Construction/Trades</option>
+                            <option value="professional-services">Professional Services (Law, Accounting, Consulting)</option>
+                            <option value="healthcare">Healthcare/Medical</option>
+                            <option value="restaurant">Restaurant/Food Service</option>
+                            <option value="retail">Retail Store</option>
+                            <option value="real-estate">Real Estate</option>
+                            <option value="automotive">Automotive Services</option>
+                            <option value="home-services">Home Services (HVAC, Plumbing, Electric)</option>
+                            <option value="fitness">Fitness/Gym</option>
+                            <option value="beauty">Beauty/Salon</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="serviceFocusTwitter">Service Focus</label>
+                        <select id="serviceFocusTwitter" name="serviceFocusTwitter" aria-label="Select service focus">
+                            <option value="seo">SEO Services</option>
+                            <option value="web-design">Web Design</option>
+                            <option value="social-media">Social Media Management</option>
+                            <option value="paid-advertising">Paid Advertising</option>
+                            <option value="email-marketing">Email Marketing</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="targetAudienceTwitter">Target Audience</label>
+                        <select id="targetAudienceTwitter" name="targetAudienceTwitter" aria-label="Select target audience">
+                            <option value="small-business">Small Business Owners</option>
+                            <option value="local-residents">Local Residents</option>
+                            <option value="insurance-seekers">Insurance Seekers</option>
+                            <option value="marketing-managers">Marketing Managers</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn" onclick="generateTwitterContent()" style="background: #1da1f2;">Generate Content</button>
+                    
+                    <div id="contentPreviewTwitter" class="post-preview hidden" role="region" aria-label="Generated content preview">
+                        <h4>Generated Tweet:</h4>
+                        <div id="previewContentTwitter"></div>
+                        <div style="text-align: right; margin-top: 5px; color: #666; font-size: 14px;">
+                            <span id="twitterCharCountPreview">0</span>/280 characters
                         </div>
-                        
-                        <div class="form-group">
-                            <label for="twitterHashtags">Hashtags (optional)</label>
-                            <input type="text" id="twitterHashtags" placeholder="#business #marketing #insurance" style="font-family: inherit; padding: 12px; border: 1px solid #ddd; border-radius: 4px; width: 100%;">
+                        <div class="hashtag-suggestions" id="hashtagSuggestionsTwitter"></div>
+                        <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+                            <button class="btn" onclick="postGeneratedToTwitter()" style="flex: 1; min-width: 200px; background: #1da1f2;">🐦 Post to Twitter/X</button>
+                            <button class="btn btn-secondary" onclick="testTwitterConnection()">🧪 Test Connection</button>
                         </div>
-                        
-                        <div style="display: flex; gap: 10px; margin-top: 20px;">
-                            <button class="btn" onclick="postToTwitter()" style="background: #1da1f2; flex: 1;">
-                                🐦 Post to Twitter/X
-                            </button>
-                            <button class="btn btn-secondary" onclick="testTwitterConnection()">
-                                🧪 Test Connection
-                            </button>
-                        </div>
-                        
                         <div id="twitterStatus" style="margin-top: 15px; padding: 12px; border-radius: 4px; display: none;"></div>
                     </div>
                 </div>
@@ -1458,6 +1507,174 @@
                 'beauty': 'Beauty'
             };
             return industryNames[industryType] || 'Business';
+        }
+        
+        // Generate Twitter content (optimized for 280 character limit)
+        function generateTwitterContent() {
+            const contentType = document.getElementById('contentTypeTwitter').value;
+            const industryType = document.getElementById('professionTypeTwitter').value;
+            const businessName = document.getElementById('clientBusinessNameTwitter').value || 'TNR Business Solutions';
+            const location = 'Greensburg PA';
+            const phone = '(412) 499-2987';
+            
+            let template;
+            
+            // Handle test post (special case - always random)
+            if (contentType === 'test-post') {
+                const testTemplates = contentTemplateLibrary['test-post'];
+                template = testTemplates[Math.floor(Math.random() * testTemplates.length)];
+            }
+            // Handle service promotions (industry-specific)
+            else if (contentType === 'service-promotion') {
+                const industryTemplates = contentTemplateLibrary[contentType][industryType];
+                if (industryTemplates && industryTemplates.length > 0) {
+                    template = industryTemplates[Math.floor(Math.random() * industryTemplates.length)];
+                } else {
+                    // Fallback to generic (Twitter-optimized)
+                    template = "🚀 Quality {industry} services in {location}!\n\n{business} delivers professional results.\n\nContact: {phone}\n\n#{location} #LocalBusiness";
+                }
+            }
+            // Handle industry tips (industry-specific)
+            else if (contentType === 'industry-tip') {
+                const industryTemplates = contentTemplateLibrary[contentType][industryType];
+                if (industryTemplates && industryTemplates.length > 0) {
+                    template = industryTemplates[Math.floor(Math.random() * industryTemplates.length)];
+                } else {
+                    // Generic tip (Twitter-optimized)
+                    template = "💡 TIP: Consistent marketing builds trust!\n\n{business} | {phone}\n\n#{location} #BusinessTip";
+                }
+            }
+            // Handle non-industry-specific content types
+            else if (contentTemplateLibrary[contentType]) {
+                const templates = contentTemplateLibrary[contentType];
+                template = templates[Math.floor(Math.random() * templates.length)];
+            }
+            // Fallback for missing content types
+            else {
+                template = "🎯 Great things happening at {business}!\n\nServing {location} with excellence.\n\nContact: {phone}\n\n#{location} #LocalBusiness";
+            }
+            
+            // Replace placeholders with actual values
+            let content = template
+                .replace(/{business}/g, businessName)
+                .replace(/{location}/g, location)
+                .replace(/{phone}/g, phone)
+                .replace(/{industry}/g, getIndustryName(industryType))
+                .replace(/#{location}/g, '#' + location.replace(/\s+/g, ''));
+            
+            // Optimize for Twitter: trim if too long, ensure it fits in 280 chars
+            if (content.length > 280) {
+                // Try to shorten by removing some hashtags or shortening text
+                const lines = content.split('\n');
+                let shortened = '';
+                let charCount = 0;
+                
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i];
+                    if (charCount + line.length + 1 <= 250) { // Leave room for hashtags
+                        shortened += (shortened ? '\n' : '') + line;
+                        charCount += line.length + 1;
+                    } else {
+                        // Add essential hashtags if we have room
+                        if (charCount < 240) {
+                            shortened += '\n\n#' + location.replace(/\s+/g, '') + ' #LocalBusiness';
+                        }
+                        break;
+                    }
+                }
+                
+                if (shortened.length > 0) {
+                    content = shortened;
+                } else {
+                    // Last resort: truncate
+                    content = content.substring(0, 277) + '...';
+                }
+            }
+            
+            // Update preview
+            document.getElementById('previewContentTwitter').textContent = content;
+            document.getElementById('contentPreviewTwitter').classList.remove('hidden');
+            
+            // Update character count
+            const charCount = content.length;
+            const charCountEl = document.getElementById('twitterCharCountPreview');
+            if (charCountEl) {
+                charCountEl.textContent = charCount;
+                // Color code: green if under 280, yellow if close, red if over
+                if (charCount <= 260) {
+                    charCountEl.style.color = '#28a745';
+                } else if (charCount <= 280) {
+                    charCountEl.style.color = '#ffc107';
+                } else {
+                    charCountEl.style.color = '#dc3545';
+                }
+            }
+        }
+        
+        // Post generated content to Twitter
+        async function postGeneratedToTwitter() {
+            const content = document.getElementById('previewContentTwitter')?.textContent?.trim();
+            const statusDiv = document.getElementById('twitterStatus');
+            
+            if (!content) {
+                alert('Please generate content first');
+                return;
+            }
+            
+            if (content.length > 280) {
+                alert('⚠️ Content is too long for Twitter (280 character limit). Please shorten it.');
+                return;
+            }
+            
+            try {
+                if (statusDiv) {
+                    statusDiv.style.display = 'block';
+                    statusDiv.style.background = '#fff3cd';
+                    statusDiv.style.color = '#856404';
+                    statusDiv.textContent = 'Posting to Twitter/X...';
+                }
+                
+                const response = await fetch('/api/post-to-twitter', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        text: content,
+                        useDatabaseToken: true
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    if (statusDiv) {
+                        statusDiv.style.background = '#d4edda';
+                        statusDiv.style.color = '#155724';
+                        statusDiv.innerHTML = `✅ Tweet posted successfully!<br><a href="${data.tweetUrl}" target="_blank" style="color: #155724; text-decoration: underline;">View Tweet →</a>`;
+                    }
+                    
+                    // Clear preview after successful post
+                    setTimeout(() => {
+                        document.getElementById('contentPreviewTwitter').classList.add('hidden');
+                        document.getElementById('previewContentTwitter').textContent = '';
+                        if (statusDiv) {
+                            statusDiv.style.display = 'none';
+                        }
+                    }, 3000);
+                } else {
+                    if (statusDiv) {
+                        statusDiv.style.background = '#f8d7da';
+                        statusDiv.style.color = '#721c24';
+                        statusDiv.textContent = `❌ Failed to post: ${data.message || data.error || 'Unknown error'}`;
+                    }
+                }
+            } catch (error) {
+                if (statusDiv) {
+                    statusDiv.style.background = '#f8d7da';
+                    statusDiv.style.color = '#721c24';
+                    statusDiv.textContent = `❌ Error: ${error.message}`;
+                }
+                console.error('Twitter post error:', error);
+            }
         }
         
         function generateHashtags() {
