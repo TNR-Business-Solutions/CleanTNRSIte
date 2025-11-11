@@ -53,15 +53,40 @@ module.exports = async (req, res) => {
   try {
     // Step 1: Exchange authorization code for access token
     console.log('Exchanging code for access token...');
+    console.log('Token exchange parameters:', {
+      grant_type: 'authorization_code',
+      code: code ? code.substring(0, 20) + '...' : 'MISSING',
+      redirect_uri: REDIRECT_URI,
+      client_id: LINKEDIN_CLIENT_ID,
+      has_client_secret: !!LINKEDIN_CLIENT_SECRET,
+      client_secret_length: LINKEDIN_CLIENT_SECRET?.length || 0
+    });
+    
+    const tokenRequestParams = {
+      grant_type: 'authorization_code',
+      code: code,
+      redirect_uri: REDIRECT_URI,
+      client_id: LINKEDIN_CLIENT_ID,
+      client_secret: LINKEDIN_CLIENT_SECRET
+    };
+    
+    // Validate all required parameters
+    if (!code) {
+      throw new Error('Authorization code is missing');
+    }
+    if (!LINKEDIN_CLIENT_ID) {
+      throw new Error('LINKEDIN_CLIENT_ID is missing');
+    }
+    if (!LINKEDIN_CLIENT_SECRET) {
+      throw new Error('LINKEDIN_CLIENT_SECRET is missing - check Vercel environment variables');
+    }
+    if (!REDIRECT_URI) {
+      throw new Error('REDIRECT_URI is missing');
+    }
+    
     const tokenResponse = await axios.post(
       'https://www.linkedin.com/oauth/v2/accessToken',
-      qs.stringify({
-        grant_type: 'authorization_code',
-        code: code,
-        redirect_uri: REDIRECT_URI,
-        client_id: LINKEDIN_CLIENT_ID,
-        client_secret: LINKEDIN_CLIENT_SECRET
-      }),
+      qs.stringify(tokenRequestParams),
       {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
@@ -69,6 +94,8 @@ module.exports = async (req, res) => {
         timeout: 10000
       }
     );
+    
+    console.log('Token exchange successful, response keys:', Object.keys(tokenResponse.data || {}));
 
     const accessToken = tokenResponse.data.access_token;
     const expiresIn = tokenResponse.data.expires_in || 5184000; // Default to 60 days if not provided
@@ -183,15 +210,32 @@ module.exports = async (req, res) => {
 
     // Check for missing environment variables first
     if (!LINKEDIN_CLIENT_SECRET) {
+      console.error('❌ LINKEDIN_CLIENT_SECRET is missing!');
       res.setHeader('Content-Type', 'text/html');
       return res.status(500).send(generateErrorHTML(
         'Configuration Error',
-        'LINKEDIN_CLIENT_SECRET is not set in Vercel environment variables.',
+        'LINKEDIN_CLIENT_SECRET is not set in Vercel environment variables. This is required for token exchange.',
         [
           '1. Go to Vercel Dashboard → Your Project → Settings → Environment Variables',
-          '2. Add LINKEDIN_CLIENT_SECRET with your Primary Client Secret',
+          '2. Add LINKEDIN_CLIENT_SECRET with your Primary Client Secret: [YOUR_CLIENT_SECRET]',
           '3. Make sure it\'s set for Production, Preview, and Development',
-          '4. Redeploy your application',
+          '4. Wait 1-2 minutes for Vercel to redeploy',
+          '5. Try the authorization flow again'
+        ]
+      ));
+    }
+    
+    if (!LINKEDIN_CLIENT_ID) {
+      console.error('❌ LINKEDIN_CLIENT_ID is missing!');
+      res.setHeader('Content-Type', 'text/html');
+      return res.status(500).send(generateErrorHTML(
+        'Configuration Error',
+        'LINKEDIN_CLIENT_ID is not set in Vercel environment variables.',
+        [
+          '1. Go to Vercel Dashboard → Your Project → Settings → Environment Variables',
+          '2. Add LINKEDIN_CLIENT_ID = 78pjq1wt4wz1fs',
+          '3. Make sure it\'s set for Production, Preview, and Development',
+          '4. Wait 1-2 minutes for Vercel to redeploy',
           '5. Try the authorization flow again'
         ]
       ));
@@ -216,6 +260,14 @@ module.exports = async (req, res) => {
       let errorMessage = errorDescription;
       let troubleshooting = [];
 
+      // Log the full error for debugging
+      console.error('LinkedIn API Error Response:', {
+        status: statusCode,
+        errorCode: errorCode,
+        errorDescription: errorDescription,
+        fullResponse: JSON.stringify(linkedinError, null, 2)
+      });
+      
       // Handle specific LinkedIn error codes
       if (errorCode === 'invalid_grant' || errorDescription.includes('expired') || errorDescription.includes('invalid')) {
         errorTitle = 'Authorization Code Error';
