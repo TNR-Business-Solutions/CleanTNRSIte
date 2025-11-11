@@ -159,11 +159,43 @@ module.exports = async (req, res) => {
             return;
           }
         } catch (testError) {
+          // Provide more detailed error information
+          let errorMessage = '❌ Token is invalid or expired';
+          let errorDetails = testError.message;
+          
+          if (testError.response) {
+            const status = testError.response.status;
+            const errorData = testError.response.data;
+            
+            if (status === 401) {
+              errorMessage = '❌ Unauthorized - Token is invalid, expired, or has insufficient permissions';
+              if (errorData?.detail) {
+                errorDetails = errorData.detail;
+              } else if (errorData?.title) {
+                errorDetails = errorData.title;
+              } else {
+                errorDetails = 'The Bearer Token may have "Read Only" permissions. Please regenerate it with "Read and Write" permissions in the X Developer Portal.';
+              }
+            } else if (status === 403) {
+              errorMessage = '❌ Forbidden - Token lacks required permissions';
+              errorDetails = 'Your token may have "Read Only" permissions. Update app permissions to "Read and Write" in X Developer Portal and regenerate the token.';
+            } else if (status === 429) {
+              errorMessage = '❌ Rate limit exceeded';
+              errorDetails = 'Too many requests. Please wait a moment and try again.';
+            } else {
+              errorDetails = errorData?.detail || errorData?.title || errorData?.error || errorMessage;
+            }
+          }
+          
           sendJson(res, 200, {
             success: true,
             valid: false,
-            error: testError.response?.data?.error?.message || testError.message,
-            message: '❌ Token is invalid or expired'
+            error: errorDetails,
+            message: errorMessage,
+            statusCode: testError.response?.status,
+            help: status === 401 || status === 403 
+              ? 'Go to X Developer Portal → Your App → Settings → User authentication settings → Change App permissions to "Read and Write" → Regenerate Bearer Token'
+              : undefined
           });
           return;
         }
