@@ -157,64 +157,66 @@ module.exports = async (req, res) => {
               message: "✅ Twitter/X token is valid",
             });
             return;
-            } else {
-              sendJson(res, 400, {
-                success: false,
-                error: `Token testing for ${platform} not yet implemented`,
-              });
-              return;
-            }
-        } catch (testError) {
-            // Provide more detailed error information
-            let errorMessage = "❌ Token is invalid or expired";
-            let errorDetails = testError.message;
-            let statusCode = null;
-            let helpText = undefined;
-
-            if (testError.response) {
-              statusCode = testError.response.status;
-              const errorData = testError.response.data;
-
-              if (statusCode === 401) {
-                errorMessage =
-                  "❌ Unauthorized - Token is invalid, expired, or has insufficient permissions";
-                if (errorData?.detail) {
-                  errorDetails = errorData.detail;
-                } else if (errorData?.title) {
-                  errorDetails = errorData.title;
-                } else {
-                  errorDetails =
-                    'The Bearer Token may have "Read Only" permissions. Please regenerate it with "Read and Write" permissions in the X Developer Portal.';
-                }
-                helpText = 'Go to X Developer Portal → Your App → Settings → User authentication settings → Change App permissions to "Read and Write" → Regenerate Bearer Token';
-              } else if (statusCode === 403) {
-                errorMessage = "❌ Forbidden - Token lacks required permissions";
-                errorDetails =
-                  'Your token may have "Read Only" permissions. Update app permissions to "Read and Write" in X Developer Portal and regenerate the token.';
-                helpText = 'Go to X Developer Portal → Your App → Settings → User authentication settings → Change App permissions to "Read and Write" → Regenerate Bearer Token';
-              } else if (statusCode === 429) {
-                errorMessage = "❌ Rate limit exceeded";
-                errorDetails =
-                  "Too many requests. Please wait a moment and try again.";
-              } else {
-                errorDetails =
-                  errorData?.detail ||
-                  errorData?.title ||
-                  errorData?.error ||
-                  errorMessage;
-              }
-            }
-
-            sendJson(res, 200, {
-              success: true,
-              valid: false,
-              error: errorDetails,
-              message: errorMessage,
-              statusCode: statusCode,
-              help: helpText,
+          } else {
+            sendJson(res, 400, {
+              success: false,
+              error: `Token testing for ${platform} not yet implemented`,
             });
             return;
           }
+        } catch (testError) {
+          // Provide more detailed error information
+          let errorMessage = "❌ Token is invalid or expired";
+          let errorDetails = testError.message;
+          let statusCode = null;
+          let helpText = undefined;
+
+          if (testError.response) {
+            statusCode = testError.response.status;
+            const errorData = testError.response.data;
+
+            if (statusCode === 401) {
+              errorMessage =
+                "❌ Unauthorized - Token is invalid, expired, or has insufficient permissions";
+              if (errorData?.detail) {
+                errorDetails = errorData.detail;
+              } else if (errorData?.title) {
+                errorDetails = errorData.title;
+              } else {
+                errorDetails =
+                  'The Bearer Token may have "Read Only" permissions. Please regenerate it with "Read and Write" permissions in the X Developer Portal.';
+              }
+              helpText =
+                'Go to X Developer Portal → Your App → Settings → User authentication settings → Change App permissions to "Read and Write" → Regenerate Bearer Token';
+            } else if (statusCode === 403) {
+              errorMessage = "❌ Forbidden - Token lacks required permissions";
+              errorDetails =
+                'Your token may have "Read Only" permissions. Update app permissions to "Read and Write" in X Developer Portal and regenerate the token.';
+              helpText =
+                'Go to X Developer Portal → Your App → Settings → User authentication settings → Change App permissions to "Read and Write" → Regenerate Bearer Token';
+            } else if (statusCode === 429) {
+              errorMessage = "❌ Rate limit exceeded";
+              errorDetails =
+                "Too many requests. Please wait a moment and try again.";
+            } else {
+              errorDetails =
+                errorData?.detail ||
+                errorData?.title ||
+                errorData?.error ||
+                errorMessage;
+            }
+          }
+
+          sendJson(res, 200, {
+            success: true,
+            valid: false,
+            error: errorDetails,
+            message: errorMessage,
+            statusCode: statusCode,
+            help: helpText,
+          });
+          return;
+        }
       }
 
       // POST - Save token manually (for OAuth 1.0a tokens or manual entry)
@@ -252,6 +254,7 @@ module.exports = async (req, res) => {
         const tokenData = {
           platform: platform,
           access_token: access_token,
+          token_type: body.token_type || "Bearer", // Include token_type from request
           page_id: page_id || extractedUserId || null,
           user_id: extractedUserId || user_id || null,
           page_name:

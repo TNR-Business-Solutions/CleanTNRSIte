@@ -5,8 +5,81 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TNR Social Media Automation Dashboard</title>
     <link rel="stylesheet" href="assets/social-media-automation.css">
+    <style>
+        .nav-header {
+            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .nav-menu {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background 0.2s;
+            font-size: 0.95rem;
+        }
+        .nav-link:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .nav-link.active {
+            background: rgba(255,255,255,0.2);
+        }
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .nav-menu {
+                width: 100%;
+                flex-direction: column;
+            }
+            .nav-link {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
+    <nav class="nav-header">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span>🚀</span>
+                <span>TNR Business Solutions</span>
+            </div>
+            <div class="nav-menu">
+                <a href="/" class="nav-link">🏠 Home</a>
+                <a href="/admin-dashboard.html" class="nav-link">📊 Admin Dashboard</a>
+                <a href="/social-media-automation-dashboard.html" class="nav-link active">📱 Social Media</a>
+                <a href="/admin-login.html" class="nav-link">🔐 Login</a>
+            </div>
+        </div>
+    </nav>
     <div class="container">
         <div class="header">
             <h1>🚀 Social Media Automation Dashboard</h1>
@@ -624,6 +697,8 @@
             }
             
             try {
+                console.log('Saving Twitter token...', { tokenLength: token.length });
+                
                 const response = await fetch('/api/social-tokens', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -637,13 +712,18 @@
                 });
                 
                 const data = await response.json();
+                console.log('Save token response:', data);
                 
                 if (data.success) {
                     alert('✅ Twitter/X token saved successfully!');
                     if (tokenInput) tokenInput.value = '';
-                    testTwitterConnection();
+                    // Refresh connection status
+                    setTimeout(() => {
+                        testTwitterConnection();
+                    }, 500);
                 } else {
-                    alert(`❌ Failed to save token: ${data.error || data.message}`);
+                    alert(`❌ Failed to save token: ${data.error || data.message || 'Unknown error'}`);
+                    console.error('Save failed:', data);
                 }
             } catch (error) {
                 alert(`❌ Error: ${error.message}`);
