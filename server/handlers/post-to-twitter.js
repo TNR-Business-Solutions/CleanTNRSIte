@@ -72,8 +72,15 @@ module.exports = async (req, res) => {
       });
     }
 
+    // Check if token is a Bearer Token (OAuth 2.0 App Only) - these cannot post tweets
+    // Bearer Tokens are typically long strings without special characters
+    // OAuth 2.0 Authorization Code tokens (which can post) are also Bearer tokens but have tweet.write scope
+    // We'll try to post and let the API tell us if it fails
+    
     // Create the tweet using Twitter API v2
     console.log('Creating Twitter/X tweet...');
+    console.log('Using token type:', token.length > 50 ? 'Bearer Token (OAuth 2.0)' : 'Unknown');
+    
     const tweetResponse = await axios.post(
       'https://api.twitter.com/2/tweets',
       {
@@ -118,22 +125,21 @@ module.exports = async (req, res) => {
           twitterError.detail?.includes('Forbidden')) {
         return res.status(403).json({
           success: false,
-          error: 'Permission Denied',
-          message: 'Your Twitter/X token does not have write permissions. The token may be set to "Read Only" instead of "Read and Write".',
-          errorType: 'permission_denied',
+          error: 'Authentication Method Not Supported',
+          message: 'Bearer Tokens (OAuth 2.0 App Only) cannot be used to post tweets. You must use OAuth 2.0 Authorization Code flow or OAuth 1.0a.',
+          errorType: 'authentication_method_unsupported',
           help: {
             title: 'How to Fix This',
             steps: [
-              '1. Go to X Developer Portal: https://developer.twitter.com/en/portal/dashboard',
-              '2. Select your app',
-              '3. Go to "Settings" → "User authentication settings"',
-              '4. Under "App permissions", select "Read and Write"',
-              '5. Click "Save"',
-              '6. Go to "Keys and tokens" tab',
-              '7. Regenerate your Bearer Token',
-              '8. Copy the new Bearer Token and save it in the dashboard'
+              '1. Click "🔗 Connect Twitter/X" button in the dashboard',
+              '2. Authorize the app on Twitter (this uses OAuth 2.0 with proper scopes)',
+              '3. The token will be automatically saved with tweet.write permissions',
+              '4. You can then post tweets successfully',
+              '',
+              '⚠️ Note: Bearer Tokens (OAuth 2.0 App Only) are read-only and cannot post tweets.',
+              '   You must use the OAuth 2.0 Authorization Code flow to get write permissions.'
             ],
-            solution: 'Your Bearer Token needs "Read and Write" permissions. Update your app settings in the X Developer Portal and regenerate the token.'
+            solution: 'Use the "Connect Twitter/X" button to authorize via OAuth 2.0. This will give you a token with tweet.write scope that can post tweets.'
           },
           details: twitterError
         });
