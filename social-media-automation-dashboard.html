@@ -713,17 +713,25 @@
                 
                 const data = await response.json();
                 console.log('Save token response:', data);
+                console.log('Response details:', {
+                    success: data.success,
+                    message: data.message,
+                    error: data.error,
+                    token: data.token
+                });
                 
                 if (data.success) {
                     alert('✅ Twitter/X token saved successfully!');
                     if (tokenInput) tokenInput.value = '';
                     // Refresh connection status
                     setTimeout(() => {
-                        testTwitterConnection();
+                        loadTwitterConnectionStatus();
                     }, 500);
                 } else {
-                    alert(`❌ Failed to save token: ${data.error || data.message || 'Unknown error'}`);
+                    const errorMsg = data.error || data.message || 'Unknown error';
+                    alert(`❌ Failed to save token: ${errorMsg}`);
                     console.error('Save failed:', data);
+                    console.error('Full error details:', JSON.stringify(data, null, 2));
                 }
             } catch (error) {
                 alert(`❌ Error: ${error.message}`);
@@ -1202,9 +1210,11 @@
         // Check if we have a saved token on load
         window.addEventListener('DOMContentLoaded', function() {
             console.log('Dashboard loaded');
+            
+            // Auto-load Meta token if available
             const savedToken = localStorage.getItem('metaPageAccessToken');
             if (savedToken) {
-                console.log('Found saved token, will auto-test...');
+                console.log('Found saved Meta token, will auto-test...');
                 const metaTokenInput = document.getElementById('metaToken');
                 if (metaTokenInput) {
                     metaTokenInput.value = savedToken;
@@ -1215,6 +1225,11 @@
                 setTimeout(() => testMetaToken(), 200);
             }
             
+            // Auto-load Twitter connection status
+            setTimeout(() => {
+                loadTwitterConnectionStatus();
+            }, 500);
+            
             // Set default date/time to tomorrow
             const tomorrow = new Date();
             tomorrow.setDate(tomorrow.getDate() + 1);
@@ -1224,6 +1239,34 @@
                 scheduleDateTimeInput.value = tomorrow.toISOString().slice(0, 16);
             }
         });
+        
+        // Load Twitter connection status from database
+        async function loadTwitterConnectionStatus() {
+            try {
+                const response = await fetch('/api/social-tokens?platform=twitter');
+                const data = await response.json();
+                
+                if (data.success && data.tokens && data.tokens.length > 0) {
+                    const token = data.tokens[0];
+                    const statusText = document.getElementById('twitterStatusText');
+                    
+                    if (statusText) {
+                        statusText.innerHTML = `✅ Connected: ${token.page_name || 'Twitter User'}`;
+                    }
+                    
+                    // Auto-test connection (silently, no alerts)
+                    window.manualTest = false;
+                    await testTwitterConnection();
+                } else {
+                    const statusText = document.getElementById('twitterStatusText');
+                    if (statusText) {
+                        statusText.textContent = 'Not connected';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading Twitter status:', error);
+            }
+        }
         
         // ENHANCED CONTENT TEMPLATES - Diverse, industry-specific, non-repetitive
         const contentTemplateLibrary = {
