@@ -274,8 +274,10 @@ module.exports = async function campaignApiHandler(req, res) {
             }));
           } catch (error) {
             console.error("Campaign send error:", error);
-            res.writeHead(500, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ success: false, error: error.message }));
+            if (!res.headersSent) {
+              res.writeHead(500, { "Content-Type": "application/json" });
+              res.end(JSON.stringify({ success: false, error: error.message }));
+            }
           }
         });
       } else {
@@ -288,8 +290,10 @@ module.exports = async function campaignApiHandler(req, res) {
     }
   } catch (error) {
     console.error("❌ Campaign API Error:", error);
-    res.writeHead(500, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ success: false, error: error.message }));
+    if (!res.headersSent) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: false, error: error.message }));
+    }
   }
 };
 

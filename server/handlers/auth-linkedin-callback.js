@@ -7,13 +7,16 @@ const TNRDatabase = require("../../database");
 const qs = require("querystring");
 
 module.exports = async (req, res) => {
-  const { code, error, error_description, state } = req.query;
+  const { code, error: oauthError, error_description, state } = req.query;
 
   // Get configuration from environment variables
-  const LINKEDIN_CLIENT_ID = process.env.LINKEDIN_CLIENT_ID || "78pjq1wt4wz1fs";
-  const LINKEDIN_CLIENT_SECRET = process.env.LINKEDIN_CLIENT_SECRET;
+  const {
+    LINKEDIN_CLIENT_ID = "78pjq1wt4wz1fs",
+    LINKEDIN_CLIENT_SECRET,
+    LINKEDIN_REDIRECT_URI,
+  } = process.env;
   const REDIRECT_URI =
-    process.env.LINKEDIN_REDIRECT_URI ||
+    LINKEDIN_REDIRECT_URI ||
     "https://www.tnrbusinesssolutions.com/api/auth/linkedin/callback";
 
   // Validate configuration
@@ -28,18 +31,18 @@ module.exports = async (req, res) => {
   // Log callback received (for debugging)
   console.log("LinkedIn OAuth callback received:", {
     hasCode: !!code,
-    hasError: !!error,
+    hasError: !!oauthError,
     state: state,
     timestamp: new Date().toISOString(),
   });
 
   // Handle OAuth errors
-  if (error) {
-    console.error("OAuth error:", error, error_description);
+  if (oauthError) {
+    console.error("OAuth error:", oauthError, error_description);
     return res.status(400).json({
       success: false,
       error: "OAuth Authorization Failed",
-      details: error_description || error,
+      details: error_description || oauthError,
       message:
         "User denied authorization or an error occurred during the OAuth flow.",
     });
@@ -143,7 +146,10 @@ module.exports = async (req, res) => {
       );
     } catch (profileError) {
       // Profile fetch is expected to fail without profile scope - this is normal
-      console.warn("Profile fetch failed (expected without profile scope):", profileError.message);
+      console.warn(
+        "Profile fetch failed (expected without profile scope):",
+        profileError.message
+      );
       if (profileError.response) {
         console.log(
           "Profile error response:",
