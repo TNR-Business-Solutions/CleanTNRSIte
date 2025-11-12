@@ -53,7 +53,11 @@ class EmailPool {
   }
 
   async processQueue() {
-    if (this.processing || this.queue.length === 0 || this.active >= this.maxConcurrent) {
+    if (
+      this.processing ||
+      this.queue.length === 0 ||
+      this.active >= this.maxConcurrent
+    ) {
       return;
     }
 
@@ -65,7 +69,9 @@ class EmailPool {
       const minInterval = 1000 / this.msgPerSec; // 1000ms for 1/sec
 
       if (timeSinceLastSend < minInterval) {
-        await new Promise((resolve) => setTimeout(resolve, minInterval - timeSinceLastSend));
+        await new Promise((resolve) =>
+          setTimeout(resolve, minInterval - timeSinceLastSend)
+        );
       }
 
       const { mailOptions, resolve, reject } = this.queue.shift();
@@ -132,11 +138,21 @@ module.exports = async function campaignApiHandler(req, res) {
       } else if (path.startsWith("audience")) {
         // Get audience count based on filters
         const q = parsedUrl ? parsedUrl.searchParams.get("q") || "" : "";
-        const status = parsedUrl ? parsedUrl.searchParams.get("status") || "" : "";
-        const businessType = parsedUrl ? parsedUrl.searchParams.get("businessType") || "" : "";
-        const source = parsedUrl ? parsedUrl.searchParams.get("source") || "" : "";
-        const interest = parsedUrl ? parsedUrl.searchParams.get("interest") || "" : "";
-        const audienceType = parsedUrl ? parsedUrl.searchParams.get("type") || "leads" : "leads";
+        const status = parsedUrl
+          ? parsedUrl.searchParams.get("status") || ""
+          : "";
+        const businessType = parsedUrl
+          ? parsedUrl.searchParams.get("businessType") || ""
+          : "";
+        const source = parsedUrl
+          ? parsedUrl.searchParams.get("source") || ""
+          : "";
+        const interest = parsedUrl
+          ? parsedUrl.searchParams.get("interest") || ""
+          : "";
+        const audienceType = parsedUrl
+          ? parsedUrl.searchParams.get("type") || "leads"
+          : "leads";
 
         let recipients = [];
         if (audienceType === "clients") {
@@ -148,26 +164,54 @@ module.exports = async function campaignApiHandler(req, res) {
         // Apply filters
         if (q) {
           recipients = recipients.filter((r) =>
-            [r.name, r.email, r.phone, r.company, r.industry, r.businessType, r.source, r.interest]
+            [
+              r.name,
+              r.email,
+              r.phone,
+              r.company,
+              r.industry,
+              r.businessType,
+              r.source,
+              r.interest,
+            ]
               .filter(Boolean)
               .some((v) => String(v).toLowerCase().includes(q.toLowerCase()))
           );
         }
-        if (status) recipients = recipients.filter((r) => (r.status || "") === status);
-        if (businessType) recipients = recipients.filter((r) => (r.businessType || "") === businessType);
-        if (source) recipients = recipients.filter((r) => (r.source || "") === source);
+        if (status)
+          recipients = recipients.filter((r) => (r.status || "") === status);
+        if (businessType)
+          recipients = recipients.filter(
+            (r) => (r.businessType || "") === businessType
+          );
+        if (source)
+          recipients = recipients.filter((r) => (r.source || "") === source);
         if (interest && audienceType === "leads") {
-          recipients = recipients.filter((r) => (r.interest || "") === interest);
+          recipients = recipients.filter(
+            (r) => (r.interest || "") === interest
+          );
         }
 
         // Filter out invalid emails
         recipients = recipients.filter((r) => r.email && r.email.includes("@"));
 
         res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ success: true, count: recipients.length, recipients: recipients.map(r => ({ id: r.id, name: r.name, email: r.email })) }));
+        res.end(
+          JSON.stringify({
+            success: true,
+            count: recipients.length,
+            recipients: recipients.map((r) => ({
+              id: r.id,
+              name: r.name,
+              email: r.email,
+            })),
+          })
+        );
       } else {
         res.writeHead(404, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ success: false, error: "Endpoint not found" }));
+        res.end(
+          JSON.stringify({ success: false, error: "Endpoint not found" })
+        );
       }
     } else if (req.method === "POST") {
       if (path === "send") {
@@ -179,11 +223,22 @@ module.exports = async function campaignApiHandler(req, res) {
         req.on("end", async () => {
           try {
             const data = JSON.parse(body);
-            const { subject, htmlContent, textContent, audienceFilters, audienceType = "leads" } = data;
+            const {
+              subject,
+              htmlContent,
+              textContent,
+              audienceFilters,
+              audienceType = "leads",
+            } = data;
 
             if (!subject || !htmlContent) {
               res.writeHead(400, { "Content-Type": "application/json" });
-              return res.end(JSON.stringify({ success: false, error: "Subject and HTML content required" }));
+              return res.end(
+                JSON.stringify({
+                  success: false,
+                  error: "Subject and HTML content required",
+                })
+              );
             }
 
             // Get recipients based on filters
@@ -198,31 +253,59 @@ module.exports = async function campaignApiHandler(req, res) {
             if (audienceFilters) {
               if (audienceFilters.q) {
                 recipients = recipients.filter((r) =>
-                  [r.name, r.email, r.phone, r.company, r.industry, r.businessType, r.source, r.interest]
+                  [
+                    r.name,
+                    r.email,
+                    r.phone,
+                    r.company,
+                    r.industry,
+                    r.businessType,
+                    r.source,
+                    r.interest,
+                  ]
                     .filter(Boolean)
-                    .some((v) => String(v).toLowerCase().includes(audienceFilters.q.toLowerCase()))
+                    .some((v) =>
+                      String(v)
+                        .toLowerCase()
+                        .includes(audienceFilters.q.toLowerCase())
+                    )
                 );
               }
               if (audienceFilters.status) {
-                recipients = recipients.filter((r) => (r.status || "") === audienceFilters.status);
+                recipients = recipients.filter(
+                  (r) => (r.status || "") === audienceFilters.status
+                );
               }
               if (audienceFilters.businessType) {
-                recipients = recipients.filter((r) => (r.businessType || "") === audienceFilters.businessType);
+                recipients = recipients.filter(
+                  (r) => (r.businessType || "") === audienceFilters.businessType
+                );
               }
               if (audienceFilters.source) {
-                recipients = recipients.filter((r) => (r.source || "") === audienceFilters.source);
+                recipients = recipients.filter(
+                  (r) => (r.source || "") === audienceFilters.source
+                );
               }
               if (audienceFilters.interest) {
-                recipients = recipients.filter((r) => (r.interest || "") === audienceFilters.interest);
+                recipients = recipients.filter(
+                  (r) => (r.interest || "") === audienceFilters.interest
+                );
               }
             }
 
             // Filter valid emails only
-            recipients = recipients.filter((r) => r.email && r.email.includes("@"));
+            recipients = recipients.filter(
+              (r) => r.email && r.email.includes("@")
+            );
 
             if (recipients.length === 0) {
               res.writeHead(400, { "Content-Type": "application/json" });
-              return res.end(JSON.stringify({ success: false, error: "No valid recipients found" }));
+              return res.end(
+                JSON.stringify({
+                  success: false,
+                  error: "No valid recipients found",
+                })
+              );
             }
 
             // Personalize and send emails with rate limiting
@@ -230,23 +313,51 @@ module.exports = async function campaignApiHandler(req, res) {
             const sendPromises = recipients.map(async (recipient) => {
               // Personalize content
               let personalizedHtml = htmlContent;
-              let personalizedText = textContent || htmlContent.replace(/<[^>]*>/g, "");
-              
+              let personalizedText =
+                textContent || htmlContent.replace(/<[^>]*>/g, "");
+
               // Replace variables
-              personalizedHtml = personalizedHtml.replace(/\{\{name\}\}/g, recipient.name || "");
-              personalizedHtml = personalizedHtml.replace(/\{\{email\}\}/g, recipient.email || "");
-              personalizedHtml = personalizedHtml.replace(/\{\{company\}\}/g, recipient.company || recipient.businessName || "");
-              personalizedText = personalizedText.replace(/\{\{name\}\}/g, recipient.name || "");
-              personalizedText = personalizedText.replace(/\{\{email\}\}/g, recipient.email || "");
-              personalizedText = personalizedText.replace(/\{\{company\}\}/g, recipient.company || recipient.businessName || "");
+              personalizedHtml = personalizedHtml.replace(
+                /\{\{name\}\}/g,
+                recipient.name || ""
+              );
+              personalizedHtml = personalizedHtml.replace(
+                /\{\{email\}\}/g,
+                recipient.email || ""
+              );
+              personalizedHtml = personalizedHtml.replace(
+                /\{\{company\}\}/g,
+                recipient.company || recipient.businessName || ""
+              );
+              personalizedText = personalizedText.replace(
+                /\{\{name\}\}/g,
+                recipient.name || ""
+              );
+              personalizedText = personalizedText.replace(
+                /\{\{email\}\}/g,
+                recipient.email || ""
+              );
+              personalizedText = personalizedText.replace(
+                /\{\{company\}\}/g,
+                recipient.company || recipient.businessName || ""
+              );
 
               const mailOptions = {
-                from: `"TNR Business Solutions" <${process.env.SMTP_USER || "roy.turner@tnrbusinesssolutions.com"}>`,
+                from: `"TNR Business Solutions" <${
+                  process.env.SMTP_USER || "roy.turner@tnrbusinesssolutions.com"
+                }>`,
                 to: recipient.email,
-                subject: subject.replace(/\{\{name\}\}/g, recipient.name || "").replace(/\{\{company\}\}/g, recipient.company || recipient.businessName || ""),
+                subject: subject
+                  .replace(/\{\{name\}\}/g, recipient.name || "")
+                  .replace(
+                    /\{\{company\}\}/g,
+                    recipient.company || recipient.businessName || ""
+                  ),
                 html: personalizedHtml,
                 text: personalizedText,
-                replyTo: process.env.SMTP_USER || "roy.turner@tnrbusinesssolutions.com",
+                replyTo:
+                  process.env.SMTP_USER ||
+                  "roy.turner@tnrbusinesssolutions.com",
               };
 
               try {
@@ -254,7 +365,10 @@ module.exports = async function campaignApiHandler(req, res) {
                 results.sent++;
               } catch (error) {
                 results.failed++;
-                results.errors.push({ email: recipient.email, error: error.message });
+                results.errors.push({
+                  email: recipient.email,
+                  error: error.message,
+                });
               }
             });
 
@@ -265,13 +379,15 @@ module.exports = async function campaignApiHandler(req, res) {
             await new Promise((resolve) => setTimeout(resolve, 2000));
 
             res.writeHead(200, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({
-              success: true,
-              sent: results.sent,
-              failed: results.failed,
-              total: recipients.length,
-              errors: results.errors.slice(0, 10), // Limit error details
-            }));
+            res.end(
+              JSON.stringify({
+                success: true,
+                sent: results.sent,
+                failed: results.failed,
+                total: recipients.length,
+                errors: results.errors.slice(0, 10), // Limit error details
+              })
+            );
           } catch (error) {
             console.error("Campaign send error:", error);
             if (!res.headersSent) {
@@ -282,7 +398,9 @@ module.exports = async function campaignApiHandler(req, res) {
         });
       } else {
         res.writeHead(404, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ success: false, error: "Endpoint not found" }));
+        res.end(
+          JSON.stringify({ success: false, error: "Endpoint not found" })
+        );
       }
     } else {
       res.writeHead(405, { "Content-Type": "application/json" });
@@ -296,4 +414,3 @@ module.exports = async function campaignApiHandler(req, res) {
     }
   }
 };
-
