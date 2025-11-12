@@ -1,6 +1,8 @@
 // Consolidated API Router - Single Serverless Function
 // Routes all API requests to appropriate handlers
 
+const { sendJson } = require("../server/handlers/http-utils");
+
 module.exports = async (req, res) => {
   // Get pathname from request
   // Vercel provides req.url with query string, or we can use the path directly
@@ -50,16 +52,18 @@ module.exports = async (req, res) => {
     allValue: req.query?.all,
   });
 
-  // Handle CORS globally
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS"
-  );
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-
+  // Handle CORS globally - but don't set headers yet, let sendJson handle it
+  // We'll handle OPTIONS separately
   if (req.method === "OPTIONS") {
-    return res.status(200).end();
+    if (!res.headersSent) {
+      res.writeHead(200, {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+      });
+      res.end();
+    }
+    return;
   }
 
   try {
@@ -222,25 +226,72 @@ module.exports = async (req, res) => {
       }
     }
 
+    // Handle root /api endpoint
+    if (!route || route === "" || pathname === "/api" || pathname === "/api/") {
+      sendJson(res, 200, {
+        success: true,
+        message: "TNR Business Solutions API",
+        version: "1.0.0",
+        availableEndpoints: [
+          "/api/crm/* - CRM management",
+          "/api/campaigns/* - Email campaigns",
+          "/api/auth/meta - Facebook/Instagram OAuth",
+          "/api/auth/linkedin - LinkedIn OAuth",
+          "/api/auth/twitter - Twitter OAuth",
+          "/api/social/tokens - Social media token management",
+          "/api/social/post-to-facebook - Post to Facebook",
+          "/api/social/post-to-instagram - Post to Instagram",
+          "/api/social/post-to-linkedin - Post to LinkedIn",
+          "/api/social/post-to-twitter - Post to Twitter",
+          "/api/social/test-token - Test social media token",
+          "/api/social/get-insights - Get social media insights",
+          "/api/admin/auth - Admin authentication",
+        ],
+      });
+      return;
+    }
+
     // 404 for unknown routes - log what we received
     console.error("❌ Route not found:", {
       route,
       pathname,
       url: req.url,
       query: req.query,
+      method: req.method,
     });
-    res.status(404).json({
+    sendJson(res, 404, {
       success: false,
       error: "Endpoint not found",
+      message: `The API endpoint '${pathname}' was not found.`,
       route: route,
       pathname: pathname,
       url: req.url,
+      method: req.method,
+      availableRoutes: [
+        "/api/crm/*",
+        "/api/campaigns/*",
+        "/api/auth/meta",
+        "/api/auth/linkedin",
+        "/api/auth/twitter",
+        "/api/social/tokens",
+        "/api/social/post-to-facebook",
+        "/api/social/post-to-instagram",
+        "/api/social/post-to-linkedin",
+        "/api/social/post-to-twitter",
+        "/api/social/test-token",
+        "/api/social/get-insights",
+        "/api/admin/auth",
+      ],
     });
   } catch (error) {
     console.error("❌ API Router Error:", error);
     console.error("Error stack:", error.stack);
     if (!res.headersSent) {
-      res.status(500).json({ success: false, error: error.message });
+      sendJson(res, 500, {
+        success: false,
+        error: error.message,
+        message: "An internal server error occurred while processing your request.",
+      });
     }
   }
 };
