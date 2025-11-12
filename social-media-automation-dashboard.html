@@ -243,21 +243,86 @@
                 </div>
                 
                 <!-- LinkedIn Content Area -->
-                <div id="linkedin" class="content-area">
-                    <div style="text-align: center; padding: 60px 20px; background: #f8f9fa; border-radius: 8px; margin: 20px 0;">
-                        <div style="font-size: 48px; margin-bottom: 20px;">💼</div>
-                        <h3 style="color: #0077b5; margin-bottom: 15px;">LinkedIn Integration Coming Soon!</h3>
-                        <p style="color: #666; margin-bottom: 20px;">
-                            We're working on LinkedIn automation. For now, you can:
-                        </p>
-                        <ul style="text-align: left; max-width: 400px; margin: 0 auto 20px; color: #666;">
-                            <li style="margin-bottom: 10px;">Use Facebook tab to generate professional content</li>
-                            <li style="margin-bottom: 10px;">Copy the generated text</li>
-                            <li style="margin-bottom: 10px;">Post directly to LinkedIn</li>
-                        </ul>
-                        <button class="btn" onclick="switchPlatform('facebook', document.querySelector('.platform-tab'))" style="background: #0077b5;">
-                            ← Generate Content for LinkedIn
-                        </button>
+                <div id="linkedin" class="content-area" style="display: none;">
+                    <div class="form-group">
+                        <label for="contentTypeLinkedIn">Content Type</label>
+                        <select id="contentTypeLinkedIn" name="contentTypeLinkedIn" aria-label="Select content type">
+                            <option value="test-post">🧪 Test Post (First Post)</option>
+                            <option value="service-promotion">Service Promotion</option>
+                            <option value="client-success">Client Success Story</option>
+                            <option value="industry-tip">Industry Tip</option>
+                            <option value="behind-scenes">Behind the Scenes</option>
+                            <option value="testimonial">Customer Testimonial</option>
+                            <option value="how-to">How-To Guide</option>
+                            <option value="question">Engagement Question</option>
+                            <option value="did-you-know">Did You Know</option>
+                            <option value="local-community">Local Community</option>
+                            <option value="seasonal">Seasonal/Holiday</option>
+                            <option value="professional-insight">Professional Insight</option>
+                            <option value="industry-news">Industry News</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="clientBusinessNameLinkedIn">Client/Business Name</label>
+                        <input type="text" id="clientBusinessNameLinkedIn" placeholder="e.g., TNR Business Solutions" value="TNR Business Solutions">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="professionTypeLinkedIn">Industry Type</label>
+                        <select id="professionTypeLinkedIn" name="professionTypeLinkedIn" aria-label="Select industry type">
+                            <option value="digital-marketing">Digital Marketing Agency</option>
+                            <option value="insurance">Insurance Services</option>
+                            <option value="construction">Construction/Trades</option>
+                            <option value="professional-services">Professional Services (Law, Accounting, Consulting)</option>
+                            <option value="healthcare">Healthcare/Medical</option>
+                            <option value="restaurant">Restaurant/Food Service</option>
+                            <option value="retail">Retail Store</option>
+                            <option value="real-estate">Real Estate</option>
+                            <option value="automotive">Automotive Services</option>
+                            <option value="home-services">Home Services (HVAC, Plumbing, Electric)</option>
+                            <option value="fitness">Fitness/Wellness</option>
+                            <option value="beauty">Beauty/Salon</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="serviceFocusLinkedIn">Service Focus</label>
+                        <select id="serviceFocusLinkedIn" name="serviceFocusLinkedIn" aria-label="Select service focus">
+                            <option value="seo">SEO Services</option>
+                            <option value="web-design">Web Design</option>
+                            <option value="social-media">Social Media</option>
+                            <option value="insurance">Insurance</option>
+                            <option value="paid-ads">Paid Advertising</option>
+                            <option value="email-marketing">Email Marketing</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="targetAudienceLinkedIn">Target Audience</label>
+                        <select id="targetAudienceLinkedIn" name="targetAudienceLinkedIn" aria-label="Select target audience">
+                            <option value="small-business">Small Business Owners</option>
+                            <option value="local-residents">Local Residents</option>
+                            <option value="insurance-seekers">Insurance Seekers</option>
+                            <option value="marketing-managers">Marketing Managers</option>
+                            <option value="professionals">Professionals</option>
+                            <option value="entrepreneurs">Entrepreneurs</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn" onclick="generateLinkedInContent()" style="background: #0077b5;">Generate LinkedIn Content</button>
+                    
+                    <div id="contentPreviewLinkedIn" class="post-preview hidden" role="region" aria-label="Generated LinkedIn content preview">
+                        <h4>Generated LinkedIn Post:</h4>
+                        <div id="previewContentLinkedIn" style="white-space: pre-wrap; line-height: 1.6;"></div>
+                        <div style="margin-top: 10px; padding: 10px; background: #f0f7ff; border-radius: 4px; font-size: 0.9rem; color: #0077b5;">
+                            <strong>Character Count:</strong> <span id="linkedInCharCountPreview">0</span> characters
+                            <br><small>LinkedIn posts can be up to 3,000 characters. Professional, longer-form content performs well.</small>
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+                            <button class="btn" onclick="postGeneratedToLinkedIn()" style="flex: 1; min-width: 200px; background: #0077b5;">💼 Post to LinkedIn</button>
+                            <button class="btn btn-secondary" onclick="copyLinkedInContent()" style="flex: 1; min-width: 200px;">📋 Copy Content</button>
+                        </div>
                     </div>
                 </div>
                 
@@ -1634,6 +1699,185 @@
                     charCountEl.style.color = '#dc3545';
                 }
             }
+        }
+        
+        // Generate LinkedIn content (professional, longer-form)
+        function generateLinkedInContent() {
+            const contentType = document.getElementById('contentTypeLinkedIn').value;
+            const industryType = document.getElementById('professionTypeLinkedIn').value;
+            const businessName = document.getElementById('clientBusinessNameLinkedIn').value || 'TNR Business Solutions';
+            const location = 'Greensburg PA';
+            const phone = '(412) 499-2987';
+            
+            let template;
+            
+            // LinkedIn-specific professional templates
+            const linkedInTemplates = {
+                'professional-insight': [
+                    `As a professional in the {industry} industry, I've noticed a significant trend that's worth sharing.\n\n{content}\n\nWhat are your thoughts on this? I'd love to hear from fellow professionals in the comments.\n\n#ProfessionalDevelopment #IndustryInsights #BusinessGrowth #Networking`,
+                    `After {years} years in {industry}, I've learned that success comes down to one key principle: {principle}.\n\nHere's why this matters:\n\n• {point1}\n• {point2}\n• {point3}\n\nWhat principles guide your professional journey? Share your insights below.\n\n#Leadership #ProfessionalGrowth #BusinessStrategy #IndustryExpertise`
+                ],
+                'industry-news': [
+                    `📰 Industry Update: The {industry} sector is experiencing significant changes.\n\nHere's what you need to know:\n\n{update}\n\nHow is your business adapting to these changes? Let's discuss in the comments.\n\n#IndustryNews #BusinessUpdate #ProfessionalNetwork #MarketTrends`,
+                    `The {industry} landscape is evolving, and staying informed is crucial for business success.\n\nRecent developments include:\n\n• {development1}\n• {development2}\n• {development3}\n\nAt {business}, we're committed to helping our clients navigate these changes effectively.\n\n#IndustryTrends #BusinessIntelligence #ProfessionalNetwork #MarketInsights`
+                ]
+            };
+            
+            // Handle test post
+            if (contentType === 'test-post') {
+                const testTemplates = contentTemplateLibrary['test-post'];
+                template = testTemplates[Math.floor(Math.random() * testTemplates.length)];
+            }
+            // Handle LinkedIn-specific content types
+            else if (linkedInTemplates[contentType]) {
+                const templates = linkedInTemplates[contentType];
+                template = templates[Math.floor(Math.random() * templates.length)];
+            }
+            // Handle service promotions (industry-specific, LinkedIn-optimized)
+            else if (contentType === 'service-promotion') {
+                const industryTemplates = contentTemplateLibrary[contentType]?.[industryType];
+                if (industryTemplates && industryTemplates.length > 0) {
+                    template = industryTemplates[Math.floor(Math.random() * industryTemplates.length)];
+                    // Enhance for LinkedIn with professional tone
+                    template = `🚀 ${template}\n\nAt {business}, we're committed to delivering exceptional results for our clients. Our proven track record speaks for itself.\n\nInterested in learning more? Let's connect and discuss how we can help your business grow.\n\n#BusinessGrowth #ProfessionalServices #ClientSuccess #Networking`;
+                } else {
+                    template = `🚀 Looking for quality {industry} services in {location}?\n\n{business} is here to help! Our experienced team delivers professional results you can count on.\n\nWe specialize in:\n• Professional service delivery\n• Client-focused solutions\n• Proven results\n\nContact us today: {phone}\n\n#ProfessionalServices #BusinessGrowth #LocalBusiness #Networking`;
+                }
+            }
+            // Handle industry tips (LinkedIn-optimized)
+            else if (contentType === 'industry-tip') {
+                const industryTemplates = contentTemplateLibrary[contentType]?.[industryType];
+                if (industryTemplates && industryTemplates.length > 0) {
+                    template = industryTemplates[Math.floor(Math.random() * industryTemplates.length)];
+                } else {
+                    template = `💡 Professional Tip: Stay consistent with your marketing strategy!\n\nIn my experience working with businesses in {location}, I've found that:\n\n• Regular, consistent messaging builds brand recognition\n• Professional content establishes authority\n• Engaging with your network creates opportunities\n\n{business} helps businesses develop and execute effective marketing strategies.\n\nWhat marketing strategies have worked best for your business? Share your insights below.\n\n#MarketingStrategy #BusinessTips #ProfessionalAdvice #BusinessGrowth`;
+                }
+            }
+            // Handle other content types
+            else if (contentTemplateLibrary[contentType]) {
+                const templates = contentTemplateLibrary[contentType];
+                template = templates[Math.floor(Math.random() * templates.length)];
+                // Add professional LinkedIn closing
+                template += `\n\nAt {business}, we're dedicated to helping businesses succeed. Connect with us to learn more.\n\n#ProfessionalNetwork #BusinessGrowth #IndustryExpertise`;
+            }
+            // Fallback
+            else {
+                template = `🎯 Great things are happening at {business}!\n\nWe're dedicated to providing excellent service to {location} and beyond. Our commitment to quality and professionalism sets us apart.\n\nContact us: {phone}\n\n#ProfessionalServices #BusinessExcellence #LocalBusiness #Networking`;
+            }
+            
+            // Replace placeholders
+            let content = template
+                .replace(/{business}/g, businessName)
+                .replace(/{location}/g, location)
+                .replace(/{phone}/g, phone)
+                .replace(/{industry}/g, getIndustryName(industryType))
+                .replace(/#{location}/g, '#' + location.replace(/\s+/g, ''))
+                .replace(/{years}/g, '15+')
+                .replace(/{principle}/g, 'consistency and client focus')
+                .replace(/{point1}/g, 'Building strong relationships')
+                .replace(/{point2}/g, 'Delivering value consistently')
+                .replace(/{point3}/g, 'Adapting to market changes')
+                .replace(/{content}/g, 'This approach has transformed how we serve our clients and drive business growth.')
+                .replace(/{update}/g, 'These changes present both challenges and opportunities for businesses willing to adapt.')
+                .replace(/{development1}/g, 'New technologies reshaping operations')
+                .replace(/{development2}/g, 'Changing customer expectations')
+                .replace(/{development3}/g, 'Regulatory updates affecting the industry');
+            
+            // Update preview
+            document.getElementById('previewContentLinkedIn').textContent = content;
+            document.getElementById('contentPreviewLinkedIn').classList.remove('hidden');
+            
+            // Update character count
+            const charCount = content.length;
+            const charCountEl = document.getElementById('linkedInCharCountPreview');
+            if (charCountEl) {
+                charCountEl.textContent = charCount;
+                // Color code: green if good length, yellow if short, red if too long
+                if (charCount >= 200 && charCount <= 2000) {
+                    charCountEl.style.color = '#28a745';
+                } else if (charCount < 200) {
+                    charCountEl.style.color = '#ffc107';
+                } else {
+                    charCountEl.style.color = '#dc3545';
+                }
+            }
+        }
+        
+        // Post generated content to LinkedIn
+        async function postGeneratedToLinkedIn() {
+            const content = document.getElementById('previewContentLinkedIn')?.textContent?.trim();
+            
+            if (!content) {
+                alert('Please generate content first');
+                return;
+            }
+            
+            if (content.length > 3000) {
+                alert('⚠️ Content is too long for LinkedIn (3,000 character limit). Please shorten it.');
+                return;
+            }
+            
+            try {
+                const statusDiv = document.getElementById('linkedinStatus') || document.createElement('div');
+                statusDiv.id = 'linkedinStatus';
+                statusDiv.style.display = 'block';
+                statusDiv.style.background = '#fff3cd';
+                statusDiv.style.color = '#856404';
+                statusDiv.style.padding = '10px';
+                statusDiv.style.borderRadius = '4px';
+                statusDiv.style.marginTop = '15px';
+                statusDiv.textContent = 'Posting to LinkedIn...';
+                
+                if (!document.getElementById('linkedinStatus')) {
+                    document.getElementById('contentPreviewLinkedIn').appendChild(statusDiv);
+                }
+                
+                const response = await fetch('/api/social/post-to-linkedin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        content: content,
+                        useDatabaseToken: true
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    statusDiv.style.background = '#d4edda';
+                    statusDiv.style.color = '#155724';
+                    statusDiv.textContent = `✅ Successfully posted to LinkedIn! ${data.postUrl ? `View post: ${data.postUrl}` : ''}`;
+                    
+                    // Clear preview after successful post
+                    setTimeout(() => {
+                        document.getElementById('contentPreviewLinkedIn').classList.add('hidden');
+                        statusDiv.style.display = 'none';
+                    }, 5000);
+                } else {
+                    statusDiv.style.background = '#f8d7da';
+                    statusDiv.style.color = '#721c24';
+                    statusDiv.textContent = `❌ Error: ${data.error || data.message || 'Failed to post to LinkedIn'}`;
+                }
+            } catch (error) {
+                console.error('LinkedIn posting error:', error);
+                alert(`Error posting to LinkedIn: ${error.message}`);
+            }
+        }
+        
+        // Copy LinkedIn content to clipboard
+        function copyLinkedInContent() {
+            const content = document.getElementById('previewContentLinkedIn')?.textContent?.trim();
+            if (!content) {
+                alert('No content to copy');
+                return;
+            }
+            
+            navigator.clipboard.writeText(content).then(() => {
+                alert('✅ Content copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                alert('Failed to copy content. Please select and copy manually.');
+            });
         }
         
         // Post generated content to Twitter
