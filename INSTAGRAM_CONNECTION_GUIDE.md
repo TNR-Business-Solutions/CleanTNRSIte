@@ -3,6 +3,8 @@
 ## 📋 Overview
 Instagram posting requires connecting your Instagram Business Account to a Facebook Page. Instagram uses Facebook's API, so you must connect through Facebook OAuth.
 
+**Important:** This guide is for connecting YOUR OWN Instagram account for posting and getting insights. If you want to analyze OTHER Instagram accounts (competitors), see the Business Discovery API documentation.
+
 ## ✅ Prerequisites
 
 1. **Instagram Business or Creator Account** (NOT Personal account)
@@ -184,6 +186,62 @@ If you're still experiencing issues after following this guide:
 - [ ] Can see Instagram username in dashboard
 - [ ] Test post to Instagram works successfully
 - [ ] Instagram insights load (may be empty if permissions are limited)
+
+---
+
+## 🔍 Understanding Instagram APIs
+
+### For YOUR Account (Current Setup):
+- **Publishing API:** Post content to your Instagram account ✅ Implemented
+- **Insights API:** Get metrics about your account ✅ Implemented
+- **Connection:** Via Facebook OAuth ✅ Implemented
+
+### For OTHER Accounts (Not Yet Implemented):
+- **Business Discovery API:** Analyze competitor/client accounts ❌ Not implemented
+  - Requires Instagram User Access Token (different from Page Token)
+  - Can get follower counts, media counts, basic metrics for other accounts
+  - Useful for competitor analysis and client monitoring
+
+**See `INSTAGRAM_API_TYPES_EXPLAINED.md` for detailed API differences.**
+
+---
+
+## 🆘 Still Having Issues?
+
+If you're still seeing errors after following this guide:
+
+1. **Check Your Account Type**
+   - Go to Instagram Settings → Account
+   - Make sure it says "Account type: Business" or "Account type: Creator"
+   - If it says "Personal", switch to Professional Account
+
+2. **Verify Facebook Page Connection**
+   - Go to Facebook Page Settings → Instagram
+   - Make sure Instagram shows as "Connected"
+   - If not connected, click "Connect Account"
+
+3. **Check OAuth Permissions**
+   - When connecting via OAuth, make sure to grant all permissions:
+     - `pages_manage_posts` - Required for posting
+     - `pages_read_engagement` - Required for insights
+     - `instagram_basic` - Required for Instagram access
+
+4. **Reconnect Everything**
+   - Disconnect Instagram from Facebook Page
+   - Reconnect Instagram to Facebook Page
+   - Reconnect via OAuth in dashboard
+   - Test posting again
+
+5. **Check Vercel Logs**
+   - Go to Vercel Dashboard → Logs
+   - Look for Instagram-related errors
+   - Check for "No Instagram Business Account" warnings
+   - Look for insights metric errors
+
+6. **Verify Token Type**
+   - Make sure you're using Facebook Page Access Token (not User Token)
+   - Page tokens never expire
+   - User tokens expire after 60 days
 
 ---
 

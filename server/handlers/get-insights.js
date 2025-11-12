@@ -12,12 +12,14 @@ const FACEBOOK_PAGE_METRICS = {
 
 // Instagram Business Account metrics (different from Facebook Page metrics)
 // Note: Instagram insights metrics must be requested for the Instagram Business Account ID, not the Facebook Page ID
-// Valid Instagram metrics: impressions, reach, profile_views, website_clicks (some require permissions)
+// Valid Instagram metrics for account-level insights (v19.0):
+// - impressions: Account impressions
+// - reach: Account reach
+// Note: profile_views and website_clicks may require additional permissions or may not be available
+// Only use the most basic metrics that are universally available
 const INSTAGRAM_METRICS = {
   impressions: { key: 'impressions', label: 'Impressions' },
   reach: { key: 'reach', label: 'Reach (Unique Users)' }
-  // Note: profile_views and website_clicks may require additional permissions or may not be available
-  // Only use the most basic metrics that are universally available
 };
 
 // Fallback metrics if primary ones fail
