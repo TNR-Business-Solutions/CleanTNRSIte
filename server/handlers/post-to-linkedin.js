@@ -15,7 +15,7 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const { accessToken, content, useDatabaseToken = true } = req.body;
+    const { accessToken, content, useDatabaseToken = true, userId } = req.body;
 
     // Try to get token from database first, fallback to request body
     let token = accessToken;
@@ -82,8 +82,12 @@ module.exports = async (req, res) => {
     // LinkedIn UGC Posts API requires the author URN
     // Since we don't have profile scope, we'll try multiple approaches
     let userUrn = null;
-
-    if (storedUserId && !storedUserId.startsWith("linkedin_user_")) {
+    
+    // Priority 1: Use userId from request body (manual input)
+    if (userId && !userId.startsWith("linkedin_user_")) {
+      userUrn = `urn:li:person:${userId}`;
+      console.log("✅ Using user ID from request:", userUrn);
+    } else if (storedUserId && !storedUserId.startsWith("linkedin_user_")) {
       // We have a real LinkedIn user ID stored, use it directly
       userUrn = `urn:li:person:${storedUserId}`;
       console.log("✅ Using stored user ID to construct URN:", userUrn);
