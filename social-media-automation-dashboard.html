@@ -1304,7 +1304,26 @@
             
             // Check if Instagram is connected
             if (!tokenData.instagram || !tokenData.instagram.id) {
-                alert('❌ No Instagram Business Account Connected!\n\nTo post to Instagram, you need to:\n\n1. Have an Instagram Business Account\n2. Link it to your Facebook Page\n3. Reconnect via the "Connect Facebook/Instagram" button\n\nFor help: https://www.facebook.com/business/help/898752960195806');
+                // Provide detailed instructions
+                const helpMessage = '❌ No Instagram Business Account Connected!\n\n' +
+                    'To post to Instagram, you need to:\n\n' +
+                    '1. Convert your Instagram account to Business or Creator account\n' +
+                    '   (Settings → Account Type → Switch to Professional Account)\n\n' +
+                    '2. Link your Instagram Business account to your Facebook Page:\n' +
+                    '   - Go to your Facebook Page\n' +
+                    '   - Settings → Instagram\n' +
+                    '   - Click "Connect Account"\n' +
+                    '   - Follow the prompts to connect\n\n' +
+                    '3. Reconnect via the "Connect Facebook/Instagram" button\n\n' +
+                    '4. Make sure your Facebook Page is connected to the Meta App\n\n' +
+                    'Need help? Visit: https://www.facebook.com/business/help/898752960195806\n\n' +
+                    'Would you like to check your Instagram connection now?';
+                
+                if (confirm(helpMessage)) {
+                    // Test the token again to see current status
+                    window.manualTest = true;
+                    testMetaToken();
+                }
                 return;
             }
             
@@ -1431,8 +1450,9 @@
                 setTimeout(() => testMetaToken(), 200);
             }
             
-            // Auto-load Twitter connection status
+            // Auto-load connection status from database
             setTimeout(() => {
+                loadMetaConnectionStatus();
                 loadTwitterConnectionStatus();
             }, 500);
             
@@ -1445,6 +1465,64 @@
                 scheduleDateTimeInput.value = tomorrow.toISOString().slice(0, 16);
             }
         });
+        
+        // Load Meta/Facebook/Instagram connection status from database
+        async function loadMetaConnectionStatus() {
+            try {
+                const response = await fetch('/api/social/tokens?platform=facebook');
+                const data = await response.json();
+                
+                if (data.success && data.tokens && data.tokens.length > 0) {
+                    const facebookToken = data.tokens[0];
+                    const metaStatus = document.getElementById('metaStatus');
+                    
+                    if (metaStatus) {
+                        let statusText = `✅ Connected to: ${facebookToken.page_name || 'Facebook Page'}`;
+                        
+                        // Check for Instagram connection
+                        if (facebookToken.instagram_account_id || facebookToken.instagram_username) {
+                            statusText += `<br>📷 Instagram: @${facebookToken.instagram_username || 'Connected'}`;
+                        } else {
+                            // Check if there's a separate Instagram token
+                            const igResponse = await fetch('/api/social/tokens?platform=instagram');
+                            const igData = await igResponse.json();
+                            
+                            if (igData.success && igData.tokens && igData.tokens.length > 0) {
+                                const instagramToken = igData.tokens[0];
+                                statusText += `<br>📷 Instagram: @${instagramToken.instagram_username || 'Connected'}`;
+                            } else {
+                                statusText += `<br>❌ No Instagram connected`;
+                            }
+                        }
+                        
+                        metaStatus.innerHTML = statusText;
+                        
+                        // Load token into input if available
+                        if (facebookToken.has_token) {
+                            // We can't get the actual token from the list endpoint (security)
+                            // But we can check if it exists in localStorage
+                            const savedToken = localStorage.getItem('metaPageAccessToken');
+                            if (savedToken) {
+                                const metaTokenInput = document.getElementById('metaToken');
+                                if (metaTokenInput && !metaTokenInput.value) {
+                                    metaTokenInput.value = savedToken;
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    // No tokens in database, check localStorage
+                    const savedToken = localStorage.getItem('metaPageAccessToken');
+                    if (savedToken) {
+                        // Test the saved token to check Instagram connection
+                        window.manualTest = false;
+                        setTimeout(() => testMetaToken(), 300);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading Meta connection status:', error);
+            }
+        }
         
         // Load Twitter connection status from database
         async function loadTwitterConnectionStatus() {
