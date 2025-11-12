@@ -1856,7 +1856,31 @@
                 } else {
                     statusDiv.style.background = '#f8d7da';
                     statusDiv.style.color = '#721c24';
-                    statusDiv.textContent = `❌ Error: ${data.error || data.message || 'Failed to post to LinkedIn'}`;
+                    
+                    let errorMsg = `❌ Error: ${data.error || data.message || 'Failed to post to LinkedIn'}`;
+                    
+                    // Add helpful guidance for user ID missing error
+                    if (data.help && data.help.steps) {
+                        errorMsg += '\n\n' + data.help.title + ':\n';
+                        errorMsg += data.help.steps.join('\n');
+                    }
+                    
+                    statusDiv.textContent = errorMsg;
+                    statusDiv.style.whiteSpace = 'pre-line';
+                    
+                    // If it's a user ID issue, suggest reconnecting
+                    if (data.error && data.error.includes('User ID')) {
+                        const reconnectBtn = document.createElement('button');
+                        reconnectBtn.className = 'btn';
+                        reconnectBtn.style.marginTop = '10px';
+                        reconnectBtn.style.background = '#0077b5';
+                        reconnectBtn.textContent = '💼 Reconnect LinkedIn Account';
+                        reconnectBtn.onclick = () => {
+                            window.location.href = '/api/auth/linkedin';
+                        };
+                        statusDiv.appendChild(document.createElement('br'));
+                        statusDiv.appendChild(reconnectBtn);
+                    }
                 }
             } catch (error) {
                 console.error('LinkedIn posting error:', error);
