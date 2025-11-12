@@ -11,16 +11,18 @@ const FACEBOOK_PAGE_METRICS = {
 };
 
 // Instagram Business Account metrics (different from Facebook Page metrics)
+// Note: Instagram insights metrics must be requested for the Instagram Business Account ID, not the Facebook Page ID
+// Valid Instagram metrics: impressions, reach, profile_views, website_clicks (some require permissions)
 const INSTAGRAM_METRICS = {
   impressions: { key: 'impressions', label: 'Impressions' },
-  reach: { key: 'reach', label: 'Reach (Unique Users)' },
-  profile_views: { key: 'profile_views', label: 'Profile Views' },
-  website_clicks: { key: 'website_clicks', label: 'Website Clicks' }
+  reach: { key: 'reach', label: 'Reach (Unique Users)' }
+  // Note: profile_views and website_clicks may require additional permissions or may not be available
+  // Only use the most basic metrics that are universally available
 };
 
 // Fallback metrics if primary ones fail
 const FACEBOOK_FALLBACK_METRICS = ['page_impressions', 'page_impressions_unique'];
-const INSTAGRAM_FALLBACK_METRICS = ['impressions', 'reach'];
+const INSTAGRAM_FALLBACK_METRICS = ['impressions']; // Use only impressions as fallback for Instagram
 
 function normalizeValue(raw) {
   if (raw == null) return 0;
@@ -115,55 +117,121 @@ module.exports = async (req, res) => {
 
   try {
     let targetPageId = pageId;
-    let isInstagram = platform === 'instagram';
+    let isInstagram = false;
     let instagramAccountId = null;
+    let facebookPageId = null;
 
-    // First, get page/account info to determine if it's Instagram or Facebook
-    if (!targetPageId) {
-      const pageInfoResponse = await axios.get(`https://graph.facebook.com/${GRAPH_VERSION}/me`, {
-        params: {
-          access_token: pageAccessToken,
-          fields: 'id,name,category,fan_count,followers_count,picture{url},instagram_business_account'
-        },
-        timeout: 10000
-      });
-      const pageInfo = pageInfoResponse.data;
-      targetPageId = pageInfo.id;
+    // Step 1: Get Facebook Page info first to check for Instagram connection
+    console.log('Fetching Facebook Page info...');
+    const pageInfoResponse = await axios.get(`https://graph.facebook.com/${GRAPH_VERSION}/me`, {
+      params: {
+        access_token: pageAccessToken,
+        fields: 'id,name,category,fan_count,followers_count,picture{url},instagram_business_account'
+      },
+      timeout: 10000
+    }).catch(async (error) => {
+      // If /me fails, try using pageId if provided
+      if (targetPageId) {
+        try {
+          return await axios.get(`https://graph.facebook.com/${GRAPH_VERSION}/${targetPageId}`, {
+            params: {
+              access_token: pageAccessToken,
+              fields: 'id,name,category,fan_count,followers_count,picture{url},instagram_business_account'
+            },
+            timeout: 10000
+          });
+        } catch (pageError) {
+          throw error; // Throw original error
+        }
+      }
+      throw error;
+    });
+
+    const pageInfo = pageInfoResponse.data;
+    facebookPageId = pageInfo.id;
+    
+    // Step 2: Check if Instagram Business Account is connected
+    if (pageInfo.instagram_business_account) {
+      instagramAccountId = pageInfo.instagram_business_account.id;
+      console.log('✅ Found Instagram Business Account:', instagramAccountId);
       
-      // Check if this is an Instagram account or has one linked
-      if (platform === 'instagram' && pageInfo.instagram_business_account) {
-        instagramAccountId = pageInfo.instagram_business_account.id;
+      // Determine which platform to fetch insights for
+      if (platform === 'instagram') {
+        // Explicitly requested Instagram insights
         isInstagram = true;
-        targetPageId = instagramAccountId;
-      } else if (platform === 'instagram') {
-        // If Instagram was requested but no Instagram account is linked, return error
+        targetPageId = instagramAccountId; // Use Instagram account ID for insights
+        console.log('📷 Fetching Instagram insights for account:', instagramAccountId);
+      } else if (platform === 'facebook') {
+        // Explicitly requested Facebook insights
+        isInstagram = false;
+        targetPageId = facebookPageId;
+        console.log('📘 Fetching Facebook Page insights for page:', facebookPageId);
+      } else {
+        // Default to Facebook if platform not specified
+        isInstagram = false;
+        targetPageId = facebookPageId;
+        console.log('📘 Defaulting to Facebook Page insights for page:', facebookPageId);
+      }
+    } else {
+      // No Instagram account connected
+      if (platform === 'instagram') {
         return res.status(400).json({
           success: false,
           error: 'No Instagram Business Account',
-          message: 'This Facebook Page does not have an Instagram Business Account connected. Please connect Instagram in Facebook Page Settings.'
+          message: 'This Facebook Page does not have an Instagram Business Account connected.',
+          help: [
+            '1. Go to your Facebook Page Settings → Instagram',
+            '2. Connect your Instagram Business or Creator account',
+            '3. Make sure your Instagram account is Business or Creator (not Personal)',
+            '4. Reconnect via OAuth after connecting Instagram'
+          ],
+          facebookPageId: facebookPageId
         });
       }
-    } else {
-      // If pageId is provided, check if it's an Instagram account ID
-      // Instagram Business Account IDs are numeric strings (typically 15-17 digits)
-      // Facebook Page IDs are also numeric, so we need to check the account type
+      // Fetch Facebook Page insights
+      isInstagram = false;
+      targetPageId = facebookPageId || targetPageId;
+      console.log('📘 No Instagram connected, fetching Facebook Page insights for page:', targetPageId);
+    }
+
+    // Step 3: If pageId was explicitly provided, verify it matches our detection
+    if (pageId && pageId !== targetPageId && pageId !== facebookPageId && pageId !== instagramAccountId) {
+      console.log('⚠️ Provided pageId does not match detected accounts, checking if it\'s an Instagram account...');
       try {
-        const accountInfo = await axios.get(`https://graph.facebook.com/${GRAPH_VERSION}/${targetPageId}`, {
+        const accountCheck = await axios.get(`https://graph.facebook.com/${GRAPH_VERSION}/${pageId}`, {
           params: {
             access_token: pageAccessToken,
             fields: 'id,username,name,profile_picture_url,followers_count'
           },
           timeout: 10000
         });
-        // If this endpoint works and returns username, it's likely an Instagram account
-        if (accountInfo.data.username) {
+        
+        // If it has a username field, it's an Instagram account
+        if (accountCheck.data.username) {
           isInstagram = true;
+          targetPageId = pageId;
+          instagramAccountId = pageId;
+          console.log('✅ Detected Instagram account from provided pageId:', pageId);
+        } else {
+          // It's a Facebook Page
+          isInstagram = false;
+          targetPageId = pageId;
+          facebookPageId = pageId;
+          console.log('✅ Detected Facebook Page from provided pageId:', pageId);
         }
       } catch (checkError) {
-        // If it fails, it's probably a Facebook Page, continue with Facebook metrics
-        isInstagram = false;
+        console.warn('⚠️ Could not verify provided pageId:', checkError.message);
+        // Continue with our detected account
       }
     }
+    
+    console.log('🎯 Final configuration:', {
+      isInstagram,
+      targetPageId,
+      facebookPageId,
+      instagramAccountId,
+      platform
+    });
 
     const now = new Date();
     const sinceDate = new Date(now);
@@ -202,12 +270,15 @@ module.exports = async (req, res) => {
         });
       }
 
-      // Fetch insights
+      // Fetch insights - use correct account ID and metrics
+      console.log(`📊 Fetching insights for ${isInstagram ? 'Instagram' : 'Facebook'} account:`, targetPageId);
+      console.log(`📊 Using metrics:`, METRICS.join(', '));
+      
       insightsResponse = await axios.get(`https://graph.facebook.com/${GRAPH_VERSION}/${targetPageId}/insights`, {
         params: {
           access_token: pageAccessToken,
           metric: METRICS.join(','),
-          period: 'day',
+          period: isInstagram ? 'day' : 'day', // Both use 'day' period
           since,
           until
         },
@@ -215,25 +286,64 @@ module.exports = async (req, res) => {
       }).catch(async (error) => {
         // If insights fail due to invalid metrics, try with fallback set
         const errorMsg = error.response?.data?.error?.message || error.message;
-        console.log('Primary metrics failed, trying fallback:', errorMsg);
+        const errorCode = error.response?.data?.error?.code;
+        console.log('❌ Primary metrics failed:', errorMsg);
+        console.log('   Error code:', errorCode);
+        console.log('   Account ID:', targetPageId);
+        console.log('   Is Instagram:', isInstagram);
+        console.log('   Metrics attempted:', METRICS.join(', '));
         
-        // If fallback also fails, return empty insights instead of error
-        try {
-          return await axios.get(`https://graph.facebook.com/${GRAPH_VERSION}/${targetPageId}/insights`, {
-            params: {
-              access_token: pageAccessToken,
-              metric: FALLBACK_METRICS.join(','),
-              period: 'day',
-              since,
-              until
-            },
-            timeout: 10000
-          });
-        } catch (fallbackError) {
-          // If even fallback fails, return empty insights
-          console.warn('Fallback metrics also failed, returning empty insights');
-          return { data: { data: [] } };
+        // For Instagram, if basic metrics fail, try with minimal metrics
+        if (isInstagram && FALLBACK_METRICS.length > 0) {
+          console.log('🔄 Trying fallback metrics for Instagram:', FALLBACK_METRICS.join(', '));
+          try {
+            return await axios.get(`https://graph.facebook.com/${GRAPH_VERSION}/${targetPageId}/insights`, {
+              params: {
+                access_token: pageAccessToken,
+                metric: FALLBACK_METRICS.join(','),
+                period: 'day',
+                since,
+                until
+              },
+              timeout: 10000
+            });
+          } catch (fallbackError) {
+            const fallbackMsg = fallbackError.response?.data?.error?.message || fallbackError.message;
+            console.warn('❌ Fallback metrics also failed:', fallbackMsg);
+            
+            // If it's a permissions error or invalid metric error, return empty insights
+            if (fallbackError.response?.data?.error?.code === 100 || 
+                fallbackError.response?.data?.error?.code === 200) {
+              console.warn('⚠️ Instagram insights not available (may require additional permissions or account setup)');
+              return { data: { data: [] } };
+            }
+            throw fallbackError;
+          }
         }
+        
+        // For Facebook, try fallback metrics
+        if (!isInstagram && FALLBACK_METRICS.length > 0) {
+          console.log('🔄 Trying fallback metrics for Facebook:', FALLBACK_METRICS.join(', '));
+          try {
+            return await axios.get(`https://graph.facebook.com/${GRAPH_VERSION}/${targetPageId}/insights`, {
+              params: {
+                access_token: pageAccessToken,
+                metric: FALLBACK_METRICS.join(','),
+                period: 'day',
+                since,
+                until
+              },
+              timeout: 10000
+            });
+          } catch (fallbackError) {
+            console.warn('❌ Fallback metrics also failed, returning empty insights');
+            return { data: { data: [] } };
+          }
+        }
+        
+        // If no fallback available or fallback also failed, return empty insights
+        console.warn('⚠️ Returning empty insights due to API error');
+        return { data: { data: [] } };
       });
     } catch (fetchError) {
       console.error('Error fetching account details or insights:', fetchError.message);
