@@ -2,42 +2,46 @@
 // This endpoint handles the redirect from LinkedIn after user authorization
 // It exchanges the authorization code for access tokens
 
-const axios = require('axios');
-const TNRDatabase = require('../../database');
-const qs = require('querystring');
+const axios = require("axios");
+const TNRDatabase = require("../../database");
+const qs = require("querystring");
 
 module.exports = async (req, res) => {
   const { code, error, error_description, state } = req.query;
-  
+
   // Get configuration from environment variables
-  const LINKEDIN_CLIENT_ID = process.env.LINKEDIN_CLIENT_ID || '78pjq1wt4wz1fs';
+  const LINKEDIN_CLIENT_ID = process.env.LINKEDIN_CLIENT_ID || "78pjq1wt4wz1fs";
   const LINKEDIN_CLIENT_SECRET = process.env.LINKEDIN_CLIENT_SECRET;
-  const REDIRECT_URI = process.env.LINKEDIN_REDIRECT_URI || 'https://www.tnrbusinesssolutions.com/api/auth/linkedin/callback';
+  const REDIRECT_URI =
+    process.env.LINKEDIN_REDIRECT_URI ||
+    "https://www.tnrbusinesssolutions.com/api/auth/linkedin/callback";
 
   // Validate configuration
   if (!LINKEDIN_CLIENT_ID || !LINKEDIN_CLIENT_SECRET) {
     return res.status(500).json({
-      error: 'Server configuration error',
-      message: 'LINKEDIN_CLIENT_ID or LINKEDIN_CLIENT_SECRET not configured. Please set environment variables in Vercel.'
+      error: "Server configuration error",
+      message:
+        "LINKEDIN_CLIENT_ID or LINKEDIN_CLIENT_SECRET not configured. Please set environment variables in Vercel.",
     });
   }
 
   // Log callback received (for debugging)
-  console.log('LinkedIn OAuth callback received:', {
+  console.log("LinkedIn OAuth callback received:", {
     hasCode: !!code,
     hasError: !!error,
     state: state,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 
   // Handle OAuth errors
   if (error) {
-    console.error('OAuth error:', error, error_description);
+    console.error("OAuth error:", error, error_description);
     return res.status(400).json({
       success: false,
-      error: 'OAuth Authorization Failed',
+      error: "OAuth Authorization Failed",
       details: error_description || error,
-      message: 'User denied authorization or an error occurred during the OAuth flow.'
+      message:
+        "User denied authorization or an error occurred during the OAuth flow.",
     });
   }
 
@@ -45,156 +49,185 @@ module.exports = async (req, res) => {
   if (!code) {
     return res.status(400).json({
       success: false,
-      error: 'Missing authorization code',
-      message: 'No authorization code received from LinkedIn. Please try again.'
+      error: "Missing authorization code",
+      message:
+        "No authorization code received from LinkedIn. Please try again.",
     });
   }
 
   try {
     // Step 1: Exchange authorization code for access token
-    console.log('Exchanging code for access token...');
-    console.log('Token exchange parameters:', {
-      grant_type: 'authorization_code',
-      code: code ? code.substring(0, 20) + '...' : 'MISSING',
+    console.log("Exchanging code for access token...");
+    console.log("Token exchange parameters:", {
+      grant_type: "authorization_code",
+      code: code ? code.substring(0, 20) + "..." : "MISSING",
       redirect_uri: REDIRECT_URI,
       client_id: LINKEDIN_CLIENT_ID,
       has_client_secret: !!LINKEDIN_CLIENT_SECRET,
-      client_secret_length: LINKEDIN_CLIENT_SECRET?.length || 0
+      client_secret_length: LINKEDIN_CLIENT_SECRET?.length || 0,
     });
-    
+
     const tokenRequestParams = {
-      grant_type: 'authorization_code',
+      grant_type: "authorization_code",
       code: code,
       redirect_uri: REDIRECT_URI,
       client_id: LINKEDIN_CLIENT_ID,
-      client_secret: LINKEDIN_CLIENT_SECRET
+      client_secret: LINKEDIN_CLIENT_SECRET,
     };
-    
+
     // Validate all required parameters
     if (!code) {
-      throw new Error('Authorization code is missing');
+      throw new Error("Authorization code is missing");
     }
     if (!LINKEDIN_CLIENT_ID) {
-      throw new Error('LINKEDIN_CLIENT_ID is missing');
+      throw new Error("LINKEDIN_CLIENT_ID is missing");
     }
     if (!LINKEDIN_CLIENT_SECRET) {
-      throw new Error('LINKEDIN_CLIENT_SECRET is missing - check Vercel environment variables');
+      throw new Error(
+        "LINKEDIN_CLIENT_SECRET is missing - check Vercel environment variables"
+      );
     }
     if (!REDIRECT_URI) {
-      throw new Error('REDIRECT_URI is missing');
+      throw new Error("REDIRECT_URI is missing");
     }
-    
+
     const tokenResponse = await axios.post(
-      'https://www.linkedin.com/oauth/v2/accessToken',
+      "https://www.linkedin.com/oauth/v2/accessToken",
       qs.stringify(tokenRequestParams),
       {
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
+          "Content-Type": "application/x-www-form-urlencoded",
         },
-        timeout: 10000
+        timeout: 10000,
       }
     );
-    
-    console.log('Token exchange successful, response keys:', Object.keys(tokenResponse.data || {}));
+
+    console.log(
+      "Token exchange successful, response keys:",
+      Object.keys(tokenResponse.data || {})
+    );
 
     const accessToken = tokenResponse.data.access_token;
     const expiresIn = tokenResponse.data.expires_in || 5184000; // Default to 60 days if not provided
     const refreshToken = tokenResponse.data.refresh_token || null;
 
     if (!accessToken) {
-      throw new Error('No access token received from LinkedIn');
+      throw new Error("No access token received from LinkedIn");
     }
 
     // Step 2: Fetch user profile to get user ID and name
-    console.log('Fetching LinkedIn profile...');
-    console.log('Profile request config:', {
-      url: 'https://api.linkedin.com/v2/me',
+    console.log("Fetching LinkedIn profile...");
+    console.log("Profile request config:", {
+      url: "https://api.linkedin.com/v2/me",
       hasAccessToken: !!accessToken,
       tokenLength: accessToken?.length || 0,
-      tokenPrefix: accessToken ? accessToken.substring(0, 20) + '...' : 'MISSING'
+      tokenPrefix: accessToken
+        ? accessToken.substring(0, 20) + "..."
+        : "MISSING",
     });
-    
+
     let profileResponse;
     try {
-      profileResponse = await axios.get('https://api.linkedin.com/v2/me', {
+      profileResponse = await axios.get("https://api.linkedin.com/v2/me", {
         headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'X-Restli-Protocol-Version': '2.0.0'
+          Authorization: `Bearer ${accessToken}`,
+          "X-Restli-Protocol-Version": "2.0.0",
         },
-        timeout: 10000
+        timeout: 10000,
       });
-      console.log('Profile fetch successful, response keys:', Object.keys(profileResponse.data || {}));
+      console.log(
+        "Profile fetch successful, response keys:",
+        Object.keys(profileResponse.data || {})
+      );
     } catch (profileError) {
-      console.error('Profile fetch failed:', profileError.message);
-      console.error('Profile error response:', JSON.stringify(profileError.response?.data, null, 2));
-      console.error('Profile error status:', profileError.response?.status);
-      
+      console.error("Profile fetch failed:", profileError.message);
+      console.error(
+        "Profile error response:",
+        JSON.stringify(profileError.response?.data, null, 2)
+      );
+      console.error("Profile error status:", profileError.response?.status);
+
       // If profile fetch fails but we have a token, we can still save it
       // Use a default user ID based on token or timestamp
       const fallbackUserId = `linkedin_user_${Date.now()}`;
-      console.warn('⚠️ Profile fetch failed, using fallback user ID:', fallbackUserId);
-      
+      console.warn(
+        "⚠️ Profile fetch failed, using fallback user ID:",
+        fallbackUserId
+      );
+
       // Try to save token anyway with fallback info
       const db = new TNRDatabase();
       await db.initialize();
-      
+
       try {
-        const expiresAt = expiresIn ? new Date(Date.now() + expiresIn * 1000).toISOString() : null;
-        
+        const expiresAt = expiresIn
+          ? new Date(Date.now() + expiresIn * 1000).toISOString()
+          : null;
+
         await db.saveSocialMediaToken({
-          platform: 'linkedin',
+          platform: "linkedin",
           page_id: fallbackUserId,
           access_token: accessToken,
-          token_type: 'Bearer',
+          token_type: "Bearer",
           expires_at: expiresAt,
           refresh_token: refreshToken,
           user_id: fallbackUserId,
-          page_name: 'LinkedIn User (Profile fetch failed)',
+          page_name: "LinkedIn User (Profile fetch failed)",
         });
-        
-        console.log('✅ Token saved with fallback user info');
-        
+
+        console.log("✅ Token saved with fallback user info");
+
         // Return success but with a warning
-        res.setHeader('Content-Type', 'text/html');
-        return res.status(200).send(generateSuccessHTML({
-          success: true,
-          message: 'LinkedIn token saved successfully! Note: Profile fetch failed, but token is valid.',
-          authorization: {
-            accessToken: accessToken,
-            expiresIn: expiresIn,
-            expiresInDays: expiresIn ? Math.floor(expiresIn / 86400) : null,
-            refreshToken: refreshToken
-          },
-          profile: {
-            id: fallbackUserId,
-            firstName: 'LinkedIn',
-            lastName: 'User',
-            email: null
-          },
-          nextSteps: [
-            '1. ✅ Access token saved to database',
-            '2. ⚠️ Profile fetch failed - token may still work for posting',
-            '3. You can test posting to LinkedIn from the dashboard',
-            '4. If posting fails, try reconnecting'
-          ]
-        }));
+        if (!res.headersSent) {
+          res.setHeader("Content-Type", "text/html");
+          return res.status(200).send(
+            generateSuccessHTML({
+              success: true,
+              message:
+                "LinkedIn token saved successfully! Note: Profile fetch failed, but token is valid.",
+              authorization: {
+                accessToken: accessToken,
+                expiresIn: expiresIn,
+                expiresInDays: expiresIn ? Math.floor(expiresIn / 86400) : null,
+                refreshToken: refreshToken,
+              },
+              profile: {
+                id: fallbackUserId,
+                firstName: "LinkedIn",
+                lastName: "User",
+                email: null,
+              },
+              nextSteps: [
+                "1. ✅ Access token saved to database",
+                "2. ⚠️ Profile fetch failed - token may still work for posting",
+                "3. You can test posting to LinkedIn from the dashboard",
+                "4. If posting fails, try reconnecting",
+              ],
+            })
+          );
+        }
+        return;
       } catch (dbError) {
-        console.error('Failed to save token:', dbError.message);
+        console.error("Failed to save token:", dbError.message);
         throw profileError; // Re-throw original error
       }
     }
 
     const userProfile = profileResponse.data;
     const userId = userProfile.id;
-    
+
     // Extract name (handles both v1 and v2 API formats)
-    const firstName = userProfile.firstName?.localized?.en_US || 
-                     userProfile.firstName?.preferredLocale?.language || 
-                     userProfile.firstName || '';
-    const lastName = userProfile.lastName?.localized?.en_US || 
-                    userProfile.lastName?.preferredLocale?.language || 
-                    userProfile.lastName || '';
-    
+    const firstName =
+      userProfile.firstName?.localized?.en_US ||
+      userProfile.firstName?.preferredLocale?.language ||
+      userProfile.firstName ||
+      "";
+    const lastName =
+      userProfile.lastName?.localized?.en_US ||
+      userProfile.lastName?.preferredLocale?.language ||
+      userProfile.lastName ||
+      "";
+
     // Email is not available without r_emailaddress scope, which we removed for simplicity
     // We only need w_member_social for posting
     const email = null;
@@ -202,112 +235,138 @@ module.exports = async (req, res) => {
     // Step 3: Save token to database
     const db = new TNRDatabase();
     await db.initialize();
-    
+
     try {
       // Calculate expiration date
-      const expiresAt = expiresIn ? new Date(Date.now() + expiresIn * 1000).toISOString() : null;
+      const expiresAt = expiresIn
+        ? new Date(Date.now() + expiresIn * 1000).toISOString()
+        : null;
 
       // Save LinkedIn token
       await db.saveSocialMediaToken({
-        platform: 'linkedin',
+        platform: "linkedin",
         page_id: userId, // Use user ID as page_id for LinkedIn
         access_token: accessToken,
-        token_type: 'Bearer',
+        token_type: "Bearer",
         expires_at: expiresAt,
         refresh_token: refreshToken,
         user_id: userId,
-        page_name: `${firstName} ${lastName}`.trim() || 'LinkedIn User',
+        page_name: `${firstName} ${lastName}`.trim() || "LinkedIn User",
       });
 
-      console.log('✅ LinkedIn token saved to database:', {
+      console.log("✅ LinkedIn token saved to database:", {
         userId: userId,
-        expiresIn: expiresIn ? `${Math.floor(expiresIn / 86400)} days` : 'Never'
+        expiresIn: expiresIn
+          ? `${Math.floor(expiresIn / 86400)} days`
+          : "Never",
       });
     } catch (dbError) {
-      console.error('⚠️ Could not save token to database:', dbError.message);
+      console.error("⚠️ Could not save token to database:", dbError.message);
       // Continue even if database save fails - token is still shown on success page
     }
 
     // Step 4: Build success response
     const response = {
       success: true,
-      message: 'Successfully authorized LinkedIn! Token saved automatically to database.',
+      message:
+        "Successfully authorized LinkedIn! Token saved automatically to database.",
       authorization: {
         accessToken: accessToken,
         expiresIn: expiresIn,
         expiresInDays: expiresIn ? Math.floor(expiresIn / 86400) : null,
-        refreshToken: refreshToken
+        refreshToken: refreshToken,
       },
       profile: {
         id: userId,
         firstName: firstName,
         lastName: lastName,
-        email: email
+        email: email,
       },
       nextSteps: [
-        '1. ✅ Access token saved to database automatically',
-        '2. You can now post to LinkedIn from the admin dashboard',
-        '3. Token expires in ' + (expiresIn ? `${Math.floor(expiresIn / 86400)} days` : 'never'),
-        refreshToken ? '4. Refresh token saved - will auto-refresh before expiration' : '4. No refresh token available - manual re-auth required when expired',
-        '5. View and manage tokens in Admin Dashboard → Social Media'
-      ]
+        "1. ✅ Access token saved to database automatically",
+        "2. You can now post to LinkedIn from the admin dashboard",
+        "3. Token expires in " +
+          (expiresIn ? `${Math.floor(expiresIn / 86400)} days` : "never"),
+        refreshToken
+          ? "4. Refresh token saved - will auto-refresh before expiration"
+          : "4. No refresh token available - manual re-auth required when expired",
+        "5. View and manage tokens in Admin Dashboard → Social Media",
+      ],
     };
 
-    console.log('LinkedIn OAuth flow completed successfully:', {
+    console.log("LinkedIn OAuth flow completed successfully:", {
       userId: userId,
-      tokenSaved: true
+      tokenSaved: true,
     });
 
     // Return formatted HTML response
-    res.setHeader('Content-Type', 'text/html');
-    res.status(200).send(generateSuccessHTML(response));
-
+    if (!res.headersSent) {
+      res.setHeader("Content-Type", "text/html");
+      res.status(200).send(generateSuccessHTML(response));
+    }
   } catch (error) {
-    console.error('Token exchange error:', error.message);
-    console.error('Error details:', JSON.stringify(error.response?.data, null, 2));
-    console.error('Error status:', error.response?.status);
-    console.error('Error headers:', error.response?.headers);
-    console.error('Request config:', {
+    console.error("Token exchange error:", error.message);
+    console.error(
+      "Error details:",
+      JSON.stringify(error.response?.data, null, 2)
+    );
+    console.error("Error status:", error.response?.status);
+    console.error("Error headers:", error.response?.headers);
+    console.error("Request config:", {
       url: error.config?.url,
       method: error.config?.method,
       redirectUri: REDIRECT_URI,
       hasClientId: !!LINKEDIN_CLIENT_ID,
       hasClientSecret: !!LINKEDIN_CLIENT_SECRET,
       clientIdLength: LINKEDIN_CLIENT_ID?.length || 0,
-      clientSecretLength: LINKEDIN_CLIENT_SECRET?.length || 0
+      clientSecretLength: LINKEDIN_CLIENT_SECRET?.length || 0,
     });
 
     // Check for missing environment variables first
     if (!LINKEDIN_CLIENT_SECRET) {
-      console.error('❌ LINKEDIN_CLIENT_SECRET is missing!');
-      res.setHeader('Content-Type', 'text/html');
-      return res.status(500).send(generateErrorHTML(
-        'Configuration Error',
-        'LINKEDIN_CLIENT_SECRET is not set in Vercel environment variables. This is required for token exchange.',
-        [
-          '1. Go to Vercel Dashboard → Your Project → Settings → Environment Variables',
-          '2. Add LINKEDIN_CLIENT_SECRET with your Primary Client Secret (get from LinkedIn Developer Console)',
-          '3. Make sure it\'s set for Production, Preview, and Development',
-          '4. Wait 1-2 minutes for Vercel to redeploy',
-          '5. Try the authorization flow again'
-        ]
-      ));
+      console.error("❌ LINKEDIN_CLIENT_SECRET is missing!");
+      if (!res.headersSent) {
+        res.setHeader("Content-Type", "text/html");
+        return res
+          .status(500)
+          .send(
+            generateErrorHTML(
+              "Configuration Error",
+              "LINKEDIN_CLIENT_SECRET is not set in Vercel environment variables. This is required for token exchange.",
+              [
+                "1. Go to Vercel Dashboard → Your Project → Settings → Environment Variables",
+                "2. Add LINKEDIN_CLIENT_SECRET with your Primary Client Secret (get from LinkedIn Developer Console)",
+                "3. Make sure it's set for Production, Preview, and Development",
+                "4. Wait 1-2 minutes for Vercel to redeploy",
+                "5. Try the authorization flow again",
+              ]
+            )
+          );
+      }
+      return;
     }
-    
+
     if (!LINKEDIN_CLIENT_ID) {
-      console.error('❌ LINKEDIN_CLIENT_ID is missing!');
-      res.setHeader('Content-Type', 'text/html');
-      return res.status(500).send(generateErrorHTML(
-        'Configuration Error',
-        'LINKEDIN_CLIENT_ID is not set in Vercel environment variables.',
-        [
-          '1. Go to Vercel Dashboard → Your Project → Settings → Environment Variables',
-          '2. Add LINKEDIN_CLIENT_ID = 78pjq1wt4wz1fs',
-          '3. Make sure it\'s set for Production, Preview, and Development',
-          '4. Wait 1-2 minutes for Vercel to redeploy',
-          '5. Try the authorization flow again'
-        ]
-      ));
+      console.error("❌ LINKEDIN_CLIENT_ID is missing!");
+      if (!res.headersSent) {
+        res.setHeader("Content-Type", "text/html");
+        return res
+          .status(500)
+          .send(
+            generateErrorHTML(
+              "Configuration Error",
+              "LINKEDIN_CLIENT_ID is not set in Vercel environment variables.",
+              [
+                "1. Go to Vercel Dashboard → Your Project → Settings → Environment Variables",
+                "2. Add LINKEDIN_CLIENT_ID = 78pjq1wt4wz1fs",
+                "3. Make sure it's set for Production, Preview, and Development",
+                "4. Wait 1-2 minutes for Vercel to redeploy",
+                "5. Try the authorization flow again",
+              ]
+            )
+          );
+      }
+      return;
     }
 
     // Handle specific error cases
@@ -315,107 +374,137 @@ module.exports = async (req, res) => {
       const linkedinError = error.response.data;
       const errorCode = linkedinError.error;
       // Try multiple ways to extract error description
-      const errorDescription = linkedinError.error_description || 
-                               linkedinError.error || 
-                               linkedinError.message ||
-                               linkedinError.detail ||
-                               (typeof linkedinError === 'string' ? linkedinError : 'Unknown error');
-      
-      console.error('LinkedIn error code:', errorCode);
-      console.error('LinkedIn error description:', errorDescription);
-      console.error('Full LinkedIn error response:', JSON.stringify(linkedinError, null, 2));
-      
-      let errorTitle = 'LinkedIn API Error';
+      const errorDescription =
+        linkedinError.error_description ||
+        linkedinError.error ||
+        linkedinError.message ||
+        linkedinError.detail ||
+        (typeof linkedinError === "string" ? linkedinError : "Unknown error");
+
+      console.error("LinkedIn error code:", errorCode);
+      console.error("LinkedIn error description:", errorDescription);
+      console.error(
+        "Full LinkedIn error response:",
+        JSON.stringify(linkedinError, null, 2)
+      );
+
+      let errorTitle = "LinkedIn API Error";
       let errorMessage = errorDescription;
       let troubleshooting = [];
 
       // Log the full error for debugging
-      console.error('LinkedIn API Error Response:', {
-        status: statusCode,
+      console.error("LinkedIn API Error Response:", {
+        status: error.response?.status,
         errorCode: errorCode,
         errorDescription: errorDescription,
-        fullResponse: JSON.stringify(linkedinError, null, 2)
+        fullResponse: JSON.stringify(linkedinError, null, 2),
       });
-      
+
       // Handle specific LinkedIn error codes
-      if (errorCode === 'invalid_grant' || errorDescription.includes('expired') || errorDescription.includes('invalid')) {
-        errorTitle = 'Authorization Code Error';
-        errorMessage = 'The authorization code is invalid or has expired. Authorization codes expire quickly and can only be used once.';
+      if (
+        errorCode === "invalid_grant" ||
+        errorDescription.includes("expired") ||
+        errorDescription.includes("invalid")
+      ) {
+        errorTitle = "Authorization Code Error";
+        errorMessage =
+          "The authorization code is invalid or has expired. Authorization codes expire quickly and can only be used once.";
         troubleshooting = [
           '1. Click "🔄 Try Again" to start a fresh authorization',
-          '2. Complete the authorization flow quickly (don\'t wait too long)',
+          "2. Complete the authorization flow quickly (don't wait too long)",
           '3. Make sure you\'re clicking "Allow" on LinkedIn immediately',
-          '4. Don\'t refresh or go back during the authorization process'
+          "4. Don't refresh or go back during the authorization process",
         ];
-      } else if (errorCode === 'invalid_client' || errorDescription.includes('client')) {
-        errorTitle = 'Client Credentials Error';
-        errorMessage = 'LinkedIn client ID or client secret is incorrect.';
+      } else if (
+        errorCode === "invalid_client" ||
+        errorDescription.includes("client")
+      ) {
+        errorTitle = "Client Credentials Error";
+        errorMessage = "LinkedIn client ID or client secret is incorrect.";
         troubleshooting = [
-          '1. Check your LINKEDIN_CLIENT_ID in Vercel environment variables',
-          '2. Check your LINKEDIN_CLIENT_SECRET in Vercel environment variables',
-          '3. Make sure there are no extra spaces or characters',
-          '4. Redeploy your application after updating environment variables'
+          "1. Check your LINKEDIN_CLIENT_ID in Vercel environment variables",
+          "2. Check your LINKEDIN_CLIENT_SECRET in Vercel environment variables",
+          "3. Make sure there are no extra spaces or characters",
+          "4. Redeploy your application after updating environment variables",
         ];
-      } else if (errorCode === 'redirect_uri_mismatch' || errorDescription.includes('redirect') || errorDescription.includes('URI')) {
-        errorTitle = 'Redirect URI Mismatch';
-        errorMessage = 'The redirect URI doesn\'t match what\'s configured in LinkedIn.';
+      } else if (
+        errorCode === "redirect_uri_mismatch" ||
+        errorDescription.includes("redirect") ||
+        errorDescription.includes("URI")
+      ) {
+        errorTitle = "Redirect URI Mismatch";
+        errorMessage =
+          "The redirect URI doesn't match what's configured in LinkedIn.";
         troubleshooting = [
-          '1. Go to LinkedIn Developer Console: https://www.linkedin.com/developers/apps',
-          '2. Select your app → Auth tab',
+          "1. Go to LinkedIn Developer Console: https://www.linkedin.com/developers/apps",
+          "2. Select your app → Auth tab",
           '3. Under "Authorized redirect URLs", add exactly:',
           `   ${REDIRECT_URI}`,
-          '4. Make sure it matches exactly (including https:// and www.)',
-          '5. Click "Update" and try again'
+          "4. Make sure it matches exactly (including https:// and www.)",
+          '5. Click "Update" and try again',
         ];
       } else {
         // For unknown errors, provide comprehensive troubleshooting
         troubleshooting = [
-          '1. **Check Vercel Environment Variables**:',
-          '   - Go to Vercel Dashboard → Settings → Environment Variables',
-          '   - Verify LINKEDIN_CLIENT_ID = 78pjq1wt4wz1fs',
-          '   - Verify LINKEDIN_CLIENT_SECRET is set (use Primary Client Secret)',
-          '   - Verify LINKEDIN_REDIRECT_URI = https://www.tnrbusinesssolutions.com/api/auth/linkedin/callback',
-          '   - Make sure all are set for Production, Preview, and Development',
-          '   - Redeploy after adding/updating variables',
-          '',
-          '2. **Verify LinkedIn App Settings**:',
-          '   - Go to https://www.linkedin.com/developers/apps',
-          '   - Select your app → Auth tab',
+          "1. **Check Vercel Environment Variables**:",
+          "   - Go to Vercel Dashboard → Settings → Environment Variables",
+          "   - Verify LINKEDIN_CLIENT_ID = 78pjq1wt4wz1fs",
+          "   - Verify LINKEDIN_CLIENT_SECRET is set (use Primary Client Secret)",
+          "   - Verify LINKEDIN_REDIRECT_URI = https://www.tnrbusinesssolutions.com/api/auth/linkedin/callback",
+          "   - Make sure all are set for Production, Preview, and Development",
+          "   - Redeploy after adding/updating variables",
+          "",
+          "2. **Verify LinkedIn App Settings**:",
+          "   - Go to https://www.linkedin.com/developers/apps",
+          "   - Select your app → Auth tab",
           '   - Under "Authorized redirect URLs", verify:',
-          '     https://www.tnrbusinesssolutions.com/api/auth/linkedin/callback',
-          '   - Must match exactly (including https:// and www.)',
-          '',
-          '3. **Check Vercel Logs**:',
-          '   - Go to Vercel Dashboard → Your Project → Logs',
-          '   - Look for detailed error messages',
-          '   - Check for any configuration issues',
-          '',
-          '4. **Try Again**:',
-          '   - Clear browser cache or use incognito mode',
+          "     https://www.tnrbusinesssolutions.com/api/auth/linkedin/callback",
+          "   - Must match exactly (including https:// and www.)",
+          "",
+          "3. **Check Vercel Logs**:",
+          "   - Go to Vercel Dashboard → Your Project → Logs",
+          "   - Look for detailed error messages",
+          "   - Check for any configuration issues",
+          "",
+          "4. **Try Again**:",
+          "   - Clear browser cache or use incognito mode",
           '   - Click "🔄 Try Again" to start fresh',
-          '   - Complete the authorization flow quickly (codes expire fast)'
+          "   - Complete the authorization flow quickly (codes expire fast)",
         ];
       }
 
-      res.setHeader('Content-Type', 'text/html');
-      return res.status(400).send(generateErrorHTML(
-        errorTitle,
-        errorMessage,
-        troubleshooting,
-        errorCode
-      ));
+      if (!res.headersSent) {
+        res.setHeader("Content-Type", "text/html");
+        return res
+          .status(400)
+          .send(
+            generateErrorHTML(
+              errorTitle,
+              errorMessage,
+              troubleshooting,
+              errorCode
+            )
+          );
+      }
+      return;
     }
 
-    res.setHeader('Content-Type', 'text/html');
-    return res.status(500).send(generateErrorHTML(
-      'Internal Server Error',
-      error.message || 'Please try the authorization flow again.',
-      [
-        '1. Check Vercel logs for more details',
-        '2. Verify environment variables are set correctly',
-        '3. Try the authorization flow again'
-      ]
-    ));
+    if (!res.headersSent) {
+      res.setHeader("Content-Type", "text/html");
+      return res
+        .status(500)
+        .send(
+          generateErrorHTML(
+            "Internal Server Error",
+            error.message || "Please try the authorization flow again.",
+            [
+              "1. Check Vercel logs for more details",
+              "2. Verify environment variables are set correctly",
+              "3. Try the authorization flow again",
+            ]
+          )
+        );
+    }
   }
 };
 
@@ -515,9 +604,15 @@ function generateSuccessHTML(data) {
         <div class="section">
             <h3>👤 Your LinkedIn Profile</h3>
             <div class="profile-info">
-                <strong>Name:</strong> ${data.profile.firstName} ${data.profile.lastName}<br>
+                <strong>Name:</strong> ${data.profile.firstName} ${
+    data.profile.lastName
+  }<br>
                 <strong>LinkedIn ID:</strong> ${data.profile.id}<br>
-                ${data.profile.email ? `<strong>Email:</strong> ${data.profile.email}<br>` : ''}
+                ${
+                  data.profile.email
+                    ? `<strong>Email:</strong> ${data.profile.email}<br>`
+                    : ""
+                }
             </div>
         </div>
         
@@ -526,25 +621,37 @@ function generateSuccessHTML(data) {
             <p style="margin-bottom: 15px;">This token has been saved to the database automatically.</p>
             <div style="margin: 20px 0;">
                 <strong>Access Token:</strong>
-                <div class="token-box" id="accessToken">${data.authorization.accessToken}</div>
+                <div class="token-box" id="accessToken">${
+                  data.authorization.accessToken
+                }</div>
                 <button class="copy-btn" onclick="copyToken('accessToken')">📋 Copy Token</button>
                 <p style="color: #666; font-size: 14px; margin-top: 10px;">
-                    ${data.authorization.expiresInDays ? `Expires in ${data.authorization.expiresInDays} days` : 'Never expires'}
+                    ${
+                      data.authorization.expiresInDays
+                        ? `Expires in ${data.authorization.expiresInDays} days`
+                        : "Never expires"
+                    }
                 </p>
             </div>
-            ${data.authorization.refreshToken ? `
+            ${
+              data.authorization.refreshToken
+                ? `
             <div style="margin: 20px 0;">
                 <strong>Refresh Token:</strong>
                 <div class="token-box" id="refreshToken">${data.authorization.refreshToken}</div>
                 <button class="copy-btn" onclick="copyToken('refreshToken')">📋 Copy Refresh Token</button>
                 <p style="color: #28a745; font-size: 14px; margin-top: 10px;">✅ Can be used to refresh access token</p>
             </div>
-            ` : ''}
+            `
+                : ""
+            }
         </div>
         
         <div class="next-steps">
             <h3>🎯 Next Steps</h3>
-            <ol>${data.nextSteps.map(step => `<li>${step}</li>`).join('')}</ol>
+            <ol>${data.nextSteps
+              .map((step) => `<li>${step}</li>`)
+              .join("")}</ol>
         </div>
         
         <div style="text-align: center; margin-top: 30px;">
@@ -571,7 +678,12 @@ function generateSuccessHTML(data) {
 }
 
 // HTML generation function for error page
-function generateErrorHTML(error, details, troubleshooting = [], errorCode = null) {
+function generateErrorHTML(
+  error,
+  details,
+  troubleshooting = [],
+  errorCode = null
+) {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -668,17 +780,25 @@ function generateErrorHTML(error, details, troubleshooting = [], errorCode = nul
         <div class="error-message">
             <h3>${error}</h3>
             <p>${details}</p>
-            ${errorCode ? `<div class="error-code">Error Code: ${errorCode}</div>` : ''}
+            ${
+              errorCode
+                ? `<div class="error-code">Error Code: ${errorCode}</div>`
+                : ""
+            }
         </div>
         
-        ${troubleshooting.length > 0 ? `
+        ${
+          troubleshooting.length > 0
+            ? `
         <div class="troubleshooting">
             <h3>🔧 How to Fix This</h3>
             <ol>
-                ${troubleshooting.map(step => `<li>${step}</li>`).join('')}
+                ${troubleshooting.map((step) => `<li>${step}</li>`).join("")}
             </ol>
         </div>
-        ` : ''}
+        `
+            : ""
+        }
         
         <div style="text-align: center; margin-top: 30px;">
             <a href="/api/auth/linkedin" class="btn btn-primary">🔄 Try Again</a>
@@ -689,4 +809,3 @@ function generateErrorHTML(error, details, troubleshooting = [], errorCode = nul
 </body>
 </html>`;
 }
-

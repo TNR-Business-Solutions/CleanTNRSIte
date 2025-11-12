@@ -1,13 +1,16 @@
 // HTTP Utilities for Raw Node.js HTTP Server
 // Provides Express-like helpers for request/response handling
 
-const { URL } = require('url');
+const { URL } = require("url");
 
 /**
  * Parse query string from request URL
  */
 function parseQuery(req) {
-  const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+  const parsedUrl = new URL(
+    req.url,
+    `http://${req.headers.host || "localhost"}`
+  );
   const query = {};
   parsedUrl.searchParams.forEach((value, key) => {
     query[key] = value;
@@ -20,13 +23,13 @@ function parseQuery(req) {
  */
 function parseBody(req) {
   return new Promise((resolve, reject) => {
-    let body = '';
-    req.on('data', chunk => {
+    let body = "";
+    req.on("data", (chunk) => {
       body += chunk.toString();
     });
-    req.on('end', () => {
+    req.on("end", () => {
       try {
-        if (body.trim() === '') {
+        if (body.trim() === "") {
           resolve({});
         } else {
           resolve(JSON.parse(body));
@@ -35,7 +38,7 @@ function parseBody(req) {
         reject(error);
       }
     });
-    req.on('error', reject);
+    req.on("error", reject);
   });
 }
 
@@ -43,13 +46,17 @@ function parseBody(req) {
  * Send JSON response
  */
 function sendJson(res, statusCode, data) {
-  res.writeHead(statusCode, { 'Content-Type': 'application/json' });
+  // Check if headers have already been sent
+  if (res.headersSent) {
+    console.warn("Attempted to send response after headers were already sent");
+    return;
+  }
+  res.writeHead(statusCode, { "Content-Type": "application/json" });
   res.end(JSON.stringify(data));
 }
 
 module.exports = {
   parseQuery,
   parseBody,
-  sendJson
+  sendJson,
 };
-

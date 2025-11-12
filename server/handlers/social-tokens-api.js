@@ -322,9 +322,14 @@ module.exports = async (req, res) => {
     });
   } catch (error) {
     console.error("Token API error:", error);
-    sendJson(res, 500, {
-      success: false,
-      error: error.message || "Internal server error",
-    });
+    // Only send error response if headers haven't been sent yet
+    if (!res.headersSent) {
+      sendJson(res, 500, {
+        success: false,
+        error: error.message || "Internal server error",
+      });
+    } else {
+      console.error("Cannot send error response - headers already sent");
+    }
   }
 };
