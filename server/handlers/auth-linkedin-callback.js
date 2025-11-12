@@ -225,7 +225,8 @@ module.exports = async (req, res) => {
     }
 
     const userProfile = profileResponse.data;
-    const userId = userProfile.id;
+    // OpenID Connect userinfo returns 'sub' as user ID, /v2/me returns 'id'
+    const userId = userProfile.sub || userProfile.id;
 
     // Extract name (handles both v1 and v2 API formats)
     const firstName =
