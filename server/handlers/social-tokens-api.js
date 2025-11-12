@@ -6,14 +6,16 @@ const axios = require("axios");
 const { parseQuery, parseBody, sendJson } = require("./http-utils");
 
 module.exports = async (req, res) => {
-  // Set CORS headers
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, DELETE, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
+  // Handle OPTIONS requests (CORS preflight)
   if (req.method === "OPTIONS") {
-    res.writeHead(200);
-    res.end();
+    if (!res.headersSent) {
+      res.writeHead(200, {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, DELETE, POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+      });
+      res.end();
+    }
     return;
   }
 
