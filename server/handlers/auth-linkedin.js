@@ -21,11 +21,10 @@ module.exports = (req, res) => {
 
   // Define required permissions for LinkedIn posting
   // w_member_social - Post content on behalf of the user (required for posting)
-  // openid profile - Get user ID (OpenID Connect, replaces deprecated r_liteprofile)
+  // Note: openid and profile scopes are not available for all LinkedIn apps
+  // We'll use w_member_social only and get user ID from token introspection or UGC Posts API
   const scopes = [
     "w_member_social", // Post content on LinkedIn (required for UGC Posts API)
-    "openid",          // OpenID Connect for user identification
-    "profile",         // Basic profile information (includes user ID)
   ];
 
   // Generate state for CSRF protection

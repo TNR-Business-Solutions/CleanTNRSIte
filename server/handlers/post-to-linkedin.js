@@ -70,7 +70,8 @@ module.exports = async (req, res) => {
     console.log('Creating LinkedIn post...');
 
     // Step 1: Get user's LinkedIn URN (unique resource name)
-    // Try to use stored user ID first (avoids profile API call which requires profile scope)
+    // LinkedIn UGC Posts API requires the author URN
+    // Since we don't have profile scope, we'll try multiple approaches
     let userUrn;
     
     if (storedUserId && !storedUserId.startsWith('linkedin_user_')) {
@@ -78,7 +79,18 @@ module.exports = async (req, res) => {
       userUrn = `urn:li:person:${storedUserId}`;
       console.log('✅ Using stored user ID to construct URN:', userUrn);
     } else {
-      // Fallback: Try to fetch profile (may fail without profile scope, but worth trying)
+      // Try to get user ID from token introspection or profile API
+      let userId = null;
+      
+      // Approach 1: Try token introspection (if available)
+      try {
+        console.log('Attempting token introspection...');
+        // LinkedIn doesn't have a standard token introspection endpoint, skip this
+      } catch (introspectionError) {
+        console.log('Token introspection not available');
+      }
+      
+      // Approach 2: Try to fetch profile (may fail without profile scope)
       try {
         console.log('⚠️ No stored user ID found, attempting to fetch profile...');
         const profileResponse = await axios.get('https://api.linkedin.com/v2/me', {
@@ -89,18 +101,18 @@ module.exports = async (req, res) => {
           timeout: 10000
         });
         
-        if (profileResponse.data && profileResponse.data.id) {
-          userUrn = `urn:li:person:${profileResponse.data.id}`;
-          console.log('✅ Successfully fetched profile, URN:', userUrn);
+        if (profileResponse.data && (profileResponse.data.id || profileResponse.data.sub)) {
+          userId = profileResponse.data.id || profileResponse.data.sub;
+          console.log('✅ Successfully fetched profile, user ID:', userId);
           
           // Update database with the user ID for future use
-          if (linkedinToken && linkedinToken.id) {
+          if (linkedinToken && linkedinToken.id && userId) {
             try {
               const db = new TNRDatabase();
               await db.initialize();
               await db.execute(
                 'UPDATE social_media_tokens SET user_id = ?, page_id = ? WHERE id = ?',
-                [profileResponse.data.id, profileResponse.data.id, linkedinToken.id]
+                [userId, userId, linkedinToken.id]
               );
               console.log('✅ Updated database with user ID');
             } catch (updateError) {
@@ -112,20 +124,28 @@ module.exports = async (req, res) => {
         }
       } catch (profileError) {
         // Profile fetch failed (likely due to missing profile scope)
-        console.warn('⚠️ Profile fetch failed (expected without profile scope):', profileError.message);
-        
-        // If we have a fallback user ID, try using it (though it may not work)
-        if (storedUserId) {
-          userUrn = `urn:li:person:${storedUserId}`;
-          console.log('⚠️ Using fallback user ID (may not work):', userUrn);
-        } else {
-          // Last resort: throw error with helpful message
-          throw new Error(
-            'Unable to determine LinkedIn user ID. ' +
-            'Please reconnect your LinkedIn account to refresh the token and user information. ' +
-            'The profile API requires additional permissions that may not be available.'
-          );
+        console.warn('⚠️ Profile fetch failed:', profileError.message);
+        if (profileError.response) {
+          console.warn('Profile error status:', profileError.response.status);
+          console.warn('Profile error data:', JSON.stringify(profileError.response.data, null, 2));
         }
+      }
+      
+      // Construct URN from user ID
+      if (userId) {
+        userUrn = `urn:li:person:${userId}`;
+        console.log('✅ Constructed URN from user ID:', userUrn);
+      } else if (storedUserId) {
+        // Use fallback (may not work)
+        userUrn = `urn:li:person:${storedUserId}`;
+        console.log('⚠️ Using fallback user ID (may not work):', userUrn);
+      } else {
+        // Last resort: throw error with helpful message
+        throw new Error(
+          'Unable to determine LinkedIn user ID. ' +
+          'Please reconnect your LinkedIn account. ' +
+          'The LinkedIn app may need additional permissions configured in LinkedIn Developer Portal.'
+        );
       }
     }
 
@@ -219,14 +239,42 @@ module.exports = async (req, res) => {
                           linkedinError.errorDetails || 
                           linkedinError.error?.message ||
                           linkedinError.error ||
-                          JSON.stringify(linkedinError);
+                          (typeof linkedinError === 'string' ? linkedinError : JSON.stringify(linkedinError));
       
-      return res.status(400).json({
+      // Check for specific error codes
+      const statusCode = error.response?.status || 400;
+      let helpMessage = null;
+      
+      if (statusCode === 422) {
+        helpMessage = {
+          title: 'Invalid Request Format',
+          steps: [
+            '1. The UGC post format may be incorrect',
+            '2. The user URN may be invalid',
+            '3. Please reconnect your LinkedIn account to get a fresh token',
+            '4. Check that your LinkedIn app has the correct permissions in LinkedIn Developer Portal'
+          ]
+        };
+      } else if (statusCode === 403) {
+        helpMessage = {
+          title: 'Permission Denied',
+          steps: [
+            '1. Your LinkedIn app may not have the required permissions',
+            '2. Go to LinkedIn Developer Portal and verify w_member_social scope is approved',
+            '3. Reconnect your LinkedIn account',
+            '4. Check that your app is in the correct status (Live or Development)'
+          ]
+        };
+      }
+      
+      return res.status(statusCode).json({
         success: false,
         error: 'LinkedIn API Error',
         message: errorMessage,
         errorType: linkedinError.errorCode || linkedinError.error?.errorCode,
         errorCode: linkedinError.errorCode,
+        statusCode: statusCode,
+        help: helpMessage,
         fullError: linkedinError,
         details: linkedinError
       });
