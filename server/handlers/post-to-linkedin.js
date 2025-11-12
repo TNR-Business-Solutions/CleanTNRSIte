@@ -147,6 +147,12 @@ module.exports = async (req, res) => {
       }
     };
 
+    console.log('Creating UGC post with:', {
+      author: userUrn,
+      contentLength: content.length,
+      contentPreview: content.substring(0, 100) + '...'
+    });
+
     const postResponse = await axios.post(
       'https://api.linkedin.com/v2/ugcPosts',
       ugcPost,
@@ -173,7 +179,14 @@ module.exports = async (req, res) => {
 
   } catch (error) {
     console.error('LinkedIn posting error:', error.message);
-    console.error('Error details:', error.response?.data);
+    console.error('Error details:', JSON.stringify(error.response?.data, null, 2));
+    console.error('Error status:', error.response?.status);
+    console.error('Error headers:', error.response?.headers);
+    console.error('Request config:', {
+      url: error.config?.url,
+      method: error.config?.method,
+      data: error.config?.data ? JSON.parse(error.config.data) : null
+    });
     console.error('Error stack:', error.stack);
 
     // Handle specific error cases
@@ -201,11 +214,20 @@ module.exports = async (req, res) => {
         });
       }
       
+      // Extract more detailed error information
+      const errorMessage = linkedinError.message || 
+                          linkedinError.errorDetails || 
+                          linkedinError.error?.message ||
+                          linkedinError.error ||
+                          JSON.stringify(linkedinError);
+      
       return res.status(400).json({
         success: false,
         error: 'LinkedIn API Error',
-        message: linkedinError.message || linkedinError.errorDetails || linkedinError.error || 'Failed to post to LinkedIn',
-        errorType: linkedinError.errorCode,
+        message: errorMessage,
+        errorType: linkedinError.errorCode || linkedinError.error?.errorCode,
+        errorCode: linkedinError.errorCode,
+        fullError: linkedinError,
         details: linkedinError
       });
     }
