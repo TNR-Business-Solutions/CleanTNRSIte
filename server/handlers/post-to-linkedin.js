@@ -81,7 +81,7 @@ module.exports = async (req, res) => {
     // Step 1: Get user's LinkedIn URN (unique resource name)
     // LinkedIn UGC Posts API requires the author URN
     // Since we don't have profile scope, we'll try multiple approaches
-    let userUrn;
+    let userUrn = null;
 
     if (storedUserId && !storedUserId.startsWith("linkedin_user_")) {
       // We have a real LinkedIn user ID stored, use it directly
@@ -232,8 +232,8 @@ module.exports = async (req, res) => {
       method: error.config?.method,
       data: error.config?.data ? JSON.parse(error.config.data) : null,
     });
-    console.error("User URN used:", userUrn);
-    console.error("Stored user ID:", storedUserId);
+    console.error("User URN used:", userUrn || "NOT DEFINED");
+    console.error("Stored user ID:", storedUserId || "NOT DEFINED");
     console.error("Error stack:", error.stack);
 
     // Handle specific error cases
