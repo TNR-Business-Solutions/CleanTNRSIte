@@ -205,7 +205,10 @@
                     
                     <div id="contentPreview" class="post-preview hidden" role="region" aria-label="Generated content preview">
                         <h4>Generated Post:</h4>
-                        <div id="previewContent"></div>
+                        <textarea id="previewContent" rows="8" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 14px; line-height: 1.6; resize: vertical; min-height: 150px;" placeholder="Generated content will appear here. You can edit it before posting."></textarea>
+                        <div style="text-align: right; margin-top: 5px; color: #666; font-size: 14px;">
+                            <span id="facebookCharCountPreview">0</span> characters
+                        </div>
                         <div class="hashtag-suggestions" id="hashtagSuggestions"></div>
                         <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
                             <button class="btn" onclick="postToFacebook()" style="flex: 1; min-width: 200px;">📤 Post to Facebook</button>
@@ -314,7 +317,7 @@
                     
                     <div id="contentPreviewLinkedIn" class="post-preview hidden" role="region" aria-label="Generated LinkedIn content preview">
                         <h4>Generated LinkedIn Post:</h4>
-                        <div id="previewContentLinkedIn" style="white-space: pre-wrap; line-height: 1.6;"></div>
+                        <textarea id="previewContentLinkedIn" rows="10" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 14px; line-height: 1.6; resize: vertical; min-height: 200px; white-space: pre-wrap;" placeholder="Generated content will appear here. You can edit it before posting."></textarea>
                         <div style="margin-top: 10px; padding: 10px; background: #f0f7ff; border-radius: 4px; font-size: 0.9rem; color: #0077b5;">
                             <strong>Character Count:</strong> <span id="linkedInCharCountPreview">0</span> characters
                             <br><small>LinkedIn posts can be up to 3,000 characters. Professional, longer-form content performs well.</small>
@@ -393,7 +396,7 @@
                     
                     <div id="contentPreviewTwitter" class="post-preview hidden" role="region" aria-label="Generated content preview">
                         <h4>Generated Tweet:</h4>
-                        <div id="previewContentTwitter"></div>
+                        <textarea id="previewContentTwitter" rows="6" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 14px; line-height: 1.6; resize: vertical; min-height: 120px;" placeholder="Generated content will appear here. You can edit it before posting."></textarea>
                         <div style="text-align: right; margin-top: 5px; color: #666; font-size: 14px;">
                             <span id="twitterCharCountPreview">0</span>/280 characters
                         </div>
@@ -1200,7 +1203,7 @@
         }
         
         async function postToFacebook() {
-            const content = document.getElementById('previewContent').textContent;
+            const content = document.getElementById('previewContent').value.trim();
             const imageUrl = document.getElementById('postImageUrl').value.trim();
             const token = localStorage.getItem('metaPageAccessToken');
             
@@ -1269,7 +1272,7 @@
         }
         
         async function postToInstagram() {
-            const content = document.getElementById('previewContent').textContent;
+            const content = document.getElementById('previewContent').value.trim();
             const imageUrl = document.getElementById('postImageUrl').value.trim();
             const token = localStorage.getItem('metaPageAccessToken');
             
@@ -1577,8 +1580,11 @@
                 .replace(/{industry}/g, getIndustryName(industryType))
                 .replace(/#{location}/g, '#' + location.replace(/\s+/g, ''));
             
-            document.getElementById('previewContent').textContent = content;
+            const previewTextarea = document.getElementById('previewContent');
+            previewTextarea.value = content;
             document.getElementById('contentPreview').classList.remove('hidden');
+            // Update character count
+            updateFacebookCharCount();
         }
         
         function getIndustryName(industryType) {
@@ -1682,23 +1688,11 @@
             }
             
             // Update preview
-            document.getElementById('previewContentTwitter').textContent = content;
+            const twitterTextarea = document.getElementById('previewContentTwitter');
+            twitterTextarea.value = content;
             document.getElementById('contentPreviewTwitter').classList.remove('hidden');
-            
             // Update character count
-            const charCount = content.length;
-            const charCountEl = document.getElementById('twitterCharCountPreview');
-            if (charCountEl) {
-                charCountEl.textContent = charCount;
-                // Color code: green if under 280, yellow if close, red if over
-                if (charCount <= 260) {
-                    charCountEl.style.color = '#28a745';
-                } else if (charCount <= 280) {
-                    charCountEl.style.color = '#ffc107';
-                } else {
-                    charCountEl.style.color = '#dc3545';
-                }
-            }
+            updateTwitterCharCount();
         }
         
         // Generate LinkedIn content (professional, longer-form)
@@ -1784,28 +1778,16 @@
                 .replace(/{development3}/g, 'Regulatory updates affecting the industry');
             
             // Update preview
-            document.getElementById('previewContentLinkedIn').textContent = content;
+            const linkedInTextarea = document.getElementById('previewContentLinkedIn');
+            linkedInTextarea.value = content;
             document.getElementById('contentPreviewLinkedIn').classList.remove('hidden');
-            
             // Update character count
-            const charCount = content.length;
-            const charCountEl = document.getElementById('linkedInCharCountPreview');
-            if (charCountEl) {
-                charCountEl.textContent = charCount;
-                // Color code: green if good length, yellow if short, red if too long
-                if (charCount >= 200 && charCount <= 2000) {
-                    charCountEl.style.color = '#28a745';
-                } else if (charCount < 200) {
-                    charCountEl.style.color = '#ffc107';
-                } else {
-                    charCountEl.style.color = '#dc3545';
-                }
-            }
+            updateLinkedInCharCount();
         }
         
         // Post generated content to LinkedIn
         async function postGeneratedToLinkedIn() {
-            const content = document.getElementById('previewContentLinkedIn')?.textContent?.trim();
+            const content = document.getElementById('previewContentLinkedIn')?.value?.trim();
             
             if (!content) {
                 alert('Please generate content first');
@@ -1890,7 +1872,7 @@
         
         // Copy LinkedIn content to clipboard
         function copyLinkedInContent() {
-            const content = document.getElementById('previewContentLinkedIn')?.textContent?.trim();
+            const content = document.getElementById('previewContentLinkedIn')?.value?.trim();
             if (!content) {
                 alert('No content to copy');
                 return;
@@ -1906,7 +1888,7 @@
         
         // Post generated content to Twitter
         async function postGeneratedToTwitter() {
-            const content = document.getElementById('previewContentTwitter')?.textContent?.trim();
+            const content = document.getElementById('previewContentTwitter')?.value?.trim();
             const statusDiv = document.getElementById('twitterStatus');
             
             if (!content) {
