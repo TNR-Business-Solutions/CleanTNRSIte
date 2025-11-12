@@ -18,10 +18,9 @@ module.exports = (req, res) => {
 
   // Define required permissions for LinkedIn posting
   // w_member_social - Post content on behalf of the user (required for posting)
-  // r_liteprofile - Read basic profile info (optional, for displaying user name)
+  // Note: r_liteprofile is deprecated by LinkedIn, removed to avoid authorization errors
   const scopes = [
-    'w_member_social',     // Post content on LinkedIn (required for UGC Posts API)
-    'r_liteprofile'        // Read basic profile info (optional, for user display)
+    'w_member_social'     // Post content on LinkedIn (required for UGC Posts API)
   ];
 
   // Generate state for CSRF protection
