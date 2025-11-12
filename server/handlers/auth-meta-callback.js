@@ -9,9 +9,8 @@ module.exports = async (req, res) => {
   const { code, error, error_description, state } = req.query;
   
   // Get configuration from environment variables
-  const META_APP_ID = process.env.META_APP_ID;
-  const META_APP_SECRET = process.env.META_APP_SECRET;
-  const REDIRECT_URI = process.env.META_REDIRECT_URI || 'https://www.tnrbusinesssolutions.com/api/auth/meta/callback';
+  const { META_APP_ID, META_APP_SECRET, META_REDIRECT_URI } = process.env;
+  const REDIRECT_URI = META_REDIRECT_URI || 'https://www.tnrbusinesssolutions.com/api/auth/meta/callback';
 
   // Validate configuration
   if (!META_APP_ID || !META_APP_SECRET) {
@@ -119,9 +118,16 @@ module.exports = async (req, res) => {
 
     // Step 4: For each page with Instagram, fetch Instagram account details
     console.log('Fetching Instagram accounts...');
+    console.log('Pages found:', pages.length);
+    console.log('Pages with Instagram Business Account:', pages.filter(p => p.instagram_business_account).length);
+    
     const pagesWithInstagram = await Promise.all(
       pages.map(async (page) => {
+        console.log(`Processing page: ${page.name} (${page.id})`);
+        console.log(`Has Instagram Business Account: ${!!page.instagram_business_account}`);
+        
         if (page.instagram_business_account) {
+          console.log(`Instagram Business Account ID: ${page.instagram_business_account.id}`);
           try {
             const igResponse = await axios.get(
               `https://graph.facebook.com/v19.0/${page.instagram_business_account.id}`,
@@ -133,14 +139,27 @@ module.exports = async (req, res) => {
                 timeout: 10000
               }
             );
+            console.log(`✅ Successfully fetched Instagram account for ${page.name}:`, igResponse.data.username);
             return {
               ...page,
               instagram_account: igResponse.data
             };
           } catch (igError) {
-            console.error('Error fetching Instagram account:', igError.message);
+            console.error(`❌ Error fetching Instagram account for ${page.name}:`, igError.message);
+            if (igError.response) {
+              console.error('Instagram API Error Status:', igError.response.status);
+              console.error('Instagram API Error Data:', JSON.stringify(igError.response.data, null, 2));
+            }
+            // Still return the page even if Instagram fetch fails
+            // This allows Facebook posting to work even if Instagram isn't connected
             return page;
           }
+        } else {
+          console.log(`⚠️ Page ${page.name} does not have an Instagram Business Account connected`);
+          console.log(`   To connect Instagram:`);
+          console.log(`   1. Go to Facebook Page Settings → Instagram`);
+          console.log(`   2. Connect your Instagram Business or Creator account`);
+          console.log(`   3. Make sure your Instagram account is Business or Creator (not Personal)`);
         }
         return page;
       })
@@ -179,10 +198,20 @@ module.exports = async (req, res) => {
         }
       }
 
+      const instagramAccountsCount = pagesWithInstagram.filter(p => p.instagram_account).length;
       console.log('✅ Tokens saved to database:', {
         facebookPages: pagesWithInstagram.length,
-        instagramAccounts: pagesWithInstagram.filter(p => p.instagram_account).length
+        instagramAccounts: instagramAccountsCount
       });
+      
+      if (instagramAccountsCount === 0 && pagesWithInstagram.length > 0) {
+        console.warn('⚠️ WARNING: No Instagram accounts were connected!');
+        console.warn('   This could mean:');
+        console.warn('   1. Your Instagram account is not connected to your Facebook Page');
+        console.warn('   2. Your Instagram account is Personal (needs to be Business or Creator)');
+        console.warn('   3. Your Instagram account connection failed during OAuth');
+        console.warn('   Solution: Go to Facebook Page Settings → Instagram → Connect Account');
+      }
     } catch (dbError) {
       console.error('⚠️ Could not save tokens to database:', dbError.message);
       // Continue even if database save fails - tokens are still shown on success page

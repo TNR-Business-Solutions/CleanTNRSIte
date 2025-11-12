@@ -86,6 +86,7 @@ module.exports = async (req, res) => {
     // Check for Instagram connection
     let instagramInfo = null;
     if (pageInfo.instagram_business_account) {
+      console.log('Instagram Business Account ID found:', pageInfo.instagram_business_account.id);
       try {
         const igResponse = await axios.get(
           `https://graph.facebook.com/v19.0/${pageInfo.instagram_business_account.id}`,
@@ -98,10 +99,30 @@ module.exports = async (req, res) => {
           }
         );
         instagramInfo = igResponse.data;
-        console.log('Instagram account connected:', instagramInfo.username);
+        console.log('✅ Instagram account connected:', instagramInfo.username);
       } catch (igError) {
-        console.warn('Could not fetch Instagram info:', igError.message);
+        console.warn('❌ Could not fetch Instagram info:', igError.message);
+        if (igError.response) {
+          console.warn('Instagram API Error Status:', igError.response.status);
+          console.warn('Instagram API Error Data:', JSON.stringify(igError.response.data, null, 2));
+          
+          // Provide helpful error message
+          if (igError.response.status === 403) {
+            console.warn('⚠️ Permission denied - Your token may not have Instagram permissions');
+            console.warn('   Solution: Reconnect via OAuth with pages_manage_posts permission');
+          } else if (igError.response.status === 400) {
+            console.warn('⚠️ Invalid request - Instagram account may not be properly connected');
+            console.warn('   Solution: Go to Facebook Page Settings → Instagram → Reconnect Account');
+          }
+        }
       }
+    } else {
+      console.warn('⚠️ No Instagram Business Account connected to this Facebook Page');
+      console.warn('   To connect Instagram:');
+      console.warn('   1. Go to Facebook Page Settings → Instagram');
+      console.warn('   2. Connect your Instagram Business or Creator account');
+      console.warn('   3. Make sure your Instagram account is Business or Creator (not Personal)');
+      console.warn('   4. Reconnect via OAuth after connecting');
     }
 
     // Return success response
