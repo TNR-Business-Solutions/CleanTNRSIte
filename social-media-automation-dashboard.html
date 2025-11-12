@@ -1353,9 +1353,69 @@
             }
         }
         
+        // Character count update functions
+        function updateFacebookCharCount() {
+            const textarea = document.getElementById('previewContent');
+            const charCountEl = document.getElementById('facebookCharCountPreview');
+            if (textarea && charCountEl) {
+                const charCount = textarea.value.length;
+                charCountEl.textContent = charCount;
+            }
+        }
+        
+        function updateLinkedInCharCount() {
+            const textarea = document.getElementById('previewContentLinkedIn');
+            const charCountEl = document.getElementById('linkedInCharCountPreview');
+            if (textarea && charCountEl) {
+                const charCount = textarea.value.length;
+                charCountEl.textContent = charCount;
+                // Color code: green if good length, yellow if short, red if too long
+                if (charCount >= 200 && charCount <= 2000) {
+                    charCountEl.style.color = '#28a745';
+                } else if (charCount < 200) {
+                    charCountEl.style.color = '#ffc107';
+                } else {
+                    charCountEl.style.color = '#dc3545';
+                }
+            }
+        }
+        
+        function updateTwitterCharCount() {
+            const textarea = document.getElementById('previewContentTwitter');
+            const charCountEl = document.getElementById('twitterCharCountPreview');
+            if (textarea && charCountEl) {
+                const charCount = textarea.value.length;
+                charCountEl.textContent = charCount;
+                // Color code: green if under limit, yellow if close, red if over
+                if (charCount <= 260) {
+                    charCountEl.style.color = '#28a745';
+                } else if (charCount <= 280) {
+                    charCountEl.style.color = '#ffc107';
+                } else {
+                    charCountEl.style.color = '#dc3545';
+                }
+            }
+        }
+        
         // Check if we have a saved token on load
         window.addEventListener('DOMContentLoaded', function() {
             console.log('Dashboard loaded');
+            
+            // Add event listeners for real-time character counting
+            const facebookTextarea = document.getElementById('previewContent');
+            if (facebookTextarea) {
+                facebookTextarea.addEventListener('input', updateFacebookCharCount);
+            }
+            
+            const linkedInTextarea = document.getElementById('previewContentLinkedIn');
+            if (linkedInTextarea) {
+                linkedInTextarea.addEventListener('input', updateLinkedInCharCount);
+            }
+            
+            const twitterTextarea = document.getElementById('previewContentTwitter');
+            if (twitterTextarea) {
+                twitterTextarea.addEventListener('input', updateTwitterCharCount);
+            }
             
             // Auto-load Meta token if available
             const savedToken = localStorage.getItem('metaPageAccessToken');
