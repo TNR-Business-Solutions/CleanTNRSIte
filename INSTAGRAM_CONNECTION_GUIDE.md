@@ -24,6 +24,14 @@ Instagram posting requires connecting your Instagram Business Account to a Faceb
 
 ### Step 1: Connect Instagram to Facebook Page
 
+**⚠️ IMPORTANT: Use the ACTIVE Instagram Account**
+
+Based on your Meta Business Suite, you have two Instagram accounts:
+- **@tnrbusinesssolutions** - Status: Inactive ❌ (Don't use this one)
+- **@royturnertnrbusinesssolutions** - Status: Active ✅ (Use this one)
+
+**Use the ACTIVE account (@royturnertnrbusinesssolutions) for posting.**
+
 1. **Go to Facebook Page Settings**
    - Log in to Facebook
    - Go to your Facebook Page
@@ -31,13 +39,16 @@ Instagram posting requires connecting your Instagram Business Account to a Faceb
 
 2. **Navigate to Instagram Section**
    - Click "Instagram" in the left sidebar (under Page Settings)
+   - Check current connection status
+   - If @tnrbusinesssolutions is connected, disconnect it first
    - You should see "Connect Account" button
 
-3. **Connect Your Instagram Account**
+3. **Connect Your ACTIVE Instagram Account**
    - Click "Connect Account"
-   - Log in to your Instagram Business/Creator account
+   - **Make sure to log in to @royturnertnrbusinesssolutions** (the active account)
    - Authorize the connection
    - Make sure your Instagram account shows as "Connected"
+   - Verify it shows as "Active" in Meta Business Suite
 
 ### Step 2: Verify Instagram Account Type
 
@@ -94,9 +105,33 @@ Instagram posting requires connecting your Instagram Business Account to a Faceb
 
 **Solution:**
 1. Make sure your Instagram account is Business or Creator (not Personal)
-2. Go to Facebook Page Settings → Instagram → Connect Account
-3. Reconnect your Instagram account if it was previously connected
-4. Reconnect via OAuth after connecting Instagram to Facebook Page
+2. **Use the ACTIVE Instagram account** (@royturnertnrbusinesssolutions, not @tnrbusinesssolutions)
+3. Go to Facebook Page Settings → Instagram → Connect Account
+4. If an inactive account is connected, disconnect it first
+5. Connect the ACTIVE Instagram account
+6. Reconnect via OAuth after connecting Instagram to Facebook Page
+
+### Problem: Instagram Account Shows as "Inactive" in Meta Business Suite
+
+**Solution:**
+1. **Check which account is connected**
+   - Go to Meta Business Suite → Settings → Business Portfolio
+   - Look for your Instagram account status
+   - If it shows "Inactive", disconnect and reconnect
+
+2. **Use the Active Account**
+   - If @tnrbusinesssolutions is inactive, use @royturnertnrbusinesssolutions instead
+   - Connect the active account to your Facebook Page
+   - Make sure the active account is Business or Creator
+
+3. **Reactivate Account**
+   - Disconnect Instagram from Facebook Page
+   - Wait 5 minutes
+   - Reconnect Instagram to Facebook Page
+   - Verify it shows as "Active" in Meta Business Suite
+   - Reconnect via OAuth in dashboard
+
+**See `INSTAGRAM_INACTIVE_ACCOUNT_FIX.md` for detailed steps.**
 
 ### Problem: "Invalid insights metric" Error
 
@@ -104,6 +139,28 @@ Instagram posting requires connecting your Instagram Business Account to a Faceb
 - This error has been fixed in the latest update
 - The system now uses only valid Instagram metrics (impressions, reach)
 - If you still see this error, make sure you're using the latest deployed version
+- Make sure you're using the ACTIVE Instagram account (not the inactive one)
+
+### Problem: Account Verification Needed
+
+**Solution:**
+1. **Complete Account Verification**
+   - Go to Meta Business Suite → Settings → Security
+   - Complete any pending verification steps
+   - This may require:
+     - Phone number verification
+     - Email verification
+     - ID verification (for business accounts)
+
+2. **Verify Your Identity**
+   - Follow the verification prompts
+   - This is required for full account access
+   - Verification helps keep your account secure
+
+3. **After Verification**
+   - Reconnect via OAuth in dashboard
+   - Verify connection status
+   - Test posting to Instagram
 
 ### Problem: Instagram Account Not Showing in OAuth Success Page
 
@@ -180,7 +237,10 @@ If you're still experiencing issues after following this guide:
 ## ✅ Success Checklist
 
 - [ ] Instagram account is Business or Creator (not Personal)
+- [ ] **Using the ACTIVE Instagram account** (@royturnertnrbusinesssolutions)
 - [ ] Instagram account is connected to Facebook Page
+- [ ] Instagram account shows as "Active" in Meta Business Suite (not "Inactive")
+- [ ] Account verification is complete (if required)
 - [ ] Connected via OAuth in TNR Dashboard
 - [ ] Instagram account shows in connection status
 - [ ] Can see Instagram username in dashboard
