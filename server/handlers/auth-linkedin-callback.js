@@ -113,6 +113,15 @@ module.exports = async (req, res) => {
     const accessToken = tokenResponse.data.access_token;
     const expiresIn = tokenResponse.data.expires_in || 5184000; // Default to 60 days if not provided
     const refreshToken = tokenResponse.data.refresh_token || null;
+    
+    // Log token response to see if it contains user info
+    console.log("Token response keys:", Object.keys(tokenResponse.data || {}));
+    console.log("Token response (excluding token):", {
+      expires_in: tokenResponse.data.expires_in,
+      token_type: tokenResponse.data.token_type,
+      scope: tokenResponse.data.scope,
+      has_refresh_token: !!refreshToken
+    });
 
     if (!accessToken) {
       throw new Error("No access token received from LinkedIn");
@@ -133,23 +142,39 @@ module.exports = async (req, res) => {
 
     let profileResponse;
     try {
-      profileResponse = await axios.get("https://api.linkedin.com/v2/me", {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "X-Restli-Protocol-Version": "2.0.0",
-        },
-        timeout: 10000,
-      });
-      console.log(
-        "Profile fetch successful, response keys:",
-        Object.keys(profileResponse.data || {})
-      );
+      // Try OpenID Connect userinfo endpoint first (works with openid profile scopes)
+      try {
+        profileResponse = await axios.get(
+          "https://api.linkedin.com/v2/userinfo",
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+            timeout: 10000,
+          }
+        );
+        console.log(
+          "UserInfo fetch successful (OpenID Connect), response keys:",
+          Object.keys(profileResponse.data || {})
+        );
+      } catch (userInfoError) {
+        // Fallback to /v2/me endpoint
+        console.log("UserInfo endpoint failed, trying /v2/me endpoint...");
+        profileResponse = await axios.get("https://api.linkedin.com/v2/me", {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "X-Restli-Protocol-Version": "2.0.0",
+          },
+          timeout: 10000,
+        });
+        console.log(
+          "Profile fetch successful (/v2/me), response keys:",
+          Object.keys(profileResponse.data || {})
+        );
+      }
     } catch (profileError) {
-      // Profile fetch is expected to fail without profile scope - this is normal
-      console.warn(
-        "Profile fetch failed (expected without profile scope):",
-        profileError.message
-      );
+      // Profile fetch failed - log details
+      console.warn("Profile fetch failed:", profileError.message);
       if (profileError.response) {
         console.log(
           "Profile error response:",
