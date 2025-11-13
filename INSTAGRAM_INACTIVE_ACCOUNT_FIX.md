@@ -153,20 +153,49 @@ Based on your Meta Business Suite:
 
 If your Instagram account is still showing as inactive after following these steps:
 
-1. **Contact Meta Support**
+1. **Complete Account Verification First**
+   - If Meta asks for verification, complete it first
+   - Update phone number if you no longer have access to old number
+   - See `META_VERIFICATION_PHONE_NUMBER_UPDATE.md` for detailed steps
+   - Verification is required before reconnecting accounts
+
+2. **Contact Meta Support**
    - Go to business.facebook.com → Help
    - Report the issue
    - Provide details about the inactive account
+   - Explain verification issues if applicable
 
-2. **Check Account Restrictions**
+3. **Check Account Restrictions**
    - Go to Instagram Settings → Help → Report a Problem
    - Check for any account restrictions
    - Follow instructions to resolve
 
-3. **Try Alternative Account**
+4. **Try Alternative Account**
    - If @tnrbusinesssolutions won't activate
    - Use @royturnertnrbusinesssolutions (which is active)
    - Connect that account to your Facebook Page instead
+
+## 📱 Phone Number Verification Issue
+
+If Meta is asking you to verify using an old phone number you no longer have access to:
+
+1. **Update Phone Number**
+   - Go to facebook.com/settings → Personal Information
+   - Remove old phone number
+   - Add new phone number
+   - Verify new number with SMS code
+
+2. **Use Alternative Verification**
+   - Use email verification instead
+   - Use authenticator app (Google Authenticator, Authy)
+   - Contact Meta Support for help
+
+3. **After Updating Phone Number**
+   - Complete account verification
+   - Reconnect Instagram to Facebook Page
+   - Reconnect via OAuth in dashboard
+
+**See `META_VERIFICATION_PHONE_NUMBER_UPDATE.md` for detailed steps.**
 
 ---
 

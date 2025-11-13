@@ -162,6 +162,34 @@ Based on your Meta Business Suite, you have two Instagram accounts:
    - Verify connection status
    - Test posting to Instagram
 
+### Problem: Old Phone Number for Verification
+
+**If Meta asks you to verify using an old phone number you no longer have access to:**
+
+1. **Update Phone Number in Meta Account**
+   - Go to **facebook.com/settings** → **Personal Information**
+   - Remove old phone number
+   - Add new phone number
+   - Verify new number with SMS code
+
+2. **Use Email Verification Instead**
+   - When Meta asks for verification, look for **"Verify with Email"** option
+   - Click **"Use Email Instead"**
+   - Check your email for verification code
+
+3. **Use Two-Factor Authentication App**
+   - Set up authenticator app (Google Authenticator, Authy)
+   - Go to **facebook.com/settings/security** → **Two-Factor Authentication**
+   - Use authenticator app for verification
+
+4. **Contact Meta Support**
+   - Go to **facebook.com/help** → **Get Help**
+   - Explain you no longer have access to old phone number
+   - Provide proof of identity
+   - Request to update phone number
+
+**See `META_VERIFICATION_PHONE_NUMBER_UPDATE.md` for detailed steps.**
+
 ### Problem: Instagram Account Not Showing in OAuth Success Page
 
 **Possible Causes:**
