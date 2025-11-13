@@ -147,7 +147,7 @@
                 <div id="facebook" class="content-area active">
                     <div class="form-group">
                         <label for="contentType">Content Type</label>
-                        <select id="contentType" name="contentType" aria-label="Select content type">
+                        <select id="contentType" name="contentType" aria-label="Select content type" onchange="toggleJobPostingFields()">
                             <option value="test-post">🧪 Test Post (First Post)</option>
                             <option value="service-promotion">Service Promotion</option>
                             <option value="client-success">Client Success Story</option>
@@ -159,6 +159,7 @@
                             <option value="did-you-know">Did You Know</option>
                             <option value="local-community">Local Community</option>
                             <option value="seasonal">Seasonal/Holiday</option>
+                            <option value="job-posting">💼 Job Posting</option>
                         </select>
                     </div>
                     
@@ -205,6 +206,16 @@
                             <option value="insurance-seekers">Insurance Seekers</option>
                             <option value="marketing-managers">Marketing Managers</option>
                         </select>
+                    </div>
+                    
+                    <!-- Job Posting Fields (shown only when job-posting is selected) -->
+                    <div id="jobPostingFields" class="form-group" style="display: none;">
+                        <label for="jobTitle">Job Title (optional)</label>
+                        <input type="text" id="jobTitle" placeholder="e.g., Marketing Specialist, Sales Representative">
+                    </div>
+                    <div id="jobPostingEmailFields" class="form-group" style="display: none;">
+                        <label for="jobEmail">Application Email (optional)</label>
+                        <input type="email" id="jobEmail" placeholder="e.g., careers@yourcompany.com">
                     </div>
                     
                     <button class="btn" onclick="generateContent()">Generate Content</button>
@@ -351,6 +362,7 @@
                             <option value="did-you-know">Did You Know</option>
                             <option value="local-community">Local Community</option>
                             <option value="seasonal">Seasonal/Holiday</option>
+                            <option value="job-posting">💼 Job Posting</option>
                         </select>
                     </div>
                     
@@ -1649,8 +1661,39 @@
             ],
             'local-community': [
                 "❤️ Community matters.\n\n{business} is proud to support local schools, charities, and events in {location}. When you shop local, you're reinvesting in OUR community.\n\nThank you for your support!\n\n{phone}\n\n#{location} #SupportLocal #CommunityFirst",
-                "🌟 Love where you live? Shop where you live!\n\n{business} has been a proud member of the {location} community for [years]. Every purchase supports local families, schools, and neighborhoods.\n\n{phone}\n\n#ShopLocal #{location} #CommunitySupport"
-            ]
+                "🌟 Love where you live? Shop where you live!\n\n{business} has been a proud member of the {location} community for [years]. Every purchase supports local families, schools, and neighborhoods.\n\n{phone}\n\n#ShopLocal #{location} #CommunitySupport",
+                "🏘️ Supporting our community, one customer at a time.\n\n{business} believes in giving back to {location}. That's why we partner with local organizations and events.\n\n{phone}\n\n#{location} #CommunityFirst #LocalBusiness",
+                "🤝 Together we're stronger.\n\n{business} is committed to building a better {location}. Join us in supporting our local community!\n\n{phone}\n\n#{location} #CommunitySupport #LocalLove"
+            ],
+            'job-posting': {
+                'digital-marketing': [
+                    "💼 WE'RE HIRING! Join Our Team\n\n{business} is looking for talented {jobTitle} to join our growing digital marketing agency in {location}.\n\n✅ What we offer:\n• Competitive salary + benefits\n• Flexible work environment\n• Growth opportunities\n• Collaborative team culture\n\n📧 Interested? Send your resume to: {email} or call {phone}\n\n#Hiring #{location} #MarketingJobs #DigitalMarketing #NowHiring",
+                    "🚀 CAREER OPPORTUNITY: {jobTitle}\n\n{business} is expanding and seeking a skilled {jobTitle} to help us deliver exceptional results for our clients.\n\nRequirements:\n• Experience in digital marketing\n• Strong communication skills\n• Passion for learning\n• Team player mentality\n\nBenefits include health insurance, PTO, and professional development opportunities.\n\nApply today: {email} | {phone}\n\n#JobOpening #{location} #MarketingCareer #NowHiring",
+                    "👥 JOIN OUR TEAM!\n\n{business} is hiring a {jobTitle} in {location}. We're a fast-growing digital agency looking for someone who's passionate about marketing and client success.\n\nWhat you'll do:\n• Manage client campaigns\n• Create engaging content\n• Analyze performance data\n• Build client relationships\n\nReady to grow your career? Apply now: {email}\n\n#HiringNow #{location} #MarketingJobs #CareerGrowth"
+                ],
+                'insurance': [
+                    "💼 CAREER OPPORTUNITY: Insurance Agent\n\n{business} is seeking a licensed Insurance Agent to join our team in {location}.\n\n✅ What we offer:\n• Base salary + commission\n• Health & dental insurance\n• Paid time off\n• Professional development\n\nRequirements:\n• Insurance license (or willing to obtain)\n• Sales experience preferred\n• Customer-focused attitude\n\nApply: {email} | Call: {phone}\n\n#Hiring #{location} #InsuranceJobs #NowHiring #SalesCareers",
+                    "🏢 WE'RE HIRING: Insurance Sales Professional\n\n{business} is growing and looking for an experienced Insurance Sales Professional to serve clients in {location}.\n\nBenefits:\n• Competitive compensation package\n• Full benefits\n• Flexible schedule\n• Supportive team environment\n\nContact us: {email} or {phone}\n\n#JobOpening #{location} #InsuranceCareers #NowHiring",
+                    "🌟 JOIN OUR INSURANCE TEAM!\n\n{business} is hiring a Licensed Insurance Agent. Perfect opportunity for someone looking to build a rewarding career helping people protect what matters most.\n\nSend resume: {email}\nCall: {phone}\n\n#HiringNow #{location} #InsuranceJobs #CareerOpportunity"
+                ],
+                'construction': [
+                    "🔨 NOW HIRING: {jobTitle}\n\n{business} is looking for skilled {jobTitle} to join our construction team in {location}.\n\n✅ We offer:\n• Competitive wages\n• Benefits package\n• Steady work\n• Overtime opportunities\n\nRequirements:\n• Experience in construction\n• Valid driver's license\n• Reliable transportation\n• Strong work ethic\n\nApply: {phone} or {email}\n\n#Hiring #{location} #ConstructionJobs #NowHiring #SkilledTrades",
+                    "💼 CAREER OPPORTUNITY: Construction Professional\n\n{business} is expanding and seeking experienced construction professionals. Multiple positions available!\n\nPositions:\n• General Laborers\n• Skilled Tradespeople\n• Project Managers\n\nBenefits: Health insurance, retirement plan, paid time off.\n\nCall: {phone} | Email: {email}\n\n#JobOpening #{location} #ConstructionCareers #NowHiring",
+                    "🏗️ JOIN OUR CONSTRUCTION TEAM!\n\n{business} is hiring! We're looking for hardworking, reliable team members to join our growing construction company in {location}.\n\nApply today: {phone}\n\n#HiringNow #{location} #ConstructionJobs #SkilledTrades"
+                ],
+                'professional-services': [
+                    "💼 WE'RE HIRING: {jobTitle}\n\n{business} is seeking a qualified {jobTitle} to join our professional services team in {location}.\n\nRequirements:\n• Professional certification/license\n• X+ years of experience\n• Strong analytical skills\n• Excellent communication\n\nBenefits: Competitive salary, health insurance, retirement plan, PTO.\n\nApply: {email} | {phone}\n\n#Hiring #{location} #ProfessionalJobs #NowHiring #CareerOpportunity",
+                    "🚀 CAREER OPPORTUNITY: Join Our Professional Team\n\n{business} is expanding and looking for talented professionals to join our team.\n\nWhat we offer:\n• Competitive compensation\n• Professional development\n• Work-life balance\n• Collaborative environment\n\nInterested candidates: {email}\n\n#JobOpening #{location} #ProfessionalCareers #NowHiring",
+                    "👔 JOIN OUR PROFESSIONAL TEAM!\n\n{business} is hiring! We're looking for experienced professionals who value excellence and client service.\n\nApply: {email} | {phone}\n\n#HiringNow #{location} #ProfessionalServices #CareerGrowth"
+                ],
+                'general': [
+                    "💼 WE'RE HIRING! Join Our Team\n\n{business} is looking for talented individuals to join our growing team in {location}.\n\n✅ What we offer:\n• Competitive salary + benefits\n• Growth opportunities\n• Supportive team environment\n• Work-life balance\n\n📧 Interested? Send your resume to: {email} or call {phone}\n\n#Hiring #{location} #NowHiring #JobOpening #CareerOpportunity",
+                    "🚀 CAREER OPPORTUNITY: {jobTitle}\n\n{business} is expanding and seeking a skilled {jobTitle} to help us serve our {location} community better.\n\nRequirements:\n• Relevant experience\n• Strong work ethic\n• Customer-focused mindset\n• Team player\n\nBenefits include health insurance, PTO, and professional development.\n\nApply today: {email} | {phone}\n\n#JobOpening #{location} #NowHiring #CareerGrowth",
+                    "👥 JOIN OUR TEAM!\n\n{business} is hiring! We're looking for passionate, dedicated individuals to join our team in {location}.\n\nWhat you'll get:\n• Competitive compensation\n• Benefits package\n• Friendly work environment\n• Opportunities for advancement\n\nReady to grow your career? Apply now: {email}\n\n#HiringNow #{location} #JobOpening #CareerOpportunity",
+                    "🌟 NOW HIRING: Multiple Positions Available\n\n{business} is growing and looking for great people to join our team!\n\nWe're hiring for:\n• {position1}\n• {position2}\n• {position3}\n\nAll positions include competitive pay and benefits.\n\nApply: {email} | Call: {phone}\n\n#Hiring #{location} #NowHiring #JobOpportunity #JoinOurTeam",
+                    "💼 EXCITING OPPORTUNITY: Join {business}\n\nWe're looking for talented team members to help us serve {location} with excellence.\n\nPositions available:\n• Full-time opportunities\n• Part-time positions\n• Internships available\n\nSend your resume: {email}\nCall: {phone}\n\n#Hiring #{location} #NowHiring #CareerOpportunity #JoinOurTeam"
+                ]
+            }
         };
         
         function switchPlatform(platform, element) {
@@ -1672,6 +1715,18 @@
             console.log('Switched to platform:', platform, 'Target area found:', !!targetArea);
         }
         
+        // Improved randomization function - shuffles array for better variety
+        function getRandomTemplate(templates) {
+            if (!templates || templates.length === 0) return null;
+            // Use Fisher-Yates shuffle for better randomization
+            const shuffled = [...templates];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled[Math.floor(Math.random() * shuffled.length)];
+        }
+        
         function generateContent() {
             const contentType = document.getElementById('contentType').value;
             const industryType = document.getElementById('professionType').value;
@@ -1684,13 +1739,27 @@
             // Handle test post (special case - always random)
             if (contentType === 'test-post') {
                 const testTemplates = contentTemplateLibrary['test-post'];
-                template = testTemplates[Math.floor(Math.random() * testTemplates.length)];
+                template = getRandomTemplate(testTemplates);
+            }
+            // Handle job postings (industry-specific or general)
+            else if (contentType === 'job-posting') {
+                const jobTemplates = contentTemplateLibrary['job-posting'];
+                // Try industry-specific first
+                if (jobTemplates[industryType] && jobTemplates[industryType].length > 0) {
+                    template = getRandomTemplate(jobTemplates[industryType]);
+                } else if (jobTemplates['general'] && jobTemplates['general'].length > 0) {
+                    // Fallback to general job posting templates
+                    template = getRandomTemplate(jobTemplates['general']);
+                } else {
+                    // Last resort fallback
+                    template = "💼 WE'RE HIRING! Join Our Team\n\n{business} is looking for talented individuals to join our growing team in {location}.\n\n📧 Interested? Send your resume to: careers@{business}.com or call {phone}\n\n#Hiring #{location} #NowHiring #JobOpening";
+                }
             }
             // Handle service promotions (industry-specific)
             else if (contentType === 'service-promotion') {
                 const industryTemplates = contentTemplateLibrary[contentType][industryType];
                 if (industryTemplates && industryTemplates.length > 0) {
-                    template = industryTemplates[Math.floor(Math.random() * industryTemplates.length)];
+                    template = getRandomTemplate(industryTemplates);
                 } else {
                     // Fallback to generic
                     template = "🚀 Looking for quality {industry} services in {location}?\n\n{business} is here to help! Our experienced team delivers professional results you can count on.\n\nContact us today: {phone}\n\n#{location} #LocalBusiness #Professional";
@@ -1700,7 +1769,7 @@
             else if (contentType === 'industry-tip') {
                 const industryTemplates = contentTemplateLibrary[contentType][industryType];
                 if (industryTemplates && industryTemplates.length > 0) {
-                    template = industryTemplates[Math.floor(Math.random() * industryTemplates.length)];
+                    template = getRandomTemplate(industryTemplates);
                 } else {
                     // Generic tip
                     template = "💡 PRO TIP: Stay consistent with your marketing!\n\nRegular posts, consistent branding, and engaging content build trust with your audience.\n\n{business} | {phone}\n\n#{location} #BusinessTip #MarketingAdvice";
@@ -1709,12 +1778,18 @@
             // Handle non-industry-specific content types
             else if (contentTemplateLibrary[contentType]) {
                 const templates = contentTemplateLibrary[contentType];
-                template = templates[Math.floor(Math.random() * templates.length)];
+                template = getRandomTemplate(templates);
             }
             // Fallback for missing content types
             else {
                 template = "🎯 Great things are happening at {business}!\n\nWe're dedicated to providing excellent service to {location} and beyond.\n\nContact us: {phone}\n\n#{location} #LocalBusiness #CommunityFocused";
             }
+            
+            // Generate job-specific placeholders if needed
+            const jobTitle = document.getElementById('jobTitle')?.value || 'Professional';
+            const email = document.getElementById('jobEmail')?.value || `careers@${businessName.toLowerCase().replace(/\s+/g, '')}.com`;
+            const positions = ['Full-time Positions', 'Part-time Opportunities', 'Contract Work'];
+            const randomPosition = positions[Math.floor(Math.random() * positions.length)];
             
             // Replace placeholders with actual values
             let content = template
@@ -1722,7 +1797,12 @@
                 .replace(/{location}/g, location)
                 .replace(/{phone}/g, phone)
                 .replace(/{industry}/g, getIndustryName(industryType))
-                .replace(/#{location}/g, '#' + location.replace(/\s+/g, ''));
+                .replace(/#{location}/g, '#' + location.replace(/\s+/g, ''))
+                .replace(/{jobTitle}/g, jobTitle)
+                .replace(/{email}/g, email)
+                .replace(/{position1}/g, 'Full-time Positions')
+                .replace(/{position2}/g, 'Part-time Opportunities')
+                .replace(/{position3}/g, randomPosition);
             
             const previewTextarea = document.getElementById('previewContent');
             previewTextarea.value = content;
@@ -1768,7 +1848,7 @@
             else if (contentType === 'service-promotion') {
                 const industryTemplates = contentTemplateLibrary[contentType][industryType];
                 if (industryTemplates && industryTemplates.length > 0) {
-                    template = industryTemplates[Math.floor(Math.random() * industryTemplates.length)];
+                    template = getRandomTemplate(industryTemplates);
                 } else {
                     // Fallback to generic (Twitter-optimized)
                     template = "🚀 Quality {industry} services in {location}!\n\n{business} delivers professional results.\n\nContact: {phone}\n\n#{location} #LocalBusiness";
@@ -1778,7 +1858,7 @@
             else if (contentType === 'industry-tip') {
                 const industryTemplates = contentTemplateLibrary[contentType][industryType];
                 if (industryTemplates && industryTemplates.length > 0) {
-                    template = industryTemplates[Math.floor(Math.random() * industryTemplates.length)];
+                    template = getRandomTemplate(industryTemplates);
                 } else {
                     // Generic tip (Twitter-optimized)
                     template = "💡 TIP: Consistent marketing builds trust!\n\n{business} | {phone}\n\n#{location} #BusinessTip";
@@ -1787,12 +1867,18 @@
             // Handle non-industry-specific content types
             else if (contentTemplateLibrary[contentType]) {
                 const templates = contentTemplateLibrary[contentType];
-                template = templates[Math.floor(Math.random() * templates.length)];
+                template = getRandomTemplate(templates);
             }
             // Fallback for missing content types
             else {
                 template = "🎯 Great things happening at {business}!\n\nServing {location} with excellence.\n\nContact: {phone}\n\n#{location} #LocalBusiness";
             }
+            
+            // Generate job-specific placeholders
+            const jobTitle = document.getElementById('jobTitle')?.value || 'Professional';
+            const email = document.getElementById('jobEmail')?.value || `careers@${businessName.toLowerCase().replace(/\s+/g, '')}.com`;
+            const positions = ['Full-time Positions', 'Part-time Opportunities', 'Contract Work'];
+            const randomPosition = positions[Math.floor(Math.random() * positions.length)];
             
             // Replace placeholders with actual values
             let content = template
@@ -1800,7 +1886,12 @@
                 .replace(/{location}/g, location)
                 .replace(/{phone}/g, phone)
                 .replace(/{industry}/g, getIndustryName(industryType))
-                .replace(/#{location}/g, '#' + location.replace(/\s+/g, ''));
+                .replace(/#{location}/g, '#' + location.replace(/\s+/g, ''))
+                .replace(/{jobTitle}/g, jobTitle)
+                .replace(/{email}/g, email)
+                .replace(/{position1}/g, 'Full-time Positions')
+                .replace(/{position2}/g, 'Part-time Opportunities')
+                .replace(/{position3}/g, randomPosition);
             
             // Optimize for Twitter: trim if too long, ensure it fits in 280 chars
             if (content.length > 280) {
@@ -1903,6 +1994,12 @@
                 template = `🎯 Great things are happening at {business}!\n\nWe're dedicated to providing excellent service to {location} and beyond. Our commitment to quality and professionalism sets us apart.\n\nContact us: {phone}\n\n#ProfessionalServices #BusinessExcellence #LocalBusiness #Networking`;
             }
             
+            // Generate job-specific placeholders
+            const jobTitle = document.getElementById('jobTitle')?.value || 'Professional';
+            const email = document.getElementById('jobEmail')?.value || `careers@${businessName.toLowerCase().replace(/\s+/g, '')}.com`;
+            const positions = ['Full-time Positions', 'Part-time Opportunities', 'Contract Work'];
+            const randomPosition = positions[Math.floor(Math.random() * positions.length)];
+            
             // Replace placeholders
             let content = template
                 .replace(/{business}/g, businessName)
@@ -1919,7 +2016,12 @@
                 .replace(/{update}/g, 'These changes present both challenges and opportunities for businesses willing to adapt.')
                 .replace(/{development1}/g, 'New technologies reshaping operations')
                 .replace(/{development2}/g, 'Changing customer expectations')
-                .replace(/{development3}/g, 'Regulatory updates affecting the industry');
+                .replace(/{development3}/g, 'Regulatory updates affecting the industry')
+                .replace(/{jobTitle}/g, jobTitle)
+                .replace(/{email}/g, email)
+                .replace(/{position1}/g, 'Full-time Positions')
+                .replace(/{position2}/g, 'Part-time Opportunities')
+                .replace(/{position3}/g, randomPosition);
             
             // Update preview
             const linkedInTextarea = document.getElementById('previewContentLinkedIn');
