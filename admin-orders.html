@@ -417,50 +417,49 @@
             // Redirect will happen in checkAuth
         }
         
-        // Sample orders data (in production, this would come from a database)
-        let orders = [
-            {
-                orderNumber: "TNR-1759154357795-WQWYHBRRF",
-                customerInfo: {
-                    firstName: "Sarah",
-                    lastName: "Johnson",
-                    email: "sarah.johnson@example.com",
-                    phone: "412-555-9876",
-                    company: "Johnson Marketing LLC",
-                    address: "456 Business Avenue, Greensburg, PA 15601"
-                },
-                items: [
-                    { name: "Basic Website Package", price: 300, quantity: 1 },
-                    { name: "SEO Optimization", price: 200, quantity: 1 },
-                    { name: "Content Creation", price: 100, quantity: 2 }
-                ],
-                total: 700,
-                status: "new",
-                createdAt: "2025-09-29T13:56:31.704Z",
-                projectTimeline: "1-month",
-                specialRequests: "Need help with our new business launch. Looking for a complete digital presence."
-            },
-            {
-                orderNumber: "TNR-1759154191704-0JOT4W4L8",
-                customerInfo: {
-                    firstName: "John",
-                    lastName: "Doe",
-                    email: "john.doe@example.com",
-                    phone: "412-555-1234",
-                    company: "Test Company LLC",
-                    address: "123 Main Street, Greensburg, PA 15601"
-                },
-                items: [
-                    { name: "Basic Website Package", price: 300, quantity: 1 },
-                    { name: "SEO Optimization", price: 200, quantity: 2 }
-                ],
-                total: 700,
-                status: "contacted",
-                createdAt: "2025-09-29T13:30:00.000Z",
-                projectTimeline: "asap",
-                specialRequests: "This is a test order for checkout functionality testing."
+        // Load orders from API (same storage as CRM fix)
+        let orders = [];
+
+        async function loadOrders() {
+            try {
+                console.log('📋 Loading orders from API...');
+                const response = await fetch('/api/crm/orders');
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success && Array.isArray(result.data)) {
+                        // Parse customerInfo and items if they're JSON strings
+                        orders = result.data.map(order => ({
+                            ...order,
+                            customerInfo: typeof order.customerInfo === 'string' 
+                                ? JSON.parse(order.customerInfo || '{}')
+                                : (order.customerInfo || {}),
+                            items: typeof order.items === 'string'
+                                ? JSON.parse(order.items || '[]')
+                                : (order.items || []),
+                            total: order.amount || 0,
+                            status: order.status || 'new',
+                            createdAt: order.createdAt || order.orderDate || new Date().toISOString(),
+                            projectTimeline: order.projectTimeline || null,
+                            specialRequests: order.specialRequests || null
+                        }));
+                        console.log(`✅ Loaded ${orders.length} orders from database`);
+                    } else {
+                        console.warn('⚠️ Invalid response format:', result);
+                        orders = [];
+                    }
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                console.error('❌ Failed to load orders from API:', error);
+                console.warn('⚠️ Falling back to empty orders array');
+                orders = [];
             }
-        ];
+            
+            renderOrders();
+            updateStats();
+        }
 
         function updateStats() {
             const totalOrders = orders.length;
@@ -474,10 +473,41 @@
             document.getElementById('pending-payments').textContent = pendingPayments;
         }
 
-        function updateOrderStatus(orderNumber, newStatus) {
+        async function updateOrderStatus(orderNumber, newStatus) {
             const order = orders.find(o => o.orderNumber === orderNumber);
             if (order) {
-                order.status = newStatus;
+                // Update via API (same storage as CRM fix)
+                try {
+                    const response = await fetch('/api/crm/orders', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            id: order.id,
+                            orderNumber: order.orderNumber,
+                            status: newStatus
+                        })
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        if (result.success) {
+                            order.status = newStatus;
+                            console.log(`✅ Order status updated: ${orderNumber} -> ${newStatus}`);
+                        } else {
+                            throw new Error(result.error || 'Failed to update order status');
+                        }
+                    } else {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                } catch (error) {
+                    console.error('❌ Failed to update order status via API:', error);
+                    // Fallback: update locally
+                    order.status = newStatus;
+                    alert('⚠️ Order status updated locally, but failed to save to database. Please refresh the page.');
+                }
+                
                 renderOrders();
                 updateStats();
             }
@@ -573,8 +603,7 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            updateStats();
-            renderOrders();
+            loadOrders(); // Load orders from API instead of hardcoded data
             // Header is now embedded in HTML
             loadFooter();
         });

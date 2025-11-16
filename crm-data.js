@@ -326,14 +326,47 @@ class TNRCRMData {
 
   // Order Management Methods
   addOrder(orderData) {
+    return this.addOrderAsync(orderData);
+  }
+
+  async addOrderAsync(orderData) {
     const newOrder = {
       id: "order-" + Date.now(),
       ...orderData,
       orderDate: new Date().toISOString().split("T")[0],
-      status: "Pending",
+      status: orderData.status || "Pending",
+      orderNumber: orderData.orderNumber || `TNR-${Date.now()}`,
+      clientName: orderData.clientName || orderData.client || "Unknown",
+      clientId: orderData.clientId || null,
+      customerInfo: typeof orderData.customerInfo === 'string' 
+        ? orderData.customerInfo 
+        : JSON.stringify(orderData.customerInfo || {}),
+      items: typeof orderData.items === 'string'
+        ? orderData.items
+        : JSON.stringify(orderData.items || (orderData.services ? (typeof orderData.services === 'string' ? orderData.services : orderData.services) : [])),
+      amount: parseFloat(orderData.amount || orderData.total || 0),
+      description: orderData.description || null,
+      projectTimeline: orderData.projectTimeline || orderData.timeline || null,
+      specialRequests: orderData.specialRequests || null,
+      invoiceNumber: orderData.invoiceNumber || null,
+      paymentMethod: orderData.paymentMethod || null,
     };
+
+    if (this.useAPI && this.api) {
+      try {
+        const savedOrder = await this.api.addOrder(newOrder);
+        this.orders.push(savedOrder);
+        console.log(`✅ Order saved to database (API): ${savedOrder.id} - ${savedOrder.orderNumber}`);
+        return savedOrder;
+      } catch (error) {
+        console.error("Failed to save order to API:", error);
+      }
+    }
+
+    // Fallback to localStorage
     this.orders.push(newOrder);
     this.saveToStorage();
+    console.log(`✅ Order saved to localStorage (fallback): ${newOrder.id} - ${newOrder.orderNumber}`);
     return newOrder;
   }
 

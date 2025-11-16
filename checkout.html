@@ -690,22 +690,67 @@
                 const result = await response.json();
 
                 if (result.success) {
-                    // Add order to CRM
-                    if (window.tnrCRM) {
-                        console.log('💼 Adding order to CRM...');
-                        const orderData = {
-                            id: result.orderNumber,
-                            client: `${customerInfo.firstName} ${customerInfo.lastName}`,
-                            clientEmail: customerInfo.email,
-                            services: cart.map(item => item.name).join(', '),
-                            amount: document.getElementById('total').textContent,
-                            status: 'Pending',
-                            date: new Date().toISOString().split('T')[0],
-                            paymentMethod: paymentInfo.method,
-                            paymentFrequency: paymentInfo.frequency
-                        };
-                        window.tnrCRM.addOrder(orderData);
-                        console.log('✅ Order added to CRM:', orderData);
+                    // Add order to CRM via API (same storage as CRM fix)
+                    console.log('💼 Adding order to CRM via API...');
+                    const totalAmount = parseFloat(document.getElementById('total').textContent.replace('$', '').replace(',', ''));
+                    const orderData = {
+                        orderNumber: result.orderNumber,
+                        clientName: `${customerInfo.firstName} ${customerInfo.lastName}`,
+                        clientId: null, // Can be linked later if customer becomes a client
+                        customerInfo: {
+                            firstName: customerInfo.firstName,
+                            lastName: customerInfo.lastName,
+                            email: customerInfo.email,
+                            phone: customerInfo.phone,
+                            company: customerInfo.company || '',
+                            address: `${customerInfo.address || ''}, ${customerInfo.city || ''}, ${customerInfo.state || ''} ${customerInfo.zip || ''}`.trim()
+                        },
+                        items: cart.map(item => ({
+                            name: item.name,
+                            price: item.price,
+                            quantity: item.quantity || 1
+                        })),
+                        amount: totalAmount,
+                        status: 'Pending',
+                        orderDate: new Date().toISOString().split('T')[0],
+                        description: cart.map(item => `${item.name} x ${item.quantity || 1}`).join(', '),
+                        projectTimeline: customerInfo.timeline || null,
+                        specialRequests: customerInfo.notes || null,
+                        paymentMethod: paymentInfo.method,
+                        paymentFrequency: paymentInfo.frequency
+                    };
+
+                    // Try API first (same as CRM fix)
+                    try {
+                        const orderResponse = await fetch('/api/crm/orders', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(orderData)
+                        });
+
+                        if (orderResponse.ok) {
+                            const orderResult = await orderResponse.json();
+                            if (orderResult.success) {
+                                console.log('✅ Order saved to database (API):', orderResult.data);
+                                // Also update CRM instance if available
+                                if (window.tnrCRM) {
+                                    window.tnrCRM.orders.push(orderResult.data);
+                                }
+                            } else {
+                                throw new Error(orderResult.error || 'Failed to save order');
+                            }
+                        } else {
+                            throw new Error(`HTTP ${orderResponse.status}: ${orderResponse.statusText}`);
+                        }
+                    } catch (apiError) {
+                        console.warn('⚠️ API save failed, falling back to localStorage:', apiError);
+                        // Fallback to localStorage if API fails
+                        if (window.tnrCRM) {
+                            window.tnrCRM.addOrder(orderData);
+                            console.log('✅ Order saved to localStorage (fallback):', orderData);
+                        }
                     }
                     
                     showSuccess(`Order confirmed! Order number: ${result.orderNumber}. Check your email for confirmation.`);
