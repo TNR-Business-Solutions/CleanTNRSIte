@@ -6,7 +6,16 @@ const path = require('path');
 const http = require('http');
 const https = require('https');
 
+// Import Wix handlers
+const authWix = require('./handlers/auth-wix');
+const authWixCallback = require('./handlers/auth-wix-callback');
+const wixApiRoutes = require('./handlers/wix-api-routes');
+
 const app = express();
+
+// Parse JSON bodies
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Configuration via environment variables (never hardcode secrets)
 const PORT = Number(process.env.PORT || 3000);
@@ -138,6 +147,14 @@ app.get('/auth/meta/callback', async (req, res) => {
     res.status(500).send(`Token exchange failed: ${JSON.stringify(msg)}`);
   }
 });
+
+// Wix OAuth Routes
+app.get('/api/auth/wix', authWix);
+app.get('/api/auth/wix/callback', authWixCallback);
+
+// Wix API Routes
+app.get('/api/wix', wixApiRoutes);
+app.post('/api/wix', wixApiRoutes);
 
 // Start HTTP and, if certificates exist, HTTPS on the same port (HTTPS-only when redirect is https)
 function startServer() {

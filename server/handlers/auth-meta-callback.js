@@ -2,40 +2,44 @@
 // This endpoint handles the redirect from Facebook after user authorization
 // It exchanges the authorization code for access tokens
 
-const axios = require('axios');
-const TNRDatabase = require('../../database');
+const axios = require("axios");
+const TNRDatabase = require("../../database");
 
 module.exports = async (req, res) => {
   const { code, error, error_description, state } = req.query;
-  
+
   // Get configuration from environment variables
   const { META_APP_ID, META_APP_SECRET, META_REDIRECT_URI } = process.env;
-  const REDIRECT_URI = META_REDIRECT_URI || 'https://www.tnrbusinesssolutions.com/api/auth/meta/callback';
+  const REDIRECT_URI =
+    META_REDIRECT_URI ||
+    "https://www.tnrbusinesssolutions.com/api/auth/meta/callback";
 
   // Validate configuration
   if (!META_APP_ID || !META_APP_SECRET) {
     return res.status(500).json({
-      error: 'Server configuration error',
-      message: 'META_APP_ID or META_APP_SECRET not configured. Please set environment variables in Vercel.'
+      error: "Server configuration error",
+      message:
+        "META_APP_ID or META_APP_SECRET not configured. Please set environment variables in Vercel.",
     });
   }
 
   // Log callback received (for debugging)
-  console.log('Meta OAuth callback received:', {
+  console.log("Meta OAuth callback received:", {
     hasCode: !!code,
     hasError: !!error,
     state: state,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 
   // Handle OAuth errors
   if (error) {
-    console.error('OAuth error:', error, error_description);
+    console.error("OAuth error:", error, error_description);
     return res.status(400).json({
       success: false,
-      error: 'OAuth Authorization Failed',
+      error: "OAuth Authorization Failed",
       details: error_description || error,
-      message: 'User denied authorization or an error occurred during the OAuth flow.'
+      message:
+        "User denied authorization or an error occurred during the OAuth flow.",
     });
   }
 
@@ -43,123 +47,173 @@ module.exports = async (req, res) => {
   if (!code) {
     return res.status(400).json({
       success: false,
-      error: 'Missing authorization code',
-      message: 'No authorization code received from Facebook. Please try again.'
+      error: "Missing authorization code",
+      message:
+        "No authorization code received from Facebook. Please try again.",
     });
   }
 
   try {
     // Step 1: Exchange authorization code for short-lived user access token
-    console.log('Exchanging code for access token...');
-    const tokenResponse = await axios.get('https://graph.facebook.com/v19.0/oauth/access_token', {
-      params: {
-        client_id: META_APP_ID,
-        client_secret: META_APP_SECRET,
-        redirect_uri: REDIRECT_URI,
-        code: code
-      },
-      timeout: 10000 // 10 second timeout
-    });
+    console.log("Exchanging code for access token...");
+    const tokenResponse = await axios.get(
+      "https://graph.facebook.com/v19.0/oauth/access_token",
+      {
+        params: {
+          client_id: META_APP_ID,
+          client_secret: META_APP_SECRET,
+          redirect_uri: REDIRECT_URI,
+          code: code,
+        },
+        timeout: 10000, // 10 second timeout
+      }
+    );
 
     const shortLivedToken = tokenResponse.data.access_token;
 
     if (!shortLivedToken) {
-      throw new Error('No access token received from Facebook');
+      throw new Error("No access token received from Facebook");
     }
 
     // Step 2: Exchange short-lived token for long-lived token (60 days)
-    console.log('Exchanging for long-lived token...');
-    const longLivedResponse = await axios.get('https://graph.facebook.com/v19.0/oauth/access_token', {
-      params: {
-        grant_type: 'fb_exchange_token',
-        client_id: META_APP_ID,
-        client_secret: META_APP_SECRET,
-        fb_exchange_token: shortLivedToken
-      },
-      timeout: 10000
-    });
+    console.log("Exchanging for long-lived token...");
+    const longLivedResponse = await axios.get(
+      "https://graph.facebook.com/v19.0/oauth/access_token",
+      {
+        params: {
+          grant_type: "fb_exchange_token",
+          client_id: META_APP_ID,
+          client_secret: META_APP_SECRET,
+          fb_exchange_token: shortLivedToken,
+        },
+        timeout: 10000,
+      }
+    );
 
     const longLivedUserToken = longLivedResponse.data.access_token;
     const expiresIn = longLivedResponse.data.expires_in || 5184000; // Default to 60 days if not provided
 
     // Step 3: Fetch user's managed Facebook Pages
-    console.log('Fetching managed pages with token:', longLivedUserToken.substring(0, 20) + '...');
-    const pagesResponse = await axios.get('https://graph.facebook.com/v19.0/me/accounts', {
-      params: { 
-        access_token: longLivedUserToken,
-        fields: 'id,name,access_token,category,instagram_business_account',
-        limit: 100
-      },
-      timeout: 10000
-    });
+    console.log(
+      "Fetching managed pages with token:",
+      longLivedUserToken.substring(0, 20) + "..."
+    );
+    const pagesResponse = await axios.get(
+      "https://graph.facebook.com/v19.0/me/accounts",
+      {
+        params: {
+          access_token: longLivedUserToken,
+          fields: "id,name,access_token,category,instagram_business_account",
+          limit: 100,
+        },
+        timeout: 10000,
+      }
+    );
 
-    console.log('Pages API response:', JSON.stringify(pagesResponse.data, null, 2));
+    console.log(
+      "Pages API response:",
+      JSON.stringify(pagesResponse.data, null, 2)
+    );
     const pages = pagesResponse.data.data || [];
-    console.log('Number of pages found:', pages.length);
+    console.log("Number of pages found:", pages.length);
 
     if (pages.length === 0) {
-      console.warn('WARNING: No pages returned from Facebook API');
-      console.warn('User token used:', longLivedUserToken.substring(0, 30) + '...');
-      
+      console.warn("WARNING: No pages returned from Facebook API");
+      console.warn(
+        "User token used:",
+        longLivedUserToken.substring(0, 30) + "..."
+      );
+
       // Try to get debug info about the token
       try {
-        const debugResponse = await axios.get('https://graph.facebook.com/v19.0/debug_token', {
-          params: {
-            input_token: longLivedUserToken,
-            access_token: longLivedUserToken
-          },
-          timeout: 10000
-        });
-        console.log('Token debug info:', JSON.stringify(debugResponse.data, null, 2));
+        const debugResponse = await axios.get(
+          "https://graph.facebook.com/v19.0/debug_token",
+          {
+            params: {
+              input_token: longLivedUserToken,
+              access_token: longLivedUserToken,
+            },
+            timeout: 10000,
+          }
+        );
+        console.log(
+          "Token debug info:",
+          JSON.stringify(debugResponse.data, null, 2)
+        );
       } catch (debugError) {
-        console.error('Could not debug token:', debugError.message);
+        console.error("Could not debug token:", debugError.message);
       }
     }
 
     // Step 4: For each page with Instagram, fetch Instagram account details
-    console.log('Fetching Instagram accounts...');
-    console.log('Pages found:', pages.length);
-    console.log('Pages with Instagram Business Account:', pages.filter(p => p.instagram_business_account).length);
-    
+    console.log("Fetching Instagram accounts...");
+    console.log("Pages found:", pages.length);
+    console.log(
+      "Pages with Instagram Business Account:",
+      pages.filter((p) => p.instagram_business_account).length
+    );
+
     const pagesWithInstagram = await Promise.all(
       pages.map(async (page) => {
         console.log(`Processing page: ${page.name} (${page.id})`);
-        console.log(`Has Instagram Business Account: ${!!page.instagram_business_account}`);
-        
+        console.log(
+          `Has Instagram Business Account: ${!!page.instagram_business_account}`
+        );
+
         if (page.instagram_business_account) {
-          console.log(`Instagram Business Account ID: ${page.instagram_business_account.id}`);
+          console.log(
+            `Instagram Business Account ID: ${page.instagram_business_account.id}`
+          );
           try {
             const igResponse = await axios.get(
               `https://graph.facebook.com/v19.0/${page.instagram_business_account.id}`,
               {
                 params: {
                   access_token: page.access_token,
-                  fields: 'id,username,name,profile_picture_url'
+                  fields: "id,username,name,profile_picture_url",
                 },
-                timeout: 10000
+                timeout: 10000,
               }
             );
-            console.log(`✅ Successfully fetched Instagram account for ${page.name}:`, igResponse.data.username);
+            console.log(
+              `✅ Successfully fetched Instagram account for ${page.name}:`,
+              igResponse.data.username
+            );
             return {
               ...page,
-              instagram_account: igResponse.data
+              instagram_account: igResponse.data,
             };
           } catch (igError) {
-            console.error(`❌ Error fetching Instagram account for ${page.name}:`, igError.message);
+            console.error(
+              `❌ Error fetching Instagram account for ${page.name}:`,
+              igError.message
+            );
             if (igError.response) {
-              console.error('Instagram API Error Status:', igError.response.status);
-              console.error('Instagram API Error Data:', JSON.stringify(igError.response.data, null, 2));
+              console.error(
+                "Instagram API Error Status:",
+                igError.response.status
+              );
+              console.error(
+                "Instagram API Error Data:",
+                JSON.stringify(igError.response.data, null, 2)
+              );
             }
             // Still return the page even if Instagram fetch fails
             // This allows Facebook posting to work even if Instagram isn't connected
             return page;
           }
         } else {
-          console.log(`⚠️ Page ${page.name} does not have an Instagram Business Account connected`);
+          console.log(
+            `⚠️ Page ${page.name} does not have an Instagram Business Account connected`
+          );
           console.log(`   To connect Instagram:`);
           console.log(`   1. Go to Facebook Page Settings → Instagram`);
-          console.log(`   2. Connect your Instagram Business or Creator account`);
-          console.log(`   3. Make sure your Instagram account is Business or Creator (not Personal)`);
+          console.log(
+            `   2. Connect your Instagram Business or Creator account`
+          );
+          console.log(
+            `   3. Make sure your Instagram account is Business or Creator (not Personal)`
+          );
         }
         return page;
       })
@@ -168,15 +222,15 @@ module.exports = async (req, res) => {
     // Step 5: Save tokens to database
     const db = new TNRDatabase();
     await db.initialize();
-    
+
     try {
       // Save each page token (these never expire!)
       for (const page of pagesWithInstagram) {
         await db.saveSocialMediaToken({
-          platform: 'facebook',
+          platform: "facebook",
           page_id: page.id,
           access_token: page.access_token,
-          token_type: 'Bearer',
+          token_type: "Bearer",
           expires_at: null, // Page tokens never expire
           page_name: page.name,
           instagram_account_id: page.instagram_business_account?.id || null,
@@ -186,10 +240,10 @@ module.exports = async (req, res) => {
         // Also save Instagram account separately if it exists
         if (page.instagram_business_account && page.instagram_account) {
           await db.saveSocialMediaToken({
-            platform: 'instagram',
+            platform: "instagram",
             page_id: page.instagram_business_account.id,
             access_token: page.access_token, // Instagram uses the same page token
-            token_type: 'Bearer',
+            token_type: "Bearer",
             expires_at: null, // Never expires
             page_name: page.instagram_account.name || page.name,
             instagram_account_id: page.instagram_business_account.id,
@@ -198,88 +252,112 @@ module.exports = async (req, res) => {
         }
       }
 
-      const instagramAccountsCount = pagesWithInstagram.filter(p => p.instagram_account).length;
-      console.log('✅ Tokens saved to database:', {
+      const instagramAccountsCount = pagesWithInstagram.filter(
+        (p) => p.instagram_account
+      ).length;
+      console.log("✅ Tokens saved to database:", {
         facebookPages: pagesWithInstagram.length,
-        instagramAccounts: instagramAccountsCount
+        instagramAccounts: instagramAccountsCount,
       });
-      
+
       if (instagramAccountsCount === 0 && pagesWithInstagram.length > 0) {
-        console.warn('⚠️ WARNING: No Instagram accounts were connected!');
-        console.warn('   This could mean:');
-        console.warn('   1. Your Instagram account is not connected to your Facebook Page');
-        console.warn('   2. Your Instagram account is Personal (needs to be Business or Creator)');
-        console.warn('   3. Your Instagram account connection failed during OAuth');
-        console.warn('   Solution: Go to Facebook Page Settings → Instagram → Connect Account');
+        console.warn("⚠️ WARNING: No Instagram accounts were connected!");
+        console.warn("   This could mean:");
+        console.warn(
+          "   1. Your Instagram account is not connected to your Facebook Page"
+        );
+        console.warn(
+          "   2. Your Instagram account is Personal (needs to be Business or Creator)"
+        );
+        console.warn(
+          "   3. Your Instagram account connection failed during OAuth"
+        );
+        console.warn(
+          "   Solution: Go to Facebook Page Settings → Instagram → Connect Account"
+        );
       }
     } catch (dbError) {
-      console.error('⚠️ Could not save tokens to database:', dbError.message);
+      console.error("⚠️ Could not save tokens to database:", dbError.message);
       // Continue even if database save fails - tokens are still shown on success page
     }
 
     // Step 6: Build success response with tokens and page information
     const response = {
       success: true,
-      message: 'Successfully authorized! Tokens saved automatically to database.',
+      message:
+        "Successfully authorized! Tokens saved automatically to database.",
       authorization: {
         longLivedUserToken: longLivedUserToken,
         expiresIn: expiresIn,
-        expiresInDays: Math.floor(expiresIn / 86400)
+        expiresInDays: Math.floor(expiresIn / 86400),
       },
-      pages: pagesWithInstagram.map(page => ({
+      pages: pagesWithInstagram.map((page) => ({
         id: page.id,
         name: page.name,
         category: page.category,
         accessToken: page.access_token,
         hasInstagram: !!page.instagram_business_account,
-        instagramAccount: page.instagram_account ? {
-          id: page.instagram_account.id,
-          username: page.instagram_account.username,
-          name: page.instagram_account.name
-        } : null
+        instagramAccount: page.instagram_account
+          ? {
+              id: page.instagram_account.id,
+              username: page.instagram_account.username,
+              name: page.instagram_account.name,
+            }
+          : null,
       })),
       nextSteps: [
-        '1. ✅ Page access tokens saved to database automatically (they don\'t expire!)',
-        '2. You can now post to Facebook and Instagram from the admin dashboard',
-        '3. No need to re-authenticate - tokens are stored permanently',
-        '4. View and manage tokens in Admin Dashboard → Social Media'
-      ]
+        "1. ✅ Page access tokens saved to database automatically (they don't expire!)",
+        "2. You can now post to Facebook and Instagram from the admin dashboard",
+        "3. No need to re-authenticate - tokens are stored permanently",
+        "4. View and manage tokens in Admin Dashboard → Social Media",
+      ],
     };
 
-    console.log('OAuth flow completed successfully:', {
+    console.log("OAuth flow completed successfully:", {
       pageCount: pages.length,
-      instagramAccounts: pagesWithInstagram.filter(p => p.instagram_account).length,
-      tokensSaved: true
+      instagramAccounts: pagesWithInstagram.filter((p) => p.instagram_account)
+        .length,
+      tokensSaved: true,
     });
 
     // If no pages but authorization succeeded, show special message
     if (pages.length === 0) {
-      res.setHeader('Content-Type', 'text/html');
-      return res.status(200).send(generateNoPagesHTML(response.authorization.longLivedUserToken));
+      res.setHeader("Content-Type", "text/html");
+      return res
+        .status(200)
+        .send(generateNoPagesHTML(response.authorization.longLivedUserToken));
     }
 
     // Return formatted HTML response with embedded data
-    res.setHeader('Content-Type', 'text/html');
+    res.setHeader("Content-Type", "text/html");
     res.status(200).send(generateSuccessHTML(response));
-
   } catch (error) {
-    console.error('Token exchange error:', error.message);
-    console.error('Error details:', error.response?.data);
+    console.error("Token exchange error:", error.message);
+    console.error("Error details:", error.response?.data);
 
     // Handle specific error cases
     if (error.response?.data) {
-      res.setHeader('Content-Type', 'text/html');
-      return res.status(400).send(generateErrorHTML(
-        'Facebook API Error',
-        error.response.data.error?.message || 'Failed to exchange tokens with Facebook. The authorization code may have expired.'
-      ));
+      res.setHeader("Content-Type", "text/html");
+      return res
+        .status(400)
+        .send(
+          generateErrorHTML(
+            "Facebook API Error",
+            error.response.data.error?.message ||
+              "Failed to exchange tokens with Facebook. The authorization code may have expired."
+          )
+        );
     }
 
-    res.setHeader('Content-Type', 'text/html');
-    return res.status(500).send(generateErrorHTML(
-      'Internal Server Error',
-      error.message || 'Please try the authorization flow again.'
-    ));
+    res.setHeader("Content-Type", "text/html");
+    return res
+      .status(500)
+      .send(
+        generateErrorHTML(
+          "Internal Server Error",
+          error.message || "Please try the authorization flow again."
+        )
+      );
   }
 };
 
@@ -393,40 +471,64 @@ function generateSuccessHTML(data) {
             <p style="margin-bottom: 15px;">Save these tokens securely. You'll need them to post to Facebook and Instagram.</p>
             <div style="margin: 20px 0;">
                 <strong>Long-Lived User Token:</strong>
-                <div class="token-box" id="userToken">${data.authorization.longLivedUserToken}</div>
+                <div class="token-box" id="userToken">${
+                  data.authorization.longLivedUserToken
+                }</div>
                 <button class="copy-btn" onclick="copyToken('userToken')">📋 Copy User Token</button>
-                <p style="color: #666; font-size: 14px; margin-top: 10px;">Expires in ${data.authorization.expiresInDays} days</p>
+                <p style="color: #666; font-size: 14px; margin-top: 10px;">Expires in ${
+                  data.authorization.expiresInDays
+                } days</p>
             </div>
         </div>
         
         <div class="section">
             <h3>📱 Connected Pages (${data.pages.length})</h3>
-            ${data.pages.map(page => `
+            ${data.pages
+              .map(
+                (page) => `
                 <div class="page-item">
                     <div class="page-name">${page.name}</div>
-                    <div style="color: #666; font-size: 14px; margin: 5px 0;">ID: ${page.id} | Category: ${page.category}</div>
-                    ${page.hasInstagram ? `<div class="instagram-badge">📷 Instagram: @${page.instagramAccount?.username}</div>` : ''}
+                    <div style="color: #666; font-size: 14px; margin: 5px 0;">ID: ${
+                      page.id
+                    } | Category: ${page.category}</div>
+                    ${
+                      page.hasInstagram
+                        ? `<div class="instagram-badge">📷 Instagram: @${page.instagramAccount?.username}</div>`
+                        : ""
+                    }
                     
                     <div style="margin-top: 15px;">
                         <strong>Page Access Token:</strong>
-                        <div class="token-box" id="pageToken${page.id}">${page.accessToken}</div>
-                        <button class="copy-btn" onclick="copyToken('pageToken${page.id}')">📋 Copy Token</button>
+                        <div class="token-box" id="pageToken${page.id}">${
+                  page.accessToken
+                }</div>
+                        <button class="copy-btn" onclick="copyToken('pageToken${
+                          page.id
+                        }')">📋 Copy Token</button>
                         <p style="color: #28a745; font-size: 14px; margin-top: 10px;">✅ Never expires!</p>
                     </div>
-                    ${page.instagramAccount ? `
+                    ${
+                      page.instagramAccount
+                        ? `
                         <div style="margin-top: 15px;">
                             <strong>Instagram ID:</strong>
                             <div class="token-box">${page.instagramAccount.id}</div>
                             <p style="color: #666; font-size: 14px; margin-top: 5px;">Use with page token to post to Instagram</p>
                         </div>
-                    ` : ''}
+                    `
+                        : ""
+                    }
                 </div>
-            `).join('')}
+            `
+              )
+              .join("")}
         </div>
         
         <div class="next-steps">
             <h3>🎯 Next Steps</h3>
-            <ol>${data.nextSteps.map(step => `<li>${step}</li>`).join('')}</ol>
+            <ol>${data.nextSteps
+              .map((step) => `<li>${step}</li>`)
+              .join("")}</ol>
         </div>
         
         <div style="text-align: center; margin-top: 30px;">
@@ -657,4 +759,3 @@ function generateErrorHTML(error, details) {
 </body>
 </html>`;
 }
-

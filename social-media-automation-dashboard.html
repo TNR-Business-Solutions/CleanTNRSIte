@@ -1842,7 +1842,22 @@
             // Handle test post (special case - always random)
             if (contentType === 'test-post') {
                 const testTemplates = contentTemplateLibrary['test-post'];
-                template = testTemplates[Math.floor(Math.random() * testTemplates.length)];
+                template = getRandomTemplate(testTemplates);
+            }
+            // Handle job postings (industry-specific or general, Twitter-optimized)
+            else if (contentType === 'job-posting') {
+                const jobTemplates = contentTemplateLibrary['job-posting'];
+                if (jobTemplates[industryType] && jobTemplates[industryType].length > 0) {
+                    template = getRandomTemplate(jobTemplates[industryType]);
+                } else if (jobTemplates['general'] && jobTemplates['general'].length > 0) {
+                    template = getRandomTemplate(jobTemplates['general']);
+                } else {
+                    template = "💼 WE'RE HIRING! Join {business} in {location}.\n\nApply: {email} | {phone}\n\n#Hiring #{location} #NowHiring";
+                }
+                // Shorten for Twitter if needed
+                if (template.length > 200) {
+                    template = template.substring(0, 200).replace(/\n[^\n]*$/, '') + '\n\n#Hiring #{location} #NowHiring';
+                }
             }
             // Handle service promotions (industry-specific)
             else if (contentType === 'service-promotion') {

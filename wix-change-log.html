@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wix Change Log - TNR Business Solutions</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; }
+        h1 { color: #667eea; }
+        .change-item { background: #f8f9fa; padding: 20px; margin: 15px 0; border-radius: 8px; border-left: 4px solid #667eea; }
+        .change-item h3 { margin: 0 0 10px 0; color: #333; }
+        .change-item .timestamp { color: #666; font-size: 0.9em; }
+        .change-item .changes { margin-top: 10px; }
+        .change-item .changes strong { color: #667eea; }
+        .btn { padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .btn:hover { background: #5568d3; }
+        .loading { text-align: center; padding: 40px; color: #667eea; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📋 Wix Change Log</h1>
+        <p>View all changes made to your Wix sites through this automation platform.</p>
+        
+        <div style="margin-bottom: 20px;">
+            <button class="btn" onclick="loadChanges()">🔄 Refresh Changes</button>
+            <button class="btn" onclick="clearLogs()">🗑️ Clear Logs</button>
+        </div>
+        
+        <div id="changesContainer" class="loading">Loading changes...</div>
+    </div>
+    
+    <script>
+        async function loadChanges() {
+            const container = document.getElementById('changesContainer');
+            container.innerHTML = '<div class="loading">Loading changes...</div>';
+            
+            try {
+                const response = await fetch('/api/wix?action=getChangeSummary');
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayChanges(data.data);
+                } else {
+                    container.innerHTML = `<p style="color: red;">Error: ${data.error}</p>`;
+                }
+            } catch (error) {
+                container.innerHTML = `<p style="color: red;">Error loading changes: ${error.message}</p>`;
+            }
+        }
+        
+        function displayChanges(summary) {
+            const container = document.getElementById('changesContainer');
+            
+            if (summary.totalChanges === 0) {
+                container.innerHTML = '<p>No changes recorded yet. Make some updates to see them here!</p>';
+                return;
+            }
+            
+            container.innerHTML = `
+                <h2>Total Changes: ${summary.totalChanges}</h2>
+                ${summary.changes.map(change => `
+                    <div class="change-item">
+                        <h3>${change.operation}</h3>
+                        <div class="timestamp">${new Date(change.timestamp).toLocaleString()}</div>
+                        <div class="changes">
+                            <strong>Entity:</strong> ${change.entityType} (${change.entityId})<br>
+                            <strong>Changes:</strong><br>
+                            ${Object.entries(change.changes).map(([key, value]) => 
+                                `&nbsp;&nbsp;• ${key}: ${JSON.stringify(value)}`
+                            ).join('<br>')}
+                        </div>
+                    </div>
+                `).join('')}
+            `;
+        }
+        
+        async function clearLogs() {
+            if (!confirm('Are you sure you want to clear all change logs?')) return;
+            
+            // This would call a backend endpoint to clear logs
+            alert('Log clearing feature coming soon. Logs are stored in server/logs/ directory.');
+        }
+        
+        // Load changes on page load
+        loadChanges();
+        
+        // Auto-refresh every 30 seconds
+        setInterval(loadChanges, 30000);
+    </script>
+</body>
+</html>
+

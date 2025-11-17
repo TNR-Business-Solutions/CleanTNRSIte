@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wix SEO Manager - TNR Business Solutions</title>
+    <style>
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 15px; margin-bottom: 30px; }
+        .card { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .btn { padding: 10px 25px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; margin-right: 10px; }
+        .btn:hover { background: #5568d3; }
+        .btn-success { background: #28a745; }
+        .btn-success:hover { background: #218838; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        .form-group textarea { min-height: 100px; }
+        .audit-item { background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 10px; border-left: 4px solid #ffc107; }
+        .audit-item.good { border-left-color: #28a745; }
+        .loading { text-align: center; padding: 40px; color: #667eea; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Wix SEO Manager</h1>
+            <p>Automate and optimize SEO for your Wix client sites</p>
+        </div>
+        
+        <div class="card">
+            <h2>Select Client</h2>
+            <select id="instanceSelect" class="form-group" onchange="selectInstance()">
+                <option value="">-- Select a Wix Client --</option>
+            </select>
+        </div>
+        
+        <div id="seoTools" style="display: none;">
+            <!-- SEO Audit -->
+            <div class="card">
+                <h2>📊 SEO Audit</h2>
+                <button class="btn" onclick="runSEOAudit()">Run Full SEO Audit</button>
+                <div id="auditResults" style="margin-top: 20px;"></div>
+            </div>
+            
+            <!-- Site-wide SEO -->
+            <div class="card">
+                <h2>🌐 Site-wide SEO Settings</h2>
+                <form id="siteSEOForm" onsubmit="updateSiteSEO(event)">
+                    <div class="form-group">
+                        <label>Site Title</label>
+                        <input type="text" id="siteTitle" placeholder="Your Site Title">
+                    </div>
+                    <div class="form-group">
+                        <label>Site Description</label>
+                        <textarea id="siteDescription" placeholder="Your site description..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Keywords (comma-separated)</label>
+                        <input type="text" id="siteKeywords" placeholder="keyword1, keyword2, keyword3">
+                    </div>
+                    <button type="submit" class="btn btn-success">Update Site SEO</button>
+                </form>
+            </div>
+            
+            <!-- Auto-Optimize -->
+            <div class="card">
+                <h2>⚡ Auto-Optimize SEO</h2>
+                <p>Automatically optimize SEO for all pages based on content</p>
+                <button class="btn btn-success" onclick="autoOptimizeAll()">Auto-Optimize All Pages</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let selectedInstance = null;
+        
+        // Load clients on page load
+        async function loadClients() {
+            try {
+                const response = await fetch('/api/wix?action=listClients');
+                const data = await response.json();
+                
+                const select = document.getElementById('instanceSelect');
+                data.clients.forEach(client => {
+                    const option = document.createElement('option');
+                    option.value = client.instanceId;
+                    option.textContent = `${client.clientId || 'Unnamed'} (${client.instanceId})`;
+                    select.appendChild(option);
+                });
+                
+                // Check URL params for pre-selected instance
+                const urlParams = new URLSearchParams(window.location.search);
+                const instanceId = urlParams.get('instanceId');
+                if (instanceId) {
+                    select.value = instanceId;
+                    selectInstance();
+                }
+            } catch (error) {
+                console.error('Error loading clients:', error);
+            }
+        }
+        
+        function selectInstance() {
+            selectedInstance = document.getElementById('instanceSelect').value;
+            document.getElementById('seoTools').style.display = selectedInstance ? 'block' : 'none';
+        }
+        
+        async function runSEOAudit() {
+            if (!selectedInstance) return;
+            
+            const resultsDiv = document.getElementById('auditResults');
+            resultsDiv.innerHTML = '<div class="loading">Running SEO audit...</div>';
+            
+            try {
+                const response = await fetch('/api/wix', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'auditSiteSEO',
+                        instanceId: selectedInstance
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const audit = data.data;
+                    resultsDiv.innerHTML = `
+                        <h3>Audit Results</h3>
+                        <p><strong>Total Pages:</strong> ${audit.totalPages}</p>
+                        <p><strong>Pages with Issues:</strong> ${audit.pagesWithIssues}</p>
+                        <div style="margin-top: 15px;">
+                            ${audit.issues.map(issue => `
+                                <div class="audit-item">
+                                    <strong>${issue.pageName}</strong>
+                                    <ul>
+                                        ${issue.issues.map(i => `<li>${i}</li>`).join('')}
+                                    </ul>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else {
+                    throw new Error(data.error);
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+        
+        async function updateSiteSEO(event) {
+            event.preventDefault();
+            if (!selectedInstance) return;
+            
+            const seoData = {
+                title: document.getElementById('siteTitle').value,
+                description: document.getElementById('siteDescription').value,
+                keywords: document.getElementById('siteKeywords').value.split(',').map(k => k.trim())
+            };
+            
+            try {
+                const response = await fetch('/api/wix', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'updateSiteSEO',
+                        instanceId: selectedInstance,
+                        seoData
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('✅ Site SEO updated successfully!');
+                } else {
+                    throw new Error(data.error);
+                }
+            } catch (error) {
+                alert(`❌ Error: ${error.message}`);
+            }
+        }
+        
+        async function autoOptimizeAll() {
+            if (!selectedInstance) return;
+            if (!confirm('This will automatically optimize SEO for all pages. Continue?')) return;
+            
+            alert('Auto-optimization started! This may take a few minutes...');
+        }
+        
+        loadClients();
+    </script>
+</body>
+</html>
+

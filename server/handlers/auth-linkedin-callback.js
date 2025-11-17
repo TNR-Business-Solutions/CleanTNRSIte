@@ -113,14 +113,14 @@ module.exports = async (req, res) => {
     const accessToken = tokenResponse.data.access_token;
     const expiresIn = tokenResponse.data.expires_in || 5184000; // Default to 60 days if not provided
     const refreshToken = tokenResponse.data.refresh_token || null;
-    
+
     // Log token response to see if it contains user info
     console.log("Token response keys:", Object.keys(tokenResponse.data || {}));
     console.log("Token response (excluding token):", {
       expires_in: tokenResponse.data.expires_in,
       token_type: tokenResponse.data.token_type,
       scope: tokenResponse.data.scope,
-      has_refresh_token: !!refreshToken
+      has_refresh_token: !!refreshToken,
     });
 
     if (!accessToken) {

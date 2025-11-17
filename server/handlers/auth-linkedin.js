@@ -25,9 +25,9 @@ module.exports = (req, res) => {
   // email - Get user email (optional but included in token generator)
   const scopes = [
     "w_member_social", // Post content on LinkedIn (required for UGC Posts API)
-    "openid",          // OpenID Connect for user identification
-    "profile",         // Basic profile information (includes user ID)
-    "email",           // User email (optional but useful)
+    "openid", // OpenID Connect for user identification
+    "profile", // Basic profile information (includes user ID)
+    "email", // User email (optional but useful)
   ];
 
   // Generate state for CSRF protection
