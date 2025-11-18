@@ -1,0 +1,5 @@
+[33m1c86e97[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m Fix Wix token storage: migrate from filesystem to database for Vercel serverless compatibility
+[33mc9f6c01[m Ensure api/index.js is configured in Vercel for Wix OAuth token redirects
+[33m90dd5f9[m Add missing Wix API route handler - fixes 404 errors
+[33ma8910a4[m Remove test and debug files - cleanup unused development files
+[33m0c66bef[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Fix admin-dashboard.html: add missing Wix Automation link and fix CSS variables
