@@ -44,6 +44,14 @@
     {
       "source": "/admin/auth",
       "destination": "/api/admin/auth"
+    },
+    {
+      "source": "/auth/wix",
+      "destination": "/api/auth/wix"
+    },
+    {
+      "source": "/auth/wix/callback",
+      "destination": "/api/auth/wix/callback"
     }
   ],
   "headers": [

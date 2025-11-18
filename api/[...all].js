@@ -142,6 +142,16 @@ module.exports = async (req, res) => {
       return await handler(req, res);
     }
 
+    // Wix OAuth routes
+    if (route.startsWith("auth/wix")) {
+      if (route === "auth/wix/callback" || route.endsWith("/callback")) {
+        const handler = require("../server/handlers/auth-wix-callback");
+        return await handler(req, res);
+      }
+      const handler = require("../server/handlers/auth-wix");
+      return await handler(req, res);
+    }
+
     if (route.startsWith("workflows/") || route === "workflows") {
       const handler = require("../server/handlers/workflows-api");
       return await handler(req, res);
@@ -238,6 +248,7 @@ module.exports = async (req, res) => {
           "/api/auth/meta - Facebook/Instagram OAuth",
           "/api/auth/linkedin - LinkedIn OAuth",
           "/api/auth/twitter - Twitter OAuth",
+          "/api/auth/wix - Wix OAuth",
           "/api/social/tokens - Social media token management",
           "/api/social/post-to-facebook - Post to Facebook",
           "/api/social/post-to-instagram - Post to Instagram",
@@ -273,6 +284,7 @@ module.exports = async (req, res) => {
         "/api/auth/meta",
         "/api/auth/linkedin",
         "/api/auth/twitter",
+        "/api/auth/wix",
         "/api/social/tokens",
         "/api/social/post-to-facebook",
         "/api/social/post-to-instagram",

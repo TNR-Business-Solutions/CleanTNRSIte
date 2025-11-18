@@ -903,9 +903,38 @@
             }
         }
         
+        // Helper function to get Meta token from database
+        async function getMetaTokenFromDatabase() {
+            try {
+                const response = await fetch('/api/social/tokens?action=get', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ platform: 'facebook' })
+                });
+                
+                const data = await response.json();
+                if (data.success && data.token) {
+                    return data.token.access_token;
+                }
+            } catch (error) {
+                console.error('Error loading token from database:', error);
+            }
+            return null;
+        }
+        
         async function testMetaToken() {
             const tokenInput = document.getElementById('metaToken');
-            const token = (tokenInput ? tokenInput.value.trim() : '') || localStorage.getItem('metaPageAccessToken');
+            let token = tokenInput ? tokenInput.value.trim() : '';
+            
+            // If no token in input, try to get from database
+            if (!token) {
+                token = await getMetaTokenFromDatabase();
+            }
+            
+            // Fallback to localStorage only if database doesn't have token
+            if (!token) {
+                token = localStorage.getItem('metaPageAccessToken');
+            }
             
             if (!token) {
                 console.log('No token found');
@@ -1208,13 +1237,38 @@
             }
         }
         
-        function saveMetaToken() {
+        async function saveMetaToken() {
             const metaTokenInput = document.getElementById('metaToken');
             const token = metaTokenInput ? metaTokenInput.value.trim() : '';
             if (token) {
-                localStorage.setItem('metaPageAccessToken', token);
-                alert('✅ Token saved! Now test it to verify.');
-                testMetaToken();
+                // Save to database via API
+                try {
+                    const response = await fetch('/api/social/tokens?action=save', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            platform: 'facebook',
+                            access_token: token,
+                            token_type: 'Bearer'
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    if (data.success) {
+                        // Also save to localStorage as backup
+                        localStorage.setItem('metaPageAccessToken', token);
+                        alert('✅ Token saved to database! Now test it to verify.');
+                        testMetaToken();
+                    } else {
+                        alert('❌ Failed to save token: ' + (data.error || data.message));
+                    }
+                } catch (error) {
+                    console.error('Error saving token:', error);
+                    // Fallback to localStorage if API fails
+                    localStorage.setItem('metaPageAccessToken', token);
+                    alert('⚠️ Saved to local storage (database save failed). Token will work but may not persist.');
+                    testMetaToken();
+                }
             } else {
                 alert('Please paste your token first');
             }
@@ -1223,7 +1277,14 @@
         async function postToFacebook() {
             const content = document.getElementById('previewContent').value.trim();
             const imageUrl = document.getElementById('postImageUrl').value.trim();
-            const token = localStorage.getItem('metaPageAccessToken');
+            
+            // Try to get token from database first
+            let token = await getMetaTokenFromDatabase();
+            
+            // Fallback to localStorage if database doesn't have token
+            if (!token) {
+                token = localStorage.getItem('metaPageAccessToken');
+            }
             
             if (!token) {
                 if (confirm('No token saved. Would you like to connect Facebook now?')) {
@@ -1292,7 +1353,14 @@
         async function postToInstagram() {
             const content = document.getElementById('previewContent').value.trim();
             const imageUrl = document.getElementById('postImageUrl').value.trim();
-            const token = localStorage.getItem('metaPageAccessToken');
+            
+            // Try to get token from database first
+            let token = await getMetaTokenFromDatabase();
+            
+            // Fallback to localStorage if database doesn't have token
+            if (!token) {
+                token = localStorage.getItem('metaPageAccessToken');
+            }
             
             if (!token) {
                 if (confirm('No token saved. Would you like to connect Facebook now?')) {
@@ -1454,19 +1522,43 @@
                 twitterTextarea.addEventListener('input', updateTwitterCharCount);
             }
             
-            // Auto-load Meta token if available
-            const savedToken = localStorage.getItem('metaPageAccessToken');
-            if (savedToken) {
-                console.log('Found saved Meta token, will auto-test...');
-                const metaTokenInput = document.getElementById('metaToken');
-                if (metaTokenInput) {
-                    metaTokenInput.value = savedToken;
+            // Auto-load Meta token from database if available
+            async function autoLoadMetaToken() {
+                try {
+                    // Try database first
+                    const token = await getMetaTokenFromDatabase();
+                    if (token) {
+                        console.log('Found Meta token in database, will auto-test...');
+                        const metaTokenInput = document.getElementById('metaToken');
+                        if (metaTokenInput) {
+                            metaTokenInput.value = token;
+                        }
+                        // Reset manual test flag for auto-test (no alert popup)
+                        window.manualTest = false;
+                        // Small delay to ensure all DOM elements are ready
+                        setTimeout(() => testMetaToken(), 200);
+                        return;
+                    }
+                    
+                    // Fallback to localStorage
+                    const savedToken = localStorage.getItem('metaPageAccessToken');
+                    if (savedToken) {
+                        console.log('Found saved Meta token in localStorage, will auto-test...');
+                        const metaTokenInput = document.getElementById('metaToken');
+                        if (metaTokenInput) {
+                            metaTokenInput.value = savedToken;
+                        }
+                        // Reset manual test flag for auto-test (no alert popup)
+                        window.manualTest = false;
+                        // Small delay to ensure all DOM elements are ready
+                        setTimeout(() => testMetaToken(), 200);
+                    }
+                } catch (error) {
+                    console.error('Error auto-loading Meta token:', error);
                 }
-                // Reset manual test flag for auto-test (no alert popup)
-                window.manualTest = false;
-                // Small delay to ensure all DOM elements are ready
-                setTimeout(() => testMetaToken(), 200);
             }
+            
+            autoLoadMetaToken();
             
             // Auto-load connection status from database
             setTimeout(() => {
@@ -1517,24 +1609,38 @@
                         
                         // Load token into input if available
                         if (facebookToken.has_token) {
-                            // We can't get the actual token from the list endpoint (security)
-                            // But we can check if it exists in localStorage
-                            const savedToken = localStorage.getItem('metaPageAccessToken');
-                            if (savedToken) {
+                            // Try to get token from database
+                            const token = await getMetaTokenFromDatabase();
+                            if (token) {
                                 const metaTokenInput = document.getElementById('metaToken');
                                 if (metaTokenInput && !metaTokenInput.value) {
-                                    metaTokenInput.value = savedToken;
+                                    metaTokenInput.value = token;
+                                }
+                            } else {
+                                // Fallback to localStorage
+                                const savedToken = localStorage.getItem('metaPageAccessToken');
+                                if (savedToken) {
+                                    const metaTokenInput = document.getElementById('metaToken');
+                                    if (metaTokenInput && !metaTokenInput.value) {
+                                        metaTokenInput.value = savedToken;
+                                    }
                                 }
                             }
                         }
                     }
                 } else {
-                    // No tokens in database, check localStorage
+                    // No tokens in database, check localStorage as fallback
                     const savedToken = localStorage.getItem('metaPageAccessToken');
                     if (savedToken) {
                         // Test the saved token to check Instagram connection
                         window.manualTest = false;
                         setTimeout(() => testMetaToken(), 300);
+                    } else {
+                        // No token found anywhere
+                        const metaStatus = document.getElementById('metaStatus');
+                        if (metaStatus) {
+                            metaStatus.innerHTML = '❌ Not connected. Click "Connect Facebook/Instagram" to get started.';
+                        }
                     }
                 }
             } catch (error) {

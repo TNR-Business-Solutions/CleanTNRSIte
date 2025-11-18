@@ -17,6 +17,11 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Serve static files from parent directory (for HTML files, assets, etc.)
+// This must come AFTER the root route handler to allow OAuth callbacks to work
+const staticPath = path.join(__dirname, '..');
+console.log('📁 Serving static files from:', staticPath);
+
 // Configuration via environment variables (never hardcode secrets)
 const PORT = Number(process.env.PORT || 3000);
 let META_APP_ID = process.env.META_APP_ID;
@@ -25,19 +30,32 @@ let META_APP_SECRET = process.env.META_APP_SECRET;
 let REDIRECT_URI = process.env.META_REDIRECT_URI || 'http://localhost:3000/auth/meta/callback';
 
 // Fallback to local file for dev if env vars are missing
-if (!META_APP_ID || !META_APP_SECRET || !process.env.META_REDIRECT_URI) {
-  try {
-    const localEnvPath = path.join(__dirname, 'env.local.json');
-    if (fs.existsSync(localEnvPath)) {
-      const raw = fs.readFileSync(localEnvPath, 'utf8');
-      const conf = JSON.parse(raw);
-      META_APP_ID = META_APP_ID || conf.META_APP_ID;
-      META_APP_SECRET = META_APP_SECRET || conf.META_APP_SECRET;
-      REDIRECT_URI = conf.META_REDIRECT_URI || REDIRECT_URI;
+try {
+  const localEnvPath = path.join(__dirname, 'env.local.json');
+  if (fs.existsSync(localEnvPath)) {
+    const raw = fs.readFileSync(localEnvPath, 'utf8');
+    const conf = JSON.parse(raw);
+    
+    // Load Meta settings
+    META_APP_ID = META_APP_ID || conf.META_APP_ID;
+    META_APP_SECRET = META_APP_SECRET || conf.META_APP_SECRET;
+    REDIRECT_URI = conf.META_REDIRECT_URI || REDIRECT_URI;
+    
+    // Load Wix settings into process.env (for Wix handlers to use)
+    if (conf.WIX_APP_ID && !process.env.WIX_APP_ID) {
+      process.env.WIX_APP_ID = conf.WIX_APP_ID;
     }
-  } catch (e) {
-    console.warn('Failed to read env.local.json:', e.message);
+    if (conf.WIX_APP_SECRET && !process.env.WIX_APP_SECRET) {
+      process.env.WIX_APP_SECRET = conf.WIX_APP_SECRET;
+    }
+    if (conf.WIX_REDIRECT_URI && !process.env.WIX_REDIRECT_URI) {
+      process.env.WIX_REDIRECT_URI = conf.WIX_REDIRECT_URI;
+    }
+    
+    console.log('✅ Loaded environment variables from env.local.json');
   }
+} catch (e) {
+  console.warn('Failed to read env.local.json:', e.message);
 }
 
 if (!META_APP_ID || !META_APP_SECRET) {
@@ -148,6 +166,55 @@ app.get('/auth/meta/callback', async (req, res) => {
   }
 });
 
+// Handle Wix OAuth callback redirected to root (common Wix behavior)
+// IMPORTANT: This must be defined BEFORE static file serving
+app.get('/', (req, res, next) => {
+  console.log('📍 Root route handler called');
+  console.log('   URL:', req.url);
+  console.log('   Query:', req.query);
+  
+  // If token parameter exists, redirect to proper callback endpoint
+  if (req.query.token || req.query.code || req.query.instanceId) {
+    console.log('🔄 Root route received Wix OAuth callback, redirecting to /api/auth/wix/callback');
+    console.log('   Query params:', Object.keys(req.query));
+    console.log('   Has token:', !!req.query.token);
+    console.log('   Has code:', !!req.query.code);
+    console.log('   Has instanceId:', !!req.query.instanceId);
+    console.log('   Protocol:', req.secure ? 'https' : 'http');
+    console.log('   Host:', req.headers.host);
+    
+    // Build callback URL with all query parameters
+    // Detect protocol from request (https if secure connection or X-Forwarded-Proto header)
+    const protocol = req.secure || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
+    const callbackUrl = new URL('/api/auth/wix/callback', `${protocol}://${req.headers.host}`);
+    Object.keys(req.query).forEach(key => {
+      callbackUrl.searchParams.append(key, req.query[key]);
+    });
+    
+    console.log('   Redirecting to:', callbackUrl.toString().substring(0, 100) + '...');
+    
+    return res.redirect(callbackUrl.toString());
+  }
+  
+  // Otherwise, serve a simple response or redirect to dashboard
+  console.log('📍 Root route: serving default page');
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>TNR Business Solutions - Wix Automation</title>
+      <meta http-equiv="refresh" content="2;url=/wix-client-dashboard.html">
+    </head>
+    <body>
+      <h1>TNR Business Solutions</h1>
+      <p>Wix Automation Server is running.</p>
+      <p>Redirecting to dashboard...</p>
+      <p><a href="/wix-client-dashboard.html">Go to Dashboard</a></p>
+    </body>
+    </html>
+  `);
+});
+
 // Wix OAuth Routes
 app.get('/api/auth/wix', authWix);
 app.get('/api/auth/wix/callback', authWixCallback);
@@ -155,6 +222,10 @@ app.get('/api/auth/wix/callback', authWixCallback);
 // Wix API Routes
 app.get('/api/wix', wixApiRoutes);
 app.post('/api/wix', wixApiRoutes);
+
+// Serve static files AFTER all API routes (so API routes take precedence)
+// The root route handler is defined above, so it will take precedence over static files
+app.use(express.static(staticPath, { index: false })); // Don't serve index.html automatically
 
 // Start HTTP and, if certificates exist, HTTPS on the same port (HTTPS-only when redirect is https)
 function startServer() {

@@ -7,12 +7,20 @@ const axios = require('axios');
 const crypto = require('crypto');
 const { stateStore } = require('./auth-wix');
 
-// Wix App Configuration
-const WIX_APP_ID = '9901133d-7490-4e6e-adfd-cb11615cc5e4';
-const WIX_APP_SECRET = '87fd621b-f3d2-4b2f-b085-2c4f00a17b97';
+// Wix App Configuration - Use environment variables if available
+const WIX_APP_ID = process.env.WIX_APP_ID || '9901133d-7490-4e6e-adfd-cb11615cc5e4';
+const WIX_APP_SECRET = process.env.WIX_APP_SECRET || '87fd621b-f3d2-4b2f-b085-2c4f00a17b97';
 
-// Token endpoint
-const WIX_TOKEN_URL = 'https://www.wix.com/oauth/access';
+// Log configuration for debugging
+console.log('🔧 Wix OAuth Callback Configuration:', {
+  appId: WIX_APP_ID.substring(0, 8) + '...',
+  hasSecret: !!WIX_APP_SECRET,
+  hasEnvAppId: !!process.env.WIX_APP_ID,
+  hasEnvSecret: !!process.env.WIX_APP_SECRET
+});
+
+// Token endpoint - Wix uses wixapis.com domain for API calls
+const WIX_TOKEN_URL = 'https://www.wixapis.com/oauth/access';
 
 // Database for storing client tokens (in production, use PostgreSQL/MongoDB)
 const clientTokensDB = new Map();
@@ -29,6 +37,9 @@ tokenManager.loadTokens(clientTokensDB);
 async function exchangeCodeForToken(code) {
   try {
     console.log('🔄 Exchanging authorization code for access token');
+    console.log(`   Using token endpoint: ${WIX_TOKEN_URL}`);
+    console.log(`   App ID: ${WIX_APP_ID.substring(0, 8)}...`);
+    console.log(`   Code length: ${code?.length || 0} characters`);
     
     const response = await axios.post(WIX_TOKEN_URL, {
       grant_type: 'authorization_code',
@@ -38,7 +49,8 @@ async function exchangeCodeForToken(code) {
     }, {
       headers: {
         'Content-Type': 'application/json'
-      }
+      },
+      timeout: 10000 // 10 second timeout
     });
     
     console.log('✅ Successfully obtained access token');
@@ -47,8 +59,8 @@ async function exchangeCodeForToken(code) {
       hasRefreshToken: !!response.data.refresh_token,
       expiresIn: response.data.expires_in,
       tokenType: response.data.token_type,
-      instanceId: response.data.instance_id || 'not provided',
-      siteId: response.data.site_id || 'not provided'
+      instanceId: response.data.instance_id || response.data.instanceId || 'not provided',
+      siteId: response.data.site_id || response.data.siteId || 'not provided'
     }, null, 2));
     
     // Log full response for debugging (but mask sensitive data)
@@ -60,7 +72,21 @@ async function exchangeCodeForToken(code) {
     return response.data;
     
   } catch (error) {
-    console.error('❌ Error exchanging code for token:', error.response?.data || error.message);
+    console.error('❌ Error exchanging code for token');
+    console.error('   Status:', error.response?.status);
+    console.error('   Status Text:', error.response?.statusText);
+    console.error('   Error Data:', JSON.stringify(error.response?.data || error.message, null, 2));
+    console.error('   Full Error:', error.message);
+    
+    // Provide helpful error message
+    if (error.response?.status === 400) {
+      throw new Error(`Invalid authorization code. The code may have expired or already been used. Details: ${JSON.stringify(error.response.data)}`);
+    } else if (error.response?.status === 401) {
+      throw new Error(`Authentication failed. Check your WIX_APP_ID and WIX_APP_SECRET. Details: ${JSON.stringify(error.response.data)}`);
+    } else if (error.response?.status === 404) {
+      throw new Error(`Token endpoint not found. Verify WIX_TOKEN_URL is correct: ${WIX_TOKEN_URL}`);
+    }
+    
     throw error;
   }
 }
@@ -311,10 +337,26 @@ module.exports = async (req, res) => {
   } catch (error) {
     console.error('❌ Error in Wix OAuth callback:', error);
     console.error('   Error details:', error.message);
+    console.error('   Query params received:', req.query);
     console.error('   Stack:', error.stack);
     
-    // Redirect to error page
-    res.redirect(`/wix-client-dashboard.html?error=${encodeURIComponent(error.message)}`);
+    // Provide detailed error information
+    let errorMessage = error.message || 'Unknown error occurred';
+    let errorDetails = '';
+    
+    if (error.response) {
+      errorDetails = JSON.stringify(error.response.data || error.response.statusText);
+      console.error('   API Error Response:', errorDetails);
+    }
+    
+    // Redirect to error page with detailed information
+    const errorUrl = new URL('/wix-client-dashboard.html', `http://${req.headers.host}`);
+    errorUrl.searchParams.append('error', errorMessage);
+    if (errorDetails) {
+      errorUrl.searchParams.append('details', errorDetails);
+    }
+    
+    res.redirect(errorUrl.toString());
   }
 };
 
