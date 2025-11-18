@@ -10,6 +10,36 @@
   },
   "rewrites": [
     {
+      "source": "/",
+      "destination": "/api/index",
+      "has": [
+        {
+          "type": "query",
+          "key": "token"
+        }
+      ]
+    },
+    {
+      "source": "/",
+      "destination": "/api/index",
+      "has": [
+        {
+          "type": "query",
+          "key": "code"
+        }
+      ]
+    },
+    {
+      "source": "/",
+      "destination": "/api/index",
+      "has": [
+        {
+          "type": "query",
+          "key": "instanceId"
+        }
+      ]
+    },
+    {
       "source": "/api/:path*",
       "destination": "/api/[...all]"
     },
