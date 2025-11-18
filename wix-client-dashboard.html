@@ -233,9 +233,108 @@
             margin: 0 0 15px 0;
             opacity: 0.9;
         }
+        
+        /* Admin Header Menu */
+        .admin-header {
+            background: linear-gradient(135deg, var(--tnr-navy) 0%, var(--tnr-primary) 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            margin-bottom: 0;
+        }
+        .admin-header-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .admin-header-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: bold;
+            text-decoration: none;
+            color: white;
+        }
+        .admin-header-logo img {
+            height: 35px;
+        }
+        .admin-header-menu {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .admin-header-link {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .admin-header-link:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-2px);
+        }
+        .admin-header-link.active {
+            background: var(--tnr-gold);
+            color: var(--tnr-navy);
+        }
+        .admin-header-link.logout {
+            background: rgba(220, 53, 69, 0.2);
+            border: 1px solid rgba(220, 53, 69, 0.5);
+        }
+        .admin-header-link.logout:hover {
+            background: rgba(220, 53, 69, 0.3);
+        }
+        @media (max-width: 768px) {
+            .admin-header {
+                padding: 1rem;
+            }
+            .admin-header-inner {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .admin-header-menu {
+                width: 100%;
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+            .admin-header-link {
+                width: 100%;
+                text-align: center;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Admin Header Menu -->
+    <header class="admin-header">
+        <div class="admin-header-inner">
+            <a href="/" class="admin-header-logo">
+                <img src="media/logo.png" alt="TNR Business Solutions Logo" loading="lazy">
+                <span>TNR Business Solutions</span>
+            </a>
+            <nav class="admin-header-menu">
+                <a href="/" class="admin-header-link">🏠 Home</a>
+                <a href="/admin-dashboard.html" class="admin-header-link">📊 Admin Dashboard</a>
+                <a href="/admin-orders.html" class="admin-header-link">📦 Orders</a>
+                <a href="/social-media-automation-dashboard.html" class="admin-header-link">📱 Social Media</a>
+                <a href="/wix-client-dashboard.html" class="admin-header-link active">🚀 Wix Automation</a>
+                <a href="/admin-login.html" class="admin-header-link logout">🔐 Logout</a>
+            </nav>
+        </div>
+    </header>
     <div class="dashboard-container">
         <!-- Header -->
         <div class="dashboard-header">
