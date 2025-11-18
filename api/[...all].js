@@ -152,12 +152,6 @@ module.exports = async (req, res) => {
       return await handler(req, res);
     }
 
-    // Wix API routes
-    if (route === "wix" || route.startsWith("wix/")) {
-      const handler = require("../server/handlers/wix-api-routes");
-      return await handler(req, res);
-    }
-
     if (route.startsWith("workflows/") || route === "workflows") {
       const handler = require("../server/handlers/workflows-api");
       return await handler(req, res);
