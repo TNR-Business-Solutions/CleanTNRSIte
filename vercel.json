@@ -6,6 +6,10 @@
     "api/[...all].js": {
       "memory": 1024,
       "maxDuration": 10
+    },
+    "api/index.js": {
+      "memory": 128,
+      "maxDuration": 5
     }
   },
   "rewrites": [
