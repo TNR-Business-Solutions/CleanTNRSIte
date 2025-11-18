@@ -292,6 +292,7 @@ module.exports = async (req, res) => {
         "/api/auth/linkedin",
         "/api/auth/twitter",
         "/api/auth/wix",
+        "/api/wix",
         "/api/social/tokens",
         "/api/social/post-to-facebook",
         "/api/social/post-to-instagram",
