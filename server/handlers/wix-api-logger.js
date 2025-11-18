@@ -7,10 +7,22 @@
 const fs = require('fs');
 const path = require('path');
 
-// Log directory
+// Log directory - handle read-only filesystem (Vercel serverless)
 const LOG_DIR = path.join(__dirname, '..', 'logs');
-if (!fs.existsSync(LOG_DIR)) {
-  fs.mkdirSync(LOG_DIR, { recursive: true });
+let canWriteLogs = false;
+try {
+  if (!fs.existsSync(LOG_DIR)) {
+    fs.mkdirSync(LOG_DIR, { recursive: true });
+  }
+  // Test write access
+  const testFile = path.join(LOG_DIR, '.test');
+  fs.writeFileSync(testFile, 'test');
+  fs.unlinkSync(testFile);
+  canWriteLogs = true;
+} catch (error) {
+  // In read-only filesystem (like Vercel), just log to console
+  canWriteLogs = false;
+  console.log('⚠️  Log directory not writable, using console logging only');
 }
 
 /**
@@ -43,9 +55,15 @@ function logRequest(operation, instanceId, requestData) {
     console.log(`   Data:`, JSON.stringify(requestData.data, null, 2));
   }
   
-  // Write to file
-  const logFile = path.join(LOG_DIR, `wix-api-${new Date().toISOString().split('T')[0]}.log`);
-  fs.appendFileSync(logFile, JSON.stringify(logEntry) + '\n');
+  // Write to file if possible (skip in read-only filesystem)
+  if (canWriteLogs) {
+    try {
+      const logFile = path.join(LOG_DIR, `wix-api-${new Date().toISOString().split('T')[0]}.log`);
+      fs.appendFileSync(logFile, JSON.stringify(logEntry) + '\n');
+    } catch (error) {
+      // Silently fail if file system is read-only
+    }
+  }
   
   return logEntry;
 }
@@ -72,9 +90,15 @@ function logResponse(operation, instanceId, responseData) {
     console.log(`   Error:`, responseData.error);
   }
   
-  // Write to file
-  const logFile = path.join(LOG_DIR, `wix-api-${new Date().toISOString().split('T')[0]}.log`);
-  fs.appendFileSync(logFile, JSON.stringify(logEntry) + '\n');
+  // Write to file if possible (skip in read-only filesystem)
+  if (canWriteLogs) {
+    try {
+      const logFile = path.join(LOG_DIR, `wix-api-${new Date().toISOString().split('T')[0]}.log`);
+      fs.appendFileSync(logFile, JSON.stringify(logEntry) + '\n');
+    } catch (error) {
+      // Silently fail if file system is read-only
+    }
+  }
   
   return logEntry;
 }
@@ -107,9 +131,15 @@ function logChange(operation, instanceId, changeDetails) {
     console.log(`   After:`, JSON.stringify(changeDetails.after, null, 2));
   }
   
-  // Write to file
-  const logFile = path.join(LOG_DIR, `wix-changes-${new Date().toISOString().split('T')[0]}.log`);
-  fs.appendFileSync(logFile, JSON.stringify(logEntry) + '\n');
+  // Write to file if possible (skip in read-only filesystem)
+  if (canWriteLogs) {
+    try {
+      const logFile = path.join(LOG_DIR, `wix-changes-${new Date().toISOString().split('T')[0]}.log`);
+      fs.appendFileSync(logFile, JSON.stringify(logEntry) + '\n');
+    } catch (error) {
+      // Silently fail if file system is read-only
+    }
+  }
   
   return logEntry;
 }
@@ -132,26 +162,40 @@ function getChangeLogFile() {
  * Read recent logs
  */
 function getRecentLogs(limit = 50) {
+  if (!canWriteLogs) {
+    return []; // Return empty array in read-only filesystem
+  }
   const logFile = getTodayLogFile();
   if (!fs.existsSync(logFile)) {
     return [];
   }
   
-  const lines = fs.readFileSync(logFile, 'utf8').split('\n').filter(l => l.trim());
-  return lines.slice(-limit).map(line => JSON.parse(line));
+  try {
+    const lines = fs.readFileSync(logFile, 'utf8').split('\n').filter(l => l.trim());
+    return lines.slice(-limit).map(line => JSON.parse(line));
+  } catch (error) {
+    return [];
+  }
 }
 
 /**
  * Read recent changes
  */
 function getRecentChanges(limit = 50) {
+  if (!canWriteLogs) {
+    return []; // Return empty array in read-only filesystem
+  }
   const logFile = getChangeLogFile();
   if (!fs.existsSync(logFile)) {
     return [];
   }
   
-  const lines = fs.readFileSync(logFile, 'utf8').split('\n').filter(l => l.trim());
-  return lines.slice(-limit).map(line => JSON.parse(line));
+  try {
+    const lines = fs.readFileSync(logFile, 'utf8').split('\n').filter(l => l.trim());
+    return lines.slice(-limit).map(line => JSON.parse(line));
+  } catch (error) {
+    return [];
+  }
 }
 
 module.exports = {
