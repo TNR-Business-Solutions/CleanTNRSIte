@@ -153,8 +153,19 @@ module.exports = async (req, res) => {
     }
 
     // Wix API routes - check before other routes to ensure it's matched
-    if (route === "wix" || route.startsWith("wix/") || req.query?.path === "wix") {
-      console.log("✅ Routing to Wix API handler for route:", route, "path param:", req.query?.path, "allValue:", req.query?.all);
+    if (
+      route === "wix" ||
+      route.startsWith("wix/") ||
+      req.query?.path === "wix"
+    ) {
+      console.log(
+        "✅ Routing to Wix API handler for route:",
+        route,
+        "path param:",
+        req.query?.path,
+        "allValue:",
+        req.query?.all
+      );
       const handler = require("../server/handlers/wix-api-routes");
       return await handler(req, res);
     }
@@ -309,7 +320,8 @@ module.exports = async (req, res) => {
       sendJson(res, 500, {
         success: false,
         error: error.message,
-        message: "An internal server error occurred while processing your request.",
+        message:
+          "An internal server error occurred while processing your request.",
       });
     }
   }
