@@ -1,0 +1,271 @@
+/**
+ * @fileoverview Analytics Feature Specific Styles
+ * @module admin/analytics/styles
+ * 
+ * Styles specific to the Analytics feature module
+ */
+
+/* Analytics Header */
+.analytics-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+/* Analytics Content */
+.analytics-content {
+    min-height: 400px;
+}
+
+/* Loading State */
+.loading-state {
+    text-align: center;
+    padding: 3rem;
+    color: #666;
+}
+
+.loading-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+/* Overview Cards Grid */
+.overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.overview-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.overview-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+.overview-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--tnr-navy);
+    margin-bottom: 0.5rem;
+}
+
+.overview-label {
+    color: #666;
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.overview-subtext {
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.overview-subtext.active {
+    color: #28a745;
+}
+
+.overview-subtext.new {
+    color: #ffc107;
+}
+
+.overview-subtext.info {
+    color: #17a2b8;
+}
+
+.overview-subtext.success {
+    color: #28a745;
+}
+
+/* Charts Grid */
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.chart-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.chart-title {
+    color: var(--tnr-navy);
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+}
+
+/* Lead Sources List */
+.lead-source-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: #f8f9fa;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.lead-source-item:hover {
+    background: #e9ecef;
+    transform: translateX(5px);
+}
+
+.lead-source-info {
+    flex: 1;
+}
+
+.lead-source-name {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.25rem;
+}
+
+.lead-source-count {
+    font-size: 0.875rem;
+    color: #666;
+}
+
+.lead-source-percentage {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--tnr-gold);
+}
+
+/* Business Types List */
+.business-type-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: #f8f9fa;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.business-type-item:hover {
+    background: #e9ecef;
+    transform: translateX(5px);
+}
+
+.business-type-name {
+    font-weight: 600;
+    color: #333;
+}
+
+.business-type-count {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--tnr-gold);
+}
+
+/* Recent Activity */
+.recent-activity-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.recent-activity-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.activity-stat {
+    text-align: center;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.activity-stat:hover {
+    background: #e9ecef;
+    transform: translateY(-2px);
+}
+
+.activity-stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--tnr-navy);
+    margin-bottom: 0.5rem;
+}
+
+.activity-stat-label {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #666;
+    font-style: italic;
+}
+
+/* Error State */
+.error-state {
+    text-align: center;
+    padding: 3rem;
+    color: #dc3545;
+}
+
+.error-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.error-title {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.error-message {
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+    color: #666;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .analytics-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .analytics-header .btn {
+        width: 100%;
+    }
+    
+    .overview-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .recent-activity-grid {
+        grid-template-columns: 1fr;
+    }
+}
+

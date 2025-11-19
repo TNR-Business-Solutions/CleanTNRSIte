@@ -1,0 +1,228 @@
+/**
+ * @fileoverview Campaigns Feature Specific Styles
+ * @module admin/campaigns/styles
+ * 
+ * Styles specific to the Email Campaigns feature module
+ */
+
+/* Campaign Form Container */
+.campaign-form-container {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.campaign-form-container h3 {
+    color: var(--tnr-navy);
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+}
+
+/* Form Groups */
+.campaign-form-container .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.campaign-form-container .form-group label {
+    display: block;
+    color: #333;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.campaign-form-container .form-group input[type="text"],
+.campaign-form-container .form-group textarea,
+.campaign-form-container .form-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    color: #333;
+    font-family: inherit;
+    transition: border-color 0.3s ease;
+}
+
+.campaign-form-container .form-group input[type="text"]:focus,
+.campaign-form-container .form-group textarea:focus,
+.campaign-form-container .form-group select:focus {
+    outline: none;
+    border-color: var(--tnr-primary);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.campaign-form-container .form-group textarea {
+    font-family: 'Courier New', monospace;
+    resize: vertical;
+    min-height: 120px;
+}
+
+.campaign-form-container .form-group small {
+    display: block;
+    margin-top: 0.25rem;
+    color: #666;
+    font-size: 0.85rem;
+}
+
+/* Audience Selection */
+.audience-selection {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background: #f5f5f5;
+    border-radius: 4px;
+}
+
+.audience-selection h4 {
+    color: #333;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.audience-filters {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.audience-filters .filter-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.audience-filters .filter-group label {
+    display: block;
+    color: #333;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.audience-filters .filter-group input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    color: #333;
+    font-size: 0.9rem;
+}
+
+/* Audience Count */
+.audience-count {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background: white;
+    border-radius: 4px;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+.audience-count strong {
+    color: var(--tnr-navy);
+}
+
+.audience-count span {
+    color: var(--tnr-primary);
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+/* Campaign Actions */
+.campaign-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #eee;
+}
+
+/* Campaign Result */
+.campaign-result {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border-radius: 4px;
+    display: none;
+}
+
+.campaign-result.success {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+    display: block;
+}
+
+.campaign-result.error {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    display: block;
+}
+
+.campaign-result.loading {
+    background: #f0f0f0;
+    border: 1px solid #ddd;
+    color: #333;
+    display: block;
+}
+
+.campaign-result strong {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+/* Button Styles */
+.btn-primary {
+    background: var(--tnr-gold);
+    color: var(--tnr-navy);
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: #d4af37;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-secondary {
+    background: #666;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background: #555;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .campaign-form-container {
+        padding: 1rem;
+    }
+    
+    .audience-filters {
+        grid-template-columns: 1fr;
+    }
+    
+    .campaign-actions {
+        flex-direction: column;
+    }
+    
+    .campaign-actions .btn {
+        width: 100%;
+    }
+}
+

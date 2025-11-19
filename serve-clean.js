@@ -420,6 +420,19 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // Handle Settings API
+  if (pathname.startsWith("/api/settings")) {
+    const settingsApi = require("./server/handlers/settings-api");
+    settingsApi(req, res).catch((err) => {
+      console.error("Settings API Error:", err);
+      if (!res.headersSent) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: false, error: "Internal server error" }));
+      }
+    });
+    return;
+  }
+
   // Handle Meta OAuth
   if (pathname.startsWith("/api/auth/meta")) {
     if (pathname.includes("callback")) {
@@ -525,14 +538,52 @@ const server = http.createServer((req, res) => {
     pathname = "/index.html";
   }
 
+  // Handle admin directory - ensure it serves index.html for directories
+  if (pathname.startsWith("/admin")) {
+    // If it's exactly "/admin" or "/admin/", redirect to index
+    if (pathname === "/admin" || pathname === "/admin/") {
+      pathname = "/admin/index.html";
+    }
+    // If it's a directory path ending with /, add index.html
+    else if (pathname.endsWith("/")) {
+      pathname = pathname.replace(/\/$/, "") + "/index.html";
+    }
+    // If no extension and doesn't end with /, assume it's a directory and add index.html
+    else if (!path.extname(pathname)) {
+      pathname = pathname + "/index.html";
+    }
+  }
+
   // Construct file path
   const filePath = path.join(__dirname, pathname);
   const ext = path.extname(filePath);
   const mimeType = mimeTypes[ext] || "text/plain";
 
+  // Debug logging
+  console.log(`📂 Request: ${pathname} -> ${filePath}`);
+
   // Check if file exists
   fs.readFile(filePath, (err, data) => {
     if (err) {
+      // File not found - log for debugging
+      console.error(`❌ 404: ${pathname} -> ${filePath}`);
+      console.error(`   Error: ${err.message}`);
+      
+      // Try to serve index.html if it's a directory
+      if (err.code === 'EISDIR' || err.code === 'ENOENT') {
+        const dirIndexPath = path.join(filePath, 'index.html');
+        fs.readFile(dirIndexPath, (err2, data2) => {
+          if (!err2) {
+            res.writeHead(200, {
+              "Content-Type": "text/html",
+              ...getCacheHeaders(dirIndexPath),
+            });
+            res.end(data2);
+            return;
+          }
+        });
+      }
+      
       // File not found
       res.writeHead(404, { "Content-Type": "text/html" });
       res.end(`
@@ -541,7 +592,9 @@ const server = http.createServer((req, res) => {
           <body>
             <h1>404 - File Not Found</h1>
             <p>The file <code>${pathname}</code> was not found.</p>
+            <p>Requested path: <code>${filePath}</code></p>
             <p><a href="/">← Back to Home</a></p>
+            <p><a href="/admin/">Admin Dashboard</a></p>
           </body>
         </html>
       `);

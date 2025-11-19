@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Campaigns - TNR Business Solutions</title>
+    <link rel="stylesheet" href="../../assets/styles.css">
+    <link rel="stylesheet" href="../shared/styles.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Load Admin Header -->
+    <div id="admin-header-placeholder"></div>
+    
+    <div class="admin-dashboard">
+        <div class="dashboard-container">
+            <div class="dashboard-header">
+                <h1>📧 Email Marketing Campaigns</h1>
+                <p>Create and send automated email campaigns to your leads and clients</p>
+            </div>
+            
+            <div class="crm-section">
+                <h2 class="crm-title">📧 Email Marketing Campaigns</h2>
+                
+                <div class="campaign-form-container">
+                    <h3>Create New Campaign</h3>
+                    
+                    <div class="form-group">
+                        <label>Campaign Subject *</label>
+                        <input type="text" id="campaignSubject" placeholder="Enter email subject (use {{name}} or {{company}} for personalization)" />
+                        <small>Use {{name}}, {{company}}, {{email}} for personalization</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Email Content (HTML) *</label>
+                        <textarea id="campaignHtml" rows="12" placeholder="Enter HTML email content. Use {{name}}, {{email}}, {{company}} for personalization."></textarea>
+                        <small>HTML email content with personalization variables</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Plain Text (Optional)</label>
+                        <textarea id="campaignText" rows="6" placeholder="Plain text version (auto-generated from HTML if blank)"></textarea>
+                        <small>Plain text fallback (auto-generated if left blank)</small>
+                    </div>
+                    
+                    <div class="audience-selection">
+                        <h4>Select Audience</h4>
+                        
+                        <div class="form-group">
+                            <label>Audience Type *</label>
+                            <select id="campaignAudienceType">
+                                <option value="leads">Leads</option>
+                                <option value="clients">Clients</option>
+                            </select>
+                        </div>
+                        
+                        <div class="audience-filters">
+                            <div class="filter-group">
+                                <label>Search</label>
+                                <input type="text" id="campaignFilterQ" placeholder="Name, email..." />
+                            </div>
+                            <div class="filter-group">
+                                <label>Status</label>
+                                <input type="text" id="campaignFilterStatus" placeholder="e.g., New, Active" />
+                            </div>
+                            <div class="filter-group">
+                                <label>Business Type</label>
+                                <input type="text" id="campaignFilterBusinessType" placeholder="e.g., Roofing" />
+                            </div>
+                            <div class="filter-group">
+                                <label>Source</label>
+                                <input type="text" id="campaignFilterSource" placeholder="e.g., Website" />
+                            </div>
+                            <div class="filter-group" id="campaignFilterInterestContainer">
+                                <label>Interest</label>
+                                <input type="text" id="campaignFilterInterest" placeholder="e.g., SEO" />
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-secondary" onclick="previewCampaignAudience()">Preview Audience Count</button>
+                        <div id="campaignAudienceCount" class="audience-count" style="display: none;">
+                            <strong>Audience Size: </strong><span id="campaignAudienceCountValue">0</span> recipients
+                        </div>
+                    </div>
+                    
+                    <div class="campaign-actions">
+                        <button class="btn btn-primary" onclick="sendCampaign()">🚀 Send Campaign</button>
+                        <button class="btn btn-secondary" onclick="clearCampaignForm()">Clear Form</button>
+                    </div>
+                    
+                    <div id="campaignResult" class="campaign-result"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="../../crm-data.js"></script>
+    <script src="../../admin-api-client.js"></script>
+    <script src="../shared/utils.js"></script>
+    <script src="campaigns.js"></script>
+    
+    <script>
+        // Load admin header
+        fetch('../shared/header.html')
+            .then(r => r.text())
+            .then(html => {
+                document.getElementById('admin-header-placeholder').innerHTML = html;
+            });
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📧 Campaigns page loaded');
+        });
+    </script>
+</body>
+</html>
+

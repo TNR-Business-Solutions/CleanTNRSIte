@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM System - TNR Business Solutions</title>
+    <link rel="stylesheet" href="../../assets/styles.css">
+    <link rel="stylesheet" href="../shared/styles.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Load Admin Header -->
+    <div id="admin-header-placeholder"></div>
+    
+    <div class="admin-dashboard">
+        <div class="dashboard-container">
+            <div class="dashboard-header">
+                <h1>👥 Client Relationship Management</h1>
+                <p>Manage clients, leads, and orders</p>
+            </div>
+            
+            <div class="crm-section">
+                <div class="crm-header">
+                    <h2 class="crm-title">👥 Client Relationship Management</h2>
+                    <div>
+                        <button class="btn" onclick="showAddClientModal()">+ Add New Client</button>
+                    </div>
+                </div>
+                
+                <div class="crm-stats">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalClients">0</div>
+                        <div class="stat-label">Total Clients</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="activeClients">0</div>
+                        <div class="stat-label">Active Clients</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="newLeads">0</div>
+                        <div class="stat-label">New Leads</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalOrders">0</div>
+                        <div class="stat-label">Total Orders</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalRevenue">$0</div>
+                        <div class="stat-label">Total Revenue</div>
+                    </div>
+                </div>
+                
+                <div class="crm-tabs">
+                    <button class="crm-tab active" onclick="showCrmTab('clients')">All Clients</button>
+                    <button class="crm-tab" onclick="showCrmTab('leads')">Leads</button>
+                    <button class="crm-tab" onclick="showCrmTab('orders')">Orders</button>
+                </div>
+                
+                <div id="clients" class="crm-content active">
+                    <div class="filter-bar">
+                        <div class="filter-group">
+                            <label>Search</label>
+                            <input id="clientsFilterQ" type="text" placeholder="Name, email, phone..." />
+                        </div>
+                        <div class="filter-group">
+                            <label>Status</label>
+                            <select id="clientsFilterStatus">
+                                <option value="">All</option>
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                                <option value="Prospect">Prospect</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Business Type</label>
+                            <input id="clientsFilterBusinessType" type="text" placeholder="e.g., Roofing" />
+                        </div>
+                        <div class="filter-group">
+                            <label>Source</label>
+                            <input id="clientsFilterSource" type="text" placeholder="e.g., Website" />
+                        </div>
+                        <div class="filter-group">
+                            <label>Sort</label>
+                            <select id="clientsSort">
+                                <option value="createdAt">Created</option>
+                                <option value="name">Name</option>
+                                <option value="status">Status</option>
+                            </select>
+                            <select id="clientsOrder">
+                                <option value="desc">Desc</option>
+                                <option value="asc">Asc</option>
+                            </select>
+                        </div>
+                        <button class="btn" onclick="loadClients()">Apply</button>
+                    </div>
+                    <div class="client-list" id="clientsList">
+                        <!-- Clients will be loaded dynamically -->
+                    </div>
+                </div>
+                
+                <div id="leads" class="crm-content">
+                    <div class="filter-bar">
+                        <div class="filter-group">
+                            <label>Search</label>
+                            <input id="leadsFilterQ" type="text" placeholder="Name, email, phone..." />
+                        </div>
+                        <div class="filter-group">
+                            <label>Status</label>
+                            <select id="leadsFilterStatus">
+                                <option value="">All</option>
+                                <option value="New">New</option>
+                                <option value="Contacted">Contacted</option>
+                                <option value="Qualified">Qualified</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Business Type</label>
+                            <input id="leadsFilterBusinessType" type="text" placeholder="e.g., Roofing" />
+                        </div>
+                        <div class="filter-group">
+                            <label>Source</label>
+                            <input id="leadsFilterSource" type="text" placeholder="e.g., Website" />
+                        </div>
+                        <div class="filter-group">
+                            <label>Interest</label>
+                            <input id="leadsFilterInterest" type="text" placeholder="e.g., SEO" />
+                        </div>
+                        <div class="filter-group">
+                            <label>Sort</label>
+                            <select id="leadsSort">
+                                <option value="createdAt">Created</option>
+                                <option value="name">Name</option>
+                                <option value="status">Status</option>
+                            </select>
+                            <select id="leadsOrder">
+                                <option value="desc">Desc</option>
+                                <option value="asc">Asc</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <input type="file" id="leadsCsvFile" accept=".csv" style="display:none" />
+                            <button class="btn" onclick="document.getElementById('leadsCsvFile').click()">Import CSV</button>
+                            <button class="btn" onclick="loadLeads()">Apply</button>
+                        </div>
+                    </div>
+                    <div class="client-list" id="leadsList">
+                        <!-- Leads will be loaded dynamically -->
+                    </div>
+                </div>
+                
+                <div id="orders" class="crm-content">
+                    <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="color: var(--tnr-gold); margin: 0;">Order Management</h3>
+                        <button class="btn" onclick="showAddOrderModal()">+ Add New Order</button>
+                    </div>
+                    <div class="client-list" id="ordersList">
+                        <!-- Orders will be loaded dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="../../crm-data.js"></script>
+    <script src="../../admin-api-client.js"></script>
+    <script src="../shared/utils.js"></script>
+    <script src="crm.js"></script>
+    
+    <script>
+        // Load admin header
+        fetch('../shared/header.html')
+            .then(r => r.text())
+            .then(html => {
+                document.getElementById('admin-header-placeholder').innerHTML = html;
+            });
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCRM();
+        });
+    </script>
+</body>
+</html>
+

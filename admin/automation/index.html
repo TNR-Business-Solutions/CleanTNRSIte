@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automation Workflows - TNR Business Solutions</title>
+    <link rel="stylesheet" href="../../assets/styles.css">
+    <link rel="stylesheet" href="../shared/styles.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Load Admin Header -->
+    <div id="admin-header-placeholder"></div>
+    
+    <div class="admin-dashboard">
+        <div class="dashboard-container">
+            <div class="dashboard-header">
+                <h1>🤖 Business Automation Workflows</h1>
+                <p>Automate your business processes and workflows</p>
+            </div>
+            
+            <div class="crm-section">
+                <div class="workflow-header">
+                    <h2 class="crm-title">🤖 Business Automation Workflows</h2>
+                    <button class="btn btn-primary" onclick="showCreateWorkflowModal()">+ Create Workflow</button>
+                </div>
+                
+                <div class="workflows-container">
+                    <h3>Active Workflows</h3>
+                    <div id="workflowsList" class="workflows-list">
+                        <div class="loading-state">
+                            <div class="loading-icon">🤖</div>
+                            <p>Loading workflows...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Available Triggers -->
+                <div class="workflow-info-section">
+                    <h3>📚 Available Trigger Types</h3>
+                    <div class="workflow-steps">
+                        <div class="workflow-step">
+                            <div class="step-icon">🆕</div>
+                            <div class="step-content">
+                                <h4>New Lead Created</h4>
+                                <p>Trigger when a new lead is added to the CRM</p>
+                            </div>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="step-icon">📧</div>
+                            <div class="step-content">
+                                <h4>Lead Status Changed</h4>
+                                <p>Trigger when a lead's status is updated (e.g., New → Contacted)</p>
+                            </div>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="step-icon">👤</div>
+                            <div class="step-content">
+                                <h4>Client Status Changed</h4>
+                                <p>Trigger when a client's status changes (e.g., Prospect → Active)</p>
+                            </div>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="step-icon">📅</div>
+                            <div class="step-content">
+                                <h4>Date-Based Trigger</h4>
+                                <p>Trigger on specific dates or after a certain time period</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Available Actions -->
+                <div class="workflow-info-section">
+                    <h3>⚡ Available Actions</h3>
+                    <div class="workflow-steps">
+                        <div class="workflow-step">
+                            <div class="step-icon">📧</div>
+                            <div class="step-content">
+                                <h4>Send Email</h4>
+                                <p>Send automated email to lead/client using templates</p>
+                            </div>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="step-icon">🔄</div>
+                            <div class="step-content">
+                                <h4>Update Status</h4>
+                                <p>Automatically update lead/client status</p>
+                            </div>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="step-icon">🏷️</div>
+                            <div class="step-content">
+                                <h4>Assign Tag/Category</h4>
+                                <p>Add tags or categories to leads/clients</p>
+                            </div>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="step-icon">📝</div>
+                            <div class="step-content">
+                                <h4>Add Note</h4>
+                                <p>Automatically add notes to lead/client record</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Workflow Modal -->
+    <div id="workflowModal" class="workflow-modal">
+        <div class="workflow-modal-content">
+            <div class="workflow-modal-header">
+                <h2>Create Workflow</h2>
+                <button onclick="closeWorkflowModal()" class="btn-close">✕ Close</button>
+            </div>
+            
+            <div class="workflow-modal-body">
+                <div class="form-group">
+                    <label>Workflow Name *</label>
+                    <input type="text" id="workflowName" placeholder="e.g., Welcome New Leads" />
+                </div>
+                
+                <div class="form-group">
+                    <label>Trigger Type *</label>
+                    <select id="workflowTriggerType" onchange="updateTriggerFields()">
+                        <option value="">Select Trigger...</option>
+                        <option value="new_lead">New Lead Created</option>
+                        <option value="lead_status_change">Lead Status Changed</option>
+                        <option value="client_status_change">Client Status Changed</option>
+                        <option value="date_based">Date-Based Trigger</option>
+                    </select>
+                </div>
+                
+                <div id="triggerFields" class="trigger-fields" style="display: none;">
+                    <!-- Trigger-specific fields will be added here -->
+                </div>
+                
+                <div class="form-group">
+                    <label>Actions</label>
+                    <div id="workflowActions" class="workflow-actions-list">
+                        <!-- Actions will be added here -->
+                    </div>
+                    <button type="button" onclick="addWorkflowAction()" class="btn btn-success">+ Add Action</button>
+                </div>
+            </div>
+            
+            <div class="workflow-modal-footer">
+                <button onclick="closeWorkflowModal()" class="btn btn-secondary">Cancel</button>
+                <button onclick="saveWorkflow()" class="btn btn-primary">💾 Save Workflow</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="../../crm-data.js"></script>
+    <script src="../../admin-api-client.js"></script>
+    <script src="../shared/utils.js"></script>
+    <script src="automation.js"></script>
+    
+    <script>
+        // Load admin header
+        fetch('../shared/header.html')
+            .then(r => r.text())
+            .then(html => {
+                document.getElementById('admin-header-placeholder').innerHTML = html;
+            });
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🤖 Automation page loaded');
+            loadWorkflows();
+        });
+    </script>
+</body>
+</html>
+

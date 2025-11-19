@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - TNR Business Solutions</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+    <link rel="stylesheet" href="shared/styles.css">
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <!-- Load Admin Header -->
+    <div id="admin-header-placeholder"></div>
+    
+    <div class="admin-dashboard">
+        <div class="dashboard-container">
+            <div class="dashboard-header">
+                <h1>🎯 TNR Business Solutions Admin Dashboard</h1>
+                <p>Complete CRM, Automation & Social Media Management System</p>
+            </div>
+            
+            <!-- Overview Dashboard Grid -->
+            <div class="dashboard-grid">
+                <!-- CRM Card -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <div class="card-icon">👥</div>
+                        <div class="card-title">Client Management (CRM)</div>
+                    </div>
+                    <div class="card-description">
+                        Manage your client relationships, track interactions, and monitor pipeline progress. View clients, leads, and orders.
+                    </div>
+                    <div class="card-actions">
+                        <a href="crm/" class="card-btn">Open CRM</a>
+                        <a href="crm/" class="card-btn secondary">Manage Clients</a>
+                    </div>
+                </div>
+                
+                <!-- Email Campaigns Card -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <div class="card-icon">📧</div>
+                        <div class="card-title">Email Marketing</div>
+                    </div>
+                    <div class="card-description">
+                        Create and send automated email campaigns, newsletters, and follow-up sequences to leads and clients.
+                    </div>
+                    <div class="card-actions">
+                        <a href="campaigns/" class="card-btn">Create Campaign</a>
+                        <a href="campaigns/" class="card-btn secondary">View Campaigns</a>
+                    </div>
+                </div>
+                
+                <!-- Social Media Card -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <div class="card-icon">📱</div>
+                        <div class="card-title">Social Media</div>
+                    </div>
+                    <div class="card-description">
+                        Connect and manage social media accounts. Automate posting, content generation, and engagement.
+                    </div>
+                    <div class="card-actions">
+                        <a href="social/" class="card-btn">Manage Accounts</a>
+                        <a href="../social-media-automation-dashboard.html" class="card-btn secondary">Automation Dashboard</a>
+                    </div>
+                </div>
+                
+                <!-- Analytics Card -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <div class="card-icon">📊</div>
+                        <div class="card-title">Analytics & Reports</div>
+                    </div>
+                    <div class="card-description">
+                        Track performance metrics, conversion rates, lead sources, and business insights.
+                    </div>
+                    <div class="card-actions">
+                        <a href="analytics/" class="card-btn">View Analytics</a>
+                        <a href="analytics/" class="card-btn secondary">Reports</a>
+                    </div>
+                </div>
+                
+                <!-- Automation Card -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <div class="card-icon">🤖</div>
+                        <div class="card-title">Business Automation</div>
+                    </div>
+                    <div class="card-description">
+                        Create automated workflows for lead nurturing, client onboarding, and task automation.
+                    </div>
+                    <div class="card-actions">
+                        <a href="automation/" class="card-btn">Manage Workflows</a>
+                        <a href="automation/" class="card-btn secondary">Create Workflow</a>
+                    </div>
+                </div>
+                
+                <!-- Settings Card -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <div class="card-icon">⚙️</div>
+                        <div class="card-title">System Settings</div>
+                    </div>
+                    <div class="card-description">
+                        Configure business information, preferences, and system-wide settings.
+                    </div>
+                    <div class="card-actions">
+                        <a href="settings/" class="card-btn">Open Settings</a>
+                        <a href="settings/" class="card-btn secondary">Configure</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Stats -->
+            <div class="quick-stats">
+                <h2 class="section-title">Quick Stats</h2>
+                <div class="stats-grid" id="quickStats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="statClients">-</div>
+                        <div class="stat-label">Total Clients</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="statLeads">-</div>
+                        <div class="stat-label">Total Leads</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="statRevenue">-</div>
+                        <div class="stat-label">Total Revenue</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="statConversion">-</div>
+                        <div class="stat-label">Conversion Rate</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="../crm-data.js"></script>
+    <script src="../admin-api-client.js"></script>
+    <script src="shared/utils.js"></script>
+    <script src="index.js"></script>
+    
+    <script>
+        // Load admin header
+        fetch('shared/header.html')
+            .then(r => r.text())
+            .then(html => {
+                document.getElementById('admin-header-placeholder').innerHTML = html;
+            });
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎯 Admin Dashboard loaded');
+            loadQuickStats();
+        });
+    </script>
+</body>
+</html>
+

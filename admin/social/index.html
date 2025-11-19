@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media - TNR Business Solutions</title>
+    <link rel="stylesheet" href="../../assets/styles.css">
+    <link rel="stylesheet" href="../shared/styles.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Load Admin Header -->
+    <div id="admin-header-placeholder"></div>
+    
+    <div class="admin-dashboard">
+        <div class="dashboard-container">
+            <div class="dashboard-header">
+                <h1>📱 Social Media Management</h1>
+                <p>Connect and manage your social media accounts</p>
+            </div>
+            
+            <!-- Social Media Token Management -->
+            <div class="crm-section" style="margin-bottom: 2rem;">
+                <h2 class="crm-title">🔐 Social Media Authentication</h2>
+                <div class="token-management-container">
+                    <div class="token-header">
+                        <h3>Connected Accounts</h3>
+                        <div class="token-actions">
+                            <button class="btn btn-secondary" onclick="loadSocialTokens()">🔄 Refresh</button>
+                            <a href="/api/auth/meta" class="btn btn-facebook">📘 Connect Facebook/Instagram</a>
+                            <a href="/api/auth/linkedin" class="btn btn-linkedin">💼 Connect LinkedIn</a>
+                            <a href="/api/auth/twitter" class="btn btn-twitter">🐦 Connect X (Twitter)</a>
+                        </div>
+                    </div>
+                    <div id="tokensList" class="tokens-list">
+                        <div class="loading-state">
+                            <div class="loading-icon">⏳</div>
+                            <p>Loading tokens...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Social Media Dashboard Cards -->
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <div class="card-icon">📱</div>
+                        <div class="card-title">Social Media Dashboard</div>
+                    </div>
+                    <div class="card-description">
+                        Manage all your social media accounts from one central location.
+                    </div>
+                    <div class="card-actions">
+                        <a href="../../social-media-automation-dashboard.html" class="card-btn">Open Dashboard</a>
+                        <a href="#" class="card-btn secondary" onclick="connectSocialAccounts()">Connect Accounts</a>
+                    </div>
+                </div>
+                
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <div class="card-icon">📝</div>
+                        <div class="card-title">Content Templates</div>
+                    </div>
+                    <div class="card-description">
+                        Access 500+ professional templates for every industry and platform.
+                    </div>
+                    <div class="card-actions">
+                        <a href="../../social-media-content-templates.html" class="card-btn">Browse Templates</a>
+                        <a href="#" class="card-btn secondary">Create Custom</a>
+                    </div>
+                </div>
+                
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <div class="card-icon">📅</div>
+                        <div class="card-title">Post Scheduler</div>
+                    </div>
+                    <div class="card-description">
+                        Schedule posts across all platforms with optimal timing.
+                    </div>
+                    <div class="card-actions">
+                        <a href="#" class="card-btn" onclick="openScheduler()">Schedule Posts</a>
+                        <a href="#" class="card-btn secondary">View Calendar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="../../crm-data.js"></script>
+    <script src="../../admin-api-client.js"></script>
+    <script src="../shared/utils.js"></script>
+    <script src="social.js"></script>
+    
+    <script>
+        // Load admin header
+        fetch('../shared/header.html')
+            .then(r => r.text())
+            .then(html => {
+                document.getElementById('admin-header-placeholder').innerHTML = html;
+            });
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📱 Social Media page loaded');
+            loadSocialTokens();
+        });
+    </script>
+</body>
+</html>
+
