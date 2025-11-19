@@ -28,8 +28,11 @@ const clientTokensDB = new Map();
 // Persistent token storage
 const tokenManager = require('./wix-token-manager');
 
-// Load tokens from file on startup
-tokenManager.loadTokens(clientTokensDB);
+// Load tokens from database on startup (async, but we'll call it)
+// In serverless, this will load from Postgres; in local dev, from SQLite
+tokenManager.loadTokens(clientTokensDB).catch(err => {
+  console.warn('⚠️  Could not load tokens on startup:', err.message);
+});
 
 /**
  * Exchange authorization code for access token
@@ -142,7 +145,7 @@ async function refreshAccessToken(refreshToken) {
 /**
  * Save client tokens to database
  */
-function saveClientTokens(instanceId, tokenData, metadata = {}) {
+async function saveClientTokens(instanceId, tokenData, metadata = {}) {
   // Wix tokens typically don't expire, or have very long expiration
   // If expires_in is not provided, default to 10 years
   const expiresIn = tokenData.expires_in || (10 * 365 * 24 * 60 * 60); // 10 years in seconds
@@ -157,11 +160,18 @@ function saveClientTokens(instanceId, tokenData, metadata = {}) {
     updatedAt: Date.now()
   };
   
+  // Save to in-memory Map for backward compatibility
   clientTokensDB.set(instanceId, clientData);
   console.log(`💾 Saved tokens for instance: ${instanceId} (expires in ${Math.floor(expiresIn / 86400)} days)`);
   
-  // Save to persistent storage
-  tokenManager.saveTokens(clientTokensDB);
+  // Save to database (async)
+  try {
+    await tokenManager.saveToken(clientData);
+    console.log(`✅ Token saved to database for instance: ${instanceId}`);
+  } catch (error) {
+    console.error(`❌ Error saving token to database:`, error.message);
+    // Continue anyway - token is in memory
+  }
   
   return clientData;
 }
@@ -216,7 +226,12 @@ module.exports = async (req, res) => {
       };
       
       clientTokensDB.set(finalInstanceId, clientData);
-      tokenManager.saveTokens(clientTokensDB);
+      try {
+        await tokenManager.saveToken(clientData);
+        console.log(`✅ Token saved to database for instance: ${finalInstanceId}`);
+      } catch (error) {
+        console.error(`❌ Error saving token to database:`, error.message);
+      }
       
       console.log(`💾 Saved direct token for instance: ${finalInstanceId}`);
       console.log(`✅ Token saved successfully`);
@@ -272,7 +287,12 @@ module.exports = async (req, res) => {
       };
       
       clientTokensDB.set(finalInstanceId, clientData);
-      tokenManager.saveTokens(clientTokensDB);
+      try {
+        await tokenManager.saveToken(clientData);
+        console.log(`✅ Token saved to database for instance: ${finalInstanceId}`);
+      } catch (error) {
+        console.error(`❌ Error saving token to database:`, error.message);
+      }
       
       console.log(`💾 Saved JWT token for instance: ${finalInstanceId}`);
       console.log(`✅ Token saved successfully`);
@@ -320,7 +340,7 @@ module.exports = async (req, res) => {
                            crypto.randomBytes(16).toString('hex');
     
     // Save tokens to database
-    const clientData = saveClientTokens(finalInstanceId, tokenData, {
+    const clientData = await saveClientTokens(finalInstanceId, tokenData, {
       clientId: stateData.clientId,
       instanceDetails
     });

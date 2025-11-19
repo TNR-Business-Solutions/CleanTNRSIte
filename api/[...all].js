@@ -152,6 +152,13 @@ module.exports = async (req, res) => {
       return await handler(req, res);
     }
 
+    // Wix API routes - handle /api/wix requests
+    if (route === "wix" || route.startsWith("wix/")) {
+      console.log("✅ Routing to Wix API handler");
+      const handler = require("../server/handlers/wix-api-routes");
+      return await handler(req, res);
+    }
+
     if (route.startsWith("workflows/") || route === "workflows") {
       const handler = require("../server/handlers/workflows-api");
       return await handler(req, res);
@@ -249,6 +256,7 @@ module.exports = async (req, res) => {
           "/api/auth/linkedin - LinkedIn OAuth",
           "/api/auth/twitter - Twitter OAuth",
           "/api/auth/wix - Wix OAuth",
+          "/api/wix - Wix automation API",
           "/api/social/tokens - Social media token management",
           "/api/social/post-to-facebook - Post to Facebook",
           "/api/social/post-to-instagram - Post to Instagram",
@@ -285,6 +293,7 @@ module.exports = async (req, res) => {
         "/api/auth/linkedin",
         "/api/auth/twitter",
         "/api/auth/wix",
+        "/api/wix",
         "/api/social/tokens",
         "/api/social/post-to-facebook",
         "/api/social/post-to-instagram",
@@ -302,7 +311,8 @@ module.exports = async (req, res) => {
       sendJson(res, 500, {
         success: false,
         error: error.message,
-        message: "An internal server error occurred while processing your request.",
+        message:
+          "An internal server error occurred while processing your request.",
       });
     }
   }

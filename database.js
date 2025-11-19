@@ -337,6 +337,17 @@ class TNRDatabase {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )`,
+
+      // Wix tokens table
+      `CREATE TABLE IF NOT EXISTS wix_tokens (
+        instance_id TEXT PRIMARY KEY,
+        access_token TEXT NOT NULL,
+        refresh_token TEXT,
+        expires_at TEXT,
+        metadata TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )`,
     ];
 
     if (this.usePostgres) {
@@ -748,6 +759,109 @@ class TNRDatabase {
 
   async deleteSocialMediaToken(tokenId) {
     await this.execute("DELETE FROM social_media_tokens WHERE id = ?", [tokenId]);
+    return true;
+  }
+
+  // ========== WIX TOKEN MANAGEMENT ==========
+  async saveWixToken(tokenData) {
+    const instanceId = tokenData.instanceId;
+    if (!instanceId) {
+      throw new Error('instanceId is required for Wix tokens');
+    }
+
+    // Check if token already exists
+    const existing = await this.queryOne(
+      "SELECT * FROM wix_tokens WHERE instance_id = ?",
+      [instanceId]
+    );
+
+    const metadata = typeof tokenData.metadata === 'string' 
+      ? tokenData.metadata 
+      : JSON.stringify(tokenData.metadata || {});
+
+    if (existing) {
+      // Update existing token
+      const sql = `UPDATE wix_tokens SET 
+        access_token = ?,
+        refresh_token = ?,
+        expires_at = ?,
+        metadata = ?,
+        updated_at = ?
+        WHERE instance_id = ?`;
+      
+      await this.execute(sql, [
+        tokenData.accessToken,
+        tokenData.refreshToken || null,
+        tokenData.expiresAt ? new Date(tokenData.expiresAt).toISOString() : null,
+        metadata,
+        new Date().toISOString(),
+        instanceId
+      ]);
+      console.log(`✅ Updated Wix token for instance: ${instanceId}`);
+    } else {
+      // Insert new token
+      const sql = `INSERT INTO wix_tokens (
+        instance_id, access_token, refresh_token, expires_at, metadata, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+      
+      await this.execute(sql, [
+        instanceId,
+        tokenData.accessToken,
+        tokenData.refreshToken || null,
+        tokenData.expiresAt ? new Date(tokenData.expiresAt).toISOString() : null,
+        metadata,
+        new Date().toISOString(),
+        new Date().toISOString()
+      ]);
+      console.log(`✅ Saved new Wix token for instance: ${instanceId}`);
+    }
+
+    return {
+      instanceId,
+      accessToken: tokenData.accessToken,
+      refreshToken: tokenData.refreshToken,
+      expiresAt: tokenData.expiresAt,
+      metadata: tokenData.metadata
+    };
+  }
+
+  async getWixToken(instanceId) {
+    const row = await this.queryOne(
+      "SELECT * FROM wix_tokens WHERE instance_id = ?",
+      [instanceId]
+    );
+    
+    if (!row) {
+      return null;
+    }
+
+    return {
+      instanceId: row.instance_id,
+      accessToken: row.access_token,
+      refreshToken: row.refresh_token,
+      expiresAt: row.expires_at ? new Date(row.expires_at).getTime() : null,
+      metadata: typeof row.metadata === 'string' ? JSON.parse(row.metadata || '{}') : row.metadata,
+      createdAt: row.created_at ? new Date(row.created_at).getTime() : null,
+      updatedAt: row.updated_at ? new Date(row.updated_at).getTime() : null
+    };
+  }
+
+  async getAllWixTokens() {
+    const rows = await this.query("SELECT * FROM wix_tokens ORDER BY created_at DESC");
+    return rows.map(row => ({
+      instanceId: row.instance_id,
+      accessToken: row.access_token,
+      refreshToken: row.refresh_token,
+      expiresAt: row.expires_at ? new Date(row.expires_at).getTime() : null,
+      metadata: typeof row.metadata === 'string' ? JSON.parse(row.metadata || '{}') : row.metadata,
+      createdAt: row.created_at ? new Date(row.created_at).getTime() : null,
+      updatedAt: row.updated_at ? new Date(row.updated_at).getTime() : null
+    }));
+  }
+
+  async deleteWixToken(instanceId) {
+    await this.execute("DELETE FROM wix_tokens WHERE instance_id = ?", [instanceId]);
+    console.log(`✅ Deleted Wix token for instance: ${instanceId}`);
     return true;
   }
 

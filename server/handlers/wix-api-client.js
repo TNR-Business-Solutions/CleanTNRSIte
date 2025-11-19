@@ -20,10 +20,39 @@ class WixAPIClient {
    * Get client data and ensure token is valid
    */
   async getValidToken() {
+    // First check in-memory cache
     this.clientData = clientTokensDB.get(this.instanceId);
     
+    // If not in memory, try loading from database
     if (!this.clientData) {
-      throw new Error(`No tokens found for instance: ${this.instanceId}`);
+      console.log(`🔍 Token not in memory for instance ${this.instanceId}, checking database...`);
+      try {
+        const tokenManager = require('./wix-token-manager');
+        const dbToken = await tokenManager.getToken(this.instanceId);
+        
+        if (dbToken) {
+          // Convert database format to Map format
+          this.clientData = {
+            instanceId: dbToken.instanceId,
+            accessToken: dbToken.accessToken,
+            refreshToken: dbToken.refreshToken,
+            expiresAt: dbToken.expiresAt || Date.now() + (10 * 365 * 24 * 60 * 60 * 1000), // Default 10 years
+            metadata: dbToken.metadata || {},
+            createdAt: dbToken.createdAt || Date.now(),
+            updatedAt: dbToken.updatedAt || Date.now()
+          };
+          
+          // Cache in memory for future requests
+          clientTokensDB.set(this.instanceId, this.clientData);
+          console.log(`✅ Loaded token from database for instance: ${this.instanceId}`);
+        }
+      } catch (error) {
+        console.error(`❌ Error loading token from database:`, error.message);
+      }
+    }
+    
+    if (!this.clientData) {
+      throw new Error(`No tokens found for instance: ${this.instanceId}. Please reconnect the Wix client.`);
     }
     
     // Check if token is expired or about to expire (within 5 minutes)
@@ -47,7 +76,12 @@ class WixAPIClient {
         
         // Save to persistent storage
         const tokenManager = require('./wix-token-manager');
-        tokenManager.saveTokens(clientTokensDB);
+        try {
+          await tokenManager.saveToken(this.clientData);
+          console.log('✅ Refreshed token saved to database');
+        } catch (error) {
+          console.error('❌ Error saving refreshed token to database:', error.message);
+        }
         
       } catch (error) {
         console.error('❌ Failed to refresh token:', error);
