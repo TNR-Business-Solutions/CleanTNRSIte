@@ -13,6 +13,7 @@ The webhook was returning "❌ Missing action parameter" error, which indicates 
 Changed the routing order in `api/[...all].js` to check for webhooks **before** the general Wix API route:
 
 **Before:**
+
 ```javascript
 // Wix API routes - handle /api/wix requests
 if (route === "wix" || route.startsWith("wix/")) {
@@ -26,6 +27,7 @@ if (route === "wix/webhooks" || route.startsWith("wix/webhooks")) {
 ```
 
 **After:**
+
 ```javascript
 // Wix Webhooks - specific endpoint (MUST come before wix/* catch-all)
 if (route === "wix/webhooks" || route.startsWith("wix/webhooks")) {
@@ -58,6 +60,7 @@ if (req.query?.action || req.body?.action) {
 ### ✅ Correct Routing
 
 **Webhook Request:**
+
 ```
 POST /api/wix/webhooks
 Content-Type: text/plain
@@ -69,6 +72,7 @@ Body: [JWT token]
 ```
 
 **API Request:**
+
 ```
 POST /api/wix?action=getClientDetails
 Content-Type: application/json
@@ -85,6 +89,7 @@ Content-Type: application/json
 After deployment, check Vercel logs:
 
 **Webhook Request Should Show:**
+
 ```
 ✅ Routing to Wix Webhooks handler
 📥 Webhook request received: { route: 'wix/webhooks', ... }
@@ -92,6 +97,7 @@ After deployment, check Vercel logs:
 ```
 
 **Should NOT Show:**
+
 ```
 ✅ Routing to Wix API handler
 ❌ Missing action parameter
@@ -111,6 +117,7 @@ The error "❌ Missing action parameter" should no longer appear for webhook req
 ## Deployment
 
 1. **Commit Changes**
+
    ```bash
    git add api/[...all].js server/handlers/wix-webhooks.js
    git commit -m "Fix webhook routing order"
@@ -137,4 +144,3 @@ The error "❌ Missing action parameter" should no longer appear for webhook req
 
 **Last Updated**: After routing fix
 **Next Action**: Deploy and test webhook
-

@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TNR SEO & Automation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #333;
+            background: #fff;
+            padding: 16px;
+        }
+
+        .header {
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #162d3d;
+            margin-bottom: 4px;
+        }
+
+        .header p {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .section {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #162d3d;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 10px 16px;
+            background: #0066ff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-bottom: 8px;
+        }
+
+        .btn:hover {
+            background: #0052cc;
+        }
+
+        .btn:active {
+            background: #003d99;
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e8e8e8;
+        }
+
+        .btn-success {
+            background: #00c853;
+        }
+
+        .btn-success:hover {
+            background: #00a043;
+        }
+
+        .status {
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+
+        .status-info {
+            background: #e3f2fd;
+            color: #1976d2;
+            border-left: 3px solid #1976d2;
+        }
+
+        .status-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-left: 3px solid #2e7d32;
+        }
+
+        .status-warning {
+            background: #fff3e0;
+            color: #f57c00;
+            border-left: 3px solid #f57c00;
+        }
+
+        .status-error {
+            background: #ffebee;
+            color: #c62828;
+            border-left: 3px solid #c62828;
+        }
+
+        .input-group {
+            margin-bottom: 12px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: #666;
+            margin-bottom: 6px;
+        }
+
+        .input-group input,
+        .input-group textarea,
+        .input-group select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .input-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #0066ff;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .result {
+            display: none;
+            padding: 12px;
+            border-radius: 4px;
+            margin-top: 12px;
+            font-size: 13px;
+        }
+
+        .result.active {
+            display: block;
+        }
+
+        .result.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .result.error {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .quick-actions .btn {
+            margin-bottom: 0;
+            font-size: 12px;
+            padding: 8px 12px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: #162d3d;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #666;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚀 TNR SEO & Automation</h1>
+        <p>Optimize your site's SEO and manage products</p>
+    </div>
+
+    <div id="statusMessage" class="status status-info" style="display: none;"></div>
+
+    <div class="section">
+        <div class="section-title">Quick Actions</div>
+        <div class="quick-actions">
+            <button class="btn btn-secondary" onclick="runSEOAudit()">🔍 SEO Audit</button>
+            <button class="btn btn-secondary" onclick="optimizeCurrentPage()">✨ Optimize Page</button>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">SEO Score</div>
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="seoScore">--</div>
+                <div class="stat-label">Overall Score</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="issuesCount">--</div>
+                <div class="stat-label">Issues Found</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Page SEO</div>
+        <div class="input-group">
+            <label>Meta Title</label>
+            <input type="text" id="metaTitle" placeholder="Enter page title (50-60 chars)">
+        </div>
+        <div class="input-group">
+            <label>Meta Description</label>
+            <textarea id="metaDescription" placeholder="Enter meta description (150-160 chars)"></textarea>
+        </div>
+        <button class="btn btn-success" onclick="updatePageSEO()">💾 Update Page SEO</button>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Product Management</div>
+        <button class="btn btn-secondary" onclick="loadProducts()">📦 View Products</button>
+        <button class="btn btn-secondary" onclick="syncProducts()">🔄 Sync Products</button>
+    </div>
+
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <div>Processing...</div>
+    </div>
+
+    <div id="result" class="result"></div>
+
+    <script>
+        // Get Wix SDK instance
+        let wixSdk = null;
+        let currentPageId = null;
+        let instanceId = null;
+
+        // Initialize when Wix SDK is ready
+        if (typeof window.wixSdk !== 'undefined') {
+            wixSdk = window.wixSdk;
+            initialize();
+        } else {
+            // Wait for SDK to load
+            window.addEventListener('load', () => {
+                if (window.wixSdk) {
+                    wixSdk = window.wixSdk;
+                    initialize();
+                }
+            });
+        }
+
+        async function initialize() {
+            try {
+                // Get current page ID
+                if (wixSdk && wixSdk.getCurrentPage) {
+                    const page = await wixSdk.getCurrentPage();
+                    currentPageId = page.id;
+                }
+
+                // Get instance ID from URL or Wix context
+                const urlParams = new URLSearchParams(window.location.search);
+                instanceId = urlParams.get('instanceId') || getInstanceIdFromContext();
+
+                // Load initial data
+                await loadSEOScore();
+            } catch (error) {
+                showStatus('error', 'Failed to initialize: ' + error.message);
+            }
+        }
+
+        function getInstanceIdFromContext() {
+            // Try to get from Wix context
+            if (wixSdk && wixSdk.getInstanceId) {
+                return wixSdk.getInstanceId();
+            }
+            // Fallback: try to get from localStorage or parent window
+            return localStorage.getItem('wixInstanceId') || null;
+        }
+
+        function showStatus(type, message) {
+            const statusEl = document.getElementById('statusMessage');
+            statusEl.className = `status status-${type}`;
+            statusEl.textContent = message;
+            statusEl.style.display = 'block';
+            setTimeout(() => {
+                statusEl.style.display = 'none';
+            }, 5000);
+        }
+
+        function showLoading(show) {
+            document.getElementById('loading').classList.toggle('active', show);
+        }
+
+        function showResult(type, message) {
+            const resultEl = document.getElementById('result');
+            resultEl.className = `result ${type} active`;
+            resultEl.textContent = message;
+            setTimeout(() => {
+                resultEl.classList.remove('active');
+            }, 5000);
+        }
+
+        async function runSEOAudit() {
+            if (!instanceId) {
+                showStatus('error', 'Please connect your Wix site first');
+                return;
+            }
+
+            showLoading(true);
+            try {
+                const response = await fetch('https://www.tnrbusinesssolutions.com/api/wix', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'auditSiteSEO',
+                        instanceId: instanceId
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showResult('success', `Audit complete! Found ${data.issues?.length || 0} issues.`);
+                    updateSEOScore(data);
+                } else {
+                    showResult('error', data.error || 'Audit failed');
+                }
+            } catch (error) {
+                showResult('error', 'Failed to run audit: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function optimizeCurrentPage() {
+            if (!currentPageId || !instanceId) {
+                showStatus('error', 'Page information not available');
+                return;
+            }
+
+            showLoading(true);
+            try {
+                const response = await fetch('https://www.tnrbusinesssolutions.com/api/wix', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'autoOptimizeSEO',
+                        instanceId: instanceId,
+                        pageId: currentPageId
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showResult('success', 'Page optimized successfully!');
+                    // Update form fields
+                    if (data.seoData) {
+                        document.getElementById('metaTitle').value = data.seoData.title || '';
+                        document.getElementById('metaDescription').value = data.seoData.description || '';
+                    }
+                } else {
+                    showResult('error', data.error || 'Optimization failed');
+                }
+            } catch (error) {
+                showResult('error', 'Failed to optimize: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function updatePageSEO() {
+            if (!currentPageId || !instanceId) {
+                showStatus('error', 'Page information not available');
+                return;
+            }
+
+            const title = document.getElementById('metaTitle').value;
+            const description = document.getElementById('metaDescription').value;
+
+            if (!title && !description) {
+                showStatus('warning', 'Please enter at least a title or description');
+                return;
+            }
+
+            showLoading(true);
+            try {
+                const response = await fetch('https://www.tnrbusinesssolutions.com/api/wix', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'updatePageSEO',
+                        instanceId: instanceId,
+                        pageId: currentPageId,
+                        seoData: {
+                            title: title,
+                            description: description
+                        }
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showResult('success', 'Page SEO updated successfully!');
+                } else {
+                    showResult('error', data.error || 'Update failed');
+                }
+            } catch (error) {
+                showResult('error', 'Failed to update: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function loadProducts() {
+            if (!instanceId) {
+                showStatus('error', 'Please connect your Wix site first');
+                return;
+            }
+
+            showLoading(true);
+            try {
+                const response = await fetch('https://www.tnrbusinesssolutions.com/api/wix', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'getProducts',
+                        instanceId: instanceId,
+                        options: { limit: 10 }
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showResult('success', `Loaded ${data.products?.length || 0} products`);
+                } else {
+                    showResult('error', data.error || 'Failed to load products');
+                }
+            } catch (error) {
+                showResult('error', 'Failed to load products: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function syncProducts() {
+            if (!instanceId) {
+                showStatus('error', 'Please connect your Wix site first');
+                return;
+            }
+
+            showLoading(true);
+            try {
+                const response = await fetch('https://www.tnrbusinesssolutions.com/api/wix', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'syncProductsToExternal',
+                        instanceId: instanceId,
+                        platform: 'wix',
+                        productIds: []
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showResult('success', 'Products synced successfully!');
+                } else {
+                    showResult('error', data.error || 'Sync failed');
+                }
+            } catch (error) {
+                showResult('error', 'Failed to sync: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function loadSEOScore() {
+            if (!instanceId) return;
+
+            try {
+                const response = await fetch('https://www.tnrbusinesssolutions.com/api/wix', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'auditSiteSEO',
+                        instanceId: instanceId
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    updateSEOScore(data);
+                }
+            } catch (error) {
+                console.error('Failed to load SEO score:', error);
+            }
+        }
+
+        function updateSEOScore(auditData) {
+            // Calculate score (100 - issues * 5, minimum 0)
+            const issues = auditData.issues?.length || 0;
+            const score = Math.max(0, 100 - (issues * 5));
+            
+            document.getElementById('seoScore').textContent = score;
+            document.getElementById('issuesCount').textContent = issues;
+        }
+    </script>
+</body>
+</html>
+

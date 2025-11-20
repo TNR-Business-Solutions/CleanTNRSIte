@@ -1,0 +1,16 @@
+{
+  "baseUri": "https://www.tnrbusinesssolutions.com/api/wix/seo-keywords",
+  "upgradeUrl": "https://www.tnrbusinesssolutions.com/packages.html",
+  "supportedCountryCodes": [
+    "US",
+    "CA",
+    "GB",
+    "AU",
+    "NZ",
+    "IE"
+  ],
+  "quotaEnabled": true,
+  "landingPageUrl": "https://www.tnrbusinesssolutions.com/seo-services.html",
+  "componentName": "TNR SEO Keywords"
+}
+
