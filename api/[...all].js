@@ -149,6 +149,16 @@ module.exports = async (req, res) => {
       return await handler(req, res);
     }
 
+    // Threads OAuth routes
+    if (route.startsWith("auth/threads")) {
+      if (route === "auth/threads/callback" || route.endsWith("/callback")) {
+        const handler = require("../server/handlers/auth-threads-callback");
+        return await handler(req, res);
+      }
+      const handler = require("../server/handlers/auth-threads");
+      return await handler(req, res);
+    }
+
     // Wix OAuth routes
     if (route.startsWith("auth/wix")) {
       if (route === "auth/wix/callback" || route.endsWith("/callback")) {
