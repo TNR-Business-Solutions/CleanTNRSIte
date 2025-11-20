@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TNR Admin Dashboard - Social Automation Platform</title>
+    <link rel="stylesheet" href="assets/styles.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --tnr-navy: #1a237e;
+            --tnr-primary: #3f51b5;
+            --tnr-secondary: #7986cb;
+            --tnr-gold: #ffd700;
+            --tnr-success: #4caf50;
+            --tnr-warning: #ff9800;
+            --tnr-danger: #f44336;
+            --tnr-info: #2196f3;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--tnr-primary), var(--tnr-secondary));
+            min-height: 100vh;
+        }
+
+        .dashboard-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .dashboard-header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .dashboard-header h1 {
+            color: var(--tnr-gold);
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-header .timestamp {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--tnr-gold);
+            color: var(--tnr-navy);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-card .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--tnr-gold);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-card .stat-label {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        .platforms-section {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .platforms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .platform-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            color: white;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .platform-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .platform-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--platform-color), transparent);
+        }
+
+        .platform-card.wix { --platform-color: #0C6EFC; }
+        .platform-card.meta { --platform-color: #1877F2; }
+        .platform-card.threads { --platform-color: #000000; }
+        .platform-card.whatsapp { --platform-color: #25D366; }
+        .platform-card.instagram { --platform-color: #E4405F; }
+        .platform-card.linkedin { --platform-color: #0077B5; }
+        .platform-card.twitter { --platform-color: #1DA1F2; }
+        .platform-card.pinterest { --platform-color: #E60023; }
+
+        .platform-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .platform-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .platform-icon {
+            font-size: 1.5rem;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-connected {
+            background: var(--tnr-success);
+            color: white;
+        }
+
+        .status-pending {
+            background: var(--tnr-warning);
+            color: white;
+        }
+
+        .status-disconnected {
+            background: var(--tnr-danger);
+            color: white;
+        }
+
+        .platform-features {
+            list-style: none;
+            margin-bottom: 1rem;
+        }
+
+        .platform-features li {
+            padding: 0.25rem 0;
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .platform-features li::before {
+            content: '✓ ';
+            color: var(--tnr-gold);
+            font-weight: bold;
+        }
+
+        .platform-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            border-radius: 8px;
+        }
+
+        .recent-activity {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            color: white;
+            margin-bottom: 2rem;
+        }
+
+        .activity-list {
+            list-style: none;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .activity-item {
+            padding: 1rem;
+            border-left: 3px solid var(--tnr-gold);
+            margin-bottom: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .activity-time {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .quick-actions {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            color: white;
+        }
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .action-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-card:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .action-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .action-label {
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 1rem;
+            }
+
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .stats-overview {
+                grid-template-columns: 1fr;
+            }
+
+            .platforms-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <div class="dashboard-header">
+            <div>
+                <h1>🚀 TNR Social Automation Platform</h1>
+                <p class="timestamp">Last updated: <span id="current-time"></span></p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-primary" onclick="refreshDashboard()">🔄 Refresh</button>
+                <a href="/" class="btn btn-secondary">🏠 Home</a>
+                <a href="/admin-dashboard.html" class="btn btn-secondary">📊 Old Dashboard</a>
+            </div>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="stats-overview">
+            <div class="stat-card">
+                <div class="stat-icon">🌐</div>
+                <div class="stat-value" id="platforms-connected">8</div>
+                <div class="stat-label">Platforms Connected</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📝</div>
+                <div class="stat-value" id="total-posts">0</div>
+                <div class="stat-label">Posts This Month</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">💬</div>
+                <div class="stat-value" id="total-messages">0</div>
+                <div class="stat-label">Messages Processed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📊</div>
+                <div class="stat-value" id="total-analytics">0</div>
+                <div class="stat-label">Analytics Events</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🔔</div>
+                <div class="stat-value" id="total-webhooks">5</div>
+                <div class="stat-label">Active Webhooks</div>
+            </div>
+        </div>
+
+        <!-- Platforms Section -->
+        <div class="platforms-section">
+            <h2 class="section-title">📱 Connected Platforms</h2>
+            <div class="platforms-grid">
+                <!-- Wix -->
+                <div class="platform-card wix">
+                    <div class="platform-header">
+                        <div class="platform-name">
+                            <span class="platform-icon">🏢</span>
+                            Wix
+                        </div>
+                        <span class="status-badge status-connected">✓ Connected</span>
+                    </div>
+                    <ul class="platform-features">
+                        <li>SEO Automation</li>
+                        <li>E-commerce Manager</li>
+                        <li>Blog Category Webhooks</li>
+                        <li>Editor Add-on</li>
+                        <li>SEO Keywords Extension</li>
+                    </ul>
+                    <div class="platform-actions">
+                        <button class="btn btn-small btn-primary" onclick="openPlatform('wix')">🔧 Manage</button>
+                        <button class="btn btn-small btn-secondary" onclick="testWebhook('wix')">🧪 Test</button>
+                    </div>
+                </div>
+
+                <!-- Meta (Facebook) -->
+                <div class="platform-card meta">
+                    <div class="platform-header">
+                        <div class="platform-name">
+                            <span class="platform-icon">📘</span>
+                            Meta/Facebook
+                        </div>
+                        <span class="status-badge status-connected">✓ Connected</span>
+                    </div>
+                    <ul class="platform-features">
+                        <li>Page Events</li>
+                        <li>Messaging Webhooks</li>
+                        <li>Ad Management</li>
+                        <li>Lead Capture</li>
+                    </ul>
+                    <div class="platform-actions">
+                        <button class="btn btn-small btn-primary" onclick="openPlatform('meta')">🔧 Manage</button>
+                        <button class="btn btn-small btn-secondary" onclick="testWebhook('meta')">🧪 Test</button>
+                    </div>
+                </div>
+
+                <!-- Threads -->
+                <div class="platform-card threads">
+                    <div class="platform-header">
+                        <div class="platform-name">
+                            <span class="platform-icon">🧵</span>
+                            Threads
+                        </div>
+                        <span class="status-badge status-pending">⏳ Pending Config</span>
+                    </div>
+                    <ul class="platform-features">
+                        <li>Post Text Content</li>
+                        <li>Post Images</li>
+                        <li>OAuth Authentication</li>
+                        <li>60-day Tokens</li>
+                    </ul>
+                    <div class="platform-actions">
+                        <button class="btn btn-small btn-primary" onclick="connectThreads()">🔗 Connect</button>
+                        <button class="btn btn-small btn-secondary" onclick="window.location.href='/api/auth/threads'">🔑 OAuth</button>
+                    </div>
+                </div>
+
+                <!-- WhatsApp -->
+                <div class="platform-card whatsapp">
+                    <div class="platform-header">
+                        <div class="platform-name">
+                            <span class="platform-icon">💬</span>
+                            WhatsApp Business
+                        </div>
+                        <span class="status-badge status-pending">⏳ Pending Config</span>
+                    </div>
+                    <ul class="platform-features">
+                        <li>Send/Receive Messages</li>
+                        <li>Template Messages</li>
+                        <li>Status Tracking</li>
+                        <li>90-Day Free Trial</li>
+                    </ul>
+                    <div class="platform-actions">
+                        <button class="btn btn-small btn-primary" onclick="openWhatsAppSetup()">⚙️ Configure</button>
+                        <button class="btn btn-small btn-secondary" onclick="testWhatsApp()">🧪 Test</button>
+                    </div>
+                </div>
+
+                <!-- Instagram -->
+                <div class="platform-card instagram">
+                    <div class="platform-header">
+                        <div class="platform-name">
+                            <span class="platform-icon">📸</span>
+                            Instagram Business
+                        </div>
+                        <span class="status-badge status-pending">⏳ Pending Config</span>
+                    </div>
+                    <ul class="platform-features">
+                        <li>Comment Management</li>
+                        <li>Direct Messages</li>
+                        <li>Story Insights</li>
+                        <li>Mention Tracking</li>
+                    </ul>
+                    <div class="platform-actions">
+                        <button class="btn btn-small btn-primary" onclick="openInstagramSetup()">⚙️ Configure</button>
+                        <button class="btn btn-small btn-secondary" onclick="testWebhook('instagram')">🧪 Test</button>
+                    </div>
+                </div>
+
+                <!-- LinkedIn -->
+                <div class="platform-card linkedin">
+                    <div class="platform-header">
+                        <div class="platform-name">
+                            <span class="platform-icon">💼</span>
+                            LinkedIn
+                        </div>
+                        <span class="status-badge status-connected">✓ OAuth Ready</span>
+                    </div>
+                    <ul class="platform-features">
+                        <li>Profile Access</li>
+                        <li>Company Pages</li>
+                        <li>Post to Feed</li>
+                        <li>OAuth 2.0</li>
+                    </ul>
+                    <div class="platform-actions">
+                        <button class="btn btn-small btn-primary" onclick="window.location.href='/api/auth/linkedin'">🔗 Connect</button>
+                        <button class="btn btn-small btn-secondary" onclick="openPlatform('linkedin')">🔧 Manage</button>
+                    </div>
+                </div>
+
+                <!-- Twitter/X -->
+                <div class="platform-card twitter">
+                    <div class="platform-header">
+                        <div class="platform-name">
+                            <span class="platform-icon">🐦</span>
+                            Twitter/X
+                        </div>
+                        <span class="status-badge status-connected">✓ OAuth Ready</span>
+                    </div>
+                    <ul class="platform-features">
+                        <li>Post Tweets</li>
+                        <li>Timeline Access</li>
+                        <li>Profile Management</li>
+                        <li>OAuth 2.0</li>
+                    </ul>
+                    <div class="platform-actions">
+                        <button class="btn btn-small btn-primary" onclick="window.location.href='/api/auth/twitter'">🔗 Connect</button>
+                        <button class="btn btn-small btn-secondary" onclick="openPlatform('twitter')">🔧 Manage</button>
+                    </div>
+                </div>
+
+                <!-- Pinterest -->
+                <div class="platform-card pinterest">
+                    <div class="platform-header">
+                        <div class="platform-name">
+                            <span class="platform-icon">📌</span>
+                            Pinterest
+                        </div>
+                        <span class="status-badge status-connected">✓ OAuth Ready</span>
+                    </div>
+                    <ul class="platform-features">
+                        <li>Create Pins</li>
+                        <li>Board Management</li>
+                        <li>Profile Access</li>
+                        <li>OAuth 2.0</li>
+                    </ul>
+                    <div class="platform-actions">
+                        <button class="btn btn-small btn-primary" onclick="window.location.href='/api/auth/pinterest'">🔗 Connect</button>
+                        <button class="btn btn-small btn-secondary" onclick="openPlatform('pinterest')">🔧 Manage</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <h2 class="section-title">⚡ Quick Actions</h2>
+            <div class="action-grid">
+                <div class="action-card" onclick="window.open('/SOCIAL_MEDIA_INTEGRATIONS_SUMMARY.md', '_blank')">
+                    <div class="action-icon">📚</div>
+                    <div class="action-label">View Setup Guides</div>
+                </div>
+                <div class="action-card" onclick="window.open('https://vercel.com/tnr-business-solutions', '_blank')">
+                    <div class="action-icon">🚀</div>
+                    <div class="action-label">Vercel Dashboard</div>
+                </div>
+                <div class="action-card" onclick="testAllWebhooks()">
+                    <div class="action-icon">🧪</div>
+                    <div class="action-label">Test All Webhooks</div>
+                </div>
+                <div class="action-card" onclick="viewLogs()">
+                    <div class="action-icon">📋</div>
+                    <div class="action-label">View Logs</div>
+                </div>
+                <div class="action-card" onclick="window.location.href='/wix-client-dashboard.html'">
+                    <div class="action-icon">🏢</div>
+                    <div class="action-label">Wix Dashboard</div>
+                </div>
+                <div class="action-card" onclick="window.location.href='/social-media-automation-dashboard.html'">
+                    <div class="action-icon">📱</div>
+                    <div class="action-label">Social Media Hub</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="recent-activity">
+            <h2 class="section-title">📊 Recent Activity</h2>
+            <ul class="activity-list" id="activity-list">
+                <li class="activity-item">
+                    <strong>🎉 Platform Deployed</strong>
+                    <p>All 8 social media integrations deployed successfully</p>
+                    <div class="activity-time">Just now</div>
+                </li>
+                <li class="activity-item">
+                    <strong>✅ Instagram Integration Added</strong>
+                    <p>Webhook handler for comments, DMs, and story insights</p>
+                    <div class="activity-time">5 minutes ago</div>
+                </li>
+                <li class="activity-item">
+                    <strong>✅ WhatsApp Business Added</strong>
+                    <p>Messaging and template support enabled</p>
+                    <div class="activity-time">10 minutes ago</div>
+                </li>
+                <li class="activity-item">
+                    <strong>✅ Threads API Integration</strong>
+                    <p>OAuth and posting capabilities deployed</p>
+                    <div class="activity-time">15 minutes ago</div>
+                </li>
+                <li class="activity-item">
+                    <strong>✅ Wix Extensions Complete</strong>
+                    <p>Editor Add-on, SEO Keywords, and Embedded Script</p>
+                    <div class="activity-time">1 hour ago</div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Update current time
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('current-time').textContent = now.toLocaleString();
+        }
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        // Refresh dashboard
+        function refreshDashboard() {
+            location.reload();
+        }
+
+        // Platform management
+        function openPlatform(platform) {
+            const platformUrls = {
+                'wix': '/wix-client-dashboard.html',
+                'meta': '/social-media-automation-dashboard.html',
+                'linkedin': '/social-media-automation-dashboard.html',
+                'twitter': '/social-media-automation-dashboard.html'
+            };
+            
+            if (platformUrls[platform]) {
+                window.location.href = platformUrls[platform];
+            } else {
+                alert(`${platform} management dashboard coming soon!`);
+            }
+        }
+
+        // Webhook testing
+        function testWebhook(platform) {
+            const webhookUrls = {
+                'wix': '/api/wix/webhooks',
+                'meta': '/api/meta/webhooks',
+                'whatsapp': '/api/whatsapp/webhooks',
+                'instagram': '/api/instagram/webhooks'
+            };
+
+            if (webhookUrls[platform]) {
+                fetch(webhookUrls[platform])
+                    .then(response => {
+                        if (response.ok) {
+                            alert(`✅ ${platform} webhook is responding!`);
+                        } else {
+                            alert(`⚠️ ${platform} webhook returned status: ${response.status}`);
+                        }
+                    })
+                    .catch(error => {
+                        alert(`❌ ${platform} webhook test failed: ${error.message}`);
+                    });
+            } else {
+                alert(`No webhook configured for ${platform}`);
+            }
+        }
+
+        function testAllWebhooks() {
+            const webhooks = ['wix', 'meta', 'whatsapp', 'instagram'];
+            let results = [];
+
+            Promise.all(webhooks.map(platform => {
+                const webhookUrls = {
+                    'wix': '/api/wix/webhooks',
+                    'meta': '/api/meta/webhooks',
+                    'whatsapp': '/api/whatsapp/webhooks',
+                    'instagram': '/api/instagram/webhooks'
+                };
+
+                return fetch(webhookUrls[platform])
+                    .then(response => {
+                        results.push(`${platform}: ${response.ok ? '✅' : '❌'}`);
+                    })
+                    .catch(() => {
+                        results.push(`${platform}: ❌`);
+                    });
+            })).then(() => {
+                alert('Webhook Test Results:\n\n' + results.join('\n'));
+            });
+        }
+
+        // Setup functions
+        function openWhatsAppSetup() {
+            window.open('/WHATSAPP_API_SETUP.md', '_blank');
+        }
+
+        function openInstagramSetup() {
+            window.open('/INSTAGRAM_API_SETUP.md', '_blank');
+        }
+
+        function connectThreads() {
+            window.open('/THREADS_API_SETUP.md', '_blank');
+        }
+
+        function testWhatsApp() {
+            const phoneNumber = prompt('Enter test phone number (digits only):');
+            if (phoneNumber) {
+                fetch('/api/send/whatsapp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        to: phoneNumber,
+                        type: 'template',
+                        templateName: 'hello_world',
+                        languageCode: 'en_US'
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('✅ WhatsApp message sent successfully!');
+                    } else {
+                        alert('❌ Failed to send WhatsApp message: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    alert('❌ Error: ' + error.message);
+                });
+            }
+        }
+
+        function viewLogs() {
+            window.open('https://vercel.com/tnr-business-solutions/logs', '_blank');
+        }
+
+        // Load stats (placeholder - connect to actual API)
+        async function loadStats() {
+            // TODO: Fetch real stats from API
+            document.getElementById('total-posts').textContent = '0';
+            document.getElementById('total-messages').textContent = '0';
+            document.getElementById('total-analytics').textContent = '0';
+        }
+
+        // Initialize
+        loadStats();
+    </script>
+</body>
+</html>
+
