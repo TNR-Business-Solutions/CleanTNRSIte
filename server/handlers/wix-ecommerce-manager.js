@@ -446,23 +446,82 @@ async function syncProductsToExternal(instanceId, platform, productIds = []) {
         productIds.map((id) => getProduct(instanceId, id))
       );
     } else {
-      const allProducts = await getProducts(instanceId);
+      const allProducts = await getProducts(instanceId, { limit: 1000 });
       products = allProducts.products || [];
     }
 
-    // This would integrate with external platforms (Shopify, Amazon, etc.)
-    // For now, return the products that would be synced
-    console.log(`✅ Prepared ${products.length} products for ${platform} sync`);
+    if (products.length === 0) {
+      return {
+        platform,
+        productsCount: 0,
+        message: 'No products found to sync',
+        products: []
+      };
+    }
 
+    // Transform Wix products to platform-specific format
+    const transformedProducts = products.map((p) => {
+      const baseProduct = {
+        id: p.id,
+        name: p.name || p.productName,
+        description: p.description || '',
+        sku: p.sku || p.productId,
+        price: p.price?.price || p.price || 0,
+        currency: p.price?.currency || 'USD',
+        images: p.media?.items?.map(item => item.url) || [],
+        inventory: p.inventory?.quantity || 0,
+        inStock: p.inventory?.inStock !== false,
+        weight: p.weight || null,
+        variants: p.productOptions?.options || []
+      };
+
+      // Platform-specific transformations
+      switch (platform.toLowerCase()) {
+        case 'shopify':
+          return {
+            title: baseProduct.name,
+            body_html: baseProduct.description,
+            vendor: p.brand || 'Wix Store',
+            product_type: p.productType || 'Product',
+            variants: [{
+              price: baseProduct.price.toString(),
+              sku: baseProduct.sku,
+              inventory_quantity: baseProduct.inventory,
+              weight: baseProduct.weight
+            }],
+            images: baseProduct.images.map(url => ({ src: url })),
+            tags: p.collections?.map(c => c.name).join(', ') || ''
+          };
+        
+        case 'amazon':
+          return {
+            'item_sku': baseProduct.sku,
+            'product_name': baseProduct.name,
+            'product_description': baseProduct.description,
+            'standard_price': baseProduct.price.toString(),
+            'quantity': baseProduct.inventory.toString(),
+            'main_product_image': baseProduct.images[0] || '',
+            'other_product_image': baseProduct.images.slice(1).join(';'),
+            'product_type': p.productType || 'Product',
+            'brand_name': p.brand || ''
+          };
+        
+        case 'csv':
+        default:
+          return baseProduct;
+      }
+    });
+
+    console.log(`✅ Transformed ${transformedProducts.length} products for ${platform} sync`);
+
+    // Return sync-ready data
     return {
       platform,
-      productsCount: products.length,
-      products: products.map((p) => ({
-        id: p.id,
-        name: p.name,
-        sku: p.sku,
-        price: p.price,
-      })),
+      productsCount: transformedProducts.length,
+      products: transformedProducts,
+      syncFormat: platform.toLowerCase() === 'csv' ? 'CSV' : 'JSON',
+      readyForSync: true,
+      timestamp: new Date().toISOString()
     };
   } catch (error) {
     console.error("❌ Error syncing products:", error);

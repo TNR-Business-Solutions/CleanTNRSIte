@@ -1,3 +1,6 @@
+// Load environment variables from .env file
+require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
+
 const express = require('express');
 const axios = require('axios');
 const qs = require('querystring');
@@ -64,6 +67,64 @@ if (!META_APP_ID || !META_APP_SECRET) {
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
+});
+
+// Database diagnostic endpoint
+app.get('/api/db/test', async (req, res) => {
+  try {
+    const TNRDatabase = require('../database');
+    const db = new TNRDatabase();
+    
+    console.log('🔍 Testing database connection...');
+    console.log('   POSTGRES_URL:', process.env.POSTGRES_URL ? 'Set' : 'Not set');
+    console.log('   DATABASE_URL:', process.env.DATABASE_URL ? 'Set' : 'Not set');
+    
+    await db.initialize();
+    
+    // Test query
+    const testResult = await db.query('SELECT 1 as test');
+    
+    // Check if wix_tokens table exists
+    let tableExists = false;
+    let tokenCount = 0;
+    try {
+      const tokens = await db.query('SELECT COUNT(*) as count FROM wix_tokens');
+      tableExists = true;
+      tokenCount = tokens[0]?.count || 0;
+    } catch (err) {
+      console.log('   wix_tokens table does not exist yet');
+    }
+    
+    res.json({
+      success: true,
+      database: {
+        type: db.usePostgres ? 'Neon Postgres' : 'SQLite',
+        connected: true,
+        testQuery: testResult,
+        wixTokensTable: {
+          exists: tableExists,
+          tokenCount: tokenCount
+        },
+        environment: {
+          hasPostgresUrl: !!process.env.POSTGRES_URL,
+          hasDatabaseUrl: !!process.env.DATABASE_URL,
+          nodeEnv: process.env.NODE_ENV
+        }
+      }
+    });
+  } catch (error) {
+    console.error('❌ Database test failed:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      stack: error.stack,
+      environment: {
+        hasPostgresUrl: !!process.env.POSTGRES_URL,
+        hasDatabaseUrl: !!process.env.DATABASE_URL,
+        nodeEnv: process.env.NODE_ENV
+      }
+    });
+  }
 });
 
 // Avoid favicon 404 noise

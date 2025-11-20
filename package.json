@@ -13,6 +13,9 @@
     "test:forms": "node test-production-forms.js",
     "test:wix": "node test-wix-app.js",
     "test:wix:real": "node test-wix-real-integration.js",
+    "test:wix:flow": "node tests/wix-flowthrough-test.js",
+    "test:wix:lighthouse": "node tests/lighthouse-test.js",
+    "test:wix:all": "npm run test:wix:flow && npm run test:wix:lighthouse",
     "server": "cd server && node index.js",
     "minify": "node minify-production.js",
     "optimize-images": "node optimize-images.js",
@@ -30,17 +33,17 @@
   "author": "TNR Business Solutions",
   "license": "MIT",
   "engines": {
-    "node": "20.x"
+    "node": ">=20.x"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",
-    "@vercel/postgres": "^0.5.1",
-    "axios": "^1.7.7",
+    "@vercel/postgres": "^0.10.0",
+    "axios": "^1.13.2",
     "cors": "^2.8.5",
-    "dotenv": "^16.3.1",
+    "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "node-fetch": "^3.3.2",
-    "nodemailer": "^6.10.1",
+    "nodemailer": "^7.0.10",
     "querystring": "^0.2.1",
     "sqlite3": "^5.1.7"
   },
@@ -51,6 +54,6 @@
   "homepage": "https://www.tnrbusinesssolutions.com",
   "devDependencies": {
     "clean-css": "^5.3.3",
-    "terser": "^5.44.0"
+    "terser": "^5.44.1"
   }
 }

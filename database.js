@@ -88,15 +88,27 @@ class TNRDatabase {
   async query(sql, params = []) {
     if (this.usePostgres) {
       const { sql: convertedSQL, params: convertedParams } = this.convertSQL(sql, params);
-      // Neon driver requires sql.query() for parameterized queries
+      // Neon driver returns a function that can be called directly
+      // The Neon serverless driver accepts: sql(queryString, ...params) or sql(queryString, paramsArray)
       try {
-        const result = await this.postgres.query(convertedSQL, convertedParams);
-        // Neon returns { rows: [...] }
-        return result.rows || result || [];
+        // Try calling with params array first (most common pattern)
+        let result;
+        if (convertedParams.length === 0) {
+          // No params, just call with SQL
+          result = await this.postgres(convertedSQL);
+        } else {
+          // With params - Neon accepts them as an array or spread
+          // Try array first (most common)
+          result = await this.postgres(convertedSQL, convertedParams);
+        }
+        
+        // Neon returns an array of rows directly, or { rows: [...] } in some cases
+        return Array.isArray(result) ? result : (result.rows || result || []);
       } catch (err) {
-        console.error('Neon query error:', err);
-        console.error('SQL:', convertedSQL.substring(0, 100));
-        console.error('Params:', convertedParams);
+        console.error('❌ Neon query error:', err.message);
+        console.error('   SQL:', convertedSQL.substring(0, 200));
+        console.error('   Params:', convertedParams);
+        console.error('   Full error:', err);
         throw err;
       }
     } else {
@@ -129,13 +141,17 @@ class TNRDatabase {
     if (this.usePostgres) {
       const { sql: convertedSQL, params: convertedParams } = this.convertSQL(sql, params);
       try {
-        // Neon driver uses sql.query() for all queries including INSERT/UPDATE/DELETE
-        const result = await this.postgres.query(convertedSQL, convertedParams);
-        return { lastID: null, changes: result.rowCount || result.count || 0 };
+        // Neon driver: this.postgres is a function that can be called directly
+        const result = await this.postgres(convertedSQL, convertedParams);
+        // For INSERT/UPDATE/DELETE, Neon returns rowCount or we can check result length
+        // If result is an array, rowCount is the length; otherwise check result.rowCount
+        const rowCount = Array.isArray(result) ? result.length : (result.rowCount || result.count || 0);
+        return { lastID: null, changes: rowCount };
       } catch (err) {
-        console.error('Neon execute error:', err);
-        console.error('SQL:', convertedSQL.substring(0, 100));
-        console.error('Params:', convertedParams);
+        console.error('❌ Neon execute error:', err.message);
+        console.error('   SQL:', convertedSQL.substring(0, 200));
+        console.error('   Params:', convertedParams);
+        console.error('   Full error:', err);
         throw err;
       }
     } else {
@@ -365,12 +381,17 @@ class TNRDatabase {
       // Postgres: Use CREATE TABLE IF NOT EXISTS (similar syntax)
       for (const sql of tables) {
         try {
-          await this.postgres.query(sql);
+          // Neon driver: this.postgres is a function, call it directly
+          await this.postgres(sql);
         } catch (err) {
-          // Ignore "already exists" errors
-          if (!err.message.includes("already exists")) {
+          // Ignore "already exists" errors (Postgres uses "relation already exists")
+          const errorMsg = err.message.toLowerCase();
+          if (!errorMsg.includes("already exists") && !errorMsg.includes("duplicate") && !errorMsg.includes("relation")) {
             console.error("❌ Error creating table:", err.message);
+            console.error("   SQL:", sql.substring(0, 200));
             throw err;
+          } else {
+            console.log("ℹ️  Table already exists (expected):", sql.substring(0, 50) + "...");
           }
         }
       }

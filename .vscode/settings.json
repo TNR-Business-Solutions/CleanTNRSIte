@@ -1,0 +1,78 @@
+{
+    "chat.agent.maxRequests": 250,
+    
+    // File associations
+    "files.associations": {
+        "*.html": "html",
+        "*.js": "javascript",
+        "*.json": "jsonc"
+    },
+    
+    // Editor settings
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll": "explicit",
+        "source.organizeImports": "explicit"
+    },
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false,
+    
+    // File exclusions for better performance
+    "files.exclude": {
+        "**/.git": true,
+        "**/.DS_Store": true,
+        "**/node_modules": true,
+        "**/tnr_database.db": false,
+        "**/tnr_database.db-journal": true
+    },
+    
+    // Search exclusions
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/bower_components": true,
+        "**/*.code-search": true,
+        "**/dist": true,
+        "**/build": true,
+        "**/.next": true,
+        "**/coverage": true,
+        "**/tnr_database.db": true,
+        "**/tnr_database.db-journal": true
+    },
+    
+    // JavaScript/TypeScript settings
+    "javascript.preferences.quoteStyle": "single",
+    "javascript.updateImportsOnFileMove.enabled": "always",
+    "typescript.updateImportsOnFileMove.enabled": "always",
+    
+    // HTML settings
+    "html.format.indentInnerHtml": true,
+    "html.format.wrapAttributes": "auto",
+    
+    // CSS settings
+    "css.validate": true,
+    "css.lint.unknownAtRules": "ignore",
+    
+    // Terminal settings
+    "terminal.integrated.defaultProfile.windows": "PowerShell",
+    "terminal.integrated.cwd": "${workspaceFolder}",
+    
+    // Extensions recommendations
+    "extensions.recommendations": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "ms-vscode.vscode-json"
+    ],
+    
+    // Workspace-specific settings
+    "files.watcherExclude": {
+        "**/node_modules/**": true,
+        "**/.git/**": true,
+        "**/tnr_database.db": true,
+        "**/tnr_database.db-journal": true
+    },
+    
+    // Auto-save
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 1000
+}
