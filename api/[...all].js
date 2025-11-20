@@ -115,6 +115,13 @@ module.exports = async (req, res) => {
       return await handler(req, res);
     }
 
+    // Meta Webhooks - specific endpoint (must come before auth/meta)
+    if (route === "meta/webhooks" || route.startsWith("meta/webhooks/")) {
+      console.log("✅ Routing to Meta Webhooks handler");
+      const handler = require("../server/handlers/meta-webhooks");
+      return await handler(req, res);
+    }
+
     if (route.startsWith("auth/meta")) {
       if (route === "auth/meta/callback" || route.endsWith("/callback")) {
         const handler = require("../server/handlers/auth-meta-callback");
