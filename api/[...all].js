@@ -115,6 +115,13 @@ module.exports = async (req, res) => {
       return await handler(req, res);
     }
 
+    // WhatsApp Webhooks - specific endpoint
+    if (route === "whatsapp/webhooks" || route.startsWith("whatsapp/webhooks/")) {
+      console.log("✅ Routing to WhatsApp Webhooks handler");
+      const handler = require("../server/handlers/whatsapp-webhooks");
+      return await handler(req, res);
+    }
+
     // Meta Webhooks - specific endpoint (must come before auth/meta)
     if (route === "meta/webhooks" || route.startsWith("meta/webhooks/")) {
       console.log("✅ Routing to Meta Webhooks handler");
