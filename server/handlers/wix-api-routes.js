@@ -7,6 +7,7 @@ const seoModule = require('./wix-seo-automation');
 const ecommerceModule = require('./wix-ecommerce-manager');
 const realUpdates = require('./wix-real-updates');
 const verification = require('./wix-verification');
+const keywordsModule = require('./wix-seo-keywords');
 const { clientTokensDB } = require('./wix-api-client');
 
 /**
@@ -50,20 +51,56 @@ module.exports = async (req, res) => {
     }
     
     if (action === 'getClientDetails') {
-      const clientData = clientTokensDB.get(instanceId);
+      // Try to get from in-memory cache first
+      let clientData = clientTokensDB.get(instanceId);
+      
+      // If not in memory, try loading from database
       if (!clientData) {
-        return res.status(404).json({ error: 'Client not found' });
+        console.log(`🔍 Client data not in memory, checking database for instance: ${instanceId}`);
+        try {
+          const tokenManager = require('./wix-token-manager');
+          const dbToken = await tokenManager.getToken(instanceId);
+          
+          if (dbToken) {
+            // Convert database format to Map format
+            clientData = {
+              instanceId: dbToken.instanceId,
+              accessToken: dbToken.accessToken,
+              refreshToken: dbToken.refreshToken,
+              expiresAt: dbToken.expiresAt || Date.now() + 10 * 365 * 24 * 60 * 60 * 1000,
+              metadata: dbToken.metadata || {},
+              createdAt: dbToken.createdAt || Date.now(),
+              updatedAt: dbToken.updatedAt || Date.now(),
+            };
+            
+            // Cache in memory
+            clientTokensDB.set(instanceId, clientData);
+            console.log(`✅ Loaded client data from database`);
+          }
+        } catch (error) {
+          console.error(`❌ Error loading client data from database:`, error.message);
+        }
       }
+      
+      if (!clientData) {
+        return res.status(404).json({ error: 'Client not found. Please reconnect the Wix client.' });
+      }
+      
+      // Use metasite ID from metadata if available
+      const actualInstanceId = clientData.metadata?.metasiteId || instanceId;
+      
       return res.json({
         success: true,
         client: {
-          instanceId,
+          instanceId: actualInstanceId,
+          originalInstanceId: instanceId,
           clientId: clientData.metadata?.clientId,
           createdAt: clientData.createdAt,
           updatedAt: clientData.updatedAt,
           expiresAt: clientData.expiresAt,
           hasValidToken: clientData.expiresAt > Date.now(),
-          instanceDetails: clientData.metadata?.instanceDetails
+          instanceDetails: clientData.metadata?.instanceDetails,
+          metadataMetasiteId: clientData.metadata?.metasiteId || 'N/A'
         }
       });
     }
@@ -85,6 +122,28 @@ module.exports = async (req, res) => {
       result = await seoModule.autoOptimizeSEO(instanceId, req.body.pageId);
     } else if (action === 'getSitemapData') {
       result = await seoModule.getSitemapData(instanceId);
+    } else if (action === 'getKeywordSuggestions') {
+      result = await keywordsModule.getKeywordSuggestions(instanceId, req.body.params || {});
+      // Update quota usage
+      await keywordsModule.updateQuotaUsage(instanceId, 1);
+    } else if (action === 'getQuotaInfo') {
+      result = await keywordsModule.getQuotaInfo(instanceId);
+    } else if (action === 'trackPageView') {
+      // Track page view from embedded script
+      result = { success: true, message: 'Page view tracked' };
+      console.log('📊 Page view tracked:', req.body.pageData);
+    } else if (action === 'trackSEOMetrics') {
+      // Track SEO metrics from embedded script
+      result = { success: true, message: 'SEO metrics tracked' };
+      console.log('📈 SEO metrics tracked:', req.body.metrics);
+    } else if (action === 'trackWebVital') {
+      // Track Web Vitals from embedded script
+      result = { success: true, message: 'Web Vital tracked' };
+      console.log('⚡ Web Vital tracked:', req.body.metric, req.body.value);
+    } else if (action === 'trackEvent') {
+      // Track custom events from embedded script
+      result = { success: true, message: 'Event tracked' };
+      console.log('🎯 Event tracked:', req.body.eventName, req.body.eventData);
     }
     
     // E-commerce Actions

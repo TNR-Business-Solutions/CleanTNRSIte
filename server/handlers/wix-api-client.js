@@ -12,6 +12,7 @@ const WIX_API_BASE = "https://www.wixapis.com";
 
 class WixAPIClient {
   constructor(instanceId) {
+    this.originalInstanceId = instanceId;
     this.instanceId = instanceId;
     this.clientData = null;
   }
@@ -50,10 +51,31 @@ class WixAPIClient {
           console.log(
             `✅ Loaded token from database for instance: ${this.instanceId}`
           );
+          console.log(
+            `   Metadata metasite ID: ${this.clientData.metadata?.metasiteId || 'N/A'}`
+          );
         }
       } catch (error) {
         console.error(`❌ Error loading token from database:`, error.message);
       }
+    }
+    
+    // If we have metadata with a different metasite ID, use that
+    // The instance ID passed to constructor might be different from the actual metasite ID
+    if (this.clientData?.metadata?.metasiteId) {
+      const metadataMetasiteId = this.clientData.metadata.metasiteId;
+      if (metadataMetasiteId !== this.instanceId) {
+        console.log(
+          `⚠️  Instance ID mismatch: Constructor has ${this.instanceId}, but metadata has metasite ID: ${metadataMetasiteId}`
+        );
+        console.log(`   Using metasite ID from metadata: ${metadataMetasiteId}`);
+        // Update instance ID to use the metasite ID from metadata
+        this.instanceId = metadataMetasiteId;
+      } else {
+        console.log(`✅ Instance ID matches metadata metasite ID: ${this.instanceId}`);
+      }
+    } else {
+      console.log(`⚠️  No metasite ID in metadata, using instance ID: ${this.instanceId}`);
     }
 
     if (!this.clientData) {
@@ -149,8 +171,33 @@ class WixAPIClient {
         ...options.headers,
       };
 
-      // For POST requests with body, ensure instance ID is clear
+      // Wix REST API requires instance ID (metasite ID) in headers only
+      // Some endpoints may require it in URL path, but query params are not standard
       let apiUrl = `${WIX_API_BASE}${endpoint}`;
+      
+      // Add query params from options if provided
+      if (options.params && Object.keys(options.params).length > 0) {
+        try {
+          const url = new URL(apiUrl);
+          Object.keys(options.params).forEach(key => {
+            url.searchParams.set(key, options.params[key]);
+          });
+          apiUrl = url.toString();
+        } catch (urlError) {
+          // If URL parsing fails, append as query string manually
+          const separator = endpoint.includes('?') ? '&' : '?';
+          const queryString = Object.keys(options.params)
+            .map(key => `${key}=${encodeURIComponent(options.params[key])}`)
+            .join('&');
+          apiUrl = `${apiUrl}${separator}${queryString}`;
+        }
+      }
+      
+      // Validate instance ID format (should be UUID format)
+      if (!this.instanceId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(this.instanceId)) {
+        console.warn(`⚠️  Instance ID format may be invalid: ${this.instanceId}`);
+        console.warn(`   Expected UUID format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`);
+      }
 
       const config = {
         method,
@@ -171,10 +218,6 @@ class WixAPIClient {
 
       if (data) {
         config.data = data;
-      }
-
-      if (options.params) {
-        config.params = options.params;
       }
 
       // Ensure instance ID is in request body for POST requests if needed
@@ -212,10 +255,18 @@ class WixAPIClient {
         JSON.stringify(errorData, null, 2)
       );
       console.error(`   Status: ${error.response?.status}`);
+      console.error(`   Instance ID used: ${this.instanceId}`);
+      console.error(`   URL: ${apiUrl}`);
       console.error(`   Headers sent:`, {
         Authorization: "Bearer [token]",
         "wix-instance-id": this.instanceId,
         "X-Wix-Metasite-Id": this.instanceId,
+      });
+      console.error(`   Client data:`, {
+        hasToken: !!this.clientData?.accessToken,
+        tokenLength: this.clientData?.accessToken?.length || 0,
+        metadataMetasiteId: this.clientData?.metadata?.metasiteId || 'N/A',
+        expiresAt: this.clientData?.expiresAt || 'N/A'
       });
 
       // Provide more helpful error messages

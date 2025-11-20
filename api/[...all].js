@@ -152,7 +152,21 @@ module.exports = async (req, res) => {
       return await handler(req, res);
     }
 
-    // Wix API routes - handle /api/wix requests
+    // Wix Webhooks - specific endpoint (MUST come before wix/* catch-all)
+    if (route === "wix/webhooks" || route.startsWith("wix/webhooks")) {
+      console.log("✅ Routing to Wix Webhooks handler");
+      const handler = require("../server/handlers/wix-webhooks");
+      return await handler(req, res);
+    }
+
+    // Wix SEO Keywords Extension - specific endpoint
+    if (route === "wix/seo-keywords" || route.startsWith("wix/seo-keywords")) {
+      console.log("✅ Routing to Wix SEO Keywords handler");
+      const handler = require("./wix/seo-keywords");
+      return await handler(req, res);
+    }
+
+    // Wix API routes - handle /api/wix requests (catch-all, must be last)
     if (route === "wix" || route.startsWith("wix/")) {
       console.log("✅ Routing to Wix API handler");
       const handler = require("../server/handlers/wix-api-routes");
