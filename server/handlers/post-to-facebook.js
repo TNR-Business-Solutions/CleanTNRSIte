@@ -152,12 +152,39 @@ module.exports = async (req, res) => {
     if (error.response?.data?.error) {
       const fbError = error.response.data.error;
       
+      // Provide actionable error messages
+      let userMessage = fbError.message || 'Failed to post to Facebook';
+      let action = 'retry';
+      let actionUrl = null;
+
+      // Handle specific error codes
+      if (fbError.code === 200 || fbError.type === 'OAuthException') {
+        userMessage = '❌ Permissions Error: Your Facebook account needs to be reconnected with the correct permissions.';
+        action = 'reconnect';
+        actionUrl = '/api/auth/meta';
+      } else if (fbError.code === 190) {
+        userMessage = '❌ Token Expired: Please reconnect your Facebook account.';
+        action = 'reconnect';
+        actionUrl = '/api/auth/meta';
+      } else if (fbError.code === 100) {
+        userMessage = '❌ Invalid Parameters: Please check your post content and try again.';
+      } else if (fbError.code === 368) {
+        userMessage = '❌ Page Access: You don\'t have permission to post on this Page. Please ensure you\'re a Page admin or editor.';
+        action = 'check_page_role';
+      }
+      
       return res.status(400).json({
         success: false,
         error: 'Facebook API Error',
-        message: fbError.message || 'Failed to post to Facebook',
+        message: userMessage,
+        originalMessage: fbError.message,
         errorType: fbError.type,
         errorCode: fbError.code,
+        action: action,
+        actionUrl: actionUrl,
+        help: action === 'reconnect' 
+          ? 'Click the "Reconnect Facebook" button to grant the required permissions'
+          : 'Please check your Facebook Page settings and permissions',
         details: fbError
       });
     }

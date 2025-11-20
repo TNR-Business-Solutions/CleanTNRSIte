@@ -252,6 +252,10 @@ module.exports = async (req, res) => {
         const handler = require("../server/handlers/social-tokens-api");
         return await handler(req, res);
       }
+      if (route.includes("check-facebook-permissions") || route === "social/check-facebook-permissions") {
+        const handler = require("../server/handlers/check-facebook-permissions");
+        return await handler(req, res);
+      }
       if (
         route.includes("post-to-facebook") ||
         route === "social/post-facebook" ||
