@@ -6,14 +6,17 @@ const sqlite3 = require("sqlite3").verbose();
 const path = require("path");
 
 // Import Neon serverless driver (works with Vercel)
-let neon;
+// Using Pool instead of neon() for better compatibility with dynamic SQL
+let Pool, neonConfig;
 try {
-  const { neon: neonDriver } = require("@neondatabase/serverless");
-  neon = neonDriver;
-  console.log('✅ Neon serverless driver loaded successfully');
+  const neonPackage = require("@neondatabase/serverless");
+  Pool = neonPackage.Pool;
+  neonConfig = neonPackage.neonConfig;
+  console.log('✅ Neon serverless driver (Pool) loaded successfully');
 } catch (e) {
   console.log('ℹ️ Neon driver not available (local development):', e.message);
-  neon = null;
+  Pool = null;
+  neonConfig = null;
 }
 
 class TNRDatabase {
@@ -36,13 +39,19 @@ class TNRDatabase {
   async initialize() {
     if (this.usePostgres) {
       try {
-        if (!neon) {
-          throw new Error('Neon driver not available');
+        if (!Pool) {
+          throw new Error('Neon Pool driver not available');
         }
         
-        // Create Neon SQL client
-        this.postgres = neon(process.env.POSTGRES_URL);
-        console.log("✅ Using Neon Postgres database");
+        // Configure Neon to use fetch for WebSockets compatibility
+        if (neonConfig) {
+          neonConfig.fetchConnectionCache = true;
+        }
+        
+        // Create Neon Pool client (compatible with standard pg Pool)
+        // Pool.query() supports dynamic SQL strings
+        this.postgres = new Pool({ connectionString: process.env.POSTGRES_URL });
+        console.log("✅ Using Neon Postgres database (Pool)");
         await this.createTables();
         return;
       } catch (err) {
@@ -88,22 +97,13 @@ class TNRDatabase {
   async query(sql, params = []) {
     if (this.usePostgres) {
       const { sql: convertedSQL, params: convertedParams } = this.convertSQL(sql, params);
-      // Neon driver returns a function that can be called directly
-      // The Neon serverless driver accepts: sql(queryString, ...params) or sql(queryString, paramsArray)
+      // Use Pool.query() method which accepts dynamic SQL and parameters
       try {
-        // Try calling with params array first (most common pattern)
-        let result;
-        if (convertedParams.length === 0) {
-          // No params, just call with SQL
-          result = await this.postgres(convertedSQL);
-        } else {
-          // With params - Neon accepts them as an array or spread
-          // Try array first (most common)
-          result = await this.postgres(convertedSQL, convertedParams);
-        }
+        // Pool.query() returns { rows: [], rowCount: N, ... }
+        const result = await this.postgres.query(convertedSQL, convertedParams);
         
-        // Neon returns an array of rows directly, or { rows: [...] } in some cases
-        return Array.isArray(result) ? result : (result.rows || result || []);
+        // Return the rows array
+        return result.rows || [];
       } catch (err) {
         console.error('❌ Neon query error:', err.message);
         console.error('   SQL:', convertedSQL.substring(0, 200));
@@ -141,11 +141,10 @@ class TNRDatabase {
     if (this.usePostgres) {
       const { sql: convertedSQL, params: convertedParams } = this.convertSQL(sql, params);
       try {
-        // Neon driver: this.postgres is a function that can be called directly
-        const result = await this.postgres(convertedSQL, convertedParams);
-        // For INSERT/UPDATE/DELETE, Neon returns rowCount or we can check result length
-        // If result is an array, rowCount is the length; otherwise check result.rowCount
-        const rowCount = Array.isArray(result) ? result.length : (result.rowCount || result.count || 0);
+        // Use Pool.query() method
+        const result = await this.postgres.query(convertedSQL, convertedParams);
+        // Pool.query() returns { rowCount, rows, ... }
+        const rowCount = result.rowCount || 0;
         return { lastID: null, changes: rowCount };
       } catch (err) {
         console.error('❌ Neon execute error:', err.message);
@@ -379,13 +378,13 @@ class TNRDatabase {
 
     if (this.usePostgres) {
       // Postgres: Use CREATE TABLE IF NOT EXISTS (similar syntax)
-      // Neon driver requires using the .query() method for raw SQL strings
+      // Using Pool.query() which accepts dynamic SQL strings
       
       for (const tableSQL of tables) {
         try {
-          // Neon serverless driver: use as tagged template function
-          // For dynamic SQL strings, we execute directly without parameters
-          const result = await this.postgres(tableSQL);
+          // Use Pool.query() method for dynamic SQL
+          // This is compatible with standard pg Pool and works with string variables
+          await this.postgres.query(tableSQL);
           console.log(`✅ Table created/verified:`, tableSQL.substring(7, 50) + "...");
         } catch (err) {
           // Ignore "already exists" errors (Postgres uses "relation already exists")
