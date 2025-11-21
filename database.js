@@ -379,18 +379,21 @@ class TNRDatabase {
 
     if (this.usePostgres) {
       // Postgres: Use CREATE TABLE IF NOT EXISTS (similar syntax)
-      // Neon driver: this.postgres is already initialized in constructor
+      // Neon driver requires using the .query() method for raw SQL strings
       
       for (const tableSQL of tables) {
         try {
-          // Use the initialized Neon function directly (calls serverless function)
-          await this.postgres(tableSQL);
+          // Use .query() method for plain SQL strings (not template literals)
+          // The neon() function returns an object with a query() method
+          const result = await this.postgres(tableSQL, [], {});
+          console.log(`✅ Table created/verified:`, tableSQL.substring(7, 50) + "...");
         } catch (err) {
           // Ignore "already exists" errors (Postgres uses "relation already exists")
           const errorMsg = err.message.toLowerCase();
           if (!errorMsg.includes("already exists") && !errorMsg.includes("duplicate") && !errorMsg.includes("relation")) {
             console.error("❌ Error creating table:", err.message);
             console.error("   SQL:", tableSQL.substring(0, 200));
+            console.error("   Full error:", err);
             throw err;
           } else {
             console.log("ℹ️  Table already exists (expected):", tableSQL.substring(0, 50) + "...");
