@@ -234,13 +234,13 @@ while ($continue) {
         
         "Q" {
             Write-Host ""
-            Write-Host "👋 Shutting down..." -ForegroundColor Yellow
+            Write-Host "Shutting down..." -ForegroundColor Yellow
             $continue = $false
         }
         
         "q" {
             Write-Host ""
-            Write-Host "👋 Shutting down..." -ForegroundColor Yellow
+            Write-Host "Shutting down..." -ForegroundColor Yellow
             $continue = $false
         }
         
@@ -251,10 +251,10 @@ while ($continue) {
 }
 
 # Cleanup
-Write-Host "🧹 Cleaning up..." -ForegroundColor Yellow
+Write-Host "Cleaning up..." -ForegroundColor Yellow
 Stop-Job $serverJob
 Remove-Job $serverJob
 
-Write-Host "✅ Goodbye!" -ForegroundColor Green
+Write-Host "Goodbye!" -ForegroundColor Green
 Write-Host ""
 

@@ -1,0 +1,166 @@
+{
+  "timestamp": "2025-11-21T00:14:22.469Z",
+  "baseUrl": "http://localhost:3000",
+  "tests": [
+    {
+      "name": "Server is running",
+      "status": "PASS",
+      "details": "Status: 200",
+      "error": null,
+      "timestamp": "2025-11-21T00:14:22.601Z"
+    },
+    {
+      "name": "API root is accessible",
+      "status": "FAIL",
+      "details": "Expected 200, got 404",
+      "error": "\"<!DOCTYPE html>\\n<html lang=\\\"en\\\">\\n<head>\\n<meta charset=\\\"utf-8\\\">\\n<title>Error</title>\\n</head>\\n<body>\\n<pre>Cannot GET /api/</pre>\\n</body>\\n</html>\\n\"",
+      "timestamp": "2025-11-21T00:14:22.615Z"
+    },
+    {
+      "name": "Wix Dashboard is accessible",
+      "status": "PASS",
+      "details": "Status: 200",
+      "error": null,
+      "timestamp": "2025-11-21T00:14:22.622Z"
+    },
+    {
+      "name": "Wix OAuth initiation",
+      "status": "FAIL",
+      "details": "Expected 307, got 403",
+      "error": "\"<!doctype html><meta charset=\\\"utf-8\\\"><meta name=viewport content=\\\"width=device-width, initial-scale=1\\\"><title>403</title>403 Forbidden\"",
+      "timestamp": "2025-11-21T00:14:23.694Z"
+    },
+    {
+      "name": "Wix API endpoint is responding",
+      "status": "FAIL",
+      "details": "Expected 404, got 400",
+      "error": "{\"error\":\"Missing instanceId parameter for action: getClientDetails\"}",
+      "timestamp": "2025-11-21T00:14:23.702Z"
+    },
+    {
+      "name": "Wix Webhooks endpoint",
+      "status": "FAIL",
+      "details": "Expected 403, got 404",
+      "error": "\"<!DOCTYPE html>\\n<html lang=\\\"en\\\">\\n<head>\\n<meta charset=\\\"utf-8\\\">\\n<title>Error</title>\\n</head>\\n<body>\\n<pre>Cannot GET /api/wix/webhooks</pre>\\n</body>\\n</html>\\n\"",
+      "timestamp": "2025-11-21T00:14:23.710Z"
+    },
+    {
+      "name": "Wix SEO Keywords endpoint",
+      "status": "FAIL",
+      "details": "Expected 405, got 404",
+      "error": "\"<!DOCTYPE html>\\n<html lang=\\\"en\\\">\\n<head>\\n<meta charset=\\\"utf-8\\\">\\n<title>Error</title>\\n</head>\\n<body>\\n<pre>Cannot GET /api/wix/seo-keywords</pre>\\n</body>\\n</html>\\n\"",
+      "timestamp": "2025-11-21T00:14:23.716Z"
+    },
+    {
+      "name": "Meta OAuth initiation",
+      "status": "FAIL",
+      "details": "Expected 307, got 404",
+      "error": "\"<!DOCTYPE html>\\n<html lang=\\\"en\\\">\\n<head>\\n<meta charset=\\\"utf-8\\\">\\n<title>Error</title>\\n</head>\\n<body>\\n<pre>Cannot GET /api/auth/meta</pre>\\n</body>\\n</html>\\n\"",
+      "timestamp": "2025-11-21T00:14:23.721Z"
+    },
+    {
+      "name": "Facebook permission checker",
+      "status": "FAIL",
+      "details": "Expected 400, got 404",
+      "error": "\"<!DOCTYPE html>\\n<html lang=\\\"en\\\">\\n<head>\\n<meta charset=\\\"utf-8\\\">\\n<title>Error</title>\\n</head>\\n<body>\\n<pre>Cannot POST /api/social/check-facebook-permissions</pre>\\n</body>\\n</html>\\n\"",
+      "timestamp": "2025-11-21T00:14:23.729Z"
+    },
+    {
+      "name": "Meta Webhooks endpoint",
+      "status": "FAIL",
+      "details": "Expected 403, got 404",
+      "error": "\"<!DOCTYPE html>\\n<html lang=\\\"en\\\">\\n<head>\\n<meta charset=\\\"utf-8\\\">\\n<title>Error</title>\\n</head>\\n<body>\\n<pre>Cannot GET /api/meta/webhooks</pre>\\n</body>\\n</html>\\n\"",
+      "timestamp": "2025-11-21T00:14:23.734Z"
+    },
+    {
+      "name": "Instagram Webhooks endpoint",
+      "status": "FAIL",
+      "details": "Expected 403, got 404",
+      "error": "\"<!DOCTYPE html>\\n<html lang=\\\"en\\\">\\n<head>\\n<meta charset=\\\"utf-8\\\">\\n<title>Error</title>\\n</head>\\n<body>\\n<pre>Cannot GET /api/instagram/webhooks</pre>\\n</body>\\n</html>\\n\"",
+      "timestamp": "2025-11-21T00:14:23.739Z"
+    },
+    {
+      "name": "Instagram posting endpoint",
+      "status": "FAIL",
+      "details": "Expected 400, got 404",
+      "error": "\"<!DOCTYPE html>\\n<html lang=\\\"en\\\">\\n<head>\\n<meta charset=\\\"utf-8\\\">\\n<title>Error</title>\\n</head>\\n<body>\\n<pre>Cannot POST /api/social/post-to-instagram</pre>\\n</body>\\n</html>\\n\"",
+      "timestamp": "2025-11-21T00:14:23.743Z"
+    },
+    {
+      "name": "WhatsApp Webhooks endpoint",
+      "status": "FAIL",
+      "details": "Expected 403, got 404",
+      "error": "\"<!DOCTYPE html>\\n<html lang=\\\"en\\\">\\n<head>\\n<meta charset=\\\"utf-8\\\">\\n<title>Error</title>\\n</head>\\n<body>\\n<pre>Cannot GET /api/whatsapp/webhooks</pre>\\n</body>\\n</html>\\n\"",
+      "timestamp": "2025-11-21T00:14:23.746Z"
+    },
+    {
+      "name": "Threads OAuth initiation",
+      "status": "FAIL",
+      "details": "Expected 307, got 404",
+      "error": "\"<!DOCTYPE html>\\n<html lang=\\\"en\\\">\\n<head>\\n<meta charset=\\\"utf-8\\\">\\n<title>Error</title>\\n</head>\\n<body>\\n<pre>Cannot GET /api/auth/threads</pre>\\n</body>\\n</html>\\n\"",
+      "timestamp": "2025-11-21T00:14:23.750Z"
+    },
+    {
+      "name": "Threads posting endpoint",
+      "status": "FAIL",
+      "details": "Expected 400, got 404",
+      "error": "\"<!DOCTYPE html>\\n<html lang=\\\"en\\\">\\n<head>\\n<meta charset=\\\"utf-8\\\">\\n<title>Error</title>\\n</head>\\n<body>\\n<pre>Cannot POST /api/post/threads</pre>\\n</body>\\n</html>\\n\"",
+      "timestamp": "2025-11-21T00:14:23.753Z"
+    },
+    {
+      "name": "LinkedIn OAuth initiation",
+      "status": "FAIL",
+      "details": "Expected 307, got 404",
+      "error": "\"<!DOCTYPE html>\\n<html lang=\\\"en\\\">\\n<head>\\n<meta charset=\\\"utf-8\\\">\\n<title>Error</title>\\n</head>\\n<body>\\n<pre>Cannot GET /api/auth/linkedin</pre>\\n</body>\\n</html>\\n\"",
+      "timestamp": "2025-11-21T00:14:23.756Z"
+    },
+    {
+      "name": "LinkedIn posting endpoint",
+      "status": "FAIL",
+      "details": "Expected 400, got 404",
+      "error": "\"<!DOCTYPE html>\\n<html lang=\\\"en\\\">\\n<head>\\n<meta charset=\\\"utf-8\\\">\\n<title>Error</title>\\n</head>\\n<body>\\n<pre>Cannot POST /api/social/post-to-linkedin</pre>\\n</body>\\n</html>\\n\"",
+      "timestamp": "2025-11-21T00:14:23.760Z"
+    },
+    {
+      "name": "Twitter OAuth initiation",
+      "status": "FAIL",
+      "details": "Expected 307, got 404",
+      "error": "\"<!DOCTYPE html>\\n<html lang=\\\"en\\\">\\n<head>\\n<meta charset=\\\"utf-8\\\">\\n<title>Error</title>\\n</head>\\n<body>\\n<pre>Cannot GET /api/auth/twitter</pre>\\n</body>\\n</html>\\n\"",
+      "timestamp": "2025-11-21T00:14:23.763Z"
+    },
+    {
+      "name": "Twitter posting endpoint",
+      "status": "FAIL",
+      "details": "Expected 400, got 404",
+      "error": "\"<!DOCTYPE html>\\n<html lang=\\\"en\\\">\\n<head>\\n<meta charset=\\\"utf-8\\\">\\n<title>Error</title>\\n</head>\\n<body>\\n<pre>Cannot POST /api/social/post-to-twitter</pre>\\n</body>\\n</html>\\n\"",
+      "timestamp": "2025-11-21T00:14:23.767Z"
+    },
+    {
+      "name": "Admin Dashboard V2",
+      "status": "PASS",
+      "details": "Status: 200",
+      "error": null,
+      "timestamp": "2025-11-21T00:14:23.780Z"
+    },
+    {
+      "name": "Social Media Automation Dashboard",
+      "status": "PASS",
+      "details": "Status: 200",
+      "error": null,
+      "timestamp": "2025-11-21T00:14:23.785Z"
+    },
+    {
+      "name": "Wix Client Dashboard",
+      "status": "PASS",
+      "details": "Status: 200",
+      "error": null,
+      "timestamp": "2025-11-21T00:14:23.790Z"
+    }
+  ],
+  "summary": {
+    "total": 22,
+    "passed": 5,
+    "failed": 17,
+    "skipped": 0
+  }
+}
