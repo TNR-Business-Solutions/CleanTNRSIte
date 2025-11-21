@@ -12,7 +12,7 @@ try {
   const neonPackage = require("@neondatabase/serverless");
   Pool = neonPackage.Pool;
   neonConfig = neonPackage.neonConfig;
-  console.log('✅ Neon serverless driver (Pool) loaded successfully');
+  console.log('✅ Neon serverless driver (Pool) loaded successfully v2');
 } catch (e) {
   console.log('ℹ️ Neon driver not available (local development):', e.message);
   Pool = null;
