@@ -1,160 +1,160 @@
 {
-  "timestamp": "2025-11-21T00:45:42.062Z",
+  "timestamp": "2025-11-21T14:17:18.126Z",
   "baseUrl": "http://localhost:3000",
   "tests": [
     {
       "name": "Server is running",
       "status": "FAIL",
-      "details": "Error: socket hang up",
-      "error": "socket hang up",
-      "timestamp": "2025-11-21T00:45:42.389Z"
+      "details": "Error: Error",
+      "error": "Error",
+      "timestamp": "2025-11-21T14:17:18.175Z"
     },
     {
       "name": "API root is accessible",
       "status": "FAIL",
-      "details": "Error: socket hang up",
-      "error": "socket hang up",
-      "timestamp": "2025-11-21T00:45:42.402Z"
+      "details": "Error: Error",
+      "error": "Error",
+      "timestamp": "2025-11-21T14:17:18.178Z"
     },
     {
       "name": "Wix Dashboard is accessible",
       "status": "FAIL",
-      "details": "Error: socket hang up",
-      "error": "socket hang up",
-      "timestamp": "2025-11-21T00:45:42.412Z"
+      "details": "Error: Error",
+      "error": "Error",
+      "timestamp": "2025-11-21T14:17:18.181Z"
     },
     {
       "name": "Wix OAuth initiation",
       "status": "FAIL",
-      "details": "Error: socket hang up",
-      "error": "socket hang up",
-      "timestamp": "2025-11-21T00:45:42.422Z"
+      "details": "Error: Error",
+      "error": "Error",
+      "timestamp": "2025-11-21T14:17:18.183Z"
     },
     {
       "name": "Wix API endpoint is responding",
       "status": "FAIL",
-      "details": "Error: socket hang up",
-      "error": "socket hang up",
-      "timestamp": "2025-11-21T00:45:42.430Z"
+      "details": "Error: Error",
+      "error": "Error",
+      "timestamp": "2025-11-21T14:17:18.185Z"
     },
     {
       "name": "Wix Webhooks endpoint",
       "status": "FAIL",
-      "details": "Error: socket hang up",
-      "error": "socket hang up",
-      "timestamp": "2025-11-21T00:45:42.439Z"
+      "details": "Error: Error",
+      "error": "Error",
+      "timestamp": "2025-11-21T14:17:18.186Z"
     },
     {
       "name": "Wix SEO Keywords endpoint",
       "status": "FAIL",
-      "details": "Error: socket hang up",
-      "error": "socket hang up",
-      "timestamp": "2025-11-21T00:45:42.445Z"
+      "details": "Error: Error",
+      "error": "Error",
+      "timestamp": "2025-11-21T14:17:18.187Z"
     },
     {
       "name": "Meta OAuth initiation",
       "status": "FAIL",
-      "details": "Error: socket hang up",
-      "error": "socket hang up",
-      "timestamp": "2025-11-21T00:45:42.457Z"
+      "details": "Error: Error",
+      "error": "Error",
+      "timestamp": "2025-11-21T14:17:18.188Z"
     },
     {
       "name": "Facebook permission checker",
       "status": "FAIL",
-      "details": "Error: socket hang up",
-      "error": "socket hang up",
-      "timestamp": "2025-11-21T00:45:42.470Z"
+      "details": "Error: Error",
+      "error": "Error",
+      "timestamp": "2025-11-21T14:17:18.191Z"
     },
     {
       "name": "Meta Webhooks endpoint",
       "status": "FAIL",
-      "details": "Error: socket hang up",
-      "error": "socket hang up",
-      "timestamp": "2025-11-21T00:45:42.476Z"
+      "details": "Error: Error",
+      "error": "Error",
+      "timestamp": "2025-11-21T14:17:18.193Z"
     },
     {
       "name": "Instagram Webhooks endpoint",
       "status": "FAIL",
-      "details": "Error: socket hang up",
-      "error": "socket hang up",
-      "timestamp": "2025-11-21T00:45:42.485Z"
+      "details": "Error: Error",
+      "error": "Error",
+      "timestamp": "2025-11-21T14:17:18.194Z"
     },
     {
       "name": "Instagram posting endpoint",
       "status": "FAIL",
-      "details": "Error: socket hang up",
-      "error": "socket hang up",
-      "timestamp": "2025-11-21T00:45:42.493Z"
+      "details": "Error: Error",
+      "error": "Error",
+      "timestamp": "2025-11-21T14:17:18.195Z"
     },
     {
       "name": "WhatsApp Webhooks endpoint",
       "status": "FAIL",
-      "details": "Error: socket hang up",
-      "error": "socket hang up",
-      "timestamp": "2025-11-21T00:45:42.500Z"
+      "details": "Error: Error",
+      "error": "Error",
+      "timestamp": "2025-11-21T14:17:18.196Z"
     },
     {
       "name": "Threads OAuth initiation",
       "status": "FAIL",
-      "details": "Error: socket hang up",
-      "error": "socket hang up",
-      "timestamp": "2025-11-21T00:45:42.507Z"
+      "details": "Error: Error",
+      "error": "Error",
+      "timestamp": "2025-11-21T14:17:18.198Z"
     },
     {
       "name": "Threads posting endpoint",
       "status": "FAIL",
-      "details": "Error: socket hang up",
-      "error": "socket hang up",
-      "timestamp": "2025-11-21T00:45:42.513Z"
+      "details": "Error: Error",
+      "error": "Error",
+      "timestamp": "2025-11-21T14:17:18.200Z"
     },
     {
       "name": "LinkedIn OAuth initiation",
       "status": "FAIL",
-      "details": "Error: socket hang up",
-      "error": "socket hang up",
-      "timestamp": "2025-11-21T00:45:42.520Z"
+      "details": "Error: Error",
+      "error": "Error",
+      "timestamp": "2025-11-21T14:17:18.201Z"
     },
     {
       "name": "LinkedIn posting endpoint",
       "status": "FAIL",
-      "details": "Error: socket hang up",
-      "error": "socket hang up",
-      "timestamp": "2025-11-21T00:45:42.525Z"
+      "details": "Error: Error",
+      "error": "Error",
+      "timestamp": "2025-11-21T14:17:18.203Z"
     },
     {
       "name": "Twitter OAuth initiation",
       "status": "FAIL",
-      "details": "Error: socket hang up",
-      "error": "socket hang up",
-      "timestamp": "2025-11-21T00:45:42.535Z"
+      "details": "Error: Error",
+      "error": "Error",
+      "timestamp": "2025-11-21T14:17:18.204Z"
     },
     {
       "name": "Twitter posting endpoint",
       "status": "FAIL",
-      "details": "Error: socket hang up",
-      "error": "socket hang up",
-      "timestamp": "2025-11-21T00:45:42.545Z"
+      "details": "Error: Error",
+      "error": "Error",
+      "timestamp": "2025-11-21T14:17:18.205Z"
     },
     {
       "name": "Admin Dashboard V2",
       "status": "FAIL",
-      "details": "Error: socket hang up",
-      "error": "socket hang up",
-      "timestamp": "2025-11-21T00:45:42.552Z"
+      "details": "Error: Error",
+      "error": "Error",
+      "timestamp": "2025-11-21T14:17:18.206Z"
     },
     {
       "name": "Social Media Automation Dashboard",
       "status": "FAIL",
-      "details": "Error: socket hang up",
-      "error": "socket hang up",
-      "timestamp": "2025-11-21T00:45:42.559Z"
+      "details": "Error: Error",
+      "error": "Error",
+      "timestamp": "2025-11-21T14:17:18.207Z"
     },
     {
       "name": "Wix Client Dashboard",
       "status": "FAIL",
-      "details": "Error: socket hang up",
-      "error": "socket hang up",
-      "timestamp": "2025-11-21T00:45:42.564Z"
+      "details": "Error: Error",
+      "error": "Error",
+      "timestamp": "2025-11-21T14:17:18.211Z"
     }
   ],
   "summary": {

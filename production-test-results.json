@@ -1,108 +1,108 @@
 {
-  "timestamp": "2025-11-21T01:19:16.222Z",
+  "timestamp": "2025-11-21T14:18:19.754Z",
   "baseUrl": "https://www.tnrbusinesssolutions.com",
   "tests": [
     {
       "name": "Meta App ID configured",
       "status": "PASS",
       "details": "2201740210361183",
-      "timestamp": "2025-11-21T01:19:16.376Z"
+      "timestamp": "2025-11-21T14:18:19.770Z"
     },
     {
       "name": "Threads App ID configured",
       "status": "PASS",
       "details": "1453925242353888",
-      "timestamp": "2025-11-21T01:19:16.376Z"
+      "timestamp": "2025-11-21T14:18:19.770Z"
     },
     {
       "name": "LinkedIn Client ID configured",
       "status": "PASS",
       "details": "78pjq1wt4wz1fs",
-      "timestamp": "2025-11-21T01:19:16.377Z"
+      "timestamp": "2025-11-21T14:18:19.770Z"
     },
     {
       "name": "Twitter Config ID set",
       "status": "PASS",
       "details": "1773578756688080",
-      "timestamp": "2025-11-21T01:19:16.377Z"
+      "timestamp": "2025-11-21T14:18:19.770Z"
     },
     {
       "name": "Homepage accessible",
       "status": "PASS",
       "details": "Status: 200",
-      "timestamp": "2025-11-21T01:19:17.157Z"
+      "timestamp": "2025-11-21T14:18:19.953Z"
     },
     {
       "name": "Admin Dashboard",
       "status": "PASS",
       "details": "Status: 200",
-      "timestamp": "2025-11-21T01:19:17.315Z"
+      "timestamp": "2025-11-21T14:18:19.997Z"
     },
     {
       "name": "Social Dashboard",
       "status": "PASS",
       "details": "Status: 200",
-      "timestamp": "2025-11-21T01:19:17.523Z"
+      "timestamp": "2025-11-21T14:18:20.037Z"
     },
     {
       "name": "Wix Dashboard",
       "status": "PASS",
       "details": "Status: 200",
-      "timestamp": "2025-11-21T01:19:17.734Z"
+      "timestamp": "2025-11-21T14:18:20.077Z"
     },
     {
       "name": "Wix OAuth",
       "status": "FAIL",
       "details": "Expected 302, got 307",
-      "timestamp": "2025-11-21T01:19:18.481Z"
+      "timestamp": "2025-11-21T14:18:20.133Z"
     },
     {
       "name": "Meta OAuth",
       "status": "FAIL",
       "details": "Expected 302, got 307",
-      "timestamp": "2025-11-21T01:19:18.681Z"
+      "timestamp": "2025-11-21T14:18:20.182Z"
     },
     {
       "name": "Threads OAuth",
       "status": "FAIL",
       "details": "Expected 302, got 307",
-      "timestamp": "2025-11-21T01:19:18.855Z"
+      "timestamp": "2025-11-21T14:18:20.240Z"
     },
     {
       "name": "LinkedIn OAuth",
       "status": "FAIL",
       "details": "Expected 302, got 307",
-      "timestamp": "2025-11-21T01:19:18.948Z"
+      "timestamp": "2025-11-21T14:18:20.284Z"
     },
     {
       "name": "Twitter OAuth",
       "status": "FAIL",
       "details": "Expected 302, got 307",
-      "timestamp": "2025-11-21T01:19:19.051Z"
+      "timestamp": "2025-11-21T14:18:20.328Z"
     },
     {
       "name": "Wix Webhooks",
       "status": "PASS",
       "details": "Responding (405)",
-      "timestamp": "2025-11-21T01:19:19.873Z"
+      "timestamp": "2025-11-21T14:18:20.899Z"
     },
     {
       "name": "Meta Webhooks",
       "status": "PASS",
       "details": "Responding (403)",
-      "timestamp": "2025-11-21T01:19:20.408Z"
+      "timestamp": "2025-11-21T14:18:21.371Z"
     },
     {
       "name": "Instagram Webhooks",
       "status": "PASS",
       "details": "Responding (403)",
-      "timestamp": "2025-11-21T01:19:21.008Z"
+      "timestamp": "2025-11-21T14:18:21.832Z"
     },
     {
       "name": "WhatsApp Webhooks",
       "status": "PASS",
       "details": "Responding (403)",
-      "timestamp": "2025-11-21T01:19:21.508Z"
+      "timestamp": "2025-11-21T14:18:22.272Z"
     }
   ],
   "summary": {

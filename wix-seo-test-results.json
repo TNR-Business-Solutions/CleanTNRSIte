@@ -1,0 +1,40 @@
+{
+  "timestamp": "2025-11-21T14:28:18.445Z",
+  "tests": [
+    {
+      "name": "Wix client connection",
+      "status": "PASS",
+      "details": "Instance ID: a4890371-c6da-46f4-a830-9e19df999cf8",
+      "timestamp": "2025-11-21T14:28:18.903Z"
+    },
+    {
+      "name": "SEO Audit execution",
+      "status": "FAIL",
+      "details": "Failed to audit site: No Metasite Context: The access token may be invalid or the instance ID is incorrect. Please reconnect the Wix client.",
+      "timestamp": "2025-11-21T14:28:19.026Z"
+    },
+    {
+      "name": "Product SEO test",
+      "status": "FAIL",
+      "details": "Failed to get products: No Metasite Context: The access token may be invalid or the instance ID is incorrect. Please reconnect the Wix client.",
+      "timestamp": "2025-11-21T14:28:19.149Z"
+    },
+    {
+      "name": "Auto-Optimize SEO execution",
+      "status": "FAIL",
+      "details": "Request failed with status code 404",
+      "timestamp": "2025-11-21T14:28:19.228Z"
+    },
+    {
+      "name": "Site-wide SEO update",
+      "status": "FAIL",
+      "details": "Request failed with status code 404",
+      "timestamp": "2025-11-21T14:28:19.314Z"
+    }
+  ],
+  "summary": {
+    "total": 5,
+    "passed": 1,
+    "failed": 4
+  }
+}

@@ -128,16 +128,17 @@ function Show-Menu {
     Write-Host "========================================" -ForegroundColor Cyan
     Write-Host ""
     Write-Host "1. Run Full Test Suite" -ForegroundColor White
-    Write-Host "2. Open Admin Dashboard (Browser)" -ForegroundColor White
-    Write-Host "3. Open Social Media Dashboard (Browser)" -ForegroundColor White
-    Write-Host "4. Open Wix Dashboard (Browser)" -ForegroundColor White
-    Write-Host "5. Test Wix OAuth" -ForegroundColor White
-    Write-Host "6. Test Meta OAuth" -ForegroundColor White
-    Write-Host "7. Test LinkedIn OAuth" -ForegroundColor White
-    Write-Host "8. Test Twitter OAuth" -ForegroundColor White
-    Write-Host "9. View Test Results" -ForegroundColor White
-    Write-Host "10. View Server Logs" -ForegroundColor White
-    Write-Host "11. Restart Server" -ForegroundColor White
+    Write-Host "2. Run Wix SEO Tests (Audit + Auto-Optimize) ⭐" -ForegroundColor Green
+    Write-Host "3. Open Admin Dashboard (Browser)" -ForegroundColor White
+    Write-Host "4. Open Social Media Dashboard (Browser)" -ForegroundColor White
+    Write-Host "5. Open Wix Dashboard (Browser)" -ForegroundColor White
+    Write-Host "6. Test Wix OAuth" -ForegroundColor White
+    Write-Host "7. Test Meta OAuth" -ForegroundColor White
+    Write-Host "8. Test LinkedIn OAuth" -ForegroundColor White
+    Write-Host "9. Test Twitter OAuth" -ForegroundColor White
+    Write-Host "10. View Test Results" -ForegroundColor White
+    Write-Host "11. View Server Logs" -ForegroundColor White
+    Write-Host "12. Restart Server" -ForegroundColor White
     Write-Host "Q. Quit" -ForegroundColor Red
     Write-Host ""
 }
@@ -172,47 +173,63 @@ while ($continue) {
         }
         
         "2" {
+            Write-Host ""
+            Write-Host "🎯 Running Wix SEO Tests..." -ForegroundColor Cyan
+            Write-Host ""
+            node test-wix-seo-complete.js
+            
+            Write-Host ""
+            if (Test-Path "wix-seo-test-results.json") {
+                $results = Get-Content "wix-seo-test-results.json" | ConvertFrom-Json
+                Write-Host "📊 Results: $($results.summary.passed)/$($results.summary.total) passed" -ForegroundColor $(if ($results.summary.failed -eq 0) { "Green" } else { "Yellow" })
+            }
+            Write-Host ""
+            Write-Host "Press any key to continue..." -ForegroundColor Gray
+            $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+        }
+        
+        "3" {
             Write-Host "🌐 Opening Admin Dashboard..." -ForegroundColor Cyan
             Start-Process "http://localhost:3000/admin-dashboard-v2.html"
         }
         
-        "3" {
+        "4" {
             Write-Host "🌐 Opening Social Media Dashboard..." -ForegroundColor Cyan
             Start-Process "http://localhost:3000/social-media-automation-dashboard.html"
         }
         
-        "4" {
+        "5" {
             Write-Host "🌐 Opening Wix Dashboard..." -ForegroundColor Cyan
             Start-Process "http://localhost:3000/wix-client-dashboard.html"
         }
         
-        "5" {
+        "6" {
             Write-Host "🔗 Opening Wix OAuth..." -ForegroundColor Cyan
             Start-Process "http://localhost:3000/api/auth/wix"
             Write-Host "✅ Please complete OAuth in browser" -ForegroundColor Yellow
             Write-Host "   Connect: http://www.shesallthatandmore.com/" -ForegroundColor Yellow
         }
         
-        "6" {
+        "7" {
             Write-Host "🔗 Opening Meta OAuth..." -ForegroundColor Cyan
             Start-Process "http://localhost:3000/api/auth/meta"
             Write-Host "✅ Please complete OAuth in browser" -ForegroundColor Yellow
             Write-Host "   Connect: TNR Business Solutions Page" -ForegroundColor Yellow
         }
         
-        "7" {
+        "8" {
             Write-Host "🔗 Opening LinkedIn OAuth..." -ForegroundColor Cyan
             Start-Process "http://localhost:3000/api/auth/linkedin"
             Write-Host "✅ Please complete OAuth in browser" -ForegroundColor Yellow
         }
         
-        "8" {
+        "9" {
             Write-Host "🔗 Opening Twitter OAuth..." -ForegroundColor Cyan
             Start-Process "http://localhost:3000/api/auth/twitter"
             Write-Host "✅ Please complete OAuth in browser" -ForegroundColor Yellow
         }
         
-        "9" {
+        "10" {
             if (Test-Path "test-results.json") {
                 Write-Host ""
                 Get-Content "test-results.json" | ConvertFrom-Json | ConvertTo-Json -Depth 10
@@ -225,7 +242,7 @@ while ($continue) {
             $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
         }
         
-        "10" {
+        "11" {
             Write-Host ""
             Write-Host "📋 Server Process Info:" -ForegroundColor Cyan
             Write-Host ""
@@ -238,7 +255,7 @@ while ($continue) {
             $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
         }
         
-        "11" {
+        "12" {
             Write-Host "🔄 Restarting server..." -ForegroundColor Yellow
             Stop-Process -Id $serverProcess.Id -Force -ErrorAction SilentlyContinue
             Start-Sleep -Seconds 2

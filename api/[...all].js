@@ -197,11 +197,19 @@ module.exports = async (req, res) => {
       return await handler(req, res);
     }
 
+    // Wix Token Test Endpoint - specific diagnostic endpoint
+    if (route === "wix/test-token" || route === "wix/test-token/") {
+      console.log("✅ Routing to Wix Token Test handler");
+      const handler = require("../server/handlers/wix-test-token");
+      return await handler(req, res);
+    }
+
     // Wix API routes - handle /api/wix requests (catch-all, must be last)
-    // Explicitly exclude webhooks and seo-keywords routes
+    // Explicitly exclude webhooks, seo-keywords, and test-token routes
     if ((route === "wix" || route.startsWith("wix/")) && 
         route !== "wix/webhooks" && 
-        !route.startsWith("wix/seo-keywords")) {
+        !route.startsWith("wix/seo-keywords") &&
+        route !== "wix/test-token") {
       console.log("✅ Routing to Wix API handler");
       const handler = require("../server/handlers/wix-api-routes");
       return await handler(req, res);

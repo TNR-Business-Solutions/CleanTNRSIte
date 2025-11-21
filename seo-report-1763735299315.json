@@ -1,0 +1,13 @@
+{
+  "timestamp": "2025-11-21T14:28:19.315Z",
+  "site": "shesallthatandmore.com",
+  "instanceId": "a4890371-c6da-46f4-a830-9e19df999cf8",
+  "audit": null,
+  "optimization": null,
+  "summary": {
+    "totalTests": 5,
+    "passed": 1,
+    "failed": 4,
+    "successRate": 20
+  }
+}
