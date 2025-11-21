@@ -383,9 +383,9 @@ class TNRDatabase {
       
       for (const tableSQL of tables) {
         try {
-          // Use .query() method for plain SQL strings (not template literals)
-          // The neon() function returns an object with a query() method
-          const result = await this.postgres(tableSQL, [], {});
+          // Neon serverless driver: use as tagged template function
+          // For dynamic SQL strings, we execute directly without parameters
+          const result = await this.postgres(tableSQL);
           console.log(`✅ Table created/verified:`, tableSQL.substring(7, 50) + "...");
         } catch (err) {
           // Ignore "already exists" errors (Postgres uses "relation already exists")
