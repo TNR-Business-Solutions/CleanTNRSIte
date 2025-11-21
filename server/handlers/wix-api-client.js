@@ -144,6 +144,7 @@ class WixAPIClient {
    */
   async request(method, endpoint, data = null, options = {}) {
     const operation = `${method} ${endpoint}`;
+    let apiUrl = ''; // Declare outside try block for error handler access
 
     try {
       const token = await this.getValidToken();
@@ -173,7 +174,7 @@ class WixAPIClient {
 
       // Wix REST API requires instance ID (metasite ID) in headers only
       // Some endpoints may require it in URL path, but query params are not standard
-      let apiUrl = `${WIX_API_BASE}${endpoint}`;
+      apiUrl = `${WIX_API_BASE}${endpoint}`;
       
       // Add query params from options if provided
       if (options.params && Object.keys(options.params).length > 0) {
