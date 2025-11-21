@@ -37,6 +37,38 @@ tokenManager.loadTokens(clientTokensDB).catch((err) => {
 });
 
 /**
+ * Decode JWT token and extract metasite ID
+ * @param {string} token - JWT token (may start with "OAUTH2." prefix)
+ * @returns {object} Decoded payload with metasiteId
+ */
+function decodeJWT(token) {
+  try {
+    // Remove OAUTH2. prefix if present
+    const jwtToken = token.startsWith("OAUTH2.") ? token.substring(7) : token;
+    
+    // JWT has 3 parts: header.payload.signature
+    const parts = jwtToken.split(".");
+    if (parts.length !== 3) {
+      console.warn("⚠️  Invalid JWT format (expected 3 parts)");
+      return null;
+    }
+    
+    // Decode the payload (second part)
+    const payload = JSON.parse(Buffer.from(parts[1], "base64").toString("utf8"));
+    
+    console.log("✅ JWT decoded successfully");
+    console.log(`   Metasite ID: ${payload.metasiteId || payload.siteId || 'N/A'}`);
+    console.log(`   Instance ID: ${payload.instanceId || 'N/A'}`);
+    console.log(`   Account ID: ${payload.accountId || 'N/A'}`);
+    
+    return payload;
+  } catch (error) {
+    console.error("❌ Error decoding JWT:", error.message);
+    return null;
+  }
+}
+
+/**
  * Exchange authorization code for access token
  */
 async function exchangeCodeForToken(code) {
@@ -198,12 +230,24 @@ async function saveClientTokens(instanceId, tokenData, metadata = {}) {
   // If expires_in is not provided, default to 10 years
   const expiresIn = tokenData.expires_in || 10 * 365 * 24 * 60 * 60; // 10 years in seconds
 
+  // Decode JWT to extract metasite ID
+  const jwtPayload = decodeJWT(tokenData.access_token);
+  const metasiteId = jwtPayload?.metasiteId || jwtPayload?.siteId || instanceId;
+
+  // Merge metadata with JWT data
+  const enrichedMetadata = {
+    ...metadata,
+    metasiteId: metasiteId,
+    instanceId: jwtPayload?.instanceId || instanceId,
+    accountId: jwtPayload?.accountId,
+  };
+
   const clientData = {
     instanceId,
     accessToken: tokenData.access_token,
     refreshToken: tokenData.refresh_token,
     expiresAt: Date.now() + expiresIn * 1000,
-    metadata,
+    metadata: enrichedMetadata,
     createdAt: Date.now(),
     updatedAt: Date.now(),
   };
@@ -263,6 +307,10 @@ module.exports = async (req, res) => {
 
       console.log(`   Using instance ID: ${finalInstanceId}`);
 
+      // Decode JWT to extract metasite ID
+      const jwtPayload = decodeJWT(token);
+      const metasiteId = jwtPayload?.metasiteId || jwtPayload?.siteId || finalInstanceId;
+
       // Save token directly
       const clientData = {
         instanceId: finalInstanceId,
@@ -270,6 +318,9 @@ module.exports = async (req, res) => {
         refreshToken: null,
         expiresAt: Date.now() + 10 * 365 * 24 * 60 * 60 * 1000, // 10 years
         metadata: {
+          metasiteId: metasiteId,
+          instanceId: jwtPayload?.instanceId || finalInstanceId,
+          accountId: jwtPayload?.accountId,
           clientId: stateData?.clientId || "shesallthatandmore",
           source: "direct-token-callback",
           tokenReceivedAt: new Date().toISOString(),
@@ -327,6 +378,10 @@ module.exports = async (req, res) => {
 
       console.log(`   Using instance ID: ${finalInstanceId}`);
 
+      // Decode JWT to extract metasite ID
+      const jwtPayload = decodeJWT(code);
+      const metasiteId = jwtPayload?.metasiteId || jwtPayload?.siteId || finalInstanceId;
+
       // Save JWT token directly as access token
       const clientData = {
         instanceId: finalInstanceId,
@@ -334,6 +389,9 @@ module.exports = async (req, res) => {
         refreshToken: null,
         expiresAt: Date.now() + 10 * 365 * 24 * 60 * 60 * 1000, // 10 years
         metadata: {
+          metasiteId: metasiteId,
+          instanceId: jwtPayload?.instanceId || finalInstanceId,
+          accountId: jwtPayload?.accountId,
           clientId: stateData?.clientId || "shesallthatandmore",
           source: "jwt-token-from-code",
           tokenType: "JWT",
