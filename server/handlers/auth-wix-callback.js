@@ -14,7 +14,7 @@ const WIX_APP_SECRET =
   process.env.WIX_APP_SECRET || "87fd621b-f3d2-4b2f-b085-2c4f00a17b97";
 
 // Log configuration for debugging
-console.log("🔧 Wix OAuth Callback Configuration:", {
+console.log("🔧 Wix OAuth Callback Configuration v3 (with JWT metasite extraction):", {
   appId: WIX_APP_ID.substring(0, 8) + "...",
   hasSecret: !!WIX_APP_SECRET,
   hasEnvAppId: !!process.env.WIX_APP_ID,
@@ -230,16 +230,16 @@ async function saveClientTokens(instanceId, tokenData, metadata = {}) {
   // If expires_in is not provided, default to 10 years
   const expiresIn = tokenData.expires_in || 10 * 365 * 24 * 60 * 60; // 10 years in seconds
 
-  // Decode JWT to extract metasite ID
+  // Decode JWT to extract additional data
   const jwtPayload = decodeJWT(tokenData.access_token);
-  const metasiteId = jwtPayload?.metasiteId || jwtPayload?.siteId || instanceId;
 
   // Merge metadata with JWT data
+  // NOTE: metadata.metasiteId should already be set correctly by caller
   const enrichedMetadata = {
     ...metadata,
-    metasiteId: metasiteId,
-    instanceId: jwtPayload?.instanceId || instanceId,
-    accountId: jwtPayload?.accountId,
+    // Only override if not already set by caller
+    instanceId: metadata.instanceId || jwtPayload?.instanceId || instanceId,
+    accountId: metadata.accountId || jwtPayload?.accountId,
   };
 
   const clientData = {
@@ -282,7 +282,15 @@ module.exports = async (req, res) => {
     console.log("   Query params:", Object.keys(req.query));
     console.log("   Full URL:", req.url);
 
-    const { code, state, instanceId, token } = req.query;
+    const { code, state, instanceId, token, metaSiteId } = req.query;
+    
+    // Log captured IDs
+    if (metaSiteId) {
+      console.log(`📍 Metasite ID from query: ${metaSiteId}`);
+    }
+    if (instanceId) {
+      console.log(`📍 Instance ID from query: ${instanceId}`);
+    }
 
     // PRIORITY 1: Check if token is provided directly in query parameter
     if (token) {
@@ -307,9 +315,13 @@ module.exports = async (req, res) => {
 
       console.log(`   Using instance ID: ${finalInstanceId}`);
 
-      // Decode JWT to extract metasite ID
+      // Decode JWT to extract additional metadata
       const jwtPayload = decodeJWT(token);
-      const metasiteId = jwtPayload?.metasiteId || jwtPayload?.siteId || finalInstanceId;
+      
+      // CRITICAL: Use metaSiteId from query parameter (Wix installation URL)
+      // This is the ACTUAL site ID needed for API calls
+      const actualMetasiteId = metaSiteId || jwtPayload?.metasiteId || jwtPayload?.siteId || finalInstanceId;
+      console.log(`   Using metasite ID for API calls: ${actualMetasiteId}`);
 
       // Save token directly
       const clientData = {
@@ -318,7 +330,7 @@ module.exports = async (req, res) => {
         refreshToken: null,
         expiresAt: Date.now() + 10 * 365 * 24 * 60 * 60 * 1000, // 10 years
         metadata: {
-          metasiteId: metasiteId,
+          metasiteId: actualMetasiteId,  // Use query parameter metaSiteId
           instanceId: jwtPayload?.instanceId || finalInstanceId,
           accountId: jwtPayload?.accountId,
           clientId: stateData?.clientId || "shesallthatandmore",
@@ -378,9 +390,13 @@ module.exports = async (req, res) => {
 
       console.log(`   Using instance ID: ${finalInstanceId}`);
 
-      // Decode JWT to extract metasite ID
+      // Decode JWT to extract additional metadata
       const jwtPayload = decodeJWT(code);
-      const metasiteId = jwtPayload?.metasiteId || jwtPayload?.siteId || finalInstanceId;
+      
+      // CRITICAL: Use metaSiteId from query parameter (Wix installation URL)
+      // This is the ACTUAL site ID needed for API calls
+      const actualMetasiteId = metaSiteId || jwtPayload?.metasiteId || jwtPayload?.siteId || finalInstanceId;
+      console.log(`   Using metasite ID for API calls: ${actualMetasiteId}`);
 
       // Save JWT token directly as access token
       const clientData = {
@@ -389,7 +405,7 @@ module.exports = async (req, res) => {
         refreshToken: null,
         expiresAt: Date.now() + 10 * 365 * 24 * 60 * 60 * 1000, // 10 years
         metadata: {
-          metasiteId: metasiteId,
+          metasiteId: actualMetasiteId,  // Use query parameter metaSiteId
           instanceId: jwtPayload?.instanceId || finalInstanceId,
           accountId: jwtPayload?.accountId,
           clientId: stateData?.clientId || "shesallthatandmore",
@@ -407,6 +423,11 @@ module.exports = async (req, res) => {
         console.log(
           `✅ Token saved to database for instance: ${finalInstanceId}`
         );
+        console.log(`   Metadata saved:`, {
+          metasiteId: clientData.metadata.metasiteId,
+          instanceId: clientData.metadata.instanceId,
+          accountId: clientData.metadata.accountId
+        });
       } catch (error) {
         console.error(`❌ Error saving token to database:`, error.message);
       }
@@ -453,22 +474,30 @@ module.exports = async (req, res) => {
     // Get instance details (non-critical)
     const instanceDetails = await getInstanceDetails(tokenData.access_token);
 
-    // Determine final instance ID (this should be the metasite ID)
-    // In Wix OAuth, instance_id from token response is the metasite ID
+    // Determine final instance ID (for token storage key)
     const finalInstanceId =
       instanceId ||
       tokenData.instance_id ||
       tokenData.instanceId ||
+      crypto.randomBytes(16).toString("hex");
+
+    // CRITICAL: Determine actual metasite ID for API calls
+    // Priority: query parameter > token response > instance ID
+    const actualMetasiteId =
+      metaSiteId ||
       tokenData.metasite_id ||
       tokenData.metasiteId ||
       instanceDetails?.sites?.[0]?.siteId ||
-      crypto.randomBytes(16).toString("hex");
+      finalInstanceId;
+
+    console.log(`   Final Instance ID (storage key): ${finalInstanceId}`);
+    console.log(`   Actual Metasite ID (for API calls): ${actualMetasiteId}`);
 
     // Store metasite ID in metadata for reference
     const metadata = {
       clientId: stateData.clientId,
       instanceDetails,
-      metasiteId: finalInstanceId, // Store metasite ID explicitly
+      metasiteId: actualMetasiteId,  // Store ACTUAL metasite ID for API calls
       instanceId: finalInstanceId,
     };
 
