@@ -149,6 +149,13 @@ class WixAPIClient {
     try {
       const token = await this.getValidToken();
 
+      // Add debug logging
+      console.log(`🔍 Making API request to Wix:`);
+      console.log(`   Endpoint: ${endpoint}`);
+      console.log(`   Method: ${method}`);
+      console.log(`   Instance ID: ${this.instanceId}`);
+      console.log(`   Metadata: ${JSON.stringify(this.clientData.metadata)}`);
+
       // Log request
       logRequest(operation, this.instanceId, {
         endpoint,
@@ -171,6 +178,14 @@ class WixAPIClient {
         "X-Wix-Metasite-Id": this.instanceId,
         ...options.headers,
       };
+
+      // Log full headers (without sensitive token)
+      console.log(`   Headers (preview):`, {
+        Authorization: "Bearer [redacted]",
+        "Content-Type": "application/json",
+        "wix-instance-id": this.instanceId,
+        "X-Wix-Metasite-Id": this.instanceId,
+      });
 
       // Wix REST API requires instance ID (metasite ID) in headers only
       // Some endpoints may require it in URL path, but query params are not standard
