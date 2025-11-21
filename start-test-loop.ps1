@@ -64,27 +64,46 @@ if (-not (Test-Path "server/node_modules")) {
     Write-Host ""
 }
 
-# Start the server in background
+# Start the server in background using Start-Process
 Write-Host "🚀 Starting server..." -ForegroundColor Cyan
-$serverJob = Start-Job -ScriptBlock {
-    Set-Location $using:scriptPath
-    Set-Location server
-    node index.js
-}
+$serverPath = Join-Path $scriptPath "server"
+$nodePath = (Get-Command node).Source
+
+# Start server in new window
+$serverProcess = Start-Process -FilePath $nodePath -ArgumentList "index.js" -WorkingDirectory $serverPath -WindowStyle Minimized -PassThru
 
 Write-Host "⏳ Waiting for server to start..." -ForegroundColor Yellow
-Start-Sleep -Seconds 5
+Start-Sleep -Seconds 8
 
 # Check if server is running
-try {
-    $response = Invoke-WebRequest -Uri "http://localhost:3000" -UseBasicParsing -TimeoutSec 5
-    Write-Host "✅ Server is running!" -ForegroundColor Green
-    Write-Host ""
-} catch {
+$serverRunning = $false
+$attempts = 0
+while (-not $serverRunning -and $attempts -lt 5) {
+    try {
+        $response = Invoke-WebRequest -Uri "http://localhost:3000" -UseBasicParsing -TimeoutSec 3 -ErrorAction Stop
+        $serverRunning = $true
+        Write-Host "✅ Server is running!" -ForegroundColor Green
+        Write-Host ""
+    } catch {
+        $attempts++
+        if ($attempts -lt 5) {
+            Write-Host "⏳ Still starting... (attempt $attempts/5)" -ForegroundColor Yellow
+            Start-Sleep -Seconds 2
+        }
+    }
+}
+
+if (-not $serverRunning) {
     Write-Host "❌ Server failed to start!" -ForegroundColor Red
-    Write-Host "Error: $_" -ForegroundColor Red
-    Stop-Job $serverJob
-    Remove-Job $serverJob
+    Write-Host "Error: Server not responding after 5 attempts" -ForegroundColor Red
+    Write-Host ""
+    Write-Host "Troubleshooting steps:" -ForegroundColor Yellow
+    Write-Host "1. Check if port 3000 is already in use" -ForegroundColor Yellow
+    Write-Host "2. Check server/index.js for errors" -ForegroundColor Yellow
+    Write-Host "3. Check .env file exists in project root" -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "Try starting manually: cd server; node index.js" -ForegroundColor Yellow
+    Stop-Process -Id $serverProcess.Id -Force -ErrorAction SilentlyContinue
     pause
     exit 1
 }
@@ -208,9 +227,12 @@ while ($continue) {
         
         "10" {
             Write-Host ""
-            Write-Host "📋 Server Logs (last 20 lines):" -ForegroundColor Cyan
+            Write-Host "📋 Server Process Info:" -ForegroundColor Cyan
             Write-Host ""
-            Receive-Job $serverJob | Select-Object -Last 20
+            Write-Host "Process ID: $($serverProcess.Id)" -ForegroundColor White
+            Write-Host "Status: $(if ($serverProcess.HasExited) { 'Stopped' } else { 'Running' })" -ForegroundColor White
+            Write-Host ""
+            Write-Host "Check server window for live logs..." -ForegroundColor Yellow
             Write-Host ""
             Write-Host "Press any key to continue..." -ForegroundColor Gray
             $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
@@ -218,15 +240,10 @@ while ($continue) {
         
         "11" {
             Write-Host "🔄 Restarting server..." -ForegroundColor Yellow
-            Stop-Job $serverJob
-            Remove-Job $serverJob
+            Stop-Process -Id $serverProcess.Id -Force -ErrorAction SilentlyContinue
             Start-Sleep -Seconds 2
             
-            $serverJob = Start-Job -ScriptBlock {
-                Set-Location $using:scriptPath
-                Set-Location server
-                node index.js
-            }
+            $serverProcess = Start-Process -FilePath $nodePath -ArgumentList "index.js" -WorkingDirectory $serverPath -WindowStyle Minimized -PassThru
             
             Start-Sleep -Seconds 5
             Write-Host "✅ Server restarted" -ForegroundColor Green
@@ -252,8 +269,10 @@ while ($continue) {
 
 # Cleanup
 Write-Host "Cleaning up..." -ForegroundColor Yellow
-Stop-Job $serverJob
-Remove-Job $serverJob
+if ($serverProcess -and -not $serverProcess.HasExited) {
+    Stop-Process -Id $serverProcess.Id -Force -ErrorAction SilentlyContinue
+    Write-Host "✅ Server stopped" -ForegroundColor Green
+}
 
 Write-Host "Goodbye!" -ForegroundColor Green
 Write-Host ""
