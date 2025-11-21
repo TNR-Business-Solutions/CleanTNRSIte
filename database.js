@@ -365,8 +365,9 @@ class TNRDatabase {
       )`,
 
       // Settings table
+      // Note: PostgreSQL uses SERIAL instead of AUTOINCREMENT
       `CREATE TABLE IF NOT EXISTS settings (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         business_name TEXT,
         business_email TEXT,
         business_phone TEXT,
