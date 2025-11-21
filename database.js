@@ -379,23 +379,21 @@ class TNRDatabase {
 
     if (this.usePostgres) {
       // Postgres: Use CREATE TABLE IF NOT EXISTS (similar syntax)
-      // Neon driver requires tagged template literals or .query() method
-      const { neon } = require('@neondatabase/serverless');
-      const sql = neon(process.env.POSTGRES_URL || process.env.DATABASE_URL);
+      // Neon driver: this.postgres is already initialized in constructor
       
       for (const tableSQL of tables) {
         try {
-          // Use tagged template literal syntax for Neon
-          await sql([tableSQL]);
+          // Use the initialized Neon function directly (calls serverless function)
+          await this.postgres(tableSQL);
         } catch (err) {
           // Ignore "already exists" errors (Postgres uses "relation already exists")
           const errorMsg = err.message.toLowerCase();
           if (!errorMsg.includes("already exists") && !errorMsg.includes("duplicate") && !errorMsg.includes("relation")) {
             console.error("❌ Error creating table:", err.message);
-            console.error("   SQL:", sql.substring(0, 200));
+            console.error("   SQL:", tableSQL.substring(0, 200));
             throw err;
           } else {
-            console.log("ℹ️  Table already exists (expected):", sql.substring(0, 50) + "...");
+            console.log("ℹ️  Table already exists (expected):", tableSQL.substring(0, 50) + "...");
           }
         }
       }
