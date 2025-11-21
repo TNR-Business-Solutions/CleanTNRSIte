@@ -149,11 +149,13 @@ class WixAPIClient {
     try {
       const token = await this.getValidToken();
 
-      // Add debug logging
-      console.log(`🔍 Making API request to Wix:`);
+      // Trivial comment to force redeploy: Debug logging added for API calls - v2
+      console.log(`🔍 Making API request to Wix (v2 debug):`);
+      console.log(`   Operation: ${operation}`);
       console.log(`   Endpoint: ${endpoint}`);
       console.log(`   Method: ${method}`);
       console.log(`   Instance ID: ${this.instanceId}`);
+      console.log(`   Original Instance ID: ${this.originalInstanceId}`);
       console.log(`   Metadata: ${JSON.stringify(this.clientData.metadata)}`);
 
       // Log request
@@ -331,3 +333,5 @@ function createWixClient(instanceId) {
 }
 
 module.exports = { WixAPIClient, createWixClient, clientTokensDB };
+/ /   T r i v i a l   c o m m e n t   t o   f o r c e   r e d e p l o y  
+ 
