@@ -74,6 +74,7 @@ class SimpleFormIntegration {
 
       // Insurance-specific fields
       insuranceType: formData.get("insuranceType") || "",
+      insuranceTypes: formData.getAll("insuranceTypes") || [],
       coverageNeeds: formData.get("coverageNeeds") || "",
       currentInsurance: formData.get("currentInsurance") || "",
 
@@ -90,6 +91,7 @@ class SimpleFormIntegration {
     };
 
     // Collect ALL other form fields dynamically
+    // Handle arrays properly (e.g., insuranceTypes checkboxes, services[])
     for (const [key, value] of formData.entries()) {
       // Skip file inputs (already handled above)
       if (value instanceof File) {
@@ -98,33 +100,74 @@ class SimpleFormIntegration {
         }
         continue;
       }
+      
+      // Skip if already handled above
+      if (submission.hasOwnProperty(key)) {
+        // If we already have a value and encounter another with same key, convert to array
+        if (!Array.isArray(submission[key])) {
+          submission[key] = [submission[key], value];
+        } else {
+          submission[key].push(value);
+        }
+        continue;
+      }
+      
       // Skip empty values
-      if (!submission.hasOwnProperty(key) && value && value.toString().trim() !== '') {
+      if (value && value.toString().trim() !== '') {
         submission[key] = value;
       }
     }
-
-    console.log("📊 Form data collected:", submission);
-
-    // 1. Create lead in CRM (database via API, with localStorage fallback)
-    await this.createLead(submission);
-
-    // 2. Send to server for email (with files if career application)
-    if (formType === "Career Application") {
-      await this.sendToServerWithFiles(event.target, submission);
-    } else {
-      await this.sendToServer(submission);
+    
+    // Ensure insuranceTypes and services are arrays
+    if (submission.insuranceTypes && !Array.isArray(submission.insuranceTypes)) {
+      submission.insuranceTypes = [submission.insuranceTypes];
+    }
+    if (submission.services && !Array.isArray(submission.services)) {
+      submission.services = [submission.services];
     }
 
-    // 3. Show success message
-    this.showSuccess();
+    console.log("📊 Form data collected:", submission);
+    console.log("📊 Form data keys:", Object.keys(submission));
+    console.log("📊 Form data values:", Object.values(submission));
 
-    // Reset form
-    event.target.reset();
-    // Reset cover letter notification
-    const coverLetterNotification = document.getElementById('coverLetterNotification');
-    if (coverLetterNotification) {
-      coverLetterNotification.style.display = 'none';
+    try {
+      // 1. Create lead in CRM (database via API, with localStorage fallback)
+      const leadResult = await this.createLead(submission);
+      if (leadResult) {
+        console.log("✅ Lead created successfully:", leadResult.id);
+      } else {
+        console.warn("⚠️ Lead creation returned null/undefined");
+      }
+
+      // 2. Send to server for email (with files if career application)
+      let emailResult = null;
+      if (formType === "Career Application") {
+        emailResult = await this.sendToServerWithFiles(event.target, submission);
+      } else {
+        emailResult = await this.sendToServer(submission);
+      }
+
+      if (emailResult && emailResult.success === false) {
+        console.error("❌ Email sending failed:", emailResult.error);
+      } else {
+        console.log("✅ Email sent successfully");
+      }
+
+      // 3. Show success message
+      this.showSuccess();
+
+      // Reset form only after successful submission
+      event.target.reset();
+      
+      // Reset cover letter notification
+      const coverLetterNotification = document.getElementById('coverLetterNotification');
+      if (coverLetterNotification) {
+        coverLetterNotification.style.display = 'none';
+      }
+    } catch (error) {
+      console.error("❌ Form submission error:", error);
+      alert("There was an error submitting your form. Please try again or contact us directly at roy.turner@tnrbusinesssolutions.com");
+      throw error;
     }
   }
 
@@ -222,6 +265,9 @@ class SimpleFormIntegration {
 
   async sendToServer(data) {
     try {
+      console.log("📧 Sending form data to server for email notification...");
+      console.log("📧 Data being sent:", JSON.stringify(data, null, 2));
+      
       const response = await fetch("/submit-form", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -229,12 +275,17 @@ class SimpleFormIntegration {
       });
 
       if (response.ok) {
-        console.log("✅ Email sent successfully");
+        const result = await response.json().catch(() => ({}));
+        console.log("✅ Email sent successfully:", result);
+        return { success: true, result };
       } else {
-        console.error("❌ Server error:", response.statusText);
+        const errorText = await response.text().catch(() => response.statusText);
+        console.error("❌ Server error:", response.status, errorText);
+        return { success: false, error: errorText };
       }
     } catch (error) {
       console.error("❌ Network error:", error);
+      return { success: false, error: error.message };
     }
   }
 
@@ -299,6 +350,7 @@ class SimpleFormIntegration {
       }
     } catch (error) {
       console.error("❌ Network error:", error);
+      return { success: false, error: error.message };
     }
   }
 

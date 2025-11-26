@@ -347,6 +347,24 @@
     </style>
 </head>
 <body>
+    <header class="admin-header">
+        <div class="admin-header-inner">
+            <a href="/" class="admin-header-logo">
+                <img src="media/logo.png" alt="TNR Business Solutions Logo" loading="lazy">
+                <span>TNR Business Solutions</span>
+            </a>
+            <nav class="admin-header-menu">
+                <a href="/" class="admin-header-link">🏠 Home</a>
+                <a href="/admin-dashboard-v2.html" class="admin-header-link active">📊 Admin Dashboard</a>
+                <a href="/admin-orders.html" class="admin-header-link">📦 Orders</a>
+                <a href="/social-media-automation-dashboard.html" class="admin-header-link">📱 Social Media</a>
+                <a href="/admin-login.html" class="admin-header-link">🔐 Login</a>
+                <!-- Add more as needed: CRM, Email, Settings, Logout -->
+                <a href="#" class="admin-header-link" onclick="logout()">🚪 Logout</a>
+            </nav>
+        </div>
+    </header>
+
     <div class="dashboard-container">
         <!-- Header -->
         <div class="dashboard-header">
@@ -627,6 +645,32 @@
                 </li>
             </ul>
         </div>
+
+        <!-- Add this right after the platforms-section, add new sections for CRM and Email (copied/adapted from v1) -->
+        <div class="crm-section">
+            <h2 class="section-title">👥 CRM Management</h2>
+            <!-- Paste CRM HTML/JS here: tables, filters, forms, etc. Adapt IDs like 'client-list-v2' to avoid conflicts -->
+            <!-- For example: -->
+            <div class="tab-content" id="clients-tab-v2">
+                <!-- Client list table, filters, add button, etc. -->
+            </div>
+            <div class="tab-content" id="leads-tab-v2">
+                <!-- Leads list -->
+            </div>
+            <!-- Add CSV importer modal -->
+        </div>
+
+        <div class="email-section">
+            <h2 class="section-title">📧 Email Campaigns</h2>
+            <!-- Paste Email HTML/JS: form, audience filters, send button -->
+            <form id="campaign-form-v2">
+                <!-- Subject, HTML editor, etc. -->
+            </form>
+        </div>
+
+        <!-- Add tab navigation for these new sections if needed, or integrate into existing UI. -->
+
+        <!-- At the end, add any required JS functions copied from v1, prefixed with 'v2' if needed. -->
     </div>
 
     <script>

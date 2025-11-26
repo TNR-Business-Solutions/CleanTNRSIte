@@ -277,6 +277,21 @@
 
     <!-- Main Content -->
     <main class="main-content">
+        <!-- Black Friday Giveaway Banner -->
+        <section style="background: linear-gradient(135deg, var(--tnr-primary) 0%, var(--tnr-secondary) 100%); padding: 1.5rem; text-align: center; border-bottom: 3px solid var(--tnr-gold);">
+            <div class="container" style="max-width: 1200px; margin: 0 auto;">
+                <div style="display: flex; align-items: center; justify-content: center; gap: 1.5rem; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 250px;">
+                        <h3 style="color: var(--tnr-gold); margin: 0 0 0.5rem 0; font-size: 1.5rem; font-weight: 700;">🎉 Black Friday Giveaway</h3>
+                        <p style="color: white; margin: 0; font-size: 1.1rem;">Win a Free Website Makeover Worth $4,500!</p>
+                    </div>
+                    <div style="flex-shrink: 0;">
+                        <a href="black-friday-giveaway.html" class="btn" style="background: var(--tnr-gold); color: var(--tnr-dark); font-weight: 700; padding: 0.75rem 2rem; white-space: nowrap;">Enter Now →</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Hero Section -->
         <section class="hero hero-pattern">
             <div class="holographic-grid"></div>
@@ -496,12 +511,57 @@
             </div>
         </section>
 
-        <!-- Contact Section -->
+        <!-- Contact Section with Form -->
         <section class="container" style="padding: 4rem 0;">
             <h2 style="text-align: center; margin-bottom: 3rem; color: white;">Ready to Get Started?</h2>
-            <div class="text-center">
-                <p style="font-size: 1.25rem; margin-bottom: 2rem; color: white;">Contact us today for a free consultation and discover how we can help your business grow and succeed.</p>
-                <a href="contact.html" class="btn">Contact Us Now</a>
+            <p style="text-align: center; font-size: 1.25rem; margin-bottom: 3rem; color: white;">Get your free consultation and discover how we can help your business grow and succeed.</p>
+            
+            <!-- Quick Contact Form -->
+            <div style="background: rgba(74, 93, 35, 0.2); padding: 3rem; border-radius: 12px; max-width: 800px; margin: 0 auto;">
+                <form id="contact-form" style="max-width: 800px; margin: 0 auto;">
+                    <!-- Personal Information -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                        <div>
+                            <label for="name" style="color: white; display: block; margin-bottom: 0.5rem;">Full Name <span style="color: var(--tnr-gold);">*</span></label>
+                            <input type="text" id="name" name="name" required placeholder="Enter your full name" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; box-sizing: border-box;">
+                        </div>
+                        <div>
+                            <label for="company" style="color: white; display: block; margin-bottom: 0.5rem;">Company Name</label>
+                            <input type="text" id="company" name="company" placeholder="Your company name" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; box-sizing: border-box;">
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                        <div>
+                            <label for="email" style="color: white; display: block; margin-bottom: 0.5rem;">Email Address <span style="color: var(--tnr-gold);">*</span></label>
+                            <input type="email" id="email" name="email" required placeholder="your.email@example.com" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; box-sizing: border-box;">
+                        </div>
+                        <div>
+                            <label for="phone" style="color: white; display: block; margin-bottom: 0.5rem;">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" placeholder="(412) 555-0123" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; box-sizing: border-box;">
+                        </div>
+                    </div>
+
+                    <!-- Message -->
+                    <div style="margin-bottom: 1rem;">
+                        <label for="message" style="color: white; display: block; margin-bottom: 0.5rem;">Tell us about your project <span style="color: var(--tnr-gold);">*</span></label>
+                        <textarea id="message" name="message" rows="4" required placeholder="Please describe your business goals and what you hope to achieve..." style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; box-sizing: border-box; resize: vertical;"></textarea>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div style="text-align: center;">
+                        <button type="submit" class="btn" style="background: var(--tnr-gold); color: var(--tnr-dark); padding: 1rem 2rem; font-size: 1.1rem; border: none; border-radius: 4px; cursor: pointer; font-weight: 700;">Send Message & Get Free Consultation</button>
+                        <p style="color: rgba(255, 255, 255, 0.8); font-size: 0.9rem; margin-top: 1rem;">
+                            * Required fields. We'll respond within 24 hours during business days.
+                        </p>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="text-center" style="margin-top: 2rem;">
+                <p style="color: white; margin-bottom: 1rem;">Or contact us directly:</p>
+                <a href="contact.html" class="btn" style="margin-right: 1rem;">Full Contact Form</a>
+                <a href="tel:4124992987" class="btn btn-secondary">Call (412) 499-2987</a>
             </div>
         </section>
     </main>
@@ -622,6 +682,10 @@
             });
         });
     </script>
+    
+    <!-- Form Handler Scripts -->
+    <script src="crm-data.js"></script>
+    <script src="form-integration-simple.js"></script>
 </body>
 </html>< ! - -   D e p l o y m e n t   t r i g g e r e d   a t   0 9 / 2 9 / 2 0 2 5   0 8 : 5 7 : 1 7   - - > 
  

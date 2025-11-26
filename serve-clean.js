@@ -22,7 +22,9 @@ try {
   console.log("✅ Email handler initialized");
 } catch (error) {
   console.warn("⚠️ Email handler not available:", error.message);
-  console.warn("   Email functionality will be disabled until SMTP is configured");
+  console.warn(
+    "   Email functionality will be disabled until SMTP is configured"
+  );
 }
 
 const PORT = process.env.PORT || 3000;
@@ -80,7 +82,7 @@ async function handleAdminAuth(req, res) {
               success: true,
               message: "Authentication successful",
               sessionToken: sessionToken,
-              redirectTo: "/admin-dashboard.html",
+              redirectTo: "/admin-dashboard-v2.html",
             })
           );
         } else {
@@ -336,7 +338,9 @@ const server = http.createServer((req, res) => {
       console.error("CRM API Error:", err);
       if (!res.headersSent) {
         res.writeHead(500, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ success: false, error: "Internal server error" }));
+        res.end(
+          JSON.stringify({ success: false, error: "Internal server error" })
+        );
       }
     });
     return;
@@ -349,7 +353,9 @@ const server = http.createServer((req, res) => {
       console.error("Campaign API Error:", err);
       if (!res.headersSent) {
         res.writeHead(500, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ success: false, error: "Internal server error" }));
+        res.end(
+          JSON.stringify({ success: false, error: "Internal server error" })
+        );
       }
     });
     return;
@@ -362,7 +368,9 @@ const server = http.createServer((req, res) => {
       console.error("Workflows API Error:", err);
       if (!res.headersSent) {
         res.writeHead(500, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ success: false, error: "Internal server error" }));
+        res.end(
+          JSON.stringify({ success: false, error: "Internal server error" })
+        );
       }
     });
     return;
@@ -375,7 +383,9 @@ const server = http.createServer((req, res) => {
       console.error("Analytics API Error:", err);
       if (!res.headersSent) {
         res.writeHead(500, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ success: false, error: "Internal server error" }));
+        res.end(
+          JSON.stringify({ success: false, error: "Internal server error" })
+        );
       }
     });
     return;
@@ -388,7 +398,9 @@ const server = http.createServer((req, res) => {
       console.error("Activities API Error:", err);
       if (!res.headersSent) {
         res.writeHead(500, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ success: false, error: "Internal server error" }));
+        res.end(
+          JSON.stringify({ success: false, error: "Internal server error" })
+        );
       }
     });
     return;
@@ -401,7 +413,9 @@ const server = http.createServer((req, res) => {
       console.error("Email Templates API Error:", err);
       if (!res.headersSent) {
         res.writeHead(500, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ success: false, error: "Internal server error" }));
+        res.end(
+          JSON.stringify({ success: false, error: "Internal server error" })
+        );
       }
     });
     return;
@@ -414,7 +428,9 @@ const server = http.createServer((req, res) => {
       console.error("Social Tokens API Error:", err);
       if (!res.headersSent) {
         res.writeHead(500, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ success: false, error: "Internal server error" }));
+        res.end(
+          JSON.stringify({ success: false, error: "Internal server error" })
+        );
       }
     });
     return;
@@ -427,7 +443,9 @@ const server = http.createServer((req, res) => {
       console.error("Settings API Error:", err);
       if (!res.headersSent) {
         res.writeHead(500, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ success: false, error: "Internal server error" }));
+        res.end(
+          JSON.stringify({ success: false, error: "Internal server error" })
+        );
       }
     });
     return;
@@ -441,7 +459,9 @@ const server = http.createServer((req, res) => {
         console.error("Meta OAuth Callback Error:", err);
         if (!res.headersSent) {
           res.writeHead(500, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ success: false, error: "Internal server error" }));
+          res.end(
+            JSON.stringify({ success: false, error: "Internal server error" })
+          );
         }
       });
     } else {
@@ -450,7 +470,9 @@ const server = http.createServer((req, res) => {
         console.error("Meta OAuth Error:", err);
         if (!res.headersSent) {
           res.writeHead(500, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ success: false, error: "Internal server error" }));
+          res.end(
+            JSON.stringify({ success: false, error: "Internal server error" })
+          );
         }
       });
     }
@@ -464,7 +486,9 @@ const server = http.createServer((req, res) => {
       console.error("Facebook Posting Error:", err);
       if (!res.headersSent) {
         res.writeHead(500, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ success: false, error: "Internal server error" }));
+        res.end(
+          JSON.stringify({ success: false, error: "Internal server error" })
+        );
       }
     });
     return;
@@ -476,7 +500,9 @@ const server = http.createServer((req, res) => {
       console.error("Instagram Posting Error:", err);
       if (!res.headersSent) {
         res.writeHead(500, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ success: false, error: "Internal server error" }));
+        res.end(
+          JSON.stringify({ success: false, error: "Internal server error" })
+        );
       }
     });
     return;
@@ -568,10 +594,10 @@ const server = http.createServer((req, res) => {
       // File not found - log for debugging
       console.error(`❌ 404: ${pathname} -> ${filePath}`);
       console.error(`   Error: ${err.message}`);
-      
+
       // Try to serve index.html if it's a directory
-      if (err.code === 'EISDIR' || err.code === 'ENOENT') {
-        const dirIndexPath = path.join(filePath, 'index.html');
+      if (err.code === "EISDIR" || err.code === "ENOENT") {
+        const dirIndexPath = path.join(filePath, "index.html");
         fs.readFile(dirIndexPath, (err2, data2) => {
           if (!err2) {
             res.writeHead(200, {
@@ -583,7 +609,7 @@ const server = http.createServer((req, res) => {
           }
         });
       }
-      
+
       // File not found
       res.writeHead(404, { "Content-Type": "text/html" });
       res.end(`
@@ -612,10 +638,22 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
-  console.log(`📊 Admin Dashboard: http://localhost:${PORT}/admin-dashboard.html`);
-  console.log(`👥 CRM System: http://localhost:${PORT}/admin-dashboard.html (CRM tab)`);
-  console.log(`📧 Email Campaigns: http://localhost:${PORT}/admin-dashboard.html (Campaigns tab)`);
-  console.log(`🤖 Workflows: http://localhost:${PORT}/admin-dashboard.html (Automation tab)`);
-  console.log(`📈 Analytics: http://localhost:${PORT}/admin-dashboard.html (Analytics tab)`);
-  console.log(`📝 Templates: http://localhost:${PORT}/admin-dashboard.html (Templates tab)`);
+  console.log(
+    `📊 Admin Dashboard: http://localhost:${PORT}/admin-dashboard.html`
+  );
+  console.log(
+    `👥 CRM System: http://localhost:${PORT}/admin-dashboard.html (CRM tab)`
+  );
+  console.log(
+    `📧 Email Campaigns: http://localhost:${PORT}/admin-dashboard.html (Campaigns tab)`
+  );
+  console.log(
+    `🤖 Workflows: http://localhost:${PORT}/admin-dashboard.html (Automation tab)`
+  );
+  console.log(
+    `📈 Analytics: http://localhost:${PORT}/admin-dashboard.html (Analytics tab)`
+  );
+  console.log(
+    `📝 Templates: http://localhost:${PORT}/admin-dashboard.html (Templates tab)`
+  );
 });

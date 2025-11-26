@@ -833,38 +833,26 @@
             updateCartDisplay();
         });
 
-        // Insurance Inquiry Form Handler
-        document.getElementById('insurance-inquiry-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(this);
-            const selectedInsuranceTypes = [];
-            const checkboxes = this.querySelectorAll('input[name="insuranceTypes"]:checked');
-            
-            checkboxes.forEach(checkbox => {
-                selectedInsuranceTypes.push(checkbox.value);
-            });
-            
-            if (selectedInsuranceTypes.length === 0) {
-                alert('Please select at least one insurance type.');
-                return;
+        // Insurance Inquiry Form validation - form-integration-simple.js will handle submission
+        // This validation runs before form-integration-simple.js processes it
+        // We use a higher priority (capturing phase) to validate before form-integration-simple.js
+        document.addEventListener('DOMContentLoaded', function() {
+            const insuranceForm = document.getElementById('insurance-inquiry-form');
+            if (insuranceForm) {
+                // Use capture phase to validate before form-integration-simple.js
+                insuranceForm.addEventListener('submit', function(e) {
+                    const formData = new FormData(this);
+                    const checkboxes = this.querySelectorAll('input[name="insuranceTypes"]:checked');
+                    
+                    if (checkboxes.length === 0) {
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                        alert('Please select at least one insurance type.');
+                        return false;
+                    }
+                    // Let form-integration-simple.js handle the rest (it will prevent default and process)
+                }, true); // true = use capture phase
             }
-            
-            // Create query string for contact page
-            const params = new URLSearchParams();
-            params.append('firstName', formData.get('firstName'));
-            params.append('lastName', formData.get('lastName'));
-            params.append('email', formData.get('email'));
-            params.append('phone', formData.get('phone'));
-            params.append('city', formData.get('city'));
-            params.append('state', formData.get('state'));
-            params.append('zip', formData.get('zip'));
-            params.append('insuranceTypes', selectedInsuranceTypes.join(','));
-            params.append('additionalInfo', formData.get('additionalInfo'));
-            params.append('inquiryType', 'insurance');
-            
-            // Redirect to contact page with form data
-            window.location.href = `contact.html?${params.toString()}`;
         });
     </script>
     
