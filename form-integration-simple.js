@@ -148,11 +148,18 @@ class SimpleFormIntegration {
 
     try {
       // 1. Create lead in CRM (database via API, with localStorage fallback)
+      console.log("🚀 Starting lead creation process...");
       const leadResult = await this.createLead(submission);
       if (leadResult) {
         console.log("✅ Lead created successfully:", leadResult.id);
       } else {
-        console.warn("⚠️ Lead creation returned null/undefined");
+        console.error(
+          "❌ CRITICAL: Lead creation returned null/undefined - lead may not be saved in database!"
+        );
+        console.error(
+          "❌ This means the API call failed and localStorage fallback also failed."
+        );
+        // Don't block form submission, but log the critical error
       }
 
       // 2. Send to server for email (with files if career application)
@@ -213,6 +220,16 @@ class SimpleFormIntegration {
         body: JSON.stringify(data),
       });
 
+      console.log(
+        "📡 API response status:",
+        response.status,
+        response.statusText
+      );
+      console.log(
+        "📡 API response headers:",
+        Object.fromEntries(response.headers.entries())
+      );
+
       if (response.ok) {
         const result = await response.json();
         if (result.success) {
@@ -221,16 +238,31 @@ class SimpleFormIntegration {
           this.saveToLocalStorageBackup(result.data);
           return result.data;
         } else {
+          console.error("❌ API returned success:false", result);
           throw new Error(result.error || "Failed to save lead");
         }
       } else {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        const errorText = await response
+          .text()
+          .catch(() => response.statusText);
+        console.error("❌ API request failed:", {
+          status: response.status,
+          statusText: response.statusText,
+          body: errorText,
+          url: "/api/crm/leads",
+          method: "POST",
+        });
+        throw new Error(
+          `HTTP ${response.status}: ${response.statusText} - ${errorText}`
+        );
       }
     } catch (apiError) {
-      console.warn(
+      console.error(
         "⚠️ API save failed, falling back to localStorage:",
-        apiError
+        apiError.message,
+        apiError.stack
       );
+      console.error("⚠️ Full error object:", apiError);
 
       // Fallback to localStorage if API fails
       console.log("🔍 Checking CRM availability for localStorage fallback...");

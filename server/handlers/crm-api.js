@@ -205,6 +205,8 @@ module.exports = async function crmApiHandler(req, res) {
         );
       }
     } else if (req.method === "POST") {
+      console.log("📥 POST request received:", fullPath);
+      console.log("📥 POST path:", path);
       let body = "";
 
       req.on("data", (chunk) => {
@@ -212,8 +214,10 @@ module.exports = async function crmApiHandler(req, res) {
       });
 
       req.on("end", async () => {
+        console.log("📥 POST body received, length:", body.length);
         try {
           const data = JSON.parse(body);
+          console.log("📥 POST data parsed successfully");
 
           if (path === "clients") {
             const client = await db.addClient(data);
@@ -264,21 +268,45 @@ module.exports = async function crmApiHandler(req, res) {
             res.writeHead(201, { "Content-Type": "application/json" });
             res.end(JSON.stringify({ success: true, data: client }));
           } else if (path === "leads") {
-            const lead = await db.addLead(data);
+            console.log("📥 POST /api/crm/leads - Creating new lead");
+            console.log(
+              "📋 Lead data received:",
+              JSON.stringify(data, null, 2)
+            );
 
-            // Trigger workflows for new lead
             try {
-              await workflowExecutor.initialize();
-              await workflowExecutor.processNewLead(lead);
-            } catch (wfError) {
-              console.warn(
-                "Workflow execution error (non-blocking):",
-                wfError.message
+              const lead = await db.addLead(data);
+              console.log(
+                "✅ Lead created successfully:",
+                lead.id,
+                "-",
+                lead.name || lead.email
+              );
+
+              // Trigger workflows for new lead
+              try {
+                await workflowExecutor.initialize();
+                await workflowExecutor.processNewLead(lead);
+              } catch (wfError) {
+                console.warn(
+                  "Workflow execution error (non-blocking):",
+                  wfError.message
+                );
+              }
+
+              setCorsHeaders(res);
+              res.writeHead(201, { "Content-Type": "application/json" });
+              res.end(JSON.stringify({ success: true, data: lead }));
+              console.log("✅ Lead creation response sent successfully");
+            } catch (leadError) {
+              console.error("❌ Error creating lead:", leadError.message);
+              console.error("❌ Error stack:", leadError.stack);
+              setCorsHeaders(res);
+              res.writeHead(500, { "Content-Type": "application/json" });
+              res.end(
+                JSON.stringify({ success: false, error: leadError.message })
               );
             }
-
-            res.writeHead(201, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ success: true, data: lead }));
           } else if (path === "orders") {
             const order = await db.addOrder(data);
             res.writeHead(201, { "Content-Type": "application/json" });
@@ -376,6 +404,10 @@ module.exports = async function crmApiHandler(req, res) {
             );
           }
         } catch (error) {
+          console.error("❌ POST request error:", error.message);
+          console.error("❌ POST request error stack:", error.stack);
+          console.error("❌ POST body was:", body.substring(0, 500));
+          setCorsHeaders(res);
           res.writeHead(400, { "Content-Type": "application/json" });
           res.end(JSON.stringify({ success: false, error: error.message }));
         }
