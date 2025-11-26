@@ -16,6 +16,7 @@ class SimpleFormIntegration {
       "insurance-inquiry-form": "Insurance Inquiry",
       careerApplicationForm: "Career Application",
       "quote-form": "Quote Request",
+      "giveaway-form": "Black Friday Giveaway",
     };
 
     let formsFound = 0;
@@ -47,15 +48,21 @@ class SimpleFormIntegration {
     // Collect ALL form data dynamically
     const submission = {
       // Core fields (always included)
-      name: formData.get("name") || 
-            (formData.get("firstName") && formData.get("lastName") 
-              ? `${formData.get("firstName")} ${formData.get("lastName")}` 
-              : formData.get("fullName") || ""),
+      name:
+        formData.get("name") ||
+        (formData.get("firstName") && formData.get("lastName")
+          ? `${formData.get("firstName")} ${formData.get("lastName")}`
+          : formData.get("fullName") || ""),
       firstName: formData.get("firstName") || "",
       lastName: formData.get("lastName") || "",
       email: formData.get("email") || "",
       phone: formData.get("phone") || "",
-      company: formData.get("company") || formData.get("currentCompany") || formData.get("businessName") || "",
+      company:
+        formData.get("company") ||
+        formData.get("currentCompany") ||
+        formData.get("businessName") ||
+        formData.get("business") ||
+        "",
       currentCompany: formData.get("currentCompany") || "",
       address: formData.get("address") || "",
       website: formData.get("website") || "",
@@ -67,8 +74,12 @@ class SimpleFormIntegration {
         formData.get("message") ||
         formData.get("additionalInfo") ||
         formData.get("details") ||
+        formData.get("needs") ||
         "",
-      additionalInfo: formData.get("additionalInfo") || "",
+      additionalInfo:
+        formData.get("additionalInfo") ||
+        (formData.get("goal") ? `Goal: ${formData.get("goal")}` : "") ||
+        (formData.get("newsletter") === "on" ? "Newsletter: Yes" : ""),
       contactMethod:
         formData.get("contactMethod") || formData.get("preferredContact") || "",
 
@@ -83,7 +94,9 @@ class SimpleFormIntegration {
       experience: formData.get("experience") || "",
       availability: formData.get("availability") || "",
       resume: formData.get("resume") ? formData.get("resume").name : "",
-      coverLetter: formData.get("coverLetter") ? formData.get("coverLetter").name : "",
+      coverLetter: formData.get("coverLetter")
+        ? formData.get("coverLetter").name
+        : "",
 
       source: formType,
       status: "New",
@@ -100,7 +113,7 @@ class SimpleFormIntegration {
         }
         continue;
       }
-      
+
       // Skip if already handled above
       if (submission.hasOwnProperty(key)) {
         // If we already have a value and encounter another with same key, convert to array
@@ -111,15 +124,18 @@ class SimpleFormIntegration {
         }
         continue;
       }
-      
+
       // Skip empty values
-      if (value && value.toString().trim() !== '') {
+      if (value && value.toString().trim() !== "") {
         submission[key] = value;
       }
     }
-    
+
     // Ensure insuranceTypes and services are arrays
-    if (submission.insuranceTypes && !Array.isArray(submission.insuranceTypes)) {
+    if (
+      submission.insuranceTypes &&
+      !Array.isArray(submission.insuranceTypes)
+    ) {
       submission.insuranceTypes = [submission.insuranceTypes];
     }
     if (submission.services && !Array.isArray(submission.services)) {
@@ -142,7 +158,10 @@ class SimpleFormIntegration {
       // 2. Send to server for email (with files if career application)
       let emailResult = null;
       if (formType === "Career Application") {
-        emailResult = await this.sendToServerWithFiles(event.target, submission);
+        emailResult = await this.sendToServerWithFiles(
+          event.target,
+          submission
+        );
       } else {
         emailResult = await this.sendToServer(submission);
       }
@@ -158,15 +177,19 @@ class SimpleFormIntegration {
 
       // Reset form only after successful submission
       event.target.reset();
-      
+
       // Reset cover letter notification
-      const coverLetterNotification = document.getElementById('coverLetterNotification');
+      const coverLetterNotification = document.getElementById(
+        "coverLetterNotification"
+      );
       if (coverLetterNotification) {
-        coverLetterNotification.style.display = 'none';
+        coverLetterNotification.style.display = "none";
       }
     } catch (error) {
       console.error("❌ Form submission error:", error);
-      alert("There was an error submitting your form. Please try again or contact us directly at roy.turner@tnrbusinesssolutions.com");
+      alert(
+        "There was an error submitting your form. Please try again or contact us directly at roy.turner@tnrbusinesssolutions.com"
+      );
       throw error;
     }
   }
@@ -178,7 +201,7 @@ class SimpleFormIntegration {
 
   async createLead(data) {
     console.log("🔄 createLead called with data:", data);
-    
+
     // First, try to save to database via API (persistent storage)
     try {
       console.log("💾 Attempting to save lead to database via API...");
@@ -204,13 +227,18 @@ class SimpleFormIntegration {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
     } catch (apiError) {
-      console.warn("⚠️ API save failed, falling back to localStorage:", apiError);
-      
+      console.warn(
+        "⚠️ API save failed, falling back to localStorage:",
+        apiError
+      );
+
       // Fallback to localStorage if API fails
       console.log("🔍 Checking CRM availability for localStorage fallback...");
       console.log(
         "  - TNRCRMData class:",
-        typeof window.TNRCRMData !== "undefined" ? "✅ Available" : "❌ Not found"
+        typeof window.TNRCRMData !== "undefined"
+          ? "✅ Available"
+          : "❌ Not found"
       );
       console.log(
         "  - window.tnrCRM instance:",
@@ -267,7 +295,7 @@ class SimpleFormIntegration {
     try {
       console.log("📧 Sending form data to server for email notification...");
       console.log("📧 Data being sent:", JSON.stringify(data, null, 2));
-      
+
       const response = await fetch("/submit-form", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -279,7 +307,9 @@ class SimpleFormIntegration {
         console.log("✅ Email sent successfully:", result);
         return { success: true, result };
       } else {
-        const errorText = await response.text().catch(() => response.statusText);
+        const errorText = await response
+          .text()
+          .catch(() => response.statusText);
         console.error("❌ Server error:", response.status, errorText);
         return { success: false, error: errorText };
       }
@@ -300,7 +330,15 @@ class SimpleFormIntegration {
       const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
       if (resumeFile && resumeFile instanceof File && resumeFile.size > 0) {
         if (resumeFile.size > MAX_FILE_SIZE) {
-          alert(`Resume file is too large (${(resumeFile.size / 1024 / 1024).toFixed(2)} MB). Maximum size is 10 MB. Please compress the file and try again.`);
+          alert(
+            `Resume file is too large (${(
+              resumeFile.size /
+              1024 /
+              1024
+            ).toFixed(
+              2
+            )} MB). Maximum size is 10 MB. Please compress the file and try again.`
+          );
           console.error("❌ Resume file too large:", resumeFile.size, "bytes");
         } else {
           try {
@@ -308,7 +346,11 @@ class SimpleFormIntegration {
             data.resumeFileSize = resumeFile.size;
             data.resumeFileType = resumeFile.type;
             data.resumeFileBase64 = await this.fileToBase64(resumeFile);
-            console.log("✅ Resume file converted to base64:", resumeFile.name, `(${(resumeFile.size / 1024).toFixed(2)} KB)`);
+            console.log(
+              "✅ Resume file converted to base64:",
+              resumeFile.name,
+              `(${(resumeFile.size / 1024).toFixed(2)} KB)`
+            );
           } catch (error) {
             console.error("❌ Error converting resume to base64:", error);
             alert("Error processing resume file. Please try again.");
@@ -317,17 +359,39 @@ class SimpleFormIntegration {
       }
 
       // Convert cover letter to base64 if present (max 10MB)
-      if (coverLetterFile && coverLetterFile instanceof File && coverLetterFile.size > 0) {
+      if (
+        coverLetterFile &&
+        coverLetterFile instanceof File &&
+        coverLetterFile.size > 0
+      ) {
         if (coverLetterFile.size > MAX_FILE_SIZE) {
-          alert(`Cover letter file is too large (${(coverLetterFile.size / 1024 / 1024).toFixed(2)} MB). Maximum size is 10 MB. Please compress the file and try again.`);
-          console.error("❌ Cover letter file too large:", coverLetterFile.size, "bytes");
+          alert(
+            `Cover letter file is too large (${(
+              coverLetterFile.size /
+              1024 /
+              1024
+            ).toFixed(
+              2
+            )} MB). Maximum size is 10 MB. Please compress the file and try again.`
+          );
+          console.error(
+            "❌ Cover letter file too large:",
+            coverLetterFile.size,
+            "bytes"
+          );
         } else {
           try {
             data.coverLetterFileName = coverLetterFile.name;
             data.coverLetterFileSize = coverLetterFile.size;
             data.coverLetterFileType = coverLetterFile.type;
-            data.coverLetterFileBase64 = await this.fileToBase64(coverLetterFile);
-            console.log("✅ Cover letter file converted to base64:", coverLetterFile.name, `(${(coverLetterFile.size / 1024).toFixed(2)} KB)`);
+            data.coverLetterFileBase64 = await this.fileToBase64(
+              coverLetterFile
+            );
+            console.log(
+              "✅ Cover letter file converted to base64:",
+              coverLetterFile.name,
+              `(${(coverLetterFile.size / 1024).toFixed(2)} KB)`
+            );
           } catch (error) {
             console.error("❌ Error converting cover letter to base64:", error);
             alert("Error processing cover letter file. Please try again.");
@@ -360,7 +424,7 @@ class SimpleFormIntegration {
       const reader = new FileReader();
       reader.onload = () => {
         // Remove the data:application/...;base64, prefix
-        const base64String = reader.result.split(',')[1];
+        const base64String = reader.result.split(",")[1];
         resolve(base64String);
       };
       reader.onerror = (error) => reject(error);
@@ -371,10 +435,14 @@ class SimpleFormIntegration {
   showSuccess() {
     // Check if this was a career application
     const url = window.location.pathname;
-    if (url.includes('careers') || url.includes('career')) {
-      alert("✅ Thank you for your application! We will review your information and get back to you within 2-3 business days.");
+    if (url.includes("careers") || url.includes("career")) {
+      alert(
+        "✅ Thank you for your application! We will review your information and get back to you within 2-3 business days."
+      );
     } else {
-      alert("✅ Thank you! Your message has been sent. We'll contact you soon.");
+      alert(
+        "✅ Thank you! Your message has been sent. We'll contact you soon."
+      );
     }
   }
 }

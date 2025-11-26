@@ -32,7 +32,10 @@ function setCorsHeaders(res) {
       "Access-Control-Allow-Methods",
       "GET, POST, PUT, DELETE, OPTIONS"
     );
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.setHeader(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization"
+    );
   }
 }
 
@@ -48,13 +51,7 @@ module.exports = async function crmApiHandler(req, res) {
 
     let db;
     let fullPath = req.url;
-    
-    // Extract the path after /api/crm/
-    const match = fullPath.match(/\/api\/crm\/(.*)/);
-    const path = match ? match[1] : "";
-    
-    console.log("📋 CRM API Request:", req.method, fullPath, "Path:", path);
-    
+
     const parsedUrl = (() => {
       try {
         // Provide a base to satisfy WHATWG URL on Node
@@ -64,6 +61,15 @@ module.exports = async function crmApiHandler(req, res) {
         return null;
       }
     })();
+
+    // Extract the path after /api/crm/ (remove query string)
+    const pathWithoutQuery = parsedUrl
+      ? parsedUrl.pathname.replace(/^\/api\/crm\//, "")
+      : "";
+    const match = fullPath.match(/\/api\/crm\/([^?]*)/);
+    const path = match ? match[1] : pathWithoutQuery;
+
+    console.log("📋 CRM API Request:", req.method, fullPath, "Path:", path);
 
     try {
       db = await getDatabase();
@@ -83,7 +89,14 @@ module.exports = async function crmApiHandler(req, res) {
         getOrders: async () => [],
         saveSocialPost: async (p) => ({ id: `post-${Date.now()}`, ...p }),
         getSocialPosts: async () => [],
-        getStats: async () => ({ totalClients:0, activeClients:0, newLeads:0, totalOrders:0, completedOrders:0, totalRevenue:0 }),
+        getStats: async () => ({
+          totalClients: 0,
+          activeClients: 0,
+          newLeads: 0,
+          totalOrders: 0,
+          completedOrders: 0,
+          totalRevenue: 0,
+        }),
       };
     }
     if (req.method === "GET") {
@@ -95,18 +108,32 @@ module.exports = async function crmApiHandler(req, res) {
           const businessType = parsedUrl.searchParams.get("businessType");
           const source = parsedUrl.searchParams.get("source");
           const sort = parsedUrl.searchParams.get("sort") || "createdAt";
-          const order = (parsedUrl.searchParams.get("order") || "desc").toLowerCase();
+          const order = (
+            parsedUrl.searchParams.get("order") || "desc"
+          ).toLowerCase();
 
           if (q) {
             clients = clients.filter((c) =>
-              [c.name, c.email, c.phone, c.company, c.industry, c.businessType, c.source]
+              [
+                c.name,
+                c.email,
+                c.phone,
+                c.company,
+                c.industry,
+                c.businessType,
+                c.source,
+              ]
                 .filter(Boolean)
                 .some((v) => String(v).toLowerCase().includes(q))
             );
           }
           if (status) clients = clients.filter((c) => c.status === status);
-          if (businessType) clients = clients.filter((c) => (c.businessType || "") === businessType);
-          if (source) clients = clients.filter((c) => (c.source || "") === source);
+          if (businessType)
+            clients = clients.filter(
+              (c) => (c.businessType || "") === businessType
+            );
+          if (source)
+            clients = clients.filter((c) => (c.source || "") === source);
 
           clients.sort((a, b) => {
             const av = a[sort] ?? "";
@@ -131,36 +158,29 @@ module.exports = async function crmApiHandler(req, res) {
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ success: true, data: lead }));
       } else if (path === "leads") {
-        let leads = await db.getLeads();
+        // Parse filter parameters from URL
+        const filter = {};
         if (parsedUrl) {
-          const q = (parsedUrl.searchParams.get("q") || "").toLowerCase();
+          const q = parsedUrl.searchParams.get("q");
           const status = parsedUrl.searchParams.get("status");
           const businessType = parsedUrl.searchParams.get("businessType");
           const source = parsedUrl.searchParams.get("source");
           const interest = parsedUrl.searchParams.get("interest");
           const sort = parsedUrl.searchParams.get("sort") || "createdAt";
-          const order = (parsedUrl.searchParams.get("order") || "desc").toLowerCase();
+          const order = parsedUrl.searchParams.get("order") || "desc";
 
-          if (q) {
-            leads = leads.filter((l) =>
-              [l.name, l.email, l.phone, l.company, l.industry, l.businessType, l.source, l.interest]
-                .filter(Boolean)
-                .some((v) => String(v).toLowerCase().includes(q))
-            );
-          }
-          if (status) leads = leads.filter((l) => l.status === status);
-          if (businessType) leads = leads.filter((l) => (l.businessType || "") === businessType);
-          if (source) leads = leads.filter((l) => (l.source || "") === source);
-          if (interest) leads = leads.filter((l) => (l.interest || "") === interest);
-
-          leads.sort((a, b) => {
-            const av = a[sort] ?? "";
-            const bv = b[sort] ?? "";
-            if (av < bv) return order === "asc" ? -1 : 1;
-            if (av > bv) return order === "asc" ? 1 : -1;
-            return 0;
-          });
+          if (q) filter.q = q;
+          if (status) filter.status = status;
+          if (businessType) filter.businessType = businessType;
+          if (source) filter.source = source;
+          if (interest) filter.interest = interest;
+          filter.sort = sort;
+          filter.order = order;
         }
+
+        // Get leads with filters (SQL-level filtering for better performance)
+        const leads = await db.getLeads(filter);
+
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ success: true, data: leads }));
       } else if (path === "orders") {
@@ -172,7 +192,9 @@ module.exports = async function crmApiHandler(req, res) {
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ success: true, data: stats }));
       } else if (path === "social-posts") {
-        const status = parsedUrl ? parsedUrl.searchParams.get("status") || null : null;
+        const status = parsedUrl
+          ? parsedUrl.searchParams.get("status") || null
+          : null;
         const posts = await db.getSocialPosts(status);
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ success: true, data: posts }));
@@ -195,50 +217,66 @@ module.exports = async function crmApiHandler(req, res) {
 
           if (path === "clients") {
             const client = await db.addClient(data);
-            
+
             // Send welcome email to new client (non-blocking)
             try {
               // Ensure .env is loaded
               require("dotenv").config();
-              
+
               const EmailHandler = require("../../email-handler");
               const emailHandler = new EmailHandler();
-              
+
               console.log("📧 Sending welcome email to:", client.email);
-              console.log("📧 Sending notification to:", process.env.BUSINESS_EMAIL || "Roy.Turner@TNRBusinessSolutions.com");
-              
-              emailHandler.sendWelcomeEmail(client)
-                .then(result => {
+              console.log(
+                "📧 Sending notification to:",
+                process.env.BUSINESS_EMAIL ||
+                  "Roy.Turner@TNRBusinessSolutions.com"
+              );
+
+              emailHandler
+                .sendWelcomeEmail(client)
+                .then((result) => {
                   if (result.success) {
                     console.log("✅ Welcome email sent successfully!");
                     console.log("   Message:", result.message);
                   } else {
-                    console.error("❌ Failed to send welcome email:", result.error);
+                    console.error(
+                      "❌ Failed to send welcome email:",
+                      result.error
+                    );
                   }
                 })
-                .catch(err => {
+                .catch((err) => {
                   console.error("❌ Error sending welcome email:", err.message);
                   console.error("   Stack:", err.stack);
                 });
             } catch (emailError) {
-              console.error("❌ Failed to initialize email handler:", emailError.message);
+              console.error(
+                "❌ Failed to initialize email handler:",
+                emailError.message
+              );
               console.error("   Stack:", emailError.stack);
-              console.error("   Make sure SMTP_USER and SMTP_PASS are set in .env file");
+              console.error(
+                "   Make sure SMTP_USER and SMTP_PASS are set in .env file"
+              );
             }
-            
+
             res.writeHead(201, { "Content-Type": "application/json" });
             res.end(JSON.stringify({ success: true, data: client }));
           } else if (path === "leads") {
             const lead = await db.addLead(data);
-            
+
             // Trigger workflows for new lead
             try {
               await workflowExecutor.initialize();
               await workflowExecutor.processNewLead(lead);
             } catch (wfError) {
-              console.warn('Workflow execution error (non-blocking):', wfError.message);
+              console.warn(
+                "Workflow execution error (non-blocking):",
+                wfError.message
+              );
             }
-            
+
             res.writeHead(201, { "Content-Type": "application/json" });
             res.end(JSON.stringify({ success: true, data: lead }));
           } else if (path === "orders") {
@@ -267,17 +305,37 @@ module.exports = async function crmApiHandler(req, res) {
             if (lines.length < 2) {
               res.writeHead(400, { "Content-Type": "application/json" });
               return res.end(
-                JSON.stringify({ success: false, error: "CSV must include header and at least one row" })
+                JSON.stringify({
+                  success: false,
+                  error: "CSV must include header and at least one row",
+                })
               );
             }
             const headers = lines[0].split(delimiter).map((h) => h.trim());
-            const required = ["firstName","lastName","phone","email","businessType","businessName","businessAddress","source","interest","notes"];
+            const required = [
+              "firstName",
+              "lastName",
+              "phone",
+              "email",
+              "businessType",
+              "businessName",
+              "businessAddress",
+              "source",
+              "interest",
+              "notes",
+            ];
             // Proceed even if some are missing; map what we can
             const created = [];
             for (let i = 1; i < lines.length; i++) {
               const cols = lines[i].split(delimiter).map((c) => c.trim());
-              const row = Object.fromEntries(headers.map((h, idx) => [h, cols[idx] ?? ""]));
-              const name = [row.firstName || "", row.lastName || ""].join(" ").trim() || row.name || row.businessName || "";
+              const row = Object.fromEntries(
+                headers.map((h, idx) => [h, cols[idx] ?? ""])
+              );
+              const name =
+                [row.firstName || "", row.lastName || ""].join(" ").trim() ||
+                row.name ||
+                row.businessName ||
+                "";
               const leadPayload = {
                 name,
                 email: row.email || null,
@@ -295,17 +353,22 @@ module.exports = async function crmApiHandler(req, res) {
               };
               const lead = await db.addLead(leadPayload);
               created.push(lead);
-              
+
               // Trigger workflows for new lead (non-blocking)
               try {
                 await workflowExecutor.initialize();
                 await workflowExecutor.processNewLead(lead);
               } catch (wfError) {
-                console.warn('Workflow execution error for imported lead (non-blocking):', wfError.message);
+                console.warn(
+                  "Workflow execution error for imported lead (non-blocking):",
+                  wfError.message
+                );
               }
             }
             res.writeHead(201, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ success: true, createdCount: created.length }));
+            res.end(
+              JSON.stringify({ success: true, createdCount: created.length })
+            );
           } else {
             res.writeHead(404, { "Content-Type": "application/json" });
             res.end(
@@ -332,19 +395,27 @@ module.exports = async function crmApiHandler(req, res) {
             // Get old client data to detect status changes
             const oldClient = await db.getClient(data.id);
             const oldStatus = oldClient?.status;
-            
+
             const client = await db.updateClient(data.id, data);
-            
+
             // Trigger workflows if status changed
             if (data.status && oldStatus && data.status !== oldStatus) {
               try {
                 await workflowExecutor.initialize();
-                await workflowExecutor.processStatusChange(client, oldStatus, data.status, 'client');
+                await workflowExecutor.processStatusChange(
+                  client,
+                  oldStatus,
+                  data.status,
+                  "client"
+                );
               } catch (wfError) {
-                console.warn('Workflow execution error (non-blocking):', wfError.message);
+                console.warn(
+                  "Workflow execution error (non-blocking):",
+                  wfError.message
+                );
               }
             }
-            
+
             res.writeHead(200, { "Content-Type": "application/json" });
             res.end(JSON.stringify({ success: true, data: client }));
           } else if (path === "orders") {

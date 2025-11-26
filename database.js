@@ -12,9 +12,9 @@ try {
   const neonPackage = require("@neondatabase/serverless");
   Pool = neonPackage.Pool;
   neonConfig = neonPackage.neonConfig;
-  console.log('✅ Neon serverless driver (Pool) loaded successfully v2');
+  console.log("✅ Neon serverless driver (Pool) loaded successfully v2");
 } catch (e) {
-  console.log('ℹ️ Neon driver not available (local development):', e.message);
+  console.log("ℹ️ Neon driver not available (local development):", e.message);
   Pool = null;
   neonConfig = null;
 }
@@ -25,13 +25,13 @@ class TNRDatabase {
     this.dbPath = path.join(__dirname, "tnr_database.db");
     this.usePostgres = !!process.env.POSTGRES_URL;
     this.postgres = null;
-    
+
     // Debug: Log environment detection
-    console.log('🔍 Database initialization:', {
+    console.log("🔍 Database initialization:", {
       hasPostgresUrl: !!process.env.POSTGRES_URL,
       hasDatabaseUrl: !!process.env.DATABASE_URL,
       usePostgres: this.usePostgres,
-      nodeEnv: process.env.NODE_ENV
+      nodeEnv: process.env.NODE_ENV,
     });
   }
 
@@ -40,17 +40,19 @@ class TNRDatabase {
     if (this.usePostgres) {
       try {
         if (!Pool) {
-          throw new Error('Neon Pool driver not available');
+          throw new Error("Neon Pool driver not available");
         }
-        
+
         // Configure Neon to use fetch for WebSockets compatibility
         if (neonConfig) {
           neonConfig.fetchConnectionCache = true;
         }
-        
+
         // Create Neon Pool client (compatible with standard pg Pool)
         // Pool.query() supports dynamic SQL strings
-        this.postgres = new Pool({ connectionString: process.env.POSTGRES_URL });
+        this.postgres = new Pool({
+          connectionString: process.env.POSTGRES_URL,
+        });
         console.log("✅ Using Neon Postgres database (Pool)");
         await this.createTables();
         return;
@@ -61,7 +63,7 @@ class TNRDatabase {
         this.usePostgres = false;
       }
     }
-    
+
     if (!this.usePostgres) {
       // SQLite for local development
       return new Promise((resolve, reject) => {
@@ -85,7 +87,7 @@ class TNRDatabase {
   // But we'll convert ? to use the template literal approach
   convertSQL(sql, params = []) {
     if (!this.usePostgres) return { sql, params };
-    
+
     // @vercel/postgres uses tagged template literals, but also supports sql.query() with $1, $2
     // For compatibility, convert ? to $1, $2 format for query() method
     let paramIndex = 1;
@@ -96,19 +98,22 @@ class TNRDatabase {
   // Unified query executor
   async query(sql, params = []) {
     if (this.usePostgres) {
-      const { sql: convertedSQL, params: convertedParams } = this.convertSQL(sql, params);
+      const { sql: convertedSQL, params: convertedParams } = this.convertSQL(
+        sql,
+        params
+      );
       // Use Pool.query() method which accepts dynamic SQL and parameters
       try {
         // Pool.query() returns { rows: [], rowCount: N, ... }
         const result = await this.postgres.query(convertedSQL, convertedParams);
-        
+
         // Return the rows array
         return result.rows || [];
       } catch (err) {
-        console.error('❌ Neon query error:', err.message);
-        console.error('   SQL:', convertedSQL.substring(0, 200));
-        console.error('   Params:', convertedParams);
-        console.error('   Full error:', err);
+        console.error("❌ Neon query error:", err.message);
+        console.error("   SQL:", convertedSQL.substring(0, 200));
+        console.error("   Params:", convertedParams);
+        console.error("   Full error:", err);
         throw err;
       }
     } else {
@@ -139,7 +144,10 @@ class TNRDatabase {
   // Unified execute (INSERT/UPDATE/DELETE)
   async execute(sql, params = []) {
     if (this.usePostgres) {
-      const { sql: convertedSQL, params: convertedParams } = this.convertSQL(sql, params);
+      const { sql: convertedSQL, params: convertedParams } = this.convertSQL(
+        sql,
+        params
+      );
       try {
         // Use Pool.query() method
         const result = await this.postgres.query(convertedSQL, convertedParams);
@@ -147,10 +155,10 @@ class TNRDatabase {
         const rowCount = result.rowCount || 0;
         return { lastID: null, changes: rowCount };
       } catch (err) {
-        console.error('❌ Neon execute error:', err.message);
-        console.error('   SQL:', convertedSQL.substring(0, 200));
-        console.error('   Params:', convertedParams);
-        console.error('   Full error:', err);
+        console.error("❌ Neon execute error:", err.message);
+        console.error("   SQL:", convertedSQL.substring(0, 200));
+        console.error("   Params:", convertedParams);
+        console.error("   Full error:", err);
         throw err;
       }
     } else {
@@ -380,23 +388,33 @@ class TNRDatabase {
     if (this.usePostgres) {
       // Postgres: Use CREATE TABLE IF NOT EXISTS (similar syntax)
       // Using Pool.query() which accepts dynamic SQL strings
-      
+
       for (const tableSQL of tables) {
         try {
           // Use Pool.query() method for dynamic SQL
           // This is compatible with standard pg Pool and works with string variables
           await this.postgres.query(tableSQL);
-          console.log(`✅ Table created/verified:`, tableSQL.substring(7, 50) + "...");
+          console.log(
+            `✅ Table created/verified:`,
+            tableSQL.substring(7, 50) + "..."
+          );
         } catch (err) {
           // Ignore "already exists" errors (Postgres uses "relation already exists")
           const errorMsg = err.message.toLowerCase();
-          if (!errorMsg.includes("already exists") && !errorMsg.includes("duplicate") && !errorMsg.includes("relation")) {
+          if (
+            !errorMsg.includes("already exists") &&
+            !errorMsg.includes("duplicate") &&
+            !errorMsg.includes("relation")
+          ) {
             console.error("❌ Error creating table:", err.message);
             console.error("   SQL:", tableSQL.substring(0, 200));
             console.error("   Full error:", err);
             throw err;
           } else {
-            console.log("ℹ️  Table already exists (expected):", tableSQL.substring(0, 50) + "...");
+            console.log(
+              "ℹ️  Table already exists (expected):",
+              tableSQL.substring(0, 50) + "..."
+            );
           }
         }
       }
@@ -428,14 +446,14 @@ class TNRDatabase {
   // ========== CLIENT MANAGEMENT ==========
   async addClient(clientData) {
     const clientId = `client-${Date.now()}`;
-    
+
     // Match the actual table column order (23 columns)
     const sql = `INSERT INTO clients (
       id, name, email, phone, company, website, industry, address, city, state, zip,
       services, status, joinDate, lastContact, notes, source,
       createdAt, updatedAt, businessType, businessName, businessAddress, interest
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-    
+
     // Values in exact column order
     const values = [
       clientId,
@@ -462,11 +480,13 @@ class TNRDatabase {
       clientData.businessAddress || clientData.address || null,
       clientData.interest || null,
     ];
-    
+
     // Verify we have 23 values for 23 columns
     if (values.length !== 23) {
       console.error(`Value count mismatch: expected 23, got ${values.length}`);
-      throw new Error(`Value count mismatch: expected 23, got ${values.length}`);
+      throw new Error(
+        `Value count mismatch: expected 23, got ${values.length}`
+      );
     }
 
     await this.execute(sql, values);
@@ -504,7 +524,9 @@ class TNRDatabase {
   }
 
   async getClient(clientId) {
-    const row = await this.queryOne("SELECT * FROM clients WHERE id = ?", [clientId]);
+    const row = await this.queryOne("SELECT * FROM clients WHERE id = ?", [
+      clientId,
+    ]);
     return row ? this.parseClient(row) : null;
   }
 
@@ -575,7 +597,7 @@ class TNRDatabase {
       submissionDateTime, originalSubmissionId, address, city, state, zipCode, notes,
       businessType, businessName, businessAddress, interest,
       createdAt, updatedAt
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
     await this.execute(sql, values);
     return { id: leadId, ...leadData };
@@ -616,7 +638,9 @@ class TNRDatabase {
   }
 
   async getLead(leadId) {
-    const row = await this.queryOne("SELECT * FROM leads WHERE id = ?", [leadId]);
+    const row = await this.queryOne("SELECT * FROM leads WHERE id = ?", [
+      leadId,
+    ]);
     return row ? this.parseLead(row) : null;
   }
 
@@ -687,16 +711,17 @@ class TNRDatabase {
   }
 
   async getOrders() {
-    const rows = await this.query("SELECT * FROM orders ORDER BY createdAt DESC");
+    const rows = await this.query(
+      "SELECT * FROM orders ORDER BY createdAt DESC"
+    );
     return rows.map((row) => this.parseOrder(row));
   }
 
   async updateOrderStatus(orderId, status) {
-    await this.execute("UPDATE orders SET status = ?, updatedAt = ? WHERE id = ?", [
-      status,
-      new Date().toISOString(),
-      orderId,
-    ]);
+    await this.execute(
+      "UPDATE orders SET status = ?, updatedAt = ? WHERE id = ?",
+      [status, new Date().toISOString(), orderId]
+    );
     return true;
   }
 
@@ -707,7 +732,9 @@ class TNRDatabase {
 
   // ========== SOCIAL MEDIA TOKEN MANAGEMENT ==========
   async saveSocialMediaToken(tokenData) {
-    const tokenId = tokenData.id || `token-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const tokenId =
+      tokenData.id ||
+      `token-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const values = [
       tokenId,
       tokenData.platform,
@@ -795,7 +822,9 @@ class TNRDatabase {
   }
 
   async deleteSocialMediaToken(tokenId) {
-    await this.execute("DELETE FROM social_media_tokens WHERE id = ?", [tokenId]);
+    await this.execute("DELETE FROM social_media_tokens WHERE id = ?", [
+      tokenId,
+    ]);
     return true;
   }
 
@@ -803,7 +832,7 @@ class TNRDatabase {
   async saveWixToken(tokenData) {
     const instanceId = tokenData.instanceId;
     if (!instanceId) {
-      throw new Error('instanceId is required for Wix tokens');
+      throw new Error("instanceId is required for Wix tokens");
     }
 
     // Check if token already exists
@@ -812,9 +841,10 @@ class TNRDatabase {
       [instanceId]
     );
 
-    const metadata = typeof tokenData.metadata === 'string' 
-      ? tokenData.metadata 
-      : JSON.stringify(tokenData.metadata || {});
+    const metadata =
+      typeof tokenData.metadata === "string"
+        ? tokenData.metadata
+        : JSON.stringify(tokenData.metadata || {});
 
     if (existing) {
       // Update existing token
@@ -825,14 +855,16 @@ class TNRDatabase {
         metadata = ?,
         updated_at = ?
         WHERE instance_id = ?`;
-      
+
       await this.execute(sql, [
         tokenData.accessToken,
         tokenData.refreshToken || null,
-        tokenData.expiresAt ? new Date(tokenData.expiresAt).toISOString() : null,
+        tokenData.expiresAt
+          ? new Date(tokenData.expiresAt).toISOString()
+          : null,
         metadata,
         new Date().toISOString(),
-        instanceId
+        instanceId,
       ]);
       console.log(`✅ Updated Wix token for instance: ${instanceId}`);
     } else {
@@ -840,15 +872,17 @@ class TNRDatabase {
       const sql = `INSERT INTO wix_tokens (
         instance_id, access_token, refresh_token, expires_at, metadata, created_at, updated_at
       ) VALUES (?, ?, ?, ?, ?, ?, ?)`;
-      
+
       await this.execute(sql, [
         instanceId,
         tokenData.accessToken,
         tokenData.refreshToken || null,
-        tokenData.expiresAt ? new Date(tokenData.expiresAt).toISOString() : null,
+        tokenData.expiresAt
+          ? new Date(tokenData.expiresAt).toISOString()
+          : null,
         metadata,
         new Date().toISOString(),
-        new Date().toISOString()
+        new Date().toISOString(),
       ]);
       console.log(`✅ Saved new Wix token for instance: ${instanceId}`);
     }
@@ -858,7 +892,7 @@ class TNRDatabase {
       accessToken: tokenData.accessToken,
       refreshToken: tokenData.refreshToken,
       expiresAt: tokenData.expiresAt,
-      metadata: tokenData.metadata
+      metadata: tokenData.metadata,
     };
   }
 
@@ -867,7 +901,7 @@ class TNRDatabase {
       "SELECT * FROM wix_tokens WHERE instance_id = ?",
       [instanceId]
     );
-    
+
     if (!row) {
       return null;
     }
@@ -877,27 +911,37 @@ class TNRDatabase {
       accessToken: row.access_token,
       refreshToken: row.refresh_token,
       expiresAt: row.expires_at ? new Date(row.expires_at).getTime() : null,
-      metadata: typeof row.metadata === 'string' ? JSON.parse(row.metadata || '{}') : row.metadata,
+      metadata:
+        typeof row.metadata === "string"
+          ? JSON.parse(row.metadata || "{}")
+          : row.metadata,
       createdAt: row.created_at ? new Date(row.created_at).getTime() : null,
-      updatedAt: row.updated_at ? new Date(row.updated_at).getTime() : null
+      updatedAt: row.updated_at ? new Date(row.updated_at).getTime() : null,
     };
   }
 
   async getAllWixTokens() {
-    const rows = await this.query("SELECT * FROM wix_tokens ORDER BY created_at DESC");
-    return rows.map(row => ({
+    const rows = await this.query(
+      "SELECT * FROM wix_tokens ORDER BY created_at DESC"
+    );
+    return rows.map((row) => ({
       instanceId: row.instance_id,
       accessToken: row.access_token,
       refreshToken: row.refresh_token,
       expiresAt: row.expires_at ? new Date(row.expires_at).getTime() : null,
-      metadata: typeof row.metadata === 'string' ? JSON.parse(row.metadata || '{}') : row.metadata,
+      metadata:
+        typeof row.metadata === "string"
+          ? JSON.parse(row.metadata || "{}")
+          : row.metadata,
       createdAt: row.created_at ? new Date(row.created_at).getTime() : null,
-      updatedAt: row.updated_at ? new Date(row.updated_at).getTime() : null
+      updatedAt: row.updated_at ? new Date(row.updated_at).getTime() : null,
     }));
   }
 
   async deleteWixToken(instanceId) {
-    await this.execute("DELETE FROM wix_tokens WHERE instance_id = ?", [instanceId]);
+    await this.execute("DELETE FROM wix_tokens WHERE instance_id = ?", [
+      instanceId,
+    ]);
     console.log(`✅ Deleted Wix token for instance: ${instanceId}`);
     return true;
   }
@@ -920,8 +964,10 @@ class TNRDatabase {
     ];
 
     // Check if workflow exists
-    const existing = workflowData.id ? await this.getWorkflow(workflowData.id) : null;
-    
+    const existing = workflowData.id
+      ? await this.getWorkflow(workflowData.id)
+      : null;
+
     if (existing) {
       // Update existing workflow
       const sql = `UPDATE automation_workflows SET
@@ -938,7 +984,7 @@ class TNRDatabase {
         workflowData.nextRun || null,
         JSON.stringify(workflowData.metadata || {}),
         new Date().toISOString(),
-        workflowData.id
+        workflowData.id,
       ]);
       return { id: workflowData.id, ...workflowData };
     } else {
@@ -950,7 +996,6 @@ class TNRDatabase {
       await this.execute(sql, values);
       return { id: workflowId, ...workflowData };
     }
-
   }
 
   async getWorkflows(activeOnly = false) {
@@ -968,7 +1013,10 @@ class TNRDatabase {
   }
 
   async getWorkflow(workflowId) {
-    const row = await this.queryOne("SELECT * FROM automation_workflows WHERE id = ?", [workflowId]);
+    const row = await this.queryOne(
+      "SELECT * FROM automation_workflows WHERE id = ?",
+      [workflowId]
+    );
     return row ? this.parseWorkflow(row) : null;
   }
 
@@ -981,7 +1029,9 @@ class TNRDatabase {
   }
 
   async deleteWorkflow(workflowId) {
-    await this.execute("DELETE FROM automation_workflows WHERE id = ?", [workflowId]);
+    await this.execute("DELETE FROM automation_workflows WHERE id = ?", [
+      workflowId,
+    ]);
     return true;
   }
 
@@ -998,12 +1048,21 @@ class TNRDatabase {
       id: row.id,
       workflowName: row.workflowname || row.workflowName,
       workflowType: row.workflowtype || row.workflowType,
-      trigger: typeof row.trigger === "string" ? JSON.parse(row.trigger || "{}") : row.trigger,
-      actions: typeof row.actions === "string" ? JSON.parse(row.actions || "[]") : row.actions,
+      trigger:
+        typeof row.trigger === "string"
+          ? JSON.parse(row.trigger || "{}")
+          : row.trigger,
+      actions:
+        typeof row.actions === "string"
+          ? JSON.parse(row.actions || "[]")
+          : row.actions,
       isActive: row.isactive === 1 || row.isActive === 1,
       lastRun: row.lastrun || row.lastRun,
       nextRun: row.nextrun || row.nextRun,
-      metadata: typeof row.metadata === "string" ? JSON.parse(row.metadata || "{}") : row.metadata,
+      metadata:
+        typeof row.metadata === "string"
+          ? JSON.parse(row.metadata || "{}")
+          : row.metadata,
       createdAt: row.createdat || row.createdAt,
       updatedAt: row.updatedat || row.updatedAt,
     };
@@ -1011,11 +1070,13 @@ class TNRDatabase {
 
   // ========== ACTIVITY MANAGEMENT ==========
   async addActivity(activityData) {
-    const activityId = activityData.id || `activity-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const activityId =
+      activityData.id ||
+      `activity-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const sql = `INSERT INTO activities (
       id, entityType, entityId, activityType, title, description, userId, metadata, createdAt
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-    
+
     await this.execute(sql, [
       activityId,
       activityData.entityType,
@@ -1025,9 +1086,9 @@ class TNRDatabase {
       activityData.description || null,
       activityData.userId || null,
       JSON.stringify(activityData.metadata || {}),
-      new Date().toISOString()
+      new Date().toISOString(),
     ]);
-    
+
     return { id: activityId, ...activityData };
   }
 
@@ -1053,18 +1114,25 @@ class TNRDatabase {
       title: row.title,
       description: row.description,
       userId: row.userid || row.userId,
-      metadata: typeof row.metadata === "string" ? JSON.parse(row.metadata || "{}") : row.metadata,
+      metadata:
+        typeof row.metadata === "string"
+          ? JSON.parse(row.metadata || "{}")
+          : row.metadata,
       createdAt: row.createdat || row.createdAt,
     };
   }
 
   // ========== EMAIL TEMPLATE MANAGEMENT ==========
   async saveEmailTemplate(templateData) {
-    const templateId = templateData.id || `template-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    
+    const templateId =
+      templateData.id ||
+      `template-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
     // Check if template exists
-    const existing = templateData.id ? await this.getEmailTemplate(templateData.id) : null;
-    
+    const existing = templateData.id
+      ? await this.getEmailTemplate(templateData.id)
+      : null;
+
     if (existing) {
       // Update existing template
       const sql = `UPDATE email_templates SET
@@ -1080,7 +1148,7 @@ class TNRDatabase {
         templateData.category || null,
         templateData.isDefault ? 1 : 0,
         new Date().toISOString(),
-        templateData.id
+        templateData.id,
       ]);
       return { id: templateData.id, ...templateData };
     } else {
@@ -1098,7 +1166,7 @@ class TNRDatabase {
         templateData.category || null,
         templateData.isDefault ? 1 : 0,
         new Date().toISOString(),
-        new Date().toISOString()
+        new Date().toISOString(),
       ]);
       return { id: templateId, ...templateData };
     }
@@ -1107,25 +1175,30 @@ class TNRDatabase {
   async getEmailTemplates(category = null) {
     let sql = "SELECT * FROM email_templates";
     const params = [];
-    
+
     if (category) {
       sql += " WHERE category = ?";
       params.push(category);
     }
-    
+
     sql += " ORDER BY createdAt DESC";
-    
+
     const rows = await this.query(sql, params);
     return rows.map((row) => this.parseEmailTemplate(row));
   }
 
   async getEmailTemplate(templateId) {
-    const row = await this.queryOne("SELECT * FROM email_templates WHERE id = ?", [templateId]);
+    const row = await this.queryOne(
+      "SELECT * FROM email_templates WHERE id = ?",
+      [templateId]
+    );
     return row ? this.parseEmailTemplate(row) : null;
   }
 
   async deleteEmailTemplate(templateId) {
-    await this.execute("DELETE FROM email_templates WHERE id = ?", [templateId]);
+    await this.execute("DELETE FROM email_templates WHERE id = ?", [
+      templateId,
+    ]);
     return true;
   }
 
@@ -1136,7 +1209,10 @@ class TNRDatabase {
       subject: row.subject,
       htmlContent: row.htmlcontent || row.htmlContent,
       textContent: row.textcontent || row.textContent,
-      variables: typeof row.variables === "string" ? JSON.parse(row.variables || "[]") : row.variables,
+      variables:
+        typeof row.variables === "string"
+          ? JSON.parse(row.variables || "[]")
+          : row.variables,
       category: row.category,
       isDefault: row.isdefault === 1 || row.isDefault === 1,
       createdAt: row.createdat || row.createdAt,
@@ -1176,7 +1252,10 @@ class TNRDatabase {
       city: row.city,
       state: row.state,
       zip: row.zip,
-      services: typeof row.services === "string" ? JSON.parse(row.services || "[]") : row.services,
+      services:
+        typeof row.services === "string"
+          ? JSON.parse(row.services || "[]")
+          : row.services,
       status: row.status,
       joinDate: row.joindate || row.joinDate,
       lastContact: row.lastcontact || row.lastContact,
@@ -1198,7 +1277,10 @@ class TNRDatabase {
       company: row.company,
       website: row.website,
       industry: row.industry,
-      services: typeof row.services === "string" ? JSON.parse(row.services || "[]") : row.services,
+      services:
+        typeof row.services === "string"
+          ? JSON.parse(row.services || "[]")
+          : row.services,
       budget: row.budget,
       timeline: row.timeline,
       message: row.message,
@@ -1209,7 +1291,8 @@ class TNRDatabase {
       date: row.date,
       submissionDate: row.submissiondate || row.submissionDate,
       submissionDateTime: row.submissiondatetime || row.submissionDateTime,
-      originalSubmissionId: row.originalsubmissionid || row.originalSubmissionId,
+      originalSubmissionId:
+        row.originalsubmissionid || row.originalSubmissionId,
       address: row.address,
       city: row.city,
       state: row.state,
@@ -1228,8 +1311,14 @@ class TNRDatabase {
       orderNumber: row.ordernumber || row.orderNumber,
       clientName: row.clientname || row.clientName,
       clientId: row.clientid || row.clientId,
-      customerInfo: typeof row.customerinfo === "string" ? JSON.parse(row.customerinfo || "{}") : row.customerinfo || row.customerInfo,
-      items: typeof row.items === "string" ? JSON.parse(row.items || "[]") : row.items,
+      customerInfo:
+        typeof row.customerinfo === "string"
+          ? JSON.parse(row.customerinfo || "{}")
+          : row.customerinfo || row.customerInfo,
+      items:
+        typeof row.items === "string"
+          ? JSON.parse(row.items || "[]")
+          : row.items,
       amount: row.amount,
       status: row.status,
       orderDate: row.orderdate || row.orderDate,
@@ -1283,4 +1372,3 @@ class TNRDatabase {
 }
 
 module.exports = TNRDatabase;
-

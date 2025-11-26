@@ -158,6 +158,26 @@
             font-family: inherit;
         }
         
+        .giveaway-form select {
+            color: black !important;
+            background: white !important;
+        }
+        
+        .giveaway-form select option {
+            color: black;
+            background: white;
+        }
+        
+        .giveaway-form select {
+            color: black;
+            background: white;
+        }
+        
+        .giveaway-form select option {
+            color: black;
+            background: white;
+        }
+        
         .giveaway-form input::placeholder,
         .giveaway-form textarea::placeholder {
             color: rgba(255, 255, 255, 0.6);
@@ -605,12 +625,34 @@
         updateCountdown();
         setInterval(updateCountdown, 1000);
 
-        // Form submission
+        // Form submission handled by form-integration-simple.js
+        // The form will be processed automatically when submitted
+        
+        // Optional: Add custom handler if form-integration-simple.js doesn't catch it
+        // The form will still work through form-integration-simple.js
+        
+        // Form submission - Create CRM Lead then Send Email (backup/fallback handler)
         document.getElementById('giveaway-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const formData = new FormData(this);
             const data = Object.fromEntries(formData);
+            
+            // Prepare submission data matching CRM lead schema
+            const submissionData = {
+                name: data.name || '',
+                email: data.email || '',
+                phone: data.phone || '',
+                company: data.business || '',
+                website: data.website || '',
+                message: data.needs || '',
+                additionalInfo: `Goal: ${data.goal || 'Not specified'}\nNewsletter: ${data.newsletter === 'on' ? 'Yes' : 'No'}`,
+                source: 'Black Friday Giveaway',
+                status: 'New',
+                date: new Date().toISOString().split('T')[0],
+                submissionDate: new Date().toLocaleString(),
+                submissionDateTime: new Date().toISOString(),
+            };
             
             // Show loading state
             const submitBtn = this.querySelector('button[type="submit"]');
@@ -618,21 +660,100 @@
             submitBtn.textContent = 'Submitting...';
             submitBtn.disabled = true;
             
+            let leadCreated = false;
+            
             try {
-                // Send to your form handler
-                const response = await fetch('/api/submit-form', {
+                // Step 1: Create lead in CRM (REQUIRED - don't skip on error)
+                console.log('💾 Creating CRM lead...');
+                console.log('📋 Lead data:', submissionData);
+                
+                const leadResponse = await fetch('/api/crm/leads', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        ...data,
-                        formType: 'black-friday-giveaway',
-                        source: 'black-friday-giveaway'
-                    })
+                    body: JSON.stringify(submissionData)
                 });
 
-                if (response.ok) {
+                let leadResult;
+                try {
+                    leadResult = await leadResponse.json();
+                } catch (jsonError) {
+                    const errorText = await leadResponse.text().catch(() => 'Unable to read response');
+                    console.error('❌ Failed to parse JSON response:', errorText);
+                    throw new Error('Invalid JSON response from server: ' + errorText.substring(0, 200));
+                }
+                
+                if (leadResponse.ok && leadResult.success && leadResult.data && leadResult.data.id) {
+                    console.log('✅ Lead created in CRM successfully!');
+                    console.log('   Lead ID:', leadResult.data.id);
+                    console.log('   Lead Name:', leadResult.data.name);
+                    leadCreated = true;
+                    
+                    // Also save to localStorage as backup if CRM system is available
+                    try {
+                        if (typeof window.TNRCRMData !== 'undefined') {
+                            if (!window.tnrCRM) {
+                                window.tnrCRM = new window.TNRCRMData();
+                            }
+                            window.tnrCRM.addLead(leadResult.data);
+                            window.tnrCRM.saveToStorage();
+                            console.log('✅ Lead also saved to localStorage backup');
+                        }
+                    } catch (localError) {
+                        console.warn('⚠️ localStorage backup failed (non-critical):', localError);
+                    }
+                } else {
+                    console.error('❌ Lead creation failed!');
+                    console.error('   Response status:', leadResponse.status);
+                    console.error('   Error:', leadResult.error || 'Unknown error');
+                    console.error('   Full response:', leadResult);
+                    
+                    // Try localStorage fallback
+                    console.log('🔄 Attempting localStorage fallback...');
+                    try {
+                        if (typeof window.TNRCRMData !== 'undefined') {
+                            if (!window.tnrCRM) {
+                                console.log('🏗️ Initializing CRM for fallback...');
+                                window.tnrCRM = new window.TNRCRMData();
+                            }
+                            console.log('💾 Saving lead to localStorage...');
+                            const localLead = window.tnrCRM.addLead(submissionData);
+                            window.tnrCRM.saveToStorage();
+                            console.log('✅ Lead saved to localStorage fallback:', localLead.id);
+                            console.log('   Lead name:', localLead.name);
+                            leadCreated = true;
+                        } else {
+                            console.error('❌ TNRCRMData class not available for fallback');
+                            console.error('   Make sure crm-data.js is loaded');
+                        }
+                    } catch (fallbackError) {
+                        console.error('❌ Both API and localStorage failed:', fallbackError);
+                        console.error('   Fallback error message:', fallbackError.message);
+                        console.error('   Fallback error stack:', fallbackError.stack);
+                    }
+                }
+
+                // Step 2: Send email notification
+                console.log('📧 Sending email notification...');
+                const emailData = {
+                    ...submissionData,
+                    formType: 'Black Friday Giveaway',
+                    source: 'black-friday-giveaway'
+                };
+
+                const emailResponse = await fetch('/submit-form', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(emailData)
+                });
+
+                if (emailResponse.ok) {
+                    const emailResult = await emailResponse.json();
+                    console.log('✅ Email sent successfully');
+                    
                     // Show success message
                     document.getElementById('success-message').style.display = 'block';
                     this.reset();
@@ -648,12 +769,18 @@
                             'currency': 'USD'
                         });
                     }
+                    
+                    if (!leadCreated) {
+                        console.warn('⚠️ Warning: Email sent but lead may not have been created in CRM');
+                    }
                 } else {
-                    throw new Error('Submission failed');
+                    const emailError = await emailResponse.json().catch(() => ({ error: 'Unknown error' }));
+                    throw new Error('Email sending failed: ' + (emailError.error || emailResponse.statusText));
                 }
             } catch (error) {
-                alert('There was an error submitting your entry. Please try again or contact us directly.');
-                console.error('Form submission error:', error);
+                console.error('❌ Form submission error:', error);
+                console.error('Error stack:', error.stack);
+                alert('There was an error submitting your entry. Please try again or contact us directly at roy.turner@tnrbusinesssolutions.com');
             } finally {
                 submitBtn.textContent = originalText;
                 submitBtn.disabled = false;
@@ -672,5 +799,8 @@
         });
     </script>
 
+    <!-- Form Handler Scripts for CRM integration -->
+    <script src="crm-data.js"></script>
+    <script src="form-integration-simple.js"></script>
 </body>
 </html>

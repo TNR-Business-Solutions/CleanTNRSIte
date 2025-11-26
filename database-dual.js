@@ -55,7 +55,7 @@ class TNRDatabase {
   // But we'll convert ? to use the template literal approach
   convertSQL(sql, params = []) {
     if (!this.usePostgres) return { sql, params };
-    
+
     // @vercel/postgres uses tagged template literals, but also supports sql.query() with $1, $2
     // For compatibility, convert ? to $1, $2 format for query() method
     let paramIndex = 1;
@@ -66,11 +66,17 @@ class TNRDatabase {
   // Unified query executor
   async query(sql, params = []) {
     if (this.usePostgres) {
-      const { sql: convertedSQL, params: convertedParams } = this.convertSQL(sql, params);
+      const { sql: convertedSQL, params: convertedParams } = this.convertSQL(
+        sql,
+        params
+      );
       // @vercel/postgres uses sql.unsafe() for raw queries with $1, $2 placeholders
       try {
         if (this.postgres && this.postgres.unsafe) {
-          const result = await this.postgres.unsafe(convertedSQL, convertedParams);
+          const result = await this.postgres.unsafe(
+            convertedSQL,
+            convertedParams
+          );
           return result.rows || [];
         } else {
           // Fallback: try as direct function call
@@ -78,7 +84,7 @@ class TNRDatabase {
           return result.rows || result || [];
         }
       } catch (err) {
-        console.error('Postgres query error:', err);
+        console.error("Postgres query error:", err);
         throw err;
       }
     } else {
@@ -109,7 +115,10 @@ class TNRDatabase {
   // Unified execute (INSERT/UPDATE/DELETE)
   async execute(sql, params = []) {
     if (this.usePostgres) {
-      const { sql: convertedSQL, params: convertedParams } = this.convertSQL(sql, params);
+      const { sql: convertedSQL, params: convertedParams } = this.convertSQL(
+        sql,
+        params
+      );
       try {
         let result;
         if (this.postgres && this.postgres.unsafe) {
@@ -119,7 +128,7 @@ class TNRDatabase {
         }
         return { lastID: null, changes: result.rowCount || result.count || 0 };
       } catch (err) {
-        console.error('Postgres execute error:', err);
+        console.error("Postgres execute error:", err);
         throw err;
       }
     } else {
@@ -405,7 +414,9 @@ class TNRDatabase {
   }
 
   async getClient(clientId) {
-    const row = await this.queryOne("SELECT * FROM clients WHERE id = ?", [clientId]);
+    const row = await this.queryOne("SELECT * FROM clients WHERE id = ?", [
+      clientId,
+    ]);
     return row ? this.parseClient(row) : null;
   }
 
@@ -476,7 +487,7 @@ class TNRDatabase {
       submissionDateTime, originalSubmissionId, address, city, state, zipCode, notes,
       businessType, businessName, businessAddress, interest,
       createdAt, updatedAt
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
     await this.execute(sql, values);
     return { id: leadId, ...leadData };
@@ -517,7 +528,9 @@ class TNRDatabase {
   }
 
   async getLead(leadId) {
-    const row = await this.queryOne("SELECT * FROM leads WHERE id = ?", [leadId]);
+    const row = await this.queryOne("SELECT * FROM leads WHERE id = ?", [
+      leadId,
+    ]);
     return row ? this.parseLead(row) : null;
   }
 
@@ -588,16 +601,17 @@ class TNRDatabase {
   }
 
   async getOrders() {
-    const rows = await this.query("SELECT * FROM orders ORDER BY createdAt DESC");
+    const rows = await this.query(
+      "SELECT * FROM orders ORDER BY createdAt DESC"
+    );
     return rows.map((row) => this.parseOrder(row));
   }
 
   async updateOrderStatus(orderId, status) {
-    await this.execute("UPDATE orders SET status = ?, updatedAt = ? WHERE id = ?", [
-      status,
-      new Date().toISOString(),
-      orderId,
-    ]);
+    await this.execute(
+      "UPDATE orders SET status = ?, updatedAt = ? WHERE id = ?",
+      [status, new Date().toISOString(), orderId]
+    );
     return true;
   }
 
@@ -608,7 +622,9 @@ class TNRDatabase {
 
   // ========== SOCIAL MEDIA TOKEN MANAGEMENT ==========
   async saveSocialMediaToken(tokenData) {
-    const tokenId = tokenData.id || `token-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const tokenId =
+      tokenData.id ||
+      `token-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const values = [
       tokenId,
       tokenData.platform,
@@ -696,7 +712,9 @@ class TNRDatabase {
   }
 
   async deleteSocialMediaToken(tokenId) {
-    await this.execute("DELETE FROM social_media_tokens WHERE id = ?", [tokenId]);
+    await this.execute("DELETE FROM social_media_tokens WHERE id = ?", [
+      tokenId,
+    ]);
     return true;
   }
 
@@ -732,7 +750,10 @@ class TNRDatabase {
       city: row.city,
       state: row.state,
       zip: row.zip,
-      services: typeof row.services === "string" ? JSON.parse(row.services || "[]") : row.services,
+      services:
+        typeof row.services === "string"
+          ? JSON.parse(row.services || "[]")
+          : row.services,
       status: row.status,
       joinDate: row.joindate || row.joinDate,
       lastContact: row.lastcontact || row.lastContact,
@@ -754,7 +775,10 @@ class TNRDatabase {
       company: row.company,
       website: row.website,
       industry: row.industry,
-      services: typeof row.services === "string" ? JSON.parse(row.services || "[]") : row.services,
+      services:
+        typeof row.services === "string"
+          ? JSON.parse(row.services || "[]")
+          : row.services,
       budget: row.budget,
       timeline: row.timeline,
       message: row.message,
@@ -765,7 +789,8 @@ class TNRDatabase {
       date: row.date,
       submissionDate: row.submissiondate || row.submissionDate,
       submissionDateTime: row.submissiondatetime || row.submissionDateTime,
-      originalSubmissionId: row.originalsubmissionid || row.originalSubmissionId,
+      originalSubmissionId:
+        row.originalsubmissionid || row.originalSubmissionId,
       address: row.address,
       city: row.city,
       state: row.state,
@@ -784,8 +809,14 @@ class TNRDatabase {
       orderNumber: row.ordernumber || row.orderNumber,
       clientName: row.clientname || row.clientName,
       clientId: row.clientid || row.clientId,
-      customerInfo: typeof row.customerinfo === "string" ? JSON.parse(row.customerinfo || "{}") : row.customerinfo || row.customerInfo,
-      items: typeof row.items === "string" ? JSON.parse(row.items || "[]") : row.items,
+      customerInfo:
+        typeof row.customerinfo === "string"
+          ? JSON.parse(row.customerinfo || "{}")
+          : row.customerinfo || row.customerInfo,
+      items:
+        typeof row.items === "string"
+          ? JSON.parse(row.items || "[]")
+          : row.items,
       amount: row.amount,
       status: row.status,
       orderDate: row.orderdate || row.orderDate,
@@ -839,4 +870,3 @@ class TNRDatabase {
 }
 
 module.exports = TNRDatabase;
-
