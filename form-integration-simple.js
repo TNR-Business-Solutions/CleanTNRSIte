@@ -105,6 +105,9 @@ class SimpleFormIntegration {
 
     // Collect ALL other form fields dynamically
     // Handle arrays properly (e.g., insuranceTypes checkboxes, services[])
+    // Fields that should always be arrays (use getAll)
+    const arrayFields = ['services', 'insuranceTypes', 'services[]'];
+    
     for (const [key, value] of formData.entries()) {
       // Skip file inputs (already handled above)
       if (value instanceof File) {
@@ -114,24 +117,37 @@ class SimpleFormIntegration {
         continue;
       }
 
-      // Skip if already handled above
+      // Skip if already handled above with explicit single-value extraction
       if (submission.hasOwnProperty(key)) {
-        // If we already have a value and encounter another with same key, convert to array
-        if (!Array.isArray(submission[key])) {
-          submission[key] = [submission[key], value];
-        } else {
-          submission[key].push(value);
+        // Only convert to array for fields that are meant to be arrays
+        if (arrayFields.includes(key) || key.endsWith('[]')) {
+          if (!Array.isArray(submission[key])) {
+            submission[key] = [submission[key], value];
+          } else {
+            submission[key].push(value);
+          }
+        }
+        // For single-value fields, keep the first value only (already set above)
+        continue;
+      }
+
+      // Handle fields that should be arrays
+      if (arrayFields.includes(key) || key.endsWith('[]')) {
+        const allValues = formData.getAll(key);
+        if (allValues.length > 0) {
+          submission[key] = allValues;
         }
         continue;
       }
 
+      // For single-value fields, use the first occurrence only
       // Skip empty values
       if (value && value.toString().trim() !== "") {
         submission[key] = value;
       }
     }
 
-    // Ensure insuranceTypes and services are arrays
+    // Normalize array fields - ensure they are arrays, and ensure single-value fields are strings
     if (
       submission.insuranceTypes &&
       !Array.isArray(submission.insuranceTypes)
@@ -140,6 +156,26 @@ class SimpleFormIntegration {
     }
     if (submission.services && !Array.isArray(submission.services)) {
       submission.services = [submission.services];
+    }
+    
+    // Ensure critical single-value fields are strings, not arrays
+    if (Array.isArray(submission.name)) {
+      submission.name = submission.name[0] || '';
+    }
+    if (Array.isArray(submission.email)) {
+      submission.email = submission.email[0] || '';
+    }
+    if (Array.isArray(submission.phone)) {
+      submission.phone = submission.phone[0] || '';
+    }
+    if (Array.isArray(submission.company)) {
+      submission.company = submission.company[0] || '';
+    }
+    if (Array.isArray(submission.website)) {
+      submission.website = submission.website[0] || '';
+    }
+    if (Array.isArray(submission.message)) {
+      submission.message = submission.message[0] || '';
     }
 
     console.log("📊 Form data collected:", submission);

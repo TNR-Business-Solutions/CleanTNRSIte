@@ -17,6 +17,14 @@ async function processFormSubmission(formData, res) {
   try {
     console.log("📥 Serverless function received form data:", formData);
 
+    // Normalize email and name fields - handle arrays by taking first value
+    if (Array.isArray(formData.email)) {
+      formData.email = formData.email[0] || '';
+    }
+    if (Array.isArray(formData.name)) {
+      formData.name = formData.name[0] || '';
+    }
+
     // Determine if this is a career application
     const isCareerApplication = formData.source === "Career Application" || 
                                 formData.position || 
@@ -237,7 +245,7 @@ async function processFormSubmission(formData, res) {
     let customerEmailSent = false;
     let customerMessageId = null;
     
-    if (formData.email && formData.email.includes('@')) {
+    if (formData.email && typeof formData.email === 'string' && formData.email.includes('@')) {
       try {
         const customerMailOptions = {
           from: `"TNR Business Solutions" <${businessEmail}>`,
