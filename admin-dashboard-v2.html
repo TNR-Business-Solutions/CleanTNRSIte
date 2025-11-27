@@ -343,6 +343,66 @@
             .platforms-grid {
                 grid-template-columns: 1fr;
             }
+
+            .modules-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Business Modules Section */
+        .business-modules-section {
+            margin-bottom: 2rem;
+        }
+
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .module-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            color: white;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .module-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .module-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .module-icon {
+            font-size: 2rem;
+        }
+
+        .module-header h3 {
+            color: var(--tnr-gold);
+            margin: 0;
+            font-size: 1.2rem;
+        }
+
+        .module-description {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .module-actions {
+            display: flex;
+            gap: 0.5rem;
         }
     </style>
 </head>
@@ -375,7 +435,7 @@
             <div class="header-actions">
                 <button class="btn btn-primary" onclick="refreshDashboard()">🔄 Refresh</button>
                 <a href="/" class="btn btn-secondary">🏠 Home</a>
-                <a href="/admin-dashboard.html" class="btn btn-secondary">📊 Old Dashboard</a>
+                <button class="btn btn-secondary" onclick="logout()">🚪 Logout</button>
             </div>
         </div>
 
@@ -646,31 +706,83 @@
             </ul>
         </div>
 
-        <!-- Add this right after the platforms-section, add new sections for CRM and Email (copied/adapted from v1) -->
-        <div class="crm-section">
-            <h2 class="section-title">👥 CRM Management</h2>
-            <!-- Paste CRM HTML/JS here: tables, filters, forms, etc. Adapt IDs like 'client-list-v2' to avoid conflicts -->
-            <!-- For example: -->
-            <div class="tab-content" id="clients-tab-v2">
-                <!-- Client list table, filters, add button, etc. -->
+        <!-- Business Management Modules -->
+        <div class="business-modules-section">
+            <h2 class="section-title">💼 Business Management Modules</h2>
+            <div class="modules-grid">
+                <!-- CRM Module -->
+                <div class="module-card">
+                    <div class="module-header">
+                        <span class="module-icon">👥</span>
+                        <h3>CRM System</h3>
+                    </div>
+                    <p class="module-description">Manage clients, leads, and orders with advanced filtering and CSV import.</p>
+                    <div class="module-actions">
+                        <a href="/admin/crm/" class="btn btn-small btn-primary">Open CRM</a>
+                    </div>
+                </div>
+
+                <!-- Email Campaigns Module -->
+                <div class="module-card">
+                    <div class="module-header">
+                        <span class="module-icon">📧</span>
+                        <h3>Email Campaigns</h3>
+                    </div>
+                    <p class="module-description">Create and send personalized email campaigns to leads and clients.</p>
+                    <div class="module-actions">
+                        <a href="/admin/campaigns/" class="btn btn-small btn-primary">Create Campaign</a>
+                    </div>
+                </div>
+
+                <!-- Analytics Module -->
+                <div class="module-card">
+                    <div class="module-header">
+                        <span class="module-icon">📊</span>
+                        <h3>Analytics & Reports</h3>
+                    </div>
+                    <p class="module-description">Track performance metrics, conversion rates, and business insights.</p>
+                    <div class="module-actions">
+                        <a href="/admin/analytics/" class="btn btn-small btn-primary">View Analytics</a>
+                    </div>
+                </div>
+
+                <!-- Automation Module -->
+                <div class="module-card">
+                    <div class="module-header">
+                        <span class="module-icon">🤖</span>
+                        <h3>Automation Workflows</h3>
+                    </div>
+                    <p class="module-description">Create automated workflows for lead nurturing and task automation.</p>
+                    <div class="module-actions">
+                        <a href="/admin/automation/" class="btn btn-small btn-primary">Manage Workflows</a>
+                    </div>
+                </div>
+
+                <!-- Settings Module -->
+                <div class="module-card">
+                    <div class="module-header">
+                        <span class="module-icon">⚙️</span>
+                        <h3>System Settings</h3>
+                    </div>
+                    <p class="module-description">Configure business information and system preferences.</p>
+                    <div class="module-actions">
+                        <a href="/admin/settings/" class="btn btn-small btn-primary">Open Settings</a>
+                    </div>
+                </div>
+
+                <!-- Orders Module -->
+                <div class="module-card">
+                    <div class="module-header">
+                        <span class="module-icon">📦</span>
+                        <h3>Order Management</h3>
+                    </div>
+                    <p class="module-description">View and manage customer orders with status tracking.</p>
+                    <div class="module-actions">
+                        <a href="/admin-orders.html" class="btn btn-small btn-primary">View Orders</a>
+                    </div>
+                </div>
             </div>
-            <div class="tab-content" id="leads-tab-v2">
-                <!-- Leads list -->
-            </div>
-            <!-- Add CSV importer modal -->
         </div>
-
-        <div class="email-section">
-            <h2 class="section-title">📧 Email Campaigns</h2>
-            <!-- Paste Email HTML/JS: form, audience filters, send button -->
-            <form id="campaign-form-v2">
-                <!-- Subject, HTML editor, etc. -->
-            </form>
-        </div>
-
-        <!-- Add tab navigation for these new sections if needed, or integrate into existing UI. -->
-
-        <!-- At the end, add any required JS functions copied from v1, prefixed with 'v2' if needed. -->
     </div>
 
     <script>
@@ -795,6 +907,15 @@
 
         function viewLogs() {
             window.open('https://vercel.com/tnr-business-solutions/logs', '_blank');
+        }
+
+        // Logout function
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                sessionStorage.removeItem('adminAuthenticated');
+                sessionStorage.removeItem('adminSessionToken');
+                window.location.href = '/admin-login.html';
+            }
         }
 
         // Load stats (placeholder - connect to actual API)

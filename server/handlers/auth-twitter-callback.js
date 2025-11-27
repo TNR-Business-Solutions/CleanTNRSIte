@@ -347,7 +347,7 @@ function generateSuccessHTML(data) {
         </div>
         
         <div style="text-align: center; margin-top: 30px;">
-            <a href="/admin-dashboard.html" class="btn btn-primary">🚀 Go to Dashboard</a>
+            <a href="/admin-dashboard-v2.html" class="btn btn-primary">🚀 Go to Dashboard</a>
             <a href="/social-media-automation-dashboard.html" class="btn btn-secondary">📱 Social Media Dashboard</a>
         </div>
     </div>

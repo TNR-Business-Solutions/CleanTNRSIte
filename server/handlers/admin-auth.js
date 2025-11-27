@@ -56,19 +56,31 @@ module.exports = async (req, res) => {
     }
 
     // Get credentials from environment variables (SECURE)
-    const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "admin";
-    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "TNR2024!";
+    // Support multiple users
+    const ADMIN_USERS = [
+      {
+        username: process.env.ADMIN_USERNAME || "admin",
+        password: process.env.ADMIN_PASSWORD || "TNR2024!",
+        role: "admin"
+      },
+      {
+        username: process.env.EMPLOYEE_USERNAME || "employee1",
+        password: process.env.EMPLOYEE_PASSWORD || "",
+        role: "employee"
+      }
+    ].filter(user => user.password); // Only include users with passwords set
 
     console.log("Admin auth attempt:", {
       username,
       hasPassword: !!password,
-      envUsername: ADMIN_USERNAME,
       bodyType: typeof req.body,
       hasBody: !!req.body,
     });
 
-    // Validate credentials
-    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+    // Validate credentials against all users
+    const user = ADMIN_USERS.find(u => u.username === username && u.password === password);
+    
+    if (user) {
       // Generate a simple session token (in production, use JWT or proper session management)
       const sessionToken = Buffer.from(`${username}:${Date.now()}`).toString(
         "base64"
@@ -79,6 +91,8 @@ module.exports = async (req, res) => {
         message: "Authentication successful",
         sessionToken: sessionToken,
         redirectTo: "/admin-dashboard-v2.html",
+        role: user.role,
+        username: user.username
       });
     } else {
       // Add small delay to prevent brute force attacks

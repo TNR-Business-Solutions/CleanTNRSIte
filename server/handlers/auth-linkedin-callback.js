@@ -692,7 +692,7 @@ function generateSuccessHTML(data) {
         </div>
         
         <div style="text-align: center; margin-top: 30px;">
-            <a href="/admin-dashboard.html" class="btn btn-primary">🚀 Go to Dashboard</a>
+            <a href="/admin-dashboard-v2.html" class="btn btn-primary">🚀 Go to Dashboard</a>
             <a href="/social-media-automation-dashboard.html" class="btn btn-secondary">📱 Social Media Dashboard</a>
         </div>
     </div>
@@ -839,7 +839,7 @@ function generateErrorHTML(
         
         <div style="text-align: center; margin-top: 30px;">
             <a href="/api/auth/linkedin" class="btn btn-primary">🔄 Try Again</a>
-            <a href="/admin-dashboard.html" class="btn btn-secondary">📊 Admin Dashboard</a>
+            <a href="/admin-dashboard-v2.html" class="btn btn-secondary">📊 Admin Dashboard</a>
             <a href="/" class="btn btn-secondary">🏠 Go Home</a>
         </div>
     </div>

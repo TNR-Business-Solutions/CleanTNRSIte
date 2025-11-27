@@ -139,7 +139,7 @@ module.exports = async (req, res) => {
     // Handle authorization errors
     if (error) {
       console.error('❌ Threads authorization error:', error);
-      return res.redirect(`/admin-dashboard.html?error=${encodeURIComponent(error_description || error)}`);
+      return res.redirect(`/admin-dashboard-v2.html?error=${encodeURIComponent(error_description || error)}`);
     }
 
     if (!code) {
@@ -188,7 +188,7 @@ module.exports = async (req, res) => {
     console.error('❌ Error in Threads OAuth callback:', error);
 
     // Redirect to error page
-    const errorUrl = new URL('/admin-dashboard.html', `https://${req.headers.host}`);
+    const errorUrl = new URL('/admin-dashboard-v2.html', `https://${req.headers.host}`);
     errorUrl.searchParams.append('error', error.message || 'Threads authentication failed');
 
     res.redirect(errorUrl.toString());

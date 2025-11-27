@@ -639,21 +639,21 @@ const server = http.createServer((req, res) => {
 server.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
   console.log(
-    `📊 Admin Dashboard: http://localhost:${PORT}/admin-dashboard.html`
+    `📊 Admin Dashboard: http://localhost:${PORT}/admin-dashboard-v2.html`
   );
   console.log(
-    `👥 CRM System: http://localhost:${PORT}/admin-dashboard.html (CRM tab)`
+    `👥 CRM System: http://localhost:${PORT}/admin/crm/`
   );
   console.log(
-    `📧 Email Campaigns: http://localhost:${PORT}/admin-dashboard.html (Campaigns tab)`
+    `📧 Email Campaigns: http://localhost:${PORT}/admin/campaigns/`
   );
   console.log(
-    `🤖 Workflows: http://localhost:${PORT}/admin-dashboard.html (Automation tab)`
+    `🤖 Workflows: http://localhost:${PORT}/admin/automation/`
   );
   console.log(
-    `📈 Analytics: http://localhost:${PORT}/admin-dashboard.html (Analytics tab)`
+    `📈 Analytics: http://localhost:${PORT}/admin/analytics/`
   );
   console.log(
-    `📝 Templates: http://localhost:${PORT}/admin-dashboard.html (Templates tab)`
+    `📝 Templates: http://localhost:${PORT}/admin/email-templates/`
   );
 });

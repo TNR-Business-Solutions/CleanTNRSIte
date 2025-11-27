@@ -54,7 +54,7 @@ module.exports = async (req, res) => {
     // Store state with metadata
     stateStore.set(state, {
       timestamp: Date.now(),
-      returnUrl: req.query.returnUrl || '/admin-dashboard.html'
+      returnUrl: req.query.returnUrl || '/admin-dashboard-v2.html'
     });
     
     console.log(`📝 Generated state token: ${state.substring(0, 10)}...`);
