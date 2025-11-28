@@ -24,15 +24,8 @@ function getEmailHandler() {
   return emailHandlerInstance;
 }
 
-// CORS headers helper
-function setCorsHeaders(res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS"
-  );
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-}
+// Import CORS utilities
+const { setCorsHeaders: setCors, handleCorsPreflight } = require("./cors-utils");
 
 // Rate-limited email sender pool
 class EmailPool {
@@ -100,12 +93,12 @@ const emailPool = new EmailPool();
 
 // Campaign API Handler
 module.exports = async function campaignApiHandler(req, res) {
-  setCorsHeaders(res);
-
-  if (req.method === "OPTIONS") {
-    res.status(200).end();
+  // Handle CORS
+  const origin = req.headers.origin || req.headers.referer;
+  if (handleCorsPreflight(req, res)) {
     return;
   }
+  setCors(res, origin);
 
   let db;
   let fullPath = req.url;

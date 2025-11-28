@@ -1,115 +1,143 @@
 // Admin Authentication - Vercel Serverless Function
-// Securely validates admin credentials server-side
+// Securely validates admin credentials server-side with JWT, bcrypt, and rate limiting
+
+const { setCorsHeaders, handleCorsPreflight } = require("./cors-utils");
+const { generateTokenPair } = require("./jwt-utils");
+const { verifyPassword, hashPassword } = require("./password-utils");
+const { rateLimiter } = require("./rate-limiter");
+const { sendErrorResponse, sendAuthError, handleUnexpectedError, ERROR_CODES } = require("./error-handler");
+
+// Apply rate limiting to auth endpoint
+const authRateLimiter = rateLimiter('auth');
 
 module.exports = async (req, res) => {
-  // Set CORS headers first
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
-  // Handle OPTIONS preflight
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
+  // Handle CORS
+  const origin = req.headers.origin || req.headers.referer;
+  if (handleCorsPreflight(req, res)) {
+    return;
   }
+  setCorsHeaders(res, origin);
 
-  // Only accept POST requests
-  if (req.method !== "POST") {
-    return res.status(405).json({
-      success: false,
-      error: "Method not allowed",
-    });
-  }
-
-  try {
-    // Handle request body - Vercel pre-parses JSON in most cases
-    let username, password;
-
-    // Check if req.body is already available (Vercel pre-parses JSON)
-    if (req.body && typeof req.body === "object") {
-      username = req.body.username;
-      password = req.body.password;
-    } else if (typeof req.body === "string") {
-      // Sometimes Vercel gives us a string
+  // Apply rate limiting (wrapped in async handler)
+  return new Promise((resolve) => {
+    authRateLimiter(req, res, async () => {
       try {
-        const parsed = JSON.parse(req.body);
-        username = parsed.username;
-        password = parsed.password;
-      } catch (e) {
-        return res.status(400).json({
-          success: false,
-          error: "Invalid request body",
+        // Only accept POST requests
+        if (req.method !== "POST") {
+          return resolve(sendErrorResponse(res, ERROR_CODES.VALIDATION_ERROR, "Method not allowed. Only POST requests are accepted.", {
+            method: req.method,
+            allowed: ['POST']
+          }));
+        }
+
+        // Handle request body - Vercel pre-parses JSON in most cases
+        let username, password;
+
+        // Check if req.body is already available (Vercel pre-parses JSON)
+        if (req.body && typeof req.body === "object") {
+          username = req.body.username;
+          password = req.body.password;
+        } else if (typeof req.body === "string") {
+          // Sometimes Vercel gives us a string
+          try {
+            const parsed = JSON.parse(req.body);
+            username = parsed.username;
+            password = parsed.password;
+          } catch (e) {
+            return resolve(res.status(400).json({
+              success: false,
+              error: "Invalid request body",
+            }));
+          }
+        } else {
+          return resolve(res.status(400).json({
+            success: false,
+            error: "Request body is required",
+          }));
+        }
+
+        // Validate input
+        if (!username || !password) {
+          return resolve(sendErrorResponse(res, ERROR_CODES.MISSING_FIELD, "Username and password are required.", {
+            missing: !username ? ['username'] : !password ? ['password'] : ['username', 'password']
+          }));
+        }
+
+        // Get credentials from environment variables (SECURE)
+        // Support multiple users with hashed passwords
+        const ADMIN_USERS = [
+          {
+            username: process.env.ADMIN_USERNAME || "admin",
+            password: process.env.ADMIN_PASSWORD || "TNR2024!",
+            passwordHash: process.env.ADMIN_PASSWORD_HASH, // Pre-hashed password
+            role: "admin"
+          },
+          {
+            username: process.env.EMPLOYEE_USERNAME || "employee1",
+            password: process.env.EMPLOYEE_PASSWORD || "",
+            passwordHash: process.env.EMPLOYEE_PASSWORD_HASH, // Pre-hashed password
+            role: "employee"
+          }
+        ].filter(user => user.password || user.passwordHash); // Only include users with passwords set
+
+        console.log("Admin auth attempt:", {
+          username,
+          hasPassword: !!password,
+          bodyType: typeof req.body,
+          hasBody: !!req.body,
         });
+
+        // Validate credentials against all users
+        let authenticatedUser = null;
+        
+        for (const user of ADMIN_USERS) {
+          if (user.username === username) {
+            // Check if we have a pre-hashed password
+            if (user.passwordHash) {
+              // Verify against hash
+              const isValid = await verifyPassword(password, user.passwordHash);
+              if (isValid) {
+                authenticatedUser = user;
+                break;
+              }
+            } else if (user.password && user.password === password) {
+              // Fallback: plain text comparison (for migration period)
+              // Hash the password for future use
+              const hash = await hashPassword(password);
+              console.log(`⚠️ Password for ${username} should be hashed. Hash: ${hash}`);
+              console.log(`Add to environment: ${user.role.toUpperCase()}_PASSWORD_HASH=${hash}`);
+              authenticatedUser = user;
+              break;
+            }
+          }
+        }
+        
+        if (authenticatedUser) {
+          // Generate JWT token pair
+          const tokens = generateTokenPair({
+            username: authenticatedUser.username,
+            role: authenticatedUser.role
+          });
+
+          return resolve(res.status(200).json({
+            success: true,
+            message: "Authentication successful",
+            accessToken: tokens.accessToken,
+            refreshToken: tokens.refreshToken,
+            expiresIn: tokens.expiresIn,
+            redirectTo: "/admin-dashboard-v2.html",
+            role: authenticatedUser.role,
+            username: authenticatedUser.username
+          }));
+        } else {
+          // Add small delay to prevent brute force attacks (rate limiter also helps)
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+
+          return resolve(sendAuthError(res, ERROR_CODES.AUTH_INVALID));
+        }
+      } catch (error) {
+        return resolve(handleUnexpectedError(res, error, 'Admin Authentication'));
       }
-    } else {
-      return res.status(400).json({
-        success: false,
-        error: "Request body is required",
-      });
-    }
-
-    // Validate input
-    if (!username || !password) {
-      return res.status(400).json({
-        success: false,
-        error: "Username and password required",
-      });
-    }
-
-    // Get credentials from environment variables (SECURE)
-    // Support multiple users
-    const ADMIN_USERS = [
-      {
-        username: process.env.ADMIN_USERNAME || "admin",
-        password: process.env.ADMIN_PASSWORD || "TNR2024!",
-        role: "admin"
-      },
-      {
-        username: process.env.EMPLOYEE_USERNAME || "employee1",
-        password: process.env.EMPLOYEE_PASSWORD || "",
-        role: "employee"
-      }
-    ].filter(user => user.password); // Only include users with passwords set
-
-    console.log("Admin auth attempt:", {
-      username,
-      hasPassword: !!password,
-      bodyType: typeof req.body,
-      hasBody: !!req.body,
     });
-
-    // Validate credentials against all users
-    const user = ADMIN_USERS.find(u => u.username === username && u.password === password);
-    
-    if (user) {
-      // Generate a simple session token (in production, use JWT or proper session management)
-      const sessionToken = Buffer.from(`${username}:${Date.now()}`).toString(
-        "base64"
-      );
-
-      return res.status(200).json({
-        success: true,
-        message: "Authentication successful",
-        sessionToken: sessionToken,
-        redirectTo: "/admin-dashboard-v2.html",
-        role: user.role,
-        username: user.username
-      });
-    } else {
-      // Add small delay to prevent brute force attacks
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      return res.status(401).json({
-        success: false,
-        error: "Invalid credentials",
-      });
-    }
-  } catch (error) {
-    console.error("Auth error:", error);
-    console.error("Error stack:", error.stack);
-    return res.status(500).json({
-      success: false,
-      error: "Internal server error",
-      message: error.message,
-    });
-  }
+  });
 };

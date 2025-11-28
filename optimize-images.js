@@ -335,7 +335,10 @@ Optimizing images can improve:
 }
 
 // Main optimization function
-function optimizeImages() {
+// Import new optimization utilities
+const { optimizeImage, generateResponsiveImageHTML } = require('./server/handlers/image-optimizer');
+
+async function optimizeImages() {
   console.log("🖼️  TNR Business Solutions - Image Optimization Analysis");
   console.log("=======================================================");
 

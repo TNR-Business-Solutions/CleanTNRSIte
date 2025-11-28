@@ -58,7 +58,7 @@ function sendJson(res, statusCode, data, headers = {}) {
   
   // Default CORS headers
   const defaultHeaders = {
-    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Origin": process.env.ALLOWED_ORIGIN || "https://www.tnrbusinesssolutions.com",
     "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
     "Content-Type": "application/json",

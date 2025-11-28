@@ -3,6 +3,7 @@
 
 const TNRDatabase = require("../../database");
 const { URL } = require("url");
+const { sendErrorResponse, handleUnexpectedError, ERROR_CODES } = require("./error-handler");
 // Workflow executor is optional - only used for automation features
 let workflowExecutor;
 try {
@@ -23,31 +24,20 @@ async function getDatabase() {
   return dbInstance;
 }
 
-// CORS headers helper
-function setCorsHeaders(res) {
-  // For raw Node.js HTTP, we need to set headers before writing
-  if (!res.headersSent) {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader(
-      "Access-Control-Allow-Methods",
-      "GET, POST, PUT, DELETE, OPTIONS"
-    );
-    res.setHeader(
-      "Access-Control-Allow-Headers",
-      "Content-Type, Authorization"
-    );
-  }
-}
+// Import CORS utilities
+const { setCorsHeaders: setCors, handleCorsPreflight } = require("./cors-utils");
 
 // CRM API Handler
 module.exports = async function crmApiHandler(req, res) {
   try {
-    if (req.method === "OPTIONS") {
-      setCorsHeaders(res);
-      res.writeHead(200);
-      res.end();
+    // Handle CORS preflight
+    const origin = req.headers.origin || req.headers.referer;
+    if (handleCorsPreflight(req, res)) {
       return;
     }
+    
+    // Set CORS headers
+    setCors(res, origin);
 
     let db;
     let fullPath = req.url;
@@ -409,7 +399,7 @@ module.exports = async function crmApiHandler(req, res) {
           console.error("❌ POST body was:", body.substring(0, 500));
           setCorsHeaders(res);
           res.writeHead(400, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ success: false, error: error.message }));
+          handleUnexpectedError(res, error, 'CRM API');
         }
       });
     } else if (req.method === "PUT") {
@@ -469,7 +459,7 @@ module.exports = async function crmApiHandler(req, res) {
           }
         } catch (error) {
           res.writeHead(400, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ success: false, error: error.message }));
+          handleUnexpectedError(res, error, 'CRM API');
         }
       });
     } else if (req.method === "DELETE") {

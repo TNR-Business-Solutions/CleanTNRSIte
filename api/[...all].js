@@ -2,6 +2,7 @@
 // Routes all API requests to appropriate handlers
 
 const { sendJson } = require("../server/handlers/http-utils");
+const { setCorsHeaders, handleCorsPreflight } = require("../server/handlers/cors-utils");
 
 module.exports = async (req, res) => {
   // Get pathname from request
@@ -52,19 +53,14 @@ module.exports = async (req, res) => {
     allValue: req.query?.all,
   });
 
-  // Handle CORS globally - but don't set headers yet, let sendJson handle it
-  // We'll handle OPTIONS separately
-  if (req.method === "OPTIONS") {
-    if (!res.headersSent) {
-      res.writeHead(200, {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization",
-      });
-      res.end();
-    }
+  // Handle CORS preflight requests
+  const origin = req.headers.origin || req.headers.referer;
+  if (handleCorsPreflight(req, res)) {
     return;
   }
+  
+  // Set CORS headers for all requests
+  setCorsHeaders(res, origin);
 
   try {
     // Ensure req.url has full path for handlers that parse it
@@ -97,7 +93,7 @@ module.exports = async (req, res) => {
       return await handler(req, res);
     }
 
-    // Admin auth route - check early and explicitly
+    // Admin auth route - check early and explicitly (rate limited in handler)
     if (
       route === "admin/auth" ||
       route === "admin/auth/" ||

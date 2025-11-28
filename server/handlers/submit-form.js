@@ -1,5 +1,10 @@
 // Vercel Serverless Function for Form Submissions
 const nodemailer = require("nodemailer");
+const { setCorsHeaders, handleCorsPreflight } = require("./cors-utils");
+const { rateLimiter } = require("./rate-limiter");
+
+// Apply rate limiting to form submissions
+const formRateLimiter = rateLimiter('forms');
 
 // Email configuration
 const transporter = nodemailer.createTransport({
@@ -397,15 +402,16 @@ async function processFormSubmission(formData, res) {
 }
 
 module.exports = async (req, res) => {
-  // Enable CORS
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
-  // Handle OPTIONS request for CORS
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
+  // Handle CORS
+  const origin = req.headers.origin || req.headers.referer;
+  if (handleCorsPreflight(req, res)) {
+    return;
   }
+  setCorsHeaders(res, origin);
+  
+  // Apply rate limiting
+  return new Promise((resolve) => {
+    formRateLimiter(req, res, async () => {
 
   // Only accept POST requests
   if (req.method !== "POST") {

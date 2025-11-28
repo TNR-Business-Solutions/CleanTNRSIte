@@ -9,7 +9,9 @@
     "serve": "node serve-clean.js",
     "build": "node verify-images.js",
     "verify-images": "node verify-images.js",
-    "test": "node run-tests.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "test:forms": "node test-production-forms.js",
     "test:wix": "node test-wix-app.js",
     "test:wix:real": "node test-wix-real-integration.js",
@@ -19,6 +21,7 @@
     "server": "cd server && node index.js",
     "minify": "node minify-production.js",
     "optimize-images": "node optimize-images.js",
+    "optimize-images:all": "node scripts/optimize-all-images.js",
     "analytics": "node analytics-monitoring.js",
     "predeploy": "npm run test && npm run verify-images && npm run minify && npm run optimize-images && npm run analytics"
   },
@@ -39,9 +42,11 @@
     "@neondatabase/serverless": "^1.0.2",
     "@vercel/postgres": "^0.10.0",
     "axios": "^1.13.2",
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "express-rate-limit": "^8.2.1",
     "jsonwebtoken": "^9.0.2",
     "node-fetch": "^3.3.2",
     "nodemailer": "^7.0.10",
@@ -54,8 +59,12 @@
   },
   "homepage": "https://www.tnrbusinesssolutions.com",
   "devDependencies": {
+    "@jest/globals": "^30.2.0",
+    "@types/jest": "^30.0.0",
     "clean-css": "^5.3.3",
+    "jest": "^30.2.0",
     "sharp": "^0.34.5",
+    "supertest": "^7.1.4",
     "terser": "^5.44.1"
   }
 }
