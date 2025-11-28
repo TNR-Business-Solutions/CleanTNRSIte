@@ -1,0 +1,19 @@
+# Vercel Environment Variables - Copy & Paste Ready
+# Add these to: Vercel Dashboard → Settings → Environment Variables
+
+# REQUIRED: JWT Secret for token signing
+JWT_SECRET=2b9fdb1cf895c6ae663d1cb00f6e564f6516a5193fab423ac7f73398d5edae16
+
+# REQUIRED: Admin password hash (for password: TNR2024!)
+ADMIN_PASSWORD_HASH=$2b$10$ngHOu7/UL/mtMX7JfvvfTO2BiQVA9wy981WRd.cpNXYLK1zLKeeue
+
+# OPTIONAL: Admin username (defaults to 'admin' if not set)
+ADMIN_USERNAME=admin
+
+# OPTIONAL: Allowed origin for CORS (defaults to production domain)
+ALLOWED_ORIGIN=https://www.tnrbusinesssolutions.com
+
+# OPTIONAL: Employee credentials (if needed)
+# EMPLOYEE_USERNAME=employee
+# EMPLOYEE_PASSWORD_HASH=<generate-by-logging-in-once>
+

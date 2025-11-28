@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login - TNR Business Solutions</title>
-    <link rel="stylesheet" href="assets/styles.css">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <link rel="stylesheet" href="assets/styles.css?v=20251128-2">
     <style>
         .login-container {
             min-height: 100vh;
@@ -396,6 +399,52 @@
     <script>
         // Header is now embedded in HTML
         // Secure server-side authentication
+        
+        // Define utility functions FIRST (before event listeners)
+        function showLoading(show) {
+            const loadingEl = document.getElementById('loading');
+            const loginBtn = document.getElementById('login-btn');
+            if (loadingEl) loadingEl.style.display = show ? 'block' : 'none';
+            if (loginBtn) loginBtn.disabled = show;
+        }
+        
+        function showSuccess(message) {
+            const errorDiv = document.getElementById('error-message');
+            if (errorDiv) {
+                errorDiv.textContent = message;
+                errorDiv.style.display = 'block';
+                errorDiv.style.backgroundColor = '#10b981';
+                errorDiv.style.color = 'white';
+                errorDiv.style.borderColor = '#10b981';
+                
+                setTimeout(() => {
+                    errorDiv.style.display = 'none';
+                }, 3000);
+            } else {
+                // Fallback if error div doesn't exist
+                alert('✅ ' + message);
+            }
+        }
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            if (errorDiv) {
+                errorDiv.textContent = message;
+                errorDiv.style.display = 'block';
+                errorDiv.style.backgroundColor = '#ef4444';
+                errorDiv.style.color = 'white';
+                errorDiv.style.borderColor = '#ef4444';
+                
+                setTimeout(() => {
+                    errorDiv.style.display = 'none';
+                }, 5000);
+            } else {
+                // Fallback if error div doesn't exist
+                alert('❌ ' + message);
+            }
+        }
+        
+        // Now set up event listeners
         document.getElementById('login-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -432,15 +481,57 @@
                 }
                 
                 const data = await response.json();
+                console.log('📥 Login response:', { 
+                    success: data.success, 
+                    hasAccessToken: !!data.accessToken, 
+                    hasSessionToken: !!data.sessionToken,
+                    error: data.error 
+                });
                 
                 if (data.success) {
-                    localStorage.setItem('adminSession', data.sessionToken);
-                    localStorage.setItem('sessionExpiry', Date.now() + (24 * 60 * 60 * 1000));
+                    console.log('✅ Login successful, storing session data...');
+                    
+                    // Store JWT tokens (prefer accessToken, fallback to sessionToken)
+                    const tokenToStore = data.accessToken || data.sessionToken;
+                    if (tokenToStore) {
+                        localStorage.setItem('adminSession', tokenToStore);
+                        console.log('✅ Session token stored in localStorage');
+                    } else {
+                        console.error('❌ No token received from server!');
+                        showError('Login successful but no session token received. Please try again.');
+                        showLoading(false);
+                        return;
+                    }
+                    
+                    if (data.refreshToken) {
+                        localStorage.setItem('adminRefreshToken', data.refreshToken);
+                    }
+                    
+                    // Set session expiry (24 hours = 86400000 ms)
+                    const expiryTime = Date.now() + (24 * 60 * 60 * 1000);
+                    localStorage.setItem('sessionExpiry', expiryTime.toString());
+                    console.log('✅ Session expiry set:', new Date(expiryTime).toLocaleString());
+                    
+                    // Store user info
+                    if (data.username) {
+                        localStorage.setItem('adminUsername', data.username);
+                    }
+                    if (data.role) {
+                        localStorage.setItem('adminRole', data.role);
+                    }
+                    
+                    // Also set sessionStorage for compatibility
+                    sessionStorage.setItem('adminAuthenticated', 'true');
+                    if (tokenToStore) {
+                        sessionStorage.setItem('adminSessionToken', tokenToStore);
+                    }
                     
                     showSuccess('Login successful! Redirecting...');
                     
                     setTimeout(() => {
-                        window.location.href = data.redirectTo || 'admin-dashboard-v2.html';
+                        const redirectUrl = data.redirectTo || 'admin-dashboard-v2.html';
+                        console.log('🔄 Redirecting to:', redirectUrl);
+                        window.location.href = redirectUrl;
                     }, 1000);
                 } else {
                     showError(data.error || 'Invalid username or password');
@@ -468,24 +559,32 @@
             }
         });
         
-        function showLoading(show) {
-            document.getElementById('loading').style.display = show ? 'block' : 'none';
-            document.getElementById('login-btn').disabled = show;
-        }
+        // Check if already authenticated (check both sessionStorage and localStorage)
+        const existingSession = localStorage.getItem('adminSession') || sessionStorage.getItem('adminSessionToken');
+        const sessionExpiry = localStorage.getItem('sessionExpiry');
         
-        function showError(message) {
-            const errorDiv = document.getElementById('error-message');
-            errorDiv.textContent = message;
-            errorDiv.style.display = 'block';
-            
-            setTimeout(() => {
-                errorDiv.style.display = 'none';
-            }, 5000);
-        }
-        
-        // Check if already authenticated
-        if (sessionStorage.getItem('adminAuthenticated') === 'true') {
-            window.location.href = 'admin-dashboard-v2.html';
+        if (existingSession) {
+            // Check if session is still valid
+            if (sessionExpiry) {
+                const expiryTime = parseInt(sessionExpiry);
+                if (!isNaN(expiryTime) && Date.now() < expiryTime) {
+                    // Session is valid, redirect to dashboard
+                    console.log('✅ Existing valid session found, redirecting to dashboard');
+                    window.location.href = 'admin-dashboard-v2.html';
+                } else {
+                    // Session expired, clear it
+                    console.log('⚠️ Session expired, clearing...');
+                    localStorage.removeItem('adminSession');
+                    localStorage.removeItem('adminRefreshToken');
+                    localStorage.removeItem('sessionExpiry');
+                    sessionStorage.removeItem('adminSessionToken');
+                    sessionStorage.removeItem('adminAuthenticated');
+                }
+            } else {
+                // No expiry set, but session exists - redirect anyway (legacy support)
+                console.log('✅ Session found (no expiry), redirecting to dashboard');
+                window.location.href = 'admin-dashboard-v2.html';
+            }
         }
         
         // New User Request Modal
@@ -583,7 +682,9 @@
         }
         
         // Submit new user request
-        function submitNewUserRequest() {
+        async function submitNewUserRequest() {
+            console.log('📧 Submitting new user request via API...');
+            
             const formData = {
                 type: 'new_user_request',
                 name: document.getElementById('newUserName').value,
@@ -594,18 +695,40 @@
                 timestamp: new Date().toISOString()
             };
             
-            // In a real implementation, this would send to a server
-            console.log('New User Request:', formData);
+            console.log('📧 Form data:', formData);
             
-            // Send email notification (simulated)
-            sendEmailNotification('New User Request', formData);
-            
-            alert('New user request submitted! Roy Turner will be notified for approval.');
-            closeModal('newUserModal');
+            try {
+                console.log('📧 Sending POST request to /api/admin-requests');
+                const response = await fetch('/api/admin-requests', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                console.log('📧 Response status:', response.status);
+                const result = await response.json();
+                console.log('📧 Response data:', result);
+                
+                if (result.success) {
+                    alert('✅ ' + result.message);
+                    closeModal('newUserModal');
+                    // Reset form
+                    document.getElementById('newUserForm').reset();
+                } else {
+                    alert('❌ Error: ' + (result.error?.message || result.error || 'Failed to submit request'));
+                }
+            } catch (error) {
+                console.error('❌ Error submitting new user request:', error);
+                alert('❌ Error: Failed to submit request. Please try again or contact support.');
+            }
         }
         
         // Submit forgot password request
-        function submitForgotPasswordRequest() {
+        async function submitForgotPasswordRequest() {
+            console.log('🔑 Submitting password reset request via API...');
+            
             const formData = {
                 type: 'forgot_password_request',
                 email: document.getElementById('forgotEmail').value,
@@ -614,46 +737,45 @@
                 timestamp: new Date().toISOString()
             };
             
-            // In a real implementation, this would send to a server
-            console.log('Forgot Password Request:', formData);
+            console.log('🔑 Form data:', formData);
             
-            // Send email notification (simulated)
-            sendEmailNotification('Password Reset Request', formData);
-            
-            alert('Password reset request submitted! Roy Turner will be notified for approval.');
-            closeModal('forgotPasswordModal');
+            try {
+                console.log('🔑 Sending POST request to /api/admin-requests');
+                const response = await fetch('/api/admin-requests', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                console.log('🔑 Response status:', response.status);
+                const result = await response.json();
+                console.log('🔑 Response data:', result);
+                
+                if (result.success) {
+                    alert('✅ ' + result.message);
+                    closeModal('forgotPasswordModal');
+                    // Reset form
+                    document.getElementById('forgotPasswordForm').reset();
+                } else {
+                    alert('❌ Error: ' + (result.error?.message || result.error || 'Failed to submit request'));
+                }
+            } catch (error) {
+                console.error('❌ Error submitting password reset request:', error);
+                alert('❌ Error: Failed to submit request. Please try again or contact support.');
+            }
         }
         
-        // Send email notification (simulated)
+        // DEPRECATED: This function should NEVER be called
+        // All email requests now go directly to /api/admin-requests
+        // If this function is called, it means there's a bug or browser cache issue
         function sendEmailNotification(subject, data) {
-            // In a real implementation, this would send an actual email
-            const emailContent = `
-Subject: ${subject} - TNR Business Solutions Admin
-
-A new ${data.type.replace('_', ' ')} has been submitted:
-
-${JSON.stringify(data, null, 2)}
-
-Please review and approve this request.
-
----
-TNR Business Solutions Admin System
-            `;
-            
-            console.log('Email would be sent to: roy.turner@tnrbusinesssolutions.com');
-            console.log('Email content:', emailContent);
-            
-            // Store in localStorage for demo purposes
-            const notifications = JSON.parse(localStorage.getItem('adminNotifications') || '[]');
-            notifications.push({
-                id: Date.now(),
-                type: data.type,
-                subject: subject,
-                data: data,
-                timestamp: new Date().toISOString(),
-                status: 'pending'
-            });
-            localStorage.setItem('adminNotifications', JSON.stringify(notifications));
+            console.error('🚨 ERROR: Deprecated sendEmailNotification() was called!');
+            console.error('🚨 This should NOT happen - requests should go to /api/admin-requests');
+            console.error('🚨 If you see this, please hard refresh the page (Ctrl+Shift+R)');
+            console.error('🚨 Subject:', subject, 'Data:', data);
+            alert('⚠️ Error: Old code detected. Please hard refresh the page (Ctrl+Shift+R) and try again.');
         }
         
         // Close modals when clicking outside

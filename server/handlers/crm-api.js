@@ -25,7 +25,7 @@ async function getDatabase() {
 }
 
 // Import CORS utilities
-const { setCorsHeaders: setCors, handleCorsPreflight } = require("./cors-utils");
+const { setCorsHeaders, handleCorsPreflight } = require("./cors-utils");
 
 // CRM API Handler
 module.exports = async function crmApiHandler(req, res) {

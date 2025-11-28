@@ -93,6 +93,17 @@ module.exports = async (req, res) => {
       return await handler(req, res);
     }
 
+    // Admin requests route (password reset, new user requests)
+    if (
+      route === "admin-requests" ||
+      route === "admin-requests/" ||
+      route.startsWith("admin-requests/")
+    ) {
+      console.log("✅ Routing to admin-requests handler");
+      const handler = require("../server/handlers/admin-requests");
+      return await handler(req, res);
+    }
+
     // Admin auth route - check early and explicitly (rate limited in handler)
     if (
       route === "admin/auth" ||

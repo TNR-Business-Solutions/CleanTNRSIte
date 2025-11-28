@@ -92,22 +92,31 @@ module.exports = async (req, res) => {
         
         for (const user of ADMIN_USERS) {
           if (user.username === username) {
+            console.log(`🔍 Checking user: ${user.username}, hasHash: ${!!user.passwordHash}, hasPassword: ${!!user.password}`);
+            
             // Check if we have a pre-hashed password
             if (user.passwordHash) {
               // Verify against hash
+              console.log(`🔐 Verifying password against hash...`);
               const isValid = await verifyPassword(password, user.passwordHash);
+              console.log(`🔐 Password verification result: ${isValid}`);
               if (isValid) {
                 authenticatedUser = user;
                 break;
+              } else {
+                console.log(`❌ Password hash verification failed for ${username}`);
               }
             } else if (user.password && user.password === password) {
               // Fallback: plain text comparison (for migration period)
+              console.log(`⚠️ Using plain text password (not secure - should use hash)`);
               // Hash the password for future use
               const hash = await hashPassword(password);
               console.log(`⚠️ Password for ${username} should be hashed. Hash: ${hash}`);
               console.log(`Add to environment: ${user.role.toUpperCase()}_PASSWORD_HASH=${hash}`);
               authenticatedUser = user;
               break;
+            } else {
+              console.log(`❌ Password mismatch for ${username}`);
             }
           }
         }

@@ -912,6 +912,12 @@
         // Logout function
         function logout() {
             if (confirm('Are you sure you want to logout?')) {
+                // Clear all authentication data
+                localStorage.removeItem('adminSession');
+                localStorage.removeItem('adminRefreshToken');
+                localStorage.removeItem('sessionExpiry');
+                localStorage.removeItem('adminUsername');
+                localStorage.removeItem('adminRole');
                 sessionStorage.removeItem('adminAuthenticated');
                 sessionStorage.removeItem('adminSessionToken');
                 window.location.href = '/admin-login.html';
@@ -924,6 +930,62 @@
             document.getElementById('total-posts').textContent = '0';
             document.getElementById('total-messages').textContent = '0';
             document.getElementById('total-analytics').textContent = '0';
+        }
+
+        // Authentication check - CRITICAL SECURITY
+        function checkAuthentication() {
+            console.log('🔐 Checking authentication...');
+            
+            // Check for session token in localStorage (primary) or sessionStorage (fallback)
+            const sessionToken = localStorage.getItem('adminSession') || 
+                                sessionStorage.getItem('adminSessionToken') ||
+                                sessionStorage.getItem('adminAuthenticated');
+            const sessionExpiry = localStorage.getItem('sessionExpiry');
+            
+            console.log('🔐 Session check:', {
+                hasToken: !!sessionToken,
+                hasExpiry: !!sessionExpiry,
+                expiryTime: sessionExpiry ? new Date(parseInt(sessionExpiry)).toLocaleString() : 'N/A'
+            });
+            
+            // Check if session exists
+            if (!sessionToken) {
+                console.warn('⚠️ No session token found. Redirecting to login.');
+                // Clear any stale data
+                localStorage.removeItem('adminSession');
+                localStorage.removeItem('adminRefreshToken');
+                localStorage.removeItem('sessionExpiry');
+                sessionStorage.removeItem('adminAuthenticated');
+                sessionStorage.removeItem('adminSessionToken');
+                window.location.href = '/admin-login.html';
+                return false;
+            }
+            
+            // Check if session is expired
+            if (sessionExpiry) {
+                const expiryTime = parseInt(sessionExpiry);
+                if (isNaN(expiryTime) || Date.now() > expiryTime) {
+                    console.warn('⚠️ Session expired. Redirecting to login.');
+                    localStorage.removeItem('adminSession');
+                    localStorage.removeItem('adminRefreshToken');
+                    localStorage.removeItem('sessionExpiry');
+                    localStorage.removeItem('adminUsername');
+                    localStorage.removeItem('adminRole');
+                    window.location.href = '/admin-login.html';
+                    return false;
+                }
+            }
+            
+            // Session is valid
+            console.log('✅ Authentication check passed');
+            return true;
+        }
+        
+        // Check authentication on page load
+        if (!checkAuthentication()) {
+            // Redirect will happen in checkAuthentication
+            // Stop execution here
+            throw new Error('Authentication required');
         }
 
         // Initialize

@@ -4,20 +4,15 @@
 const TNRDatabase = require("../../database");
 const axios = require("axios");
 const { parseQuery, parseBody, sendJson } = require("./http-utils");
+const { setCorsHeaders, handleCorsPreflight } = require("./cors-utils");
 
 module.exports = async (req, res) => {
-  // Handle OPTIONS requests (CORS preflight)
-  if (req.method === "OPTIONS") {
-    if (!res.headersSent) {
-      res.writeHead(200, {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, DELETE, POST, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type",
-      });
-      res.end();
-    }
+  // Handle CORS
+  const origin = req.headers.origin || req.headers.referer;
+  if (handleCorsPreflight(req, res)) {
     return;
   }
+  setCorsHeaders(res, origin);
 
   const db = new TNRDatabase();
   await db.initialize();
