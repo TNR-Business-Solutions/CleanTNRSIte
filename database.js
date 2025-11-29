@@ -372,6 +372,15 @@ class TNRDatabase {
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )`,
 
+      // API Keys table (for Buffer, Zapier, Make.com, Analytics, etc.)
+      `CREATE TABLE IF NOT EXISTS api_keys (
+        platform TEXT PRIMARY KEY,
+        api_key TEXT NOT NULL,
+        metadata TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )`,
+
       // Settings table
       // Note: PostgreSQL uses SERIAL instead of AUTOINCREMENT
       `CREATE TABLE IF NOT EXISTS settings (
@@ -1346,6 +1355,91 @@ class TNRDatabase {
       created_at: row.created_at,
       updated_at: row.updated_at,
     };
+  }
+
+  // ========== API KEYS MANAGEMENT ==========
+  // Ensure API keys table exists
+  async ensureApiKeysTable() {
+    const tableSQL = `CREATE TABLE IF NOT EXISTS api_keys (
+      platform TEXT PRIMARY KEY,
+      api_key TEXT NOT NULL,
+      metadata TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )`;
+    await this.execute(tableSQL);
+  }
+
+  // Save API key
+  async saveApiKey(platform, apiKey, metadata = null) {
+    await this.ensureApiKeysTable();
+    
+    const existing = await this.queryOne(
+      "SELECT * FROM api_keys WHERE platform = ?",
+      [platform]
+    );
+
+    if (existing) {
+      // Update existing key
+      const sql = `UPDATE api_keys SET 
+        api_key = ?,
+        metadata = ?,
+        updated_at = ?
+        WHERE platform = ?`;
+      await this.execute(sql, [
+        apiKey,
+        metadata ? JSON.stringify(metadata) : null,
+        new Date().toISOString(),
+        platform
+      ]);
+    } else {
+      // Insert new key
+      const sql = `INSERT INTO api_keys (
+        platform, api_key, metadata, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?)`;
+      await this.execute(sql, [
+        platform,
+        apiKey,
+        metadata ? JSON.stringify(metadata) : null,
+        new Date().toISOString(),
+        new Date().toISOString()
+      ]);
+    }
+    return { platform, saved: true };
+  }
+
+  // Get all API keys (returns platform names only, not actual keys for security)
+  async getApiKeys() {
+    await this.ensureApiKeysTable();
+    const rows = await this.query("SELECT platform, metadata, created_at, updated_at FROM api_keys ORDER BY platform");
+    return rows.map(row => ({
+      platform: row.platform,
+      hasKey: true,
+      metadata: row.metadata ? JSON.parse(row.metadata) : null,
+      created_at: row.created_at,
+      updated_at: row.updated_at
+    }));
+  }
+
+  // Get API key value (for server-side use only)
+  async getApiKey(platform) {
+    await this.ensureApiKeysTable();
+    const row = await this.queryOne(
+      "SELECT * FROM api_keys WHERE platform = ?",
+      [platform]
+    );
+    return row ? {
+      platform: row.platform,
+      api_key: row.api_key,
+      metadata: row.metadata ? JSON.parse(row.metadata) : null
+    } : null;
+  }
+
+  // Delete API key
+  async deleteApiKey(platform) {
+    await this.ensureApiKeysTable();
+    await this.execute("DELETE FROM api_keys WHERE platform = ?", [platform]);
+    return { platform, deleted: true };
   }
 
   // Close database connection

@@ -169,6 +169,7 @@
                     <div class="platform-tab" onclick="switchPlatform('instagram', this)">Instagram</div>
                     <div class="platform-tab" onclick="switchPlatform('linkedin', this)">LinkedIn</div>
                     <div class="platform-tab" onclick="switchPlatform('twitter', this)">Twitter</div>
+                    <div class="platform-tab" onclick="switchPlatform('nextdoor', this)">Nextdoor</div>
                 </div>
                 
                 <div id="facebook" class="content-area active">
@@ -453,6 +454,87 @@
                         <div id="twitterStatus" style="margin-top: 15px; padding: 12px; border-radius: 4px; display: none;"></div>
                     </div>
                 </div>
+                
+                <!-- Nextdoor Content Area -->
+                <div id="nextdoor" class="content-area" style="display: none;">
+                    <div class="form-group">
+                        <label for="contentTypeNextdoor">Content Type</label>
+                        <select id="contentTypeNextdoor" name="contentTypeNextdoor" aria-label="Select content type">
+                            <option value="test-post">🧪 Test Post (First Post)</option>
+                            <option value="service-promotion">Service Promotion</option>
+                            <option value="client-success">Client Success Story</option>
+                            <option value="industry-tip">Industry Tip</option>
+                            <option value="behind-scenes">Behind the Scenes</option>
+                            <option value="testimonial">Customer Testimonial</option>
+                            <option value="how-to">How-To Guide</option>
+                            <option value="question">Engagement Question</option>
+                            <option value="local-community">Local Community</option>
+                            <option value="seasonal">Seasonal/Holiday</option>
+                            <option value="job-posting">💼 Job Posting</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="clientBusinessNameNextdoor">Client/Business Name</label>
+                        <input type="text" id="clientBusinessNameNextdoor" placeholder="e.g., TNR Business Solutions" value="TNR Business Solutions">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="professionTypeNextdoor">Industry Type</label>
+                        <select id="professionTypeNextdoor" name="professionTypeNextdoor" aria-label="Select industry type">
+                            <option value="digital-marketing">Digital Marketing Agency</option>
+                            <option value="insurance">Insurance Services</option>
+                            <option value="construction">Construction/Trades</option>
+                            <option value="professional-services">Professional Services (Law, Accounting, Consulting)</option>
+                            <option value="healthcare">Healthcare/Medical</option>
+                            <option value="restaurant">Restaurant/Food Service</option>
+                            <option value="retail">Retail Store</option>
+                            <option value="real-estate">Real Estate</option>
+                            <option value="automotive">Automotive Services</option>
+                            <option value="home-services">Home Services (HVAC, Plumbing, Electric)</option>
+                            <option value="fitness">Fitness/Gym</option>
+                            <option value="beauty">Beauty/Salon</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="serviceFocusNextdoor">Service Focus</label>
+                        <select id="serviceFocusNextdoor" name="serviceFocusNextdoor" aria-label="Select service focus">
+                            <option value="seo">SEO Services</option>
+                            <option value="web-design">Web Design</option>
+                            <option value="social-media">Social Media Management</option>
+                            <option value="paid-advertising">Paid Advertising</option>
+                            <option value="email-marketing">Email Marketing</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="targetAudienceNextdoor">Target Audience</label>
+                        <select id="targetAudienceNextdoor" name="targetAudienceNextdoor" aria-label="Select target audience">
+                            <option value="neighbors">Neighbors</option>
+                            <option value="local-business">Local Business Owners</option>
+                            <option value="homeowners">Homeowners</option>
+                            <option value="community-members">Community Members</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn" onclick="generateNextdoorContent()" style="background: #00A862;">Generate Nextdoor Content</button>
+                    
+                    <div id="contentPreviewNextdoor" class="post-preview hidden" role="region" aria-label="Generated Nextdoor content preview">
+                        <h4>Generated Nextdoor Post:</h4>
+                        <textarea id="previewContentNextdoor" rows="8" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 14px; line-height: 1.6; resize: vertical; min-height: 200px; white-space: pre-wrap;" placeholder="Generated content will appear here. You can edit it before posting."></textarea>
+                        <div style="text-align: right; margin-top: 5px; color: #666; font-size: 14px;">
+                            <strong>Character Count:</strong> <span id="nextdoorCharCountPreview">0</span> characters
+                            <br><small>Nextdoor posts can be up to 5,000 characters. Local, community-focused content performs best.</small>
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+                            <button class="btn" onclick="postGeneratedToNextdoor()" style="flex: 1; min-width: 200px; background: #00A862;">🏘️ Post to Nextdoor</button>
+                            <button class="btn btn-secondary" onclick="testNextdoorConnection()">🧪 Test Connection</button>
+                            <button class="btn btn-secondary" onclick="copyNextdoorContent()" style="flex: 1; min-width: 200px;">📋 Copy Content</button>
+                        </div>
+                        <div id="nextdoorStatus" style="margin-top: 15px; padding: 12px; border-radius: 4px; display: none;"></div>
+                    </div>
+                </div>
             </div>
             
             <!-- Post Scheduler -->
@@ -466,6 +548,7 @@
                         <option value="instagram">Instagram</option>
                         <option value="linkedin">LinkedIn</option>
                         <option value="twitter">Twitter</option>
+                        <option value="nextdoor">Nextdoor</option>
                     </select>
                 </div>
                 
@@ -695,7 +778,7 @@
         // Meta OAuth Functions
         function connectMeta() {
             // Redirect to Meta OAuth flow
-            window.location.href = '/auth/meta';
+            window.location.href = '/api/auth/meta';
         }
         
         // Twitter/X OAuth Functions
@@ -927,6 +1010,115 @@
             } catch (error) {
                 alert(`❌ Error: ${error.message}`);
                 console.error('Save Twitter token error:', error);
+            }
+        }
+        
+        // Nextdoor OAuth Functions
+        function connectNextdoor() {
+            // Redirect to Nextdoor OAuth flow
+            window.location.href = '/api/auth/nextdoor';
+        }
+        
+        async function testNextdoorConnection() {
+            const statusDiv = document.getElementById('nextdoorStatus');
+            const statusText = document.getElementById('nextdoorStatusText');
+            
+            try {
+                if (statusDiv) {
+                    statusDiv.style.display = 'block';
+                    statusDiv.style.background = '#fff3cd';
+                    statusDiv.style.color = '#856404';
+                    statusDiv.textContent = 'Testing connection...';
+                }
+                
+                // Get tokens from database
+                const response = await fetch('/api/social-tokens?platform=nextdoor');
+                const data = await response.json();
+                
+                if (!data.success || !data.tokens || data.tokens.length === 0) {
+                    if (statusDiv) {
+                        statusDiv.style.background = '#f8d7da';
+                        statusDiv.style.color = '#721c24';
+                        statusDiv.textContent = '❌ No Nextdoor token found. Please connect your account first.';
+                    }
+                    if (statusText) statusText.textContent = 'Not connected';
+                    return;
+                }
+                
+                // Test the first token
+                const token = data.tokens[0];
+                const testResponse = await fetch('/api/social-tokens', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'test',
+                        tokenId: token.id,
+                        platform: 'nextdoor'
+                    })
+                });
+                
+                const testData = await testResponse.json();
+                
+                if (testData.success && testData.valid) {
+                    if (statusDiv) {
+                        statusDiv.style.background = '#d4edda';
+                        statusDiv.style.color = '#155724';
+                        statusDiv.textContent = `✅ Connection successful! Connected as: ${testData.account?.username || token.page_name || 'Nextdoor User'}`;
+                    }
+                    if (statusText) statusText.innerHTML = `✅ Connected: ${testData.account?.username || token.page_name || 'Nextdoor User'}`;
+                } else {
+                    if (statusDiv) {
+                        statusDiv.style.background = '#f8d7da';
+                        statusDiv.style.color = '#721c24';
+                        statusDiv.textContent = `❌ Connection failed: ${testData.message || 'Invalid token'}`;
+                    }
+                    if (statusText) statusText.textContent = 'Connection failed';
+                }
+            } catch (error) {
+                if (statusDiv) {
+                    statusDiv.style.background = '#f8d7da';
+                    statusDiv.style.color = '#721c24';
+                    statusDiv.textContent = `❌ Error: ${error.message}`;
+                }
+                if (statusText) statusText.textContent = 'Error';
+                console.error('Nextdoor connection test error:', error);
+            }
+        }
+        
+        async function saveNextdoorToken() {
+            const tokenInput = document.getElementById('nextdoorToken');
+            const token = tokenInput?.value.trim();
+            
+            if (!token) {
+                alert('Please enter an Access Token');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/social-tokens', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'save',
+                        platform: 'nextdoor',
+                        access_token: token,
+                        page_name: 'TNR Business Solutions',
+                        token_type: 'Bearer'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('✅ Nextdoor token saved successfully!');
+                    if (tokenInput) tokenInput.value = '';
+                    testNextdoorConnection();
+                } else {
+                    alert(`❌ Failed to save token: ${data.message || data.error || 'Server error'}`);
+                }
+            } catch (error) {
+                alert(`❌ Error: ${error.message}`);
+                console.error('Nextdoor token save error:', error);
             }
         }
         
@@ -2357,6 +2549,128 @@
                     statusDiv.textContent = `❌ Error: ${error.message}`;
                 }
                 console.error('Twitter post error:', error);
+            }
+        }
+        
+        // Nextdoor Content Generation and Posting
+        function generateNextdoorContent() {
+            const contentType = document.getElementById('contentTypeNextdoor').value;
+            const industryType = document.getElementById('professionTypeNextdoor').value;
+            const businessName = document.getElementById('clientBusinessNameNextdoor').value || 'TNR Business Solutions';
+            const location = 'Greensburg PA';
+            const phone = '(412) 499-2987';
+            
+            let template;
+            
+            // Handle test post (special case - always random)
+            if (contentType === 'test-post') {
+                const testTemplates = [
+                    `Hello neighbors! 👋 We're ${businessName}, your local ${industryType} serving ${location}.\n\nWe're excited to connect with our community and help local businesses grow!\n\nContact us: ${phone}\n\n#LocalBusiness #${location.replace(/\s+/g, '')} #Community`,
+                    `Hi ${location} neighbors! 🏘️\n\n${businessName} is here to serve our community with quality ${industryType} services.\n\nReach out: ${phone}\n\n#LocalBusiness #CommunitySupport`,
+                    `Neighbors, meet ${businessName}! 👋\n\nWe're a local ${industryType} business in ${location}, dedicated to helping our community thrive.\n\nGet in touch: ${phone}\n\n#LocalBusiness #${location.replace(/\s+/g, '')}`
+                ];
+                template = testTemplates[Math.floor(Math.random() * testTemplates.length)];
+            } else if (contentType === 'service-promotion') {
+                template = `🏘️ Neighbors, did you know?\n\n${businessName} offers professional ${industryType} services right here in ${location}!\n\nWe're committed to supporting our local community with quality service.\n\nContact us: ${phone}\n\n#LocalBusiness #${location.replace(/\s+/g, '')} #CommunitySupport`;
+            } else if (contentType === 'local-community') {
+                template = `Hello ${location} neighbors! 👋\n\n${businessName} is proud to be part of this amazing community. We're here to support local businesses and neighbors.\n\nLet's connect! ${phone}\n\n#Community #LocalBusiness #${location.replace(/\s+/g, '')}`;
+            } else {
+                // Generic template for other content types
+                template = `Hello neighbors! 👋\n\n${businessName} - Your trusted ${industryType} partner in ${location}.\n\nContact: ${phone}\n\n#LocalBusiness #${location.replace(/\s+/g, '')} #Community`;
+            }
+            
+            // Replace placeholders
+            template = template
+                .replace(/{business}/g, businessName)
+                .replace(/{location}/g, location)
+                .replace(/{phone}/g, phone)
+                .replace(/{industry}/g, industryType);
+            
+            // Show preview
+            const previewDiv = document.getElementById('contentPreviewNextdoor');
+            const previewText = document.getElementById('previewContentNextdoor');
+            const charCountEl = document.getElementById('nextdoorCharCountPreview');
+            
+            if (previewText) {
+                previewText.value = template;
+            }
+            if (charCountEl) {
+                charCountEl.textContent = template.length;
+            }
+            if (previewDiv) {
+                previewDiv.classList.remove('hidden');
+            }
+        }
+        
+        async function postGeneratedToNextdoor() {
+            const content = document.getElementById('previewContentNextdoor')?.value?.trim();
+            const statusDiv = document.getElementById('nextdoorStatus');
+            
+            if (!content) {
+                alert('Please generate content first');
+                return;
+            }
+            
+            try {
+                if (statusDiv) {
+                    statusDiv.style.display = 'block';
+                    statusDiv.style.background = '#fff3cd';
+                    statusDiv.style.color = '#856404';
+                    statusDiv.textContent = 'Posting to Nextdoor...';
+                }
+                
+                const response = await fetch('/api/post-to-nextdoor', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        text: content,
+                        useDatabaseToken: true
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    if (statusDiv) {
+                        statusDiv.style.background = '#d4edda';
+                        statusDiv.style.color = '#155724';
+                        statusDiv.innerHTML = `✅ Post published to Nextdoor successfully!<br><a href="${data.postUrl || '#'}" target="_blank" style="color: #155724; text-decoration: underline;">View Post →</a>`;
+                    }
+                    
+                    // Clear preview after successful post
+                    setTimeout(() => {
+                        document.getElementById('contentPreviewNextdoor').classList.add('hidden');
+                        document.getElementById('previewContentNextdoor').value = '';
+                        if (statusDiv) {
+                            statusDiv.style.display = 'none';
+                        }
+                    }, 3000);
+                } else {
+                    if (statusDiv) {
+                        statusDiv.style.background = '#f8d7da';
+                        statusDiv.style.color = '#721c24';
+                        statusDiv.textContent = `❌ Failed to post: ${data.message || data.error || 'Unknown error'}`;
+                    }
+                }
+            } catch (error) {
+                if (statusDiv) {
+                    statusDiv.style.background = '#f8d7da';
+                    statusDiv.style.color = '#721c24';
+                    statusDiv.textContent = `❌ Error: ${error.message}`;
+                }
+                console.error('Nextdoor post error:', error);
+            }
+        }
+        
+        function copyNextdoorContent() {
+            const content = document.getElementById('previewContentNextdoor')?.value;
+            if (content) {
+                navigator.clipboard.writeText(content).then(() => {
+                    alert('✅ Content copied to clipboard!');
+                }).catch(err => {
+                    console.error('Copy failed:', err);
+                    alert('❌ Failed to copy content');
+                });
             }
         }
         

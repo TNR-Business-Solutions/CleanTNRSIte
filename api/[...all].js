@@ -170,6 +170,15 @@ module.exports = async (req, res) => {
       return await handler(req, res);
     }
 
+    if (route.startsWith("auth/nextdoor")) {
+      if (route === "auth/nextdoor/callback" || route.endsWith("/callback")) {
+        const handler = require("../server/handlers/auth-nextdoor-callback");
+        return await handler(req, res);
+      }
+      const handler = require("../server/handlers/auth-nextdoor");
+      return await handler(req, res);
+    }
+
     // Threads OAuth routes
     if (route.startsWith("auth/threads")) {
       if (route === "auth/threads/callback" || route.endsWith("/callback")) {
@@ -262,6 +271,16 @@ module.exports = async (req, res) => {
       return await handler(req, res);
     }
 
+    // Post to Nextdoor
+    if (
+      route === "post-to-nextdoor" ||
+      route.includes("post-to-nextdoor") ||
+      route === "social/post-nextdoor"
+    ) {
+      const handler = require("../server/handlers/post-to-nextdoor");
+      return await handler(req, res);
+    }
+
     if (route.startsWith("social/")) {
       if (route.includes("tokens") || route === "social/tokens") {
         const handler = require("../server/handlers/social-tokens-api");
@@ -304,6 +323,12 @@ module.exports = async (req, res) => {
         const handler = require("../server/handlers/test-token");
         return await handler(req, res);
       }
+    }
+
+    // API Keys Management
+    if (route === "api-keys" || route.startsWith("api-keys/")) {
+      const handler = require("../server/handlers/api-keys-api");
+      return await handler(req, res);
       if (route.includes("get-insights")) {
         const handler = require("../server/handlers/get-insights");
         return await handler(req, res);
