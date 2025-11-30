@@ -27,6 +27,16 @@ async function getDatabase() {
 // Import CORS utilities
 const { setCorsHeaders, handleCorsPreflight } = require("./cors-utils");
 
+// Import activity logging
+let logActivity;
+try {
+  const activityLog = require("./activity-log-api");
+  logActivity = activityLog.logActivity;
+} catch (e) {
+  console.log("Activity logging not available (optional feature)");
+  logActivity = async () => {}; // No-op if not available
+}
+
 // CRM API Handler
 module.exports = async function crmApiHandler(req, res) {
   try {
@@ -224,6 +234,9 @@ module.exports = async function crmApiHandler(req, res) {
           if (path === "clients") {
             const client = await db.addClient(data);
 
+            // Log activity
+            await logActivity('client', 'Created', `New client added: ${client.name || client.email}`, 'system', 'CRM', { clientId: client.id });
+
             // Send welcome email to new client (non-blocking)
             try {
               // Ensure .env is loaded
@@ -284,6 +297,9 @@ module.exports = async function crmApiHandler(req, res) {
                 "-",
                 lead.name || lead.email
               );
+
+              // Log activity
+              await logActivity('lead', 'Created', `New lead added: ${lead.name || lead.email}`, 'system', 'CRM', { leadId: lead.id, source: lead.source });
 
               // Trigger workflows for new lead
               try {
@@ -384,6 +400,9 @@ module.exports = async function crmApiHandler(req, res) {
               const lead = await db.addLead(leadPayload);
               created.push(lead);
 
+              // Log activity
+              await logActivity('lead', 'Imported', `Lead imported from CSV: ${lead.name || lead.email}`, 'system', 'CRM', { leadId: lead.id, source: lead.source });
+
               // Trigger workflows for new lead (non-blocking)
               try {
                 await workflowExecutor.initialize();
@@ -431,6 +450,9 @@ module.exports = async function crmApiHandler(req, res) {
             const oldStatus = oldClient?.status;
 
             const client = await db.updateClient(data.id, data);
+
+            // Log activity
+            await logActivity('client', 'Updated', `Client updated: ${client.name || client.email}`, 'system', 'CRM', { clientId: client.id, changes: Object.keys(data) });
 
             // Trigger workflows if status changed
             if (data.status && oldStatus && data.status !== oldStatus) {
@@ -508,11 +530,21 @@ module.exports = async function crmApiHandler(req, res) {
         setCorsHeaders(res, origin);
         try {
           if (resourceType === "clients") {
+            const client = await db.getClient(id);
             await db.deleteClient(id);
+            
+            // Log activity
+            await logActivity('client', 'Deleted', `Client deleted: ${client?.name || client?.email || id}`, 'system', 'CRM', { clientId: id });
+            
             res.writeHead(200, { "Content-Type": "application/json" });
             res.end(JSON.stringify({ success: true, message: "Client deleted successfully" }));
           } else if (resourceType === "leads") {
+            const lead = await db.getLead(id);
             await db.deleteLead(id);
+            
+            // Log activity
+            await logActivity('lead', 'Deleted', `Lead deleted: ${lead?.name || lead?.email || id}`, 'system', 'CRM', { leadId: id });
+            
             res.writeHead(200, { "Content-Type": "application/json" });
             res.end(JSON.stringify({ success: true, message: "Lead deleted successfully" }));
           } else if (resourceType === "orders") {
