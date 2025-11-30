@@ -73,7 +73,23 @@ module.exports = async (req, res) => {
     if (route === "crm" || route.startsWith("crm/")) {
       console.log("✅ Routing to CRM API handler");
       const handler = require("../server/handlers/crm-api");
-      req.url = fullPath;
+      // Preserve original req.url with query string for proper parsing
+      req.url = req.url || fullPath;
+      // Ensure req.query is available (Vercel provides this)
+      if (!req.query) {
+        req.query = {};
+        // Parse query string from req.url if available
+        const urlParts = req.url.split('?');
+        if (urlParts.length > 1) {
+          const queryString = urlParts[1];
+          queryString.split('&').forEach(param => {
+            const [key, value] = param.split('=');
+            if (key) {
+              req.query[decodeURIComponent(key)] = value ? decodeURIComponent(value) : '';
+            }
+          });
+        }
+      }
       return await handler(req, res);
     }
 
