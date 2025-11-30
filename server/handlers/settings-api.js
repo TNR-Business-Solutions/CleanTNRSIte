@@ -7,6 +7,7 @@
 
 const TNRDatabase = require('../../database');
 const httpUtils = require('./http-utils');
+const { setCorsHeaders, handleCorsPreflight } = require('./cors-utils');
 
 // Initialize database connection
 let dbInstance = null;
@@ -22,15 +23,14 @@ async function getDatabase() {
 async function handleSettingsAPI(req, res) {
     const method = req.method;
     
+    // Handle CORS
+    const origin = req.headers.origin || req.headers.referer;
+    if (handleCorsPreflight(req, res)) {
+        return;
+    }
+    setCorsHeaders(res, origin);
+    
     try {
-        if (req.method === "OPTIONS") {
-            res.setHeader("Access-Control-Allow-Origin", "*");
-            res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-            res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-            res.writeHead(200);
-            res.end();
-            return;
-        }
         
         if (method === 'GET') {
             // Get settings

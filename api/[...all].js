@@ -251,6 +251,18 @@ module.exports = async (req, res) => {
       return await handler(req, res);
     }
 
+    // Settings API
+    if (route === "settings" || route.startsWith("settings/")) {
+      const handler = require("../server/handlers/settings-api");
+      return await handler(req, res);
+    }
+
+    // Pinterest OAuth (placeholder - not yet implemented)
+    if (route === "auth/pinterest" || route.startsWith("auth/pinterest")) {
+      const handler = require("../server/handlers/auth-pinterest");
+      return await handler(req, res);
+    }
+
     // Social media token management - handle both /api/social-tokens and /api/social/tokens
     if (
       route === "social-tokens" ||

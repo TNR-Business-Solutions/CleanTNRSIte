@@ -463,25 +463,46 @@ module.exports = async function crmApiHandler(req, res) {
         }
       });
     } else if (req.method === "DELETE") {
+      // Handle DELETE requests - support both path-based and query parameter IDs
+      const query = parsedUrl ? Object.fromEntries(parsedUrl.searchParams) : {};
+      let id = null;
+      
       if (path.startsWith("clients/")) {
-        const id = path.replace("clients/", "");
-        await db.deleteClient(id);
-        res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ success: true }));
+        id = path.replace("clients/", "");
+      } else if (path === "clients" && query.clientId) {
+        id = query.clientId;
       } else if (path.startsWith("leads/")) {
-        const id = path.replace("leads/", "");
-        await db.deleteLead(id);
-        res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ success: true }));
+        id = path.replace("leads/", "");
+      } else if (path === "leads" && query.leadId) {
+        id = query.leadId;
       } else if (path.startsWith("orders/")) {
-        const id = path.replace("orders/", "");
-        await db.deleteOrder(id);
-        res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ success: true }));
+        id = path.replace("orders/", "");
+      } else if (path === "orders" && query.orderId) {
+        id = query.orderId;
+      }
+      
+      if (id) {
+        if (path.startsWith("clients/") || (path === "clients" && query.clientId)) {
+          await db.deleteClient(id);
+          setCorsHeaders(res, origin);
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ success: true, message: "Client deleted successfully" }));
+        } else if (path.startsWith("leads/") || (path === "leads" && query.leadId)) {
+          await db.deleteLead(id);
+          setCorsHeaders(res, origin);
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ success: true, message: "Lead deleted successfully" }));
+        } else if (path.startsWith("orders/") || (path === "orders" && query.orderId)) {
+          await db.deleteOrder(id);
+          setCorsHeaders(res, origin);
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ success: true, message: "Order deleted successfully" }));
+        }
       } else {
-        res.writeHead(404, { "Content-Type": "application/json" });
+        setCorsHeaders(res, origin);
+        res.writeHead(400, { "Content-Type": "application/json" });
         res.end(
-          JSON.stringify({ success: false, error: "Endpoint not found" })
+          JSON.stringify({ success: false, error: "ID is required for DELETE operation" })
         );
       }
     } else {
