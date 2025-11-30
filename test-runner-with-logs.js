@@ -261,13 +261,22 @@ async function testCRMDelete(page) {
       
       // Test DELETE with query param using fetch
       const deleteResult = await page.evaluate(async (url, clientId) => {
-        const response = await fetch(`${url}/api/crm/clients?clientId=${clientId}`, {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' }
-        });
-        const data = await response.json();
-        return { status: response.status, data };
+        try {
+          const response = await fetch(`${url}/api/crm/clients?clientId=${clientId}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' }
+          });
+          const data = await response.json();
+          return { status: response.status, data, error: null };
+        } catch (error) {
+          return { status: 0, data: null, error: error.message };
+        }
       }, BASE_URL, clientId);
+      
+      if (deleteResult.error) {
+        recordTest('CRM DELETE (query param)', false, new Error(deleteResult.error));
+        return false;
+      }
       
       const passed = deleteResult.status === 200 && deleteResult.data.success;
       recordTest('CRM DELETE (query param)', passed, passed ? null : new Error(`Status ${deleteResult.status}`), { status: deleteResult.status });

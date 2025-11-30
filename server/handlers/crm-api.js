@@ -60,6 +60,7 @@ module.exports = async function crmApiHandler(req, res) {
     const path = match ? match[1] : pathWithoutQuery;
 
     console.log("📋 CRM API Request:", req.method, fullPath, "Path:", path);
+    console.log("📋 Query params:", parsedUrl ? Object.fromEntries(parsedUrl.searchParams) : "none");
 
     try {
       db = await getDatabase();
