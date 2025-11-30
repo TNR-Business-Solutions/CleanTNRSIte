@@ -444,7 +444,10 @@
                         </select>
                     </div>
                     
-                    <button class="btn" onclick="generateTwitterContent()" style="background: #1da1f2;">Generate Content</button>
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <button class="btn" onclick="generateTwitterContent()" style="background: #1da1f2;">Generate Content</button>
+                        <button class="btn" onclick="openContentLibrary('previewContentTwitter')" style="background: #17a2b8;">📚 Content Library</button>
+                    </div>
                     
                     <div id="contentPreviewTwitter" class="post-preview hidden" role="region" aria-label="Generated content preview">
                         <h4>Generated Tweet:</h4>
