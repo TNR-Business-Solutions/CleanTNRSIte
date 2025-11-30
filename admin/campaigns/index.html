@@ -111,6 +111,49 @@
                 document.getElementById('admin-header-placeholder').innerHTML = html;
             });
         
+        // Content Library Integration
+        function openContentLibrary(targetTextareaId) {
+            sessionStorage.setItem('contentLibraryTarget', targetTextareaId);
+            window.open('/content-library.html', 'ContentLibrary', 'width=1200,height=800');
+        }
+
+        // Listen for content selection from library
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'selectedContent') {
+                const content = JSON.parse(e.newValue);
+                const targetId = sessionStorage.getItem('contentLibraryTarget');
+                if (targetId && content) {
+                    const textarea = document.getElementById(targetId);
+                    if (textarea) {
+                        textarea.value = content.content;
+                        textarea.dispatchEvent(new Event('input'));
+                    }
+                    sessionStorage.removeItem('contentLibraryTarget');
+                    sessionStorage.removeItem('selectedContent');
+                }
+            }
+        });
+
+        // Check for content on page load
+        window.addEventListener('load', function() {
+            const selectedContent = sessionStorage.getItem('selectedContent');
+            const targetId = sessionStorage.getItem('contentLibraryTarget');
+            if (selectedContent && targetId) {
+                try {
+                    const content = JSON.parse(selectedContent);
+                    const textarea = document.getElementById(targetId);
+                    if (textarea) {
+                        textarea.value = content.content;
+                        textarea.dispatchEvent(new Event('input'));
+                    }
+                    sessionStorage.removeItem('contentLibraryTarget');
+                    sessionStorage.removeItem('selectedContent');
+                } catch (e) {
+                    console.error('Error loading content from library:', e);
+                }
+            }
+        });
+
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
             console.log('📧 Campaigns page loaded');
