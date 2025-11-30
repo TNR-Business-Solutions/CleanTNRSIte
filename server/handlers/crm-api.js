@@ -41,11 +41,16 @@ module.exports = async function crmApiHandler(req, res) {
 
     let db;
     let fullPath = req.url;
+    
+    // Also check req.query if available (Vercel provides this)
+    const queryFromReq = req.query || {};
 
     const parsedUrl = (() => {
       try {
         // Provide a base to satisfy WHATWG URL on Node
-        return new URL(fullPath, "http://localhost");
+        // If fullPath doesn't start with /, it might be relative
+        const urlToParse = fullPath.startsWith('/') ? fullPath : `/${fullPath}`;
+        return new URL(urlToParse, "http://localhost");
       } catch (e) {
         console.error("URL parse error:", e);
         return null;
@@ -59,8 +64,14 @@ module.exports = async function crmApiHandler(req, res) {
     const match = fullPath.match(/\/api\/crm\/([^?]*)/);
     const path = match ? match[1] : pathWithoutQuery;
 
+    // Combine query params from URL and req.query
+    const urlQueryParams = parsedUrl ? Object.fromEntries(parsedUrl.searchParams) : {};
+    const allQueryParams = { ...urlQueryParams, ...queryFromReq };
+
     console.log("📋 CRM API Request:", req.method, fullPath, "Path:", path);
-    console.log("📋 Query params:", parsedUrl ? Object.fromEntries(parsedUrl.searchParams) : "none");
+    console.log("📋 Query params from URL:", urlQueryParams);
+    console.log("📋 Query params from req.query:", queryFromReq);
+    console.log("📋 Combined query params:", allQueryParams);
 
     try {
       db = await getDatabase();
@@ -465,8 +476,8 @@ module.exports = async function crmApiHandler(req, res) {
       });
     } else if (req.method === "DELETE") {
       // Handle DELETE requests - support both path-based and query parameter IDs
-      // Extract query parameters from the full URL
-      const queryParams = parsedUrl ? Object.fromEntries(parsedUrl.searchParams) : {};
+      // Use combined query params (from URL and req.query)
+      const queryParams = allQueryParams;
       let id = null;
       let resourceType = null;
       
