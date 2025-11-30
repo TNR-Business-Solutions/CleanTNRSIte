@@ -1,0 +1,186 @@
+{
+  "totalIterations": 1,
+  "allPassed": true,
+  "allResults": [
+    {
+      "iteration": 1,
+      "results": {
+        "passed": [
+          {
+            "name": "Admin Login",
+            "passed": true,
+            "error": null,
+            "details": {
+              "status": 200
+            },
+            "timestamp": 1764532640996
+          },
+          {
+            "name": "GET /api/crm/clients",
+            "passed": true,
+            "error": null,
+            "details": {
+              "status": 200
+            },
+            "timestamp": 1764532645350
+          },
+          {
+            "name": "GET /api/crm/leads",
+            "passed": true,
+            "error": null,
+            "details": {
+              "status": 200
+            },
+            "timestamp": 1764532645350
+          },
+          {
+            "name": "GET /api/crm/orders",
+            "passed": true,
+            "error": null,
+            "details": {
+              "status": 200
+            },
+            "timestamp": 1764532645350
+          },
+          {
+            "name": "GET /api/crm/stats",
+            "passed": true,
+            "error": null,
+            "details": {
+              "status": 200
+            },
+            "timestamp": 1764532645350
+          },
+          {
+            "name": "Settings API",
+            "passed": true,
+            "error": null,
+            "details": {
+              "status": 200
+            },
+            "timestamp": 1764532646282
+          },
+          {
+            "name": "Social Tokens API",
+            "passed": true,
+            "error": null,
+            "details": {
+              "status": 200
+            },
+            "timestamp": 1764532647368
+          },
+          {
+            "name": "Pinterest OAuth",
+            "passed": true,
+            "error": null,
+            "details": {
+              "status": 501
+            },
+            "timestamp": 1764532648395
+          },
+          {
+            "name": "CRM DELETE (query param)",
+            "passed": true,
+            "error": null,
+            "details": {
+              "status": 200
+            },
+            "timestamp": 1764532649486
+          },
+          {
+            "name": "Page Load: Admin Dashboard",
+            "passed": true,
+            "error": null,
+            "details": {
+              "status": 200
+            },
+            "timestamp": 1764532650399
+          },
+          {
+            "name": "Page Load: CRM Page",
+            "passed": true,
+            "error": null,
+            "details": {
+              "status": 200
+            },
+            "timestamp": 1764532651365
+          },
+          {
+            "name": "Page Load: Campaigns Page",
+            "passed": true,
+            "error": null,
+            "details": {
+              "status": 200
+            },
+            "timestamp": 1764532652400
+          },
+          {
+            "name": "Page Load: Analytics Page",
+            "passed": true,
+            "error": null,
+            "details": {
+              "status": 200
+            },
+            "timestamp": 1764532653363
+          },
+          {
+            "name": "Page Load: Settings Page",
+            "passed": true,
+            "error": null,
+            "details": {
+              "status": 200
+            },
+            "timestamp": 1764532654417
+          },
+          {
+            "name": "Page Load: Orders Page",
+            "passed": true,
+            "error": null,
+            "details": {
+              "status": 200
+            },
+            "timestamp": 1764532655432
+          },
+          {
+            "name": "Page Load: Social Media Dashboard",
+            "passed": true,
+            "error": null,
+            "details": {
+              "status": 200
+            },
+            "timestamp": 1764532656919
+          },
+          {
+            "name": "Page Load: Wix Dashboard",
+            "passed": true,
+            "error": null,
+            "details": {
+              "status": 200
+            },
+            "timestamp": 1764532657536
+          }
+        ],
+        "failed": [],
+        "warnings": [],
+        "apiErrors": [
+          {
+            "url": "https://www.tnrbusinesssolutions.com/api/auth/pinterest",
+            "status": 501,
+            "timestamp": 1764532647447
+          },
+          {
+            "url": "https://www.tnrbusinesssolutions.com/api/social/test-token",
+            "status": 400,
+            "timestamp": 1764532656398
+          }
+        ],
+        "vercelLogs": [],
+        "startTime": 1764532635794,
+        "endTime": 1764532658223,
+        "duration": 22429,
+        "totalTests": 17,
+        "passRate": "100.00"
+      }
+    }
+  ]
+}
