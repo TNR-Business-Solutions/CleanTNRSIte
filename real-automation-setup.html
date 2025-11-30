@@ -511,6 +511,14 @@
             }
         }
 
+        // Extract hashtags from content
+        function extractHashtags(text) {
+            if (!text) return [];
+            const hashtagRegex = /#[\w]+/g;
+            const matches = text.match(hashtagRegex);
+            return matches ? matches.map(tag => tag.substring(1)) : [];
+        }
+
         // Test real post
         async function testRealPost() {
             const content = document.getElementById('testContent').value;
@@ -589,6 +597,81 @@
                 }
             };
             input.click();
+        }
+
+        // Test Google Analytics connection
+        async function testGoogleAnalytics() {
+            const trackingId = document.getElementById('gaTrackingId').value.trim();
+            if (!trackingId) {
+                alert('Please enter a Google Analytics Measurement ID (G-XXXXXXXXXX)');
+                return;
+            }
+
+            // Validate format (should start with G-)
+            if (!trackingId.startsWith('G-')) {
+                alert('Invalid GA4 Measurement ID format. Should start with "G-" (e.g., G-XXXXXXXXXX)');
+                return;
+            }
+
+            try {
+                // Save to database
+                await saveApiKeyToDatabase('google-analytics', trackingId);
+                
+                // Test by checking if gtag is available (client-side validation)
+                if (typeof window.gtag === 'undefined') {
+                    // Initialize gtag for testing
+                    window.dataLayer = window.dataLayer || [];
+                    function gtag(){window.dataLayer.push(arguments);}
+                    window.gtag = gtag;
+                    gtag('js', new Date());
+                    gtag('config', trackingId);
+                }
+                
+                alert('✅ Google Analytics connection configured successfully!\n\nMeasurement ID: ' + trackingId + '\n\nNote: Verify tracking in Google Analytics dashboard.');
+            } catch (error) {
+                alert('❌ Error configuring Google Analytics: ' + error.message);
+                console.error('Google Analytics test error:', error);
+            }
+        }
+
+        // Test Facebook Pixel connection
+        async function testFacebookPixel() {
+            const pixelId = document.getElementById('fbPixelId').value.trim();
+            if (!pixelId) {
+                alert('Please enter a Facebook Pixel ID');
+                return;
+            }
+
+            // Validate format (should be numeric)
+            if (!/^\d+$/.test(pixelId)) {
+                alert('Invalid Facebook Pixel ID format. Should be numeric only.');
+                return;
+            }
+
+            try {
+                // Save to database
+                await saveApiKeyToDatabase('facebook-pixel', pixelId);
+                
+                // Test by checking if fbq is available (client-side validation)
+                if (typeof window.fbq === 'undefined') {
+                    // Initialize fbq for testing
+                    !function(f,b,e,v,n,t,s)
+                    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+                    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+                    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+                    n.queue=[];t=b.createElement(e);t.async=!0;
+                    t.src=v;s=b.getElementsByTagName(e)[0];
+                    s.parentNode.insertBefore(t,s)}(window, document,'script',
+                    'https://connect.facebook.net/en_US/fbevents.js');
+                    fbq('init', pixelId);
+                    fbq('track', 'PageView');
+                }
+                
+                alert('✅ Facebook Pixel connection configured successfully!\n\nPixel ID: ' + pixelId + '\n\nNote: Verify tracking in Facebook Events Manager.');
+            } catch (error) {
+                alert('❌ Error configuring Facebook Pixel: ' + error.message);
+                console.error('Facebook Pixel test error:', error);
+            }
         }
 
         // Save API key to database

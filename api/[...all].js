@@ -329,10 +329,6 @@ module.exports = async (req, res) => {
     if (route === "api-keys" || route.startsWith("api-keys/")) {
       const handler = require("../server/handlers/api-keys-api");
       return await handler(req, res);
-      if (route.includes("get-insights")) {
-        const handler = require("../server/handlers/get-insights");
-        return await handler(req, res);
-      }
     }
 
     // Handle root /api endpoint
