@@ -37,7 +37,7 @@ module.exports = async function crmApiHandler(req, res) {
     }
     
     // Set CORS headers
-    setCors(res, origin);
+    setCorsHeaders(res, origin);
 
     let db;
     let fullPath = req.url;

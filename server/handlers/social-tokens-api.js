@@ -40,6 +40,7 @@ module.exports = async (req, res) => {
           has_token: !!token.access_token,
         })),
       });
+      return;
     }
 
     // DELETE - Remove a token
