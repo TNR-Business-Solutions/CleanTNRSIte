@@ -464,45 +464,64 @@ module.exports = async function crmApiHandler(req, res) {
       });
     } else if (req.method === "DELETE") {
       // Handle DELETE requests - support both path-based and query parameter IDs
-      const query = parsedUrl ? Object.fromEntries(parsedUrl.searchParams) : {};
+      // Extract query parameters from the full URL
+      const queryParams = parsedUrl ? Object.fromEntries(parsedUrl.searchParams) : {};
       let id = null;
+      let resourceType = null;
       
+      // Check path-based first
       if (path.startsWith("clients/")) {
         id = path.replace("clients/", "");
-      } else if (path === "clients" && query.clientId) {
-        id = query.clientId;
+        resourceType = "clients";
       } else if (path.startsWith("leads/")) {
         id = path.replace("leads/", "");
-      } else if (path === "leads" && query.leadId) {
-        id = query.leadId;
+        resourceType = "leads";
       } else if (path.startsWith("orders/")) {
         id = path.replace("orders/", "");
-      } else if (path === "orders" && query.orderId) {
-        id = query.orderId;
+        resourceType = "orders";
+      }
+      // Then check query parameters
+      else if (path === "clients" && queryParams.clientId) {
+        id = queryParams.clientId;
+        resourceType = "clients";
+      } else if (path === "leads" && queryParams.leadId) {
+        id = queryParams.leadId;
+        resourceType = "leads";
+      } else if (path === "orders" && queryParams.orderId) {
+        id = queryParams.orderId;
+        resourceType = "orders";
       }
       
-      if (id) {
-        if (path.startsWith("clients/") || (path === "clients" && query.clientId)) {
-          await db.deleteClient(id);
-          setCorsHeaders(res, origin);
-          res.writeHead(200, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ success: true, message: "Client deleted successfully" }));
-        } else if (path.startsWith("leads/") || (path === "leads" && query.leadId)) {
-          await db.deleteLead(id);
-          setCorsHeaders(res, origin);
-          res.writeHead(200, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ success: true, message: "Lead deleted successfully" }));
-        } else if (path.startsWith("orders/") || (path === "orders" && query.orderId)) {
-          await db.deleteOrder(id);
-          setCorsHeaders(res, origin);
-          res.writeHead(200, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ success: true, message: "Order deleted successfully" }));
+      if (id && resourceType) {
+        setCorsHeaders(res, origin);
+        try {
+          if (resourceType === "clients") {
+            await db.deleteClient(id);
+            res.writeHead(200, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ success: true, message: "Client deleted successfully" }));
+          } else if (resourceType === "leads") {
+            await db.deleteLead(id);
+            res.writeHead(200, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ success: true, message: "Lead deleted successfully" }));
+          } else if (resourceType === "orders") {
+            await db.deleteOrder(id);
+            res.writeHead(200, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ success: true, message: "Order deleted successfully" }));
+          }
+        } catch (deleteError) {
+          console.error("❌ Delete error:", deleteError);
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ success: false, error: deleteError.message }));
         }
       } else {
         setCorsHeaders(res, origin);
         res.writeHead(400, { "Content-Type": "application/json" });
         res.end(
-          JSON.stringify({ success: false, error: "ID is required for DELETE operation" })
+          JSON.stringify({ 
+            success: false, 
+            error: "ID is required for DELETE operation",
+            details: { path, queryParams, parsedUrl: parsedUrl ? parsedUrl.toString() : null }
+          })
         );
       }
     } else {

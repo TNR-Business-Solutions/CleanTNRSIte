@@ -18,6 +18,8 @@
     "test:wix:flow": "node tests/wix-flowthrough-test.js",
     "test:wix:lighthouse": "node tests/lighthouse-test.js",
     "test:wix:all": "npm run test:wix:flow && npm run test:wix:lighthouse",
+    "test:suite": "node test-runner-with-logs.js",
+    "test:suite:loop": "node test-runner-with-logs.js",
     "server": "cd server && node index.js",
     "minify": "node minify-production.js",
     "optimize-images": "node optimize-images.js",
@@ -63,6 +65,7 @@
     "@types/jest": "^30.0.0",
     "clean-css": "^5.3.3",
     "jest": "^30.2.0",
+    "puppeteer": "^24.31.0",
     "sharp": "^0.34.5",
     "supertest": "^7.1.4",
     "terser": "^5.44.1"
