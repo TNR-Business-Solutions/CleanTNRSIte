@@ -33,6 +33,9 @@
                     
                     <div class="form-group">
                         <label>Email Content (HTML) *</label>
+                        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                            <button class="btn" onclick="openContentLibrary('campaignHtml')" style="background: #17a2b8; padding: 8px 15px; font-size: 0.9em;">📚 Insert from Library</button>
+                        </div>
                         <textarea id="campaignHtml" rows="12" placeholder="Enter HTML email content. Use {{name}}, {{email}}, {{company}} for personalization."></textarea>
                         <small>HTML email content with personalization variables</small>
                     </div>

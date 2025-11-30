@@ -42,6 +42,12 @@ module.exports = async (req, res) => {
     }
   }
 
+  // Content Library routes
+  if (route === "content-library" || route.startsWith("content-library/")) {
+    const handler = require("../server/handlers/content-library-api");
+    return await handler(req, res);
+  }
+
   // Always log for debugging (will help identify routing issues)
   console.log("API Route Debug:", {
     pathname,

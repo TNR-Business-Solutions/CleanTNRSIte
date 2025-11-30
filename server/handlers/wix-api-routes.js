@@ -242,6 +242,38 @@ module.exports = async (req, res) => {
       const contentManager = require('./wix-content-manager');
       const manager = new contentManager(instanceId);
       result = await manager.getPageElements(req.body.pageId);
+    } else if (action === 'getCollectionSchema') {
+      const contentManager = require('./wix-content-manager');
+      const manager = new contentManager(instanceId);
+      result = await manager.getCollectionSchema(req.body.collectionId);
+    } else if (action === 'createCollectionItem') {
+      const contentManager = require('./wix-content-manager');
+      const manager = new contentManager(instanceId);
+      result = await manager.createCollectionItem(req.body.collectionId, req.body.itemData);
+    } else if (action === 'updateCollectionItem') {
+      const contentManager = require('./wix-content-manager');
+      const manager = new contentManager(instanceId);
+      result = await manager.updateCollectionItem(req.body.collectionId, req.body.itemId, req.body.itemData);
+    } else if (action === 'deleteCollectionItem') {
+      const contentManager = require('./wix-content-manager');
+      const manager = new contentManager(instanceId);
+      result = await manager.deleteCollectionItem(req.body.collectionId, req.body.itemId);
+    } else if (action === 'uploadImage') {
+      const contentManager = require('./wix-content-manager');
+      const manager = new contentManager(instanceId);
+      // Handle file upload from multipart form data
+      const formidable = require('formidable');
+      const form = formidable({});
+      const [fields, files] = await form.parse(req);
+      const file = files.file?.[0];
+      if (file) {
+        const fs = require('fs');
+        const fileBuffer = fs.readFileSync(file.filepath);
+        result = await manager.uploadImage(fileBuffer, file.originalFilename || 'image.jpg', file.mimetype || 'image/jpeg');
+        fs.unlinkSync(file.filepath); // Clean up temp file
+      } else {
+        result = { success: false, error: 'No file provided' };
+      }
     }
     
     else {

@@ -307,6 +307,129 @@ class WixContentManager {
   }
 
   /**
+   * Get collection schema/fields
+   */
+  async getCollectionSchema(collectionId) {
+    try {
+      const response = await this.client.request('GET', `/wix-data/v2/collections/${collectionId}`);
+      return {
+        success: true,
+        fields: response.data?.collection?.fields || []
+      };
+    } catch (error) {
+      console.error('Error getting collection schema:', error);
+      return {
+        success: false,
+        error: error.message || 'Failed to get collection schema'
+      };
+    }
+  }
+
+  /**
+   * Create a collection item
+   */
+  async createCollectionItem(collectionId, itemData) {
+    try {
+      const payload = {
+        item: itemData
+      };
+
+      const response = await this.client.request('POST', `/wix-data/v2/collections/${collectionId}/items`, payload);
+      return {
+        success: true,
+        item: response.data
+      };
+    } catch (error) {
+      console.error('Error creating collection item:', error);
+      return {
+        success: false,
+        error: error.message || 'Failed to create collection item'
+      };
+    }
+  }
+
+  /**
+   * Update a collection item
+   */
+  async updateCollectionItem(collectionId, itemId, itemData) {
+    try {
+      const payload = {
+        item: itemData
+      };
+
+      const response = await this.client.request('PATCH', `/wix-data/v2/collections/${collectionId}/items/${itemId}`, payload);
+      return {
+        success: true,
+        item: response.data
+      };
+    } catch (error) {
+      console.error('Error updating collection item:', error);
+      return {
+        success: false,
+        error: error.message || 'Failed to update collection item'
+      };
+    }
+  }
+
+  /**
+   * Delete a collection item
+   */
+  async deleteCollectionItem(collectionId, itemId) {
+    try {
+      await this.client.request('DELETE', `/wix-data/v2/collections/${collectionId}/items/${itemId}`);
+      return {
+        success: true,
+        message: 'Collection item deleted successfully'
+      };
+    } catch (error) {
+      console.error('Error deleting collection item:', error);
+      return {
+        success: false,
+        error: error.message || 'Failed to delete collection item'
+      };
+    }
+  }
+
+  /**
+   * Upload image to Wix Media Manager
+   */
+  async uploadImage(fileBuffer, fileName, mimeType) {
+    try {
+      // First, get upload URL from Wix
+      const uploadUrlResponse = await this.client.request('POST', '/media/v1/files', {
+        file: {
+          name: fileName,
+          mimeType: mimeType
+        }
+      });
+
+      if (!uploadUrlResponse.data?.uploadUrl) {
+        throw new Error('Failed to get upload URL');
+      }
+
+      // Upload file to the provided URL
+      const axios = require('axios');
+      const uploadResponse = await axios.put(uploadUrlResponse.data.uploadUrl, fileBuffer, {
+        headers: {
+          'Content-Type': mimeType
+        }
+      });
+
+      return {
+        success: true,
+        url: uploadUrlResponse.data.fileUrl || uploadUrlResponse.data.url,
+        fileId: uploadUrlResponse.data.fileId
+      };
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      return {
+        success: false,
+        error: error.message || 'Failed to upload image'
+      };
+    }
+  }
+
+  /**
    * Generate URL slug from title
    */
   generateSlug(title) {

@@ -246,7 +246,10 @@
                         <input type="email" id="jobEmail" placeholder="e.g., careers@yourcompany.com">
                     </div>
                     
-                    <button class="btn" onclick="generateContent()">Generate Content</button>
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <button class="btn" onclick="generateContent()">Generate Content</button>
+                        <button class="btn" onclick="openContentLibrary('previewContent')" style="background: #17a2b8;">📚 Content Library</button>
+                    </div>
                     
                     <div id="contentPreview" class="post-preview hidden" role="region" aria-label="Generated content preview">
                         <h4>Generated Post:</h4>
@@ -518,7 +521,10 @@
                         </select>
                     </div>
                     
-                    <button class="btn" onclick="generateNextdoorContent()" style="background: #00A862;">Generate Nextdoor Content</button>
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <button class="btn" onclick="generateNextdoorContent()" style="background: #00A862;">Generate Nextdoor Content</button>
+                        <button class="btn" onclick="openContentLibrary('previewContentNextdoor')" style="background: #17a2b8;">📚 Content Library</button>
+                    </div>
                     
                     <div id="contentPreviewNextdoor" class="post-preview hidden" role="region" aria-label="Generated Nextdoor content preview">
                         <h4>Generated Nextdoor Post:</h4>
@@ -554,6 +560,9 @@
                 
                 <div class="form-group">
                     <label for="scheduleContent">Post Content</label>
+                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                        <button class="btn" onclick="openContentLibrary('scheduleContent')" style="background: #17a2b8; padding: 8px 15px; font-size: 0.9em;">📚 Insert from Library</button>
+                    </div>
                     <textarea id="scheduleContent" name="scheduleContent" rows="4" placeholder="Enter your post content..." aria-label="Enter post content"></textarea>
                 </div>
                 
