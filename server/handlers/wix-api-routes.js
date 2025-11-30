@@ -197,6 +197,53 @@ module.exports = async (req, res) => {
       result = await verification.getChangeSummary(instanceId || req.body.instanceId || null);
     }
     
+    // Content Management Actions
+    else if (action === 'getPages') {
+      const contentManager = require('./wix-content-manager');
+      const manager = new contentManager(instanceId);
+      result = await manager.getPages();
+    } else if (action === 'createPage') {
+      const contentManager = require('./wix-content-manager');
+      const manager = new contentManager(instanceId);
+      result = await manager.createPage(req.body.pageData);
+    } else if (action === 'updatePage') {
+      const contentManager = require('./wix-content-manager');
+      const manager = new contentManager(instanceId);
+      result = await manager.updatePage(req.body.pageId, req.body.pageData);
+    } else if (action === 'deletePage') {
+      const contentManager = require('./wix-content-manager');
+      const manager = new contentManager(instanceId);
+      result = await manager.deletePage(req.body.pageId);
+    } else if (action === 'getBlogPosts') {
+      const contentManager = require('./wix-content-manager');
+      const manager = new contentManager(instanceId);
+      result = await manager.getBlogPosts();
+    } else if (action === 'createBlogPost') {
+      const contentManager = require('./wix-content-manager');
+      const manager = new contentManager(instanceId);
+      result = await manager.createBlogPost(req.body.postData);
+    } else if (action === 'updateBlogPost') {
+      const contentManager = require('./wix-content-manager');
+      const manager = new contentManager(instanceId);
+      result = await manager.updateBlogPost(req.body.postId, req.body.postData);
+    } else if (action === 'deleteBlogPost') {
+      const contentManager = require('./wix-content-manager');
+      const manager = new contentManager(instanceId);
+      result = await manager.deleteBlogPost(req.body.postId);
+    } else if (action === 'getCollections') {
+      const contentManager = require('./wix-content-manager');
+      const manager = new contentManager(instanceId);
+      result = await manager.getCollections();
+    } else if (action === 'getCollectionItems') {
+      const contentManager = require('./wix-content-manager');
+      const manager = new contentManager(instanceId);
+      result = await manager.getCollectionItems(req.body.collectionId, req.body.options);
+    } else if (action === 'getPageElements') {
+      const contentManager = require('./wix-content-manager');
+      const manager = new contentManager(instanceId);
+      result = await manager.getPageElements(req.body.pageId);
+    }
+    
     else {
       console.error(`❌ Unknown action: ${action}`);
       return res.status(400).json({ error: `Unknown action: ${action}` });

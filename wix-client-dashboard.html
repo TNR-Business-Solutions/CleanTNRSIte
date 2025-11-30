@@ -302,6 +302,11 @@
                     <button class="btn" onclick="showSocialMedia()">Launch Social</button>
                 </div>
                 <div class="feature-card">
+                    <h3>📝 Content Manager</h3>
+                    <p>Edit pages, blog posts, and collections</p>
+                    <button class="btn" onclick="showContentManager()">Launch Content Manager</button>
+                </div>
+                <div class="feature-card">
                     <h3>🔄 Multi-Platform Sync</h3>
                     <p>Sync to Shopify, Amazon, and more</p>
                     <button class="btn" onclick="showPlatformSync()">Launch Sync</button>
@@ -389,6 +394,7 @@
                     <div class="client-actions">
                         <button class="btn" onclick="manageSEO('${client.instanceId}')">SEO</button>
                         <button class="btn btn-success" onclick="manageEcommerce('${client.instanceId}')">Store</button>
+                        <button class="btn" onclick="manageContent('${client.instanceId}')" style="background: #17a2b8;">📝 Content</button>
                         <button class="btn btn-secondary" onclick="viewDetails('${client.instanceId}')">Details</button>
                     </div>
                 </div>
@@ -413,6 +419,11 @@
         // Manage e-commerce for specific client
         function manageEcommerce(instanceId) {
             window.location.href = `wix-ecommerce-manager.html?instanceId=${instanceId}`;
+        }
+        
+        // Manage content for specific client
+        function manageContent(instanceId) {
+            window.location.href = `wix-content-manager.html?instanceId=${instanceId}`;
         }
         
         // View client details
@@ -443,6 +454,16 @@
         // Show social media integration
         function showSocialMedia() {
             window.location.href = 'social-media-automation-dashboard.html';
+        }
+        
+        // Show content manager
+        function showContentManager() {
+            const clients = document.querySelectorAll('.client-item');
+            if (clients.length === 0) {
+                alert('Please connect at least one Wix client first!');
+                return;
+            }
+            window.location.href = 'wix-content-manager.html';
         }
         
         // Show platform sync

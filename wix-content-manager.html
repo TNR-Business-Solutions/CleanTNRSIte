@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Edit and manage content for Wix sites - pages, blog posts, collections, and more">
+    <title>Wix Content Manager - TNR Business Solutions</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .header h1 { margin: 0 0 10px 0; font-size: 2.5em; }
+        .header p { margin: 0; opacity: 0.9; }
+        .card { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #e0e0e0; }
+        .tab { padding: 12px 24px; background: none; border: none; cursor: pointer; font-size: 1em; color: #666; border-bottom: 3px solid transparent; transition: all 0.3s; }
+        .tab:hover { color: #667eea; }
+        .tab.active { color: #667eea; border-bottom-color: #667eea; font-weight: 600; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .btn { padding: 10px 25px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1em; margin-right: 10px; margin-bottom: 10px; transition: all 0.3s; }
+        .btn:hover { background: #5568d3; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); }
+        .btn-success { background: #28a745; }
+        .btn-success:hover { background: #218838; }
+        .btn-danger { background: #dc3545; }
+        .btn-danger:hover { background: #c82333; }
+        .btn-secondary { background: #6c757d; }
+        .btn-secondary:hover { background: #5a6268; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 1em; font-family: inherit; }
+        .form-group textarea { min-height: 150px; resize: vertical; }
+        .form-group textarea.large { min-height: 300px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .item-list { display: grid; gap: 15px; margin-top: 20px; }
+        .item-card { background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s; }
+        .item-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.1); transform: translateY(-2px); }
+        .item-info h3 { margin: 0 0 5px 0; color: #333; }
+        .item-info p { margin: 0; color: #666; font-size: 0.9em; }
+        .item-actions { display: flex; gap: 10px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; overflow-y: auto; }
+        .modal.active { display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background: white; padding: 30px; border-radius: 10px; max-width: 800px; width: 100%; max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h2 { margin: 0; }
+        .close-btn { background: none; border: none; font-size: 2em; cursor: pointer; color: #666; }
+        .close-btn:hover { color: #333; }
+        .loading { text-align: center; padding: 40px; color: #667eea; }
+        .alert { padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; }
+        .alert-success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .alert-error { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .alert-info { background: #d1ecf1; color: #0c5460; border-left: 4px solid #17a2b8; }
+        .image-preview { max-width: 200px; max-height: 200px; border-radius: 5px; margin-top: 10px; }
+        .rich-editor { border: 1px solid #ddd; border-radius: 5px; min-height: 200px; padding: 10px; }
+        .collection-fields { background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 15px; }
+        .field-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: white; border-radius: 5px; margin-bottom: 10px; }
+        @media (max-width: 768px) {
+            .form-row { grid-template-columns: 1fr; }
+            .item-card { flex-direction: column; align-items: flex-start; }
+            .item-actions { width: 100%; margin-top: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📝 Wix Content Manager</h1>
+            <p>Edit and manage pages, blog posts, collections, and content for your Wix sites</p>
+        </div>
+
+        <div id="alertContainer"></div>
+
+        <!-- Client Selection -->
+        <div class="card">
+            <h2>Select Client</h2>
+            <select id="instanceSelect" class="form-group" onchange="selectInstance()" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 1em;">
+                <option value="">-- Select a Wix Client --</option>
+            </select>
+        </div>
+
+        <div id="contentTools" style="display: none;">
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('pages')">📄 Pages</button>
+                <button class="tab" onclick="switchTab('blog')">📰 Blog Posts</button>
+                <button class="tab" onclick="switchTab('collections')">🗂️ Collections</button>
+                <button class="tab" onclick="switchTab('elements')">🎨 Content Elements</button>
+            </div>
+
+            <!-- Pages Tab -->
+            <div id="pagesTab" class="tab-content active">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="margin: 0;">Pages</h2>
+                        <button class="btn btn-success" onclick="showAddPageModal()">➕ Add New Page</button>
+                    </div>
+                    <button class="btn" onclick="loadPages()">🔄 Refresh</button>
+                    <div id="pagesList" class="loading">Loading pages...</div>
+                </div>
+            </div>
+
+            <!-- Blog Posts Tab -->
+            <div id="blogTab" class="tab-content">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="margin: 0;">Blog Posts</h2>
+                        <button class="btn btn-success" onclick="showAddBlogModal()">➕ New Blog Post</button>
+                    </div>
+                    <button class="btn" onclick="loadBlogPosts()">🔄 Refresh</button>
+                    <div id="blogList" class="loading">Loading blog posts...</div>
+                </div>
+            </div>
+
+            <!-- Collections Tab -->
+            <div id="collectionsTab" class="tab-content">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="margin: 0;">Collections</h2>
+                        <button class="btn" onclick="loadCollections()">🔄 Refresh</button>
+                    </div>
+                    <div id="collectionsList" class="loading">Loading collections...</div>
+                </div>
+            </div>
+
+            <!-- Content Elements Tab -->
+            <div id="elementsTab" class="tab-content">
+                <div class="card">
+                    <h2>Content Elements</h2>
+                    <p>Select a page to edit its content elements (text, images, buttons, etc.)</p>
+                    <select id="pageForElements" class="form-group" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 1em;">
+                        <option value="">-- Select a page first --</option>
+                    </select>
+                    <button class="btn" onclick="loadPageElements()" style="margin-top: 10px;">Load Elements</button>
+                    <div id="elementsList" style="margin-top: 20px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Page Modal -->
+    <div id="pageModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="pageModalTitle">Add New Page</h2>
+                <button class="close-btn" onclick="closeModal('pageModal')">&times;</button>
+            </div>
+            <form id="pageForm" onsubmit="savePage(event)">
+                <div class="form-group">
+                    <label>Page Title *</label>
+                    <input type="text" id="pageTitle" required>
+                </div>
+                <div class="form-group">
+                    <label>Page URL (slug)</label>
+                    <input type="text" id="pageUrl" placeholder="auto-generated from title">
+                </div>
+                <div class="form-group">
+                    <label>Page Description</label>
+                    <textarea id="pageDescription"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>SEO Title</label>
+                    <input type="text" id="pageSEOTitle">
+                </div>
+                <div class="form-group">
+                    <label>SEO Description</label>
+                    <textarea id="pageSEODescription"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Page Content (HTML)</label>
+                    <textarea id="pageContent" class="large"></textarea>
+                </div>
+                <input type="hidden" id="pageId">
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn btn-success">💾 Save Page</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('pageModal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add/Edit Blog Post Modal -->
+    <div id="blogModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="blogModalTitle">New Blog Post</h2>
+                <button class="close-btn" onclick="closeModal('blogModal')">&times;</button>
+            </div>
+            <form id="blogForm" onsubmit="saveBlogPost(event)">
+                <div class="form-group">
+                    <label>Post Title *</label>
+                    <input type="text" id="blogTitle" required>
+                </div>
+                <div class="form-group">
+                    <label>Post URL (slug)</label>
+                    <input type="text" id="blogUrl" placeholder="auto-generated from title">
+                </div>
+                <div class="form-group">
+                    <label>Excerpt</label>
+                    <textarea id="blogExcerpt"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Content (HTML) *</label>
+                    <textarea id="blogContent" class="large" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Featured Image URL</label>
+                    <input type="url" id="blogImage">
+                    <img id="blogImagePreview" class="image-preview" style="display: none;">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Category</label>
+                        <input type="text" id="blogCategory">
+                    </div>
+                    <div class="form-group">
+                        <label>Tags (comma-separated)</label>
+                        <input type="text" id="blogTags">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Publish Date</label>
+                        <input type="datetime-local" id="blogPublishDate">
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="blogStatus">
+                            <option value="published">Published</option>
+                            <option value="draft">Draft</option>
+                        </select>
+                    </div>
+                </div>
+                <input type="hidden" id="blogId">
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn btn-success">💾 Save Post</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('blogModal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let selectedInstance = null;
+        let currentPages = [];
+        let currentBlogPosts = [];
+        let currentCollections = [];
+
+        // Load clients on page load
+        async function loadClients() {
+            try {
+                const response = await fetch('/api/wix?action=listClients');
+                const data = await response.json();
+                
+                const select = document.getElementById('instanceSelect');
+                data.clients.forEach(client => {
+                    const option = document.createElement('option');
+                    option.value = client.instanceId;
+                    option.textContent = `${client.clientId || 'Unnamed'} (${client.instanceId})`;
+                    select.appendChild(option);
+                });
+                
+                const urlParams = new URLSearchParams(window.location.search);
+                const instanceId = urlParams.get('instanceId');
+                if (instanceId) {
+                    select.value = instanceId;
+                    selectInstance();
+                }
+            } catch (error) {
+                showAlert('error', `Error loading clients: ${error.message}`);
+            }
+        }
+
+        function selectInstance() {
+            selectedInstance = document.getElementById('instanceSelect').value;
+            document.getElementById('contentTools').style.display = selectedInstance ? 'block' : 'none';
+            if (selectedInstance) {
+                loadPages();
+                loadBlogPosts();
+                loadCollections();
+            }
+        }
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            
+            // Show selected tab
+            event.target.classList.add('active');
+            document.getElementById(tabName + 'Tab').classList.add('active');
+        }
+
+        // Pages Management
+        async function loadPages() {
+            if (!selectedInstance) return;
+            
+            const listDiv = document.getElementById('pagesList');
+            listDiv.innerHTML = '<div class="loading">Loading pages...</div>';
+            
+            try {
+                const response = await fetch('/api/wix', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'getPages',
+                        instanceId: selectedInstance
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentPages = data.data || [];
+                    displayPages(currentPages);
+                    updatePageSelectForElements();
+                } else {
+                    throw new Error(data.error || 'Failed to load pages');
+                }
+            } catch (error) {
+                listDiv.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+
+        function displayPages(pages) {
+            const listDiv = document.getElementById('pagesList');
+            
+            if (pages.length === 0) {
+                listDiv.innerHTML = '<p>No pages found. Click "Add New Page" to create one.</p>';
+                return;
+            }
+            
+            listDiv.innerHTML = '<div class="item-list">' + pages.map(page => `
+                <div class="item-card">
+                    <div class="item-info">
+                        <h3>${page.title || page.name || 'Untitled Page'}</h3>
+                        <p>URL: ${page.url || page.slug || 'N/A'} | ID: ${page.id || 'N/A'}</p>
+                    </div>
+                    <div class="item-actions">
+                        <button class="btn" onclick="editPage('${page.id}')">✏️ Edit</button>
+                        <button class="btn btn-danger" onclick="deletePage('${page.id}')">🗑️ Delete</button>
+                    </div>
+                </div>
+            `).join('') + '</div>';
+        }
+
+        function showAddPageModal() {
+            document.getElementById('pageModalTitle').textContent = 'Add New Page';
+            document.getElementById('pageForm').reset();
+            document.getElementById('pageId').value = '';
+            document.getElementById('pageModal').classList.add('active');
+        }
+
+        function editPage(pageId) {
+            const page = currentPages.find(p => p.id === pageId);
+            if (!page) return;
+            
+            document.getElementById('pageModalTitle').textContent = 'Edit Page';
+            document.getElementById('pageId').value = page.id;
+            document.getElementById('pageTitle').value = page.title || page.name || '';
+            document.getElementById('pageUrl').value = page.url || page.slug || '';
+            document.getElementById('pageDescription').value = page.description || '';
+            document.getElementById('pageSEOTitle').value = page.seoTitle || '';
+            document.getElementById('pageSEODescription').value = page.seoDescription || '';
+            document.getElementById('pageContent').value = page.content || '';
+            document.getElementById('pageModal').classList.add('active');
+        }
+
+        async function savePage(event) {
+            event.preventDefault();
+            if (!selectedInstance) return;
+            
+            const pageData = {
+                id: document.getElementById('pageId').value || undefined,
+                title: document.getElementById('pageTitle').value,
+                url: document.getElementById('pageUrl').value || undefined,
+                description: document.getElementById('pageDescription').value,
+                seoTitle: document.getElementById('pageSEOTitle').value,
+                seoDescription: document.getElementById('pageSEODescription').value,
+                content: document.getElementById('pageContent').value
+            };
+            
+            try {
+                const response = await fetch('/api/wix', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: pageData.id ? 'updatePage' : 'createPage',
+                        instanceId: selectedInstance,
+                        pageData
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('success', `✅ Page ${pageData.id ? 'updated' : 'created'} successfully!`);
+                    closeModal('pageModal');
+                    loadPages();
+                } else {
+                    throw new Error(data.error || 'Failed to save page');
+                }
+            } catch (error) {
+                showAlert('error', `❌ Error: ${error.message}`);
+            }
+        }
+
+        async function deletePage(pageId) {
+            if (!confirm('Are you sure you want to delete this page?')) return;
+            
+            try {
+                const response = await fetch('/api/wix', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'deletePage',
+                        instanceId: selectedInstance,
+                        pageId
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('success', '✅ Page deleted successfully!');
+                    loadPages();
+                } else {
+                    throw new Error(data.error || 'Failed to delete page');
+                }
+            } catch (error) {
+                showAlert('error', `❌ Error: ${error.message}`);
+            }
+        }
+
+        // Blog Posts Management
+        async function loadBlogPosts() {
+            if (!selectedInstance) return;
+            
+            const listDiv = document.getElementById('blogList');
+            listDiv.innerHTML = '<div class="loading">Loading blog posts...</div>';
+            
+            try {
+                const response = await fetch('/api/wix', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'getBlogPosts',
+                        instanceId: selectedInstance
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentBlogPosts = data.data || [];
+                    displayBlogPosts(currentBlogPosts);
+                } else {
+                    throw new Error(data.error || 'Failed to load blog posts');
+                }
+            } catch (error) {
+                listDiv.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+
+        function displayBlogPosts(posts) {
+            const listDiv = document.getElementById('blogList');
+            
+            if (posts.length === 0) {
+                listDiv.innerHTML = '<p>No blog posts found. Click "New Blog Post" to create one.</p>';
+                return;
+            }
+            
+            listDiv.innerHTML = '<div class="item-list">' + posts.map(post => `
+                <div class="item-card">
+                    <div class="item-info">
+                        <h3>${post.title || 'Untitled Post'}</h3>
+                        <p>${post.status || 'draft'} | ${post.category || 'Uncategorized'} | ${post.publishDate ? new Date(post.publishDate).toLocaleDateString() : 'Not published'}</p>
+                    </div>
+                    <div class="item-actions">
+                        <button class="btn" onclick="editBlogPost('${post.id}')">✏️ Edit</button>
+                        <button class="btn btn-danger" onclick="deleteBlogPost('${post.id}')">🗑️ Delete</button>
+                    </div>
+                </div>
+            `).join('') + '</div>';
+        }
+
+        function showAddBlogModal() {
+            document.getElementById('blogModalTitle').textContent = 'New Blog Post';
+            document.getElementById('blogForm').reset();
+            document.getElementById('blogId').value = '';
+            document.getElementById('blogPublishDate').value = new Date().toISOString().slice(0, 16);
+            document.getElementById('blogModal').classList.add('active');
+        }
+
+        function editBlogPost(postId) {
+            const post = currentBlogPosts.find(p => p.id === postId);
+            if (!post) return;
+            
+            document.getElementById('blogModalTitle').textContent = 'Edit Blog Post';
+            document.getElementById('blogId').value = post.id;
+            document.getElementById('blogTitle').value = post.title || '';
+            document.getElementById('blogUrl').value = post.url || post.slug || '';
+            document.getElementById('blogExcerpt').value = post.excerpt || '';
+            document.getElementById('blogContent').value = post.content || '';
+            document.getElementById('blogImage').value = post.featuredImage || '';
+            document.getElementById('blogCategory').value = post.category || '';
+            document.getElementById('blogTags').value = post.tags ? post.tags.join(', ') : '';
+            document.getElementById('blogStatus').value = post.status || 'draft';
+            if (post.publishDate) {
+                document.getElementById('blogPublishDate').value = new Date(post.publishDate).toISOString().slice(0, 16);
+            }
+            document.getElementById('blogModal').classList.add('active');
+        }
+
+        async function saveBlogPost(event) {
+            event.preventDefault();
+            if (!selectedInstance) return;
+            
+            const postData = {
+                id: document.getElementById('blogId').value || undefined,
+                title: document.getElementById('blogTitle').value,
+                url: document.getElementById('blogUrl').value || undefined,
+                excerpt: document.getElementById('blogExcerpt').value,
+                content: document.getElementById('blogContent').value,
+                featuredImage: document.getElementById('blogImage').value,
+                category: document.getElementById('blogCategory').value,
+                tags: document.getElementById('blogTags').value.split(',').map(t => t.trim()).filter(t => t),
+                status: document.getElementById('blogStatus').value,
+                publishDate: document.getElementById('blogPublishDate').value || undefined
+            };
+            
+            try {
+                const response = await fetch('/api/wix', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: postData.id ? 'updateBlogPost' : 'createBlogPost',
+                        instanceId: selectedInstance,
+                        postData
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('success', `✅ Blog post ${postData.id ? 'updated' : 'created'} successfully!`);
+                    closeModal('blogModal');
+                    loadBlogPosts();
+                } else {
+                    throw new Error(data.error || 'Failed to save blog post');
+                }
+            } catch (error) {
+                showAlert('error', `❌ Error: ${error.message}`);
+            }
+        }
+
+        async function deleteBlogPost(postId) {
+            if (!confirm('Are you sure you want to delete this blog post?')) return;
+            
+            try {
+                const response = await fetch('/api/wix', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'deleteBlogPost',
+                        instanceId: selectedInstance,
+                        postId
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('success', '✅ Blog post deleted successfully!');
+                    loadBlogPosts();
+                } else {
+                    throw new Error(data.error || 'Failed to delete blog post');
+                }
+            } catch (error) {
+                showAlert('error', `❌ Error: ${error.message}`);
+            }
+        }
+
+        // Collections Management
+        async function loadCollections() {
+            if (!selectedInstance) return;
+            
+            const listDiv = document.getElementById('collectionsList');
+            listDiv.innerHTML = '<div class="loading">Loading collections...</div>';
+            
+            try {
+                const response = await fetch('/api/wix', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'getCollections',
+                        instanceId: selectedInstance
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentCollections = data.data || [];
+                    displayCollections(currentCollections);
+                } else {
+                    throw new Error(data.error || 'Failed to load collections');
+                }
+            } catch (error) {
+                listDiv.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+
+        function displayCollections(collections) {
+            const listDiv = document.getElementById('collectionsList');
+            
+            if (collections.length === 0) {
+                listDiv.innerHTML = '<p>No collections found.</p>';
+                return;
+            }
+            
+            listDiv.innerHTML = '<div class="item-list">' + collections.map(collection => `
+                <div class="item-card">
+                    <div class="item-info">
+                        <h3>${collection.name || collection.displayName || 'Unnamed Collection'}</h3>
+                        <p>ID: ${collection.id || 'N/A'} | Items: ${collection.itemCount || 0}</p>
+                    </div>
+                    <div class="item-actions">
+                        <button class="btn" onclick="viewCollection('${collection.id}')">👁️ View Items</button>
+                    </div>
+                </div>
+            `).join('') + '</div>';
+        }
+
+        function viewCollection(collectionId) {
+            alert(`Collection viewer coming soon!\n\nCollection ID: ${collectionId}`);
+        }
+
+        // Content Elements
+        function updatePageSelectForElements() {
+            const select = document.getElementById('pageForElements');
+            select.innerHTML = '<option value="">-- Select a page --</option>';
+            currentPages.forEach(page => {
+                const option = document.createElement('option');
+                option.value = page.id;
+                option.textContent = page.title || page.name || 'Untitled Page';
+                select.appendChild(option);
+            });
+        }
+
+        async function loadPageElements() {
+            const pageId = document.getElementById('pageForElements').value;
+            if (!pageId) {
+                showAlert('info', 'Please select a page first');
+                return;
+            }
+            
+            const listDiv = document.getElementById('elementsList');
+            listDiv.innerHTML = '<div class="loading">Loading page elements...</div>';
+            
+            try {
+                const response = await fetch('/api/wix', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'getPageElements',
+                        instanceId: selectedInstance,
+                        pageId
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayPageElements(data.data || []);
+                } else {
+                    throw new Error(data.error || 'Failed to load page elements');
+                }
+            } catch (error) {
+                listDiv.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+
+        function displayPageElements(elements) {
+            const listDiv = document.getElementById('elementsList');
+            
+            if (elements.length === 0) {
+                listDiv.innerHTML = '<p>No content elements found for this page.</p>';
+                return;
+            }
+            
+            listDiv.innerHTML = '<div class="item-list">' + elements.map(element => `
+                <div class="item-card">
+                    <div class="item-info">
+                        <h3>${element.type || 'Element'} - ${element.id || 'N/A'}</h3>
+                        <p>${element.content ? element.content.substring(0, 100) + '...' : 'No content'}</p>
+                    </div>
+                    <div class="item-actions">
+                        <button class="btn" onclick="editElement('${element.id}')">✏️ Edit</button>
+                    </div>
+                </div>
+            `).join('') + '</div>';
+        }
+
+        function editElement(elementId) {
+            alert(`Element editor coming soon!\n\nElement ID: ${elementId}`);
+        }
+
+        // Utility Functions
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function showAlert(type, message) {
+            const container = document.getElementById('alertContainer');
+            const alertClass = `alert-${type}`;
+            container.innerHTML = `<div class="alert ${alertClass}">${message}</div>`;
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+
+        // Initialize
+        loadClients();
+    </script>
+</body>
+</html>
+
