@@ -676,32 +676,16 @@
 
         <!-- Recent Activity -->
         <div class="recent-activity">
-            <h2 class="section-title">📊 Recent Activity</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2 class="section-title" style="margin: 0;">📊 Recent Activity</h2>
+                <button class="btn btn-small btn-secondary" onclick="loadActivityLog()">🔄 Refresh</button>
+            </div>
             <ul class="activity-list" id="activity-list">
                 <li class="activity-item">
-                    <strong>🎉 Platform Deployed</strong>
-                    <p>All 8 social media integrations deployed successfully</p>
-                    <div class="activity-time">Just now</div>
-                </li>
-                <li class="activity-item">
-                    <strong>✅ Instagram Integration Added</strong>
-                    <p>Webhook handler for comments, DMs, and story insights</p>
-                    <div class="activity-time">5 minutes ago</div>
-                </li>
-                <li class="activity-item">
-                    <strong>✅ WhatsApp Business Added</strong>
-                    <p>Messaging and template support enabled</p>
-                    <div class="activity-time">10 minutes ago</div>
-                </li>
-                <li class="activity-item">
-                    <strong>✅ Threads API Integration</strong>
-                    <p>OAuth and posting capabilities deployed</p>
-                    <div class="activity-time">15 minutes ago</div>
-                </li>
-                <li class="activity-item">
-                    <strong>✅ Wix Extensions Complete</strong>
-                    <p>Editor Add-on, SEO Keywords, and Embedded Script</p>
-                    <div class="activity-time">1 hour ago</div>
+                    <div class="loading-state" style="text-align: center; padding: 2rem;">
+                        <div class="loading-icon">⏳</div>
+                        <p>Loading activity...</p>
+                    </div>
                 </li>
             </ul>
         </div>
@@ -924,12 +908,42 @@
             }
         }
 
-        // Load stats (placeholder - connect to actual API)
+        // Load stats from API
         async function loadStats() {
-            // TODO: Fetch real stats from API
-            document.getElementById('total-posts').textContent = '0';
-            document.getElementById('total-messages').textContent = '0';
-            document.getElementById('total-analytics').textContent = '0';
+            try {
+                const response = await fetch('/api/dashboard/stats');
+                const data = await response.json();
+                
+                if (data.success && data.data) {
+                    const stats = data.data;
+                    
+                    // Update platform connections
+                    document.getElementById('platforms-connected').textContent = 
+                        stats.social?.platformsConnected || 0;
+                    
+                    // Update posts count
+                    document.getElementById('total-posts').textContent = 
+                        stats.social?.postsThisMonth || 0;
+                    
+                    // Update messages count
+                    document.getElementById('total-messages').textContent = 
+                        stats.social?.messagesProcessed || 0;
+                    
+                    // Update analytics count
+                    document.getElementById('total-analytics').textContent = 
+                        stats.social?.analyticsEvents || 0;
+                    
+                    // Update webhooks (static for now)
+                    // document.getElementById('total-webhooks').textContent = '5';
+                    
+                    console.log('✅ Dashboard stats loaded:', stats);
+                } else {
+                    console.warn('⚠️ Failed to load stats:', data);
+                }
+            } catch (error) {
+                console.error('❌ Error loading dashboard stats:', error);
+                // Keep default values on error
+            }
         }
 
         // Authentication check - CRITICAL SECURITY
@@ -988,8 +1002,84 @@
             throw new Error('Authentication required');
         }
 
+        // Load activity log
+        async function loadActivityLog() {
+            try {
+                const response = await fetch('/api/activity-log?limit=10');
+                const data = await response.json();
+                
+                const activityList = document.getElementById('activity-list');
+                
+                if (data.success && data.data && data.data.length > 0) {
+                    activityList.innerHTML = data.data.map(activity => {
+                        const timeAgo = getTimeAgo(new Date(activity.createdAt));
+                        const icon = getActivityIcon(activity.type);
+                        
+                        return `
+                            <li class="activity-item">
+                                <strong>${icon} ${activity.action}</strong>
+                                <p>${activity.description || ''}</p>
+                                ${activity.module ? `<small style="opacity: 0.7;">Module: ${activity.module}</small>` : ''}
+                                <div class="activity-time">${timeAgo}</div>
+                            </li>
+                        `;
+                    }).join('');
+                } else {
+                    activityList.innerHTML = `
+                        <li class="activity-item">
+                            <p style="text-align: center; opacity: 0.7;">No recent activity</p>
+                        </li>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading activity log:', error);
+                document.getElementById('activity-list').innerHTML = `
+                    <li class="activity-item">
+                        <p style="color: var(--tnr-danger);">Error loading activity log</p>
+                    </li>
+                `;
+            }
+        }
+
+        function getActivityIcon(type) {
+            const icons = {
+                'client': '👥',
+                'lead': '📋',
+                'order': '📦',
+                'campaign': '📧',
+                'social': '📱',
+                'system': '⚙️',
+                'user': '👤',
+                'error': '❌',
+                'success': '✅',
+                'warning': '⚠️'
+            };
+            return icons[type] || '📊';
+        }
+
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diff = now - date;
+            const seconds = Math.floor(diff / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+
+            if (days > 0) return `${days} day${days > 1 ? 's' : ''} ago`;
+            if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+            if (minutes > 0) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+            return 'Just now';
+        }
+
         // Initialize
         loadStats();
+        loadActivityLog();
+        
+        // Auto-refresh every 30 seconds
+        setInterval(() => {
+            loadStats();
+            loadActivityLog();
+        }, 30000);
     </script>
 </body>
 </html>

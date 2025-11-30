@@ -48,6 +48,18 @@ module.exports = async (req, res) => {
     return await handler(req, res);
   }
 
+  // Dashboard Stats routes
+  if (route === "dashboard/stats" || route === "dashboard-stats") {
+    const handler = require("../server/handlers/dashboard-stats-api");
+    return await handler(req, res);
+  }
+
+  // Activity Log routes
+  if (route === "activity-log" || route.startsWith("activity-log/")) {
+    const handler = require("../server/handlers/activity-log-api");
+    return await handler(req, res);
+  }
+
   // Always log for debugging (will help identify routing issues)
   console.log("API Route Debug:", {
     pathname,
