@@ -361,7 +361,10 @@
                         </select>
                     </div>
                     
-                    <button class="btn" onclick="generateLinkedInContent()" style="background: #0077b5;">Generate LinkedIn Content</button>
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <button class="btn" onclick="generateLinkedInContent()" style="background: #0077b5;">Generate LinkedIn Content</button>
+                        <button class="btn" onclick="openContentLibrary('previewContentLinkedIn')" style="background: #17a2b8;">📚 Content Library</button>
+                    </div>
                     
                     <div id="contentPreviewLinkedIn" class="post-preview hidden" role="region" aria-label="Generated LinkedIn content preview">
                         <h4>Generated LinkedIn Post:</h4>
