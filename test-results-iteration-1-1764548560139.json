@@ -1,0 +1,202 @@
+{
+  "passed": [
+    {
+      "name": "Admin Login",
+      "passed": true,
+      "error": null,
+      "details": {
+        "status": 200
+      },
+      "timestamp": 1764548542761
+    },
+    {
+      "name": "GET /api/crm/clients",
+      "passed": true,
+      "error": null,
+      "details": {
+        "status": 200
+      },
+      "timestamp": 1764548546312
+    },
+    {
+      "name": "GET /api/crm/leads",
+      "passed": true,
+      "error": null,
+      "details": {
+        "status": 200
+      },
+      "timestamp": 1764548546312
+    },
+    {
+      "name": "GET /api/crm/orders",
+      "passed": true,
+      "error": null,
+      "details": {
+        "status": 200
+      },
+      "timestamp": 1764548546312
+    },
+    {
+      "name": "GET /api/crm/stats",
+      "passed": true,
+      "error": null,
+      "details": {
+        "status": 200
+      },
+      "timestamp": 1764548546313
+    },
+    {
+      "name": "Settings API",
+      "passed": true,
+      "error": null,
+      "details": {
+        "status": 200
+      },
+      "timestamp": 1764548547329
+    },
+    {
+      "name": "Social Tokens API",
+      "passed": true,
+      "error": null,
+      "details": {
+        "status": 200
+      },
+      "timestamp": 1764548548232
+    },
+    {
+      "name": "Pinterest OAuth",
+      "passed": true,
+      "error": null,
+      "details": {
+        "status": 501
+      },
+      "timestamp": 1764548549297
+    },
+    {
+      "name": "CRM DELETE (query param)",
+      "passed": true,
+      "error": null,
+      "details": {
+        "status": 200
+      },
+      "timestamp": 1764548551186
+    },
+    {
+      "name": "Page Load: Admin Dashboard",
+      "passed": true,
+      "error": null,
+      "details": {
+        "status": 200
+      },
+      "timestamp": 1764548552012
+    },
+    {
+      "name": "Page Load: CRM Page",
+      "passed": true,
+      "error": null,
+      "details": {
+        "status": 200
+      },
+      "timestamp": 1764548553026
+    },
+    {
+      "name": "Page Load: Campaigns Page",
+      "passed": true,
+      "error": null,
+      "details": {
+        "status": 200
+      },
+      "timestamp": 1764548554027
+    },
+    {
+      "name": "Page Load: Analytics Page",
+      "passed": true,
+      "error": null,
+      "details": {
+        "status": 200
+      },
+      "timestamp": 1764548555044
+    },
+    {
+      "name": "Page Load: Settings Page",
+      "passed": true,
+      "error": null,
+      "details": {
+        "status": 200
+      },
+      "timestamp": 1764548556044
+    },
+    {
+      "name": "Page Load: Orders Page",
+      "passed": true,
+      "error": null,
+      "details": {
+        "status": 200
+      },
+      "timestamp": 1764548557046
+    },
+    {
+      "name": "Page Load: Social Media Dashboard",
+      "passed": true,
+      "error": null,
+      "details": {
+        "status": 200
+      },
+      "timestamp": 1764548558546
+    },
+    {
+      "name": "Page Load: Wix Dashboard",
+      "passed": true,
+      "error": null,
+      "details": {
+        "status": 200
+      },
+      "timestamp": 1764548559219
+    }
+  ],
+  "failed": [],
+  "warnings": [],
+  "apiErrors": [
+    {
+      "url": "https://www.tnrbusinesssolutions.com/api/activity-log?limit=10",
+      "status": 500,
+      "timestamp": 1764548542763
+    },
+    {
+      "url": "https://www.tnrbusinesssolutions.com/api/auth/pinterest",
+      "status": 501,
+      "timestamp": 1764548548281
+    },
+    {
+      "url": "https://www.tnrbusinesssolutions.com/api/activity-log?limit=10",
+      "status": 500,
+      "timestamp": 1764548551438
+    },
+    {
+      "url": "https://www.tnrbusinesssolutions.com/api/analytics?type=all",
+      "status": 500,
+      "timestamp": 1764548554379
+    },
+    {
+      "url": "https://www.tnrbusinesssolutions.com/api/analytics?type=all",
+      "status": 500,
+      "timestamp": 1764548554423
+    },
+    {
+      "url": "https://www.tnrbusinesssolutions.com/api/activity-log?limit=10",
+      "status": 500,
+      "timestamp": 1764548556327
+    },
+    {
+      "url": "https://www.tnrbusinesssolutions.com/api/social/test-token",
+      "status": 400,
+      "timestamp": 1764548557894
+    }
+  ],
+  "vercelLogs": [],
+  "startTime": 1764548537766,
+  "endTime": 1764548560138,
+  "duration": 22372,
+  "totalTests": 17,
+  "passRate": "100.00"
+}

@@ -76,11 +76,13 @@ module.exports = async (req, res) => {
   try {
     const db = await getDatabase();
     const method = req.method;
-    const url = new URL(req.url, `http://${req.headers.host}`);
-    const limit = parseInt(url.searchParams.get('limit')) || 50;
-    const offset = parseInt(url.searchParams.get('offset')) || 0;
-    const type = url.searchParams.get('type');
-    const module = url.searchParams.get('module');
+    
+    // Parse query parameters from req.query (Vercel) or req.url
+    const queryParams = req.query || {};
+    const limit = parseInt(queryParams.limit) || 50;
+    const offset = parseInt(queryParams.offset) || 0;
+    const type = queryParams.type;
+    const module = queryParams.module;
 
     // GET - List activities
     if (method === 'GET') {
