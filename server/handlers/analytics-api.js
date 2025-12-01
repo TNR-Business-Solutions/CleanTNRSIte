@@ -84,8 +84,12 @@ module.exports = async (req, res) => {
           });
         }
 
-        // Calculate conversion funnel
+        // Calculate conversion rates and funnel
         const totalLeads = leads.length;
+        const convertedLeads = clients.filter(c => c.source?.includes('Lead Conversion')).length;
+        const conversionRate = totalLeads > 0 ? (convertedLeads / totalLeads * 100).toFixed(1) : 0;
+
+        // Calculate conversion funnel
         const contactedLeads = leads.filter(l => {
           const status = (l.status || '').toLowerCase();
           return status !== 'new' && status !== '';
@@ -103,11 +107,6 @@ module.exports = async (req, res) => {
           stages: ['Leads', 'Contacted', 'Qualified', 'Converted to Client'],
           values: [totalLeads, contactedLeads, qualifiedLeads, clientsFromLeads]
         };
-
-        // Calculate conversion rates
-        const totalLeads = leads.length;
-        const convertedLeads = clients.filter(c => c.source?.includes('Lead Conversion')).length;
-        const conversionRate = totalLeads > 0 ? (convertedLeads / totalLeads * 100).toFixed(1) : 0;
 
         // Lead source breakdown
         const leadSources = {};
