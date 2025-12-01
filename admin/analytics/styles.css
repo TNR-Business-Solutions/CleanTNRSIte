@@ -95,6 +95,22 @@
     margin-bottom: 2rem;
 }
 
+.chart-card.full-width {
+    grid-column: 1 / -1;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.chart-header .btn-small {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+}
+
 .chart-card {
     background: white;
     padding: 1.5rem;

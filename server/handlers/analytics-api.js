@@ -60,6 +60,50 @@ module.exports = async (req, res) => {
           db.getOrders()
         ]);
 
+        // Calculate revenue trend (last 6 months)
+        const revenueTrend = [];
+        const now = new Date();
+        for (let i = 5; i >= 0; i--) {
+          const monthDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
+          const monthEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 0);
+          
+          const monthOrders = orders.filter(o => {
+            const orderDate = new Date(o.createdAt || o.created_at);
+            return orderDate >= monthDate && orderDate <= monthEnd;
+          });
+          
+          const monthRevenue = monthOrders.reduce((sum, o) => {
+            const amount = parseFloat(o.total || o.amount || 0);
+            return sum + (isNaN(amount) ? 0 : amount);
+          }, 0);
+          
+          revenueTrend.push({
+            month: monthDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+            date: monthDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+            revenue: monthRevenue
+          });
+        }
+
+        // Calculate conversion funnel
+        const totalLeads = leads.length;
+        const contactedLeads = leads.filter(l => {
+          const status = (l.status || '').toLowerCase();
+          return status !== 'new' && status !== '';
+        }).length;
+        const qualifiedLeads = leads.filter(l => {
+          const status = (l.status || '').toLowerCase();
+          return status === 'qualified' || status === 'proposal' || status === 'client';
+        }).length;
+        const clientsFromLeads = clients.filter(c => {
+          const source = (c.source || '').toLowerCase();
+          return source.includes('lead') || source.includes('converted');
+        }).length;
+        
+        const conversionFunnel = {
+          stages: ['Leads', 'Contacted', 'Qualified', 'Converted to Client'],
+          values: [totalLeads, contactedLeads, qualifiedLeads, clientsFromLeads]
+        };
+
         // Calculate conversion rates
         const totalLeads = leads.length;
         const convertedLeads = clients.filter(c => c.source?.includes('Lead Conversion')).length;
