@@ -1,0 +1,1847 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Posts Management - TNR Admin Dashboard</title>
+    <link rel="stylesheet" href="assets/styles.css" />
+    <link rel="stylesheet" href="assets/css/error-handler.css" />
+    <script src="assets/js/error-handler-ui.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --tnr-navy: #1a237e;
+        --tnr-primary: #3f51b5;
+        --tnr-secondary: #7986cb;
+        --tnr-gold: #ffd700;
+        --tnr-success: #4caf50;
+        --tnr-warning: #ff9800;
+        --tnr-danger: #f44336;
+        --tnr-info: #2196f3;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(
+          135deg,
+          var(--tnr-primary),
+          var(--tnr-secondary)
+        );
+        min-height: 100vh;
+      }
+
+      .page-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+
+      .page-header {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      .page-header h1 {
+        color: var(--tnr-gold);
+        font-size: 2rem;
+        margin: 0;
+      }
+
+      .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+      }
+
+      .btn-primary {
+        background: var(--tnr-gold);
+        color: var(--tnr-navy);
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+      }
+
+      .btn-secondary {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .stat-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 1.5rem;
+        color: white;
+        text-align: center;
+      }
+
+      .stat-card .stat-icon {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .stat-card .stat-value {
+        font-size: 2rem;
+        font-weight: bold;
+        color: var(--tnr-gold);
+        margin-bottom: 0.25rem;
+      }
+
+      .stat-card .stat-label {
+        opacity: 0.8;
+        font-size: 0.9rem;
+      }
+
+      .filters-section {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .filters-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+      }
+
+      .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .filter-group label {
+        color: white;
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+
+      .filter-group select,
+      .filter-group input {
+        padding: 0.75rem;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        font-size: 1rem;
+      }
+
+      .filter-group select option {
+        background: var(--tnr-primary);
+        color: white;
+      }
+
+      .posts-list {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 2rem;
+      }
+
+      .post-item {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        color: white;
+        transition: all 0.3s ease;
+      }
+
+      .post-item:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateX(5px);
+      }
+
+      .post-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      .post-platform {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+      }
+
+      .post-date {
+        opacity: 0.7;
+        font-size: 0.9rem;
+      }
+
+      .post-content {
+        margin-bottom: 1rem;
+        line-height: 1.6;
+      }
+
+      .post-meta {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        font-size: 0.85rem;
+        opacity: 0.8;
+      }
+
+      .post-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1rem;
+      }
+
+      .btn-small {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+        border-radius: 8px;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: white;
+        opacity: 0.7;
+      }
+
+      .empty-state-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+      }
+
+      .loading-state {
+        text-align: center;
+        padding: 3rem;
+        color: white;
+      }
+
+      .loading-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        animation: spin 2s linear infinite;
+      }
+
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Schedule Modal Styles */
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(5px);
+        z-index: 2000;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+      }
+
+      .modal-overlay.active {
+        display: flex;
+      }
+
+      .modal-content {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        max-width: 600px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--tnr-primary);
+      }
+
+      .modal-header h2 {
+        color: var(--tnr-navy);
+        margin: 0;
+        font-size: 1.75rem;
+      }
+
+      .modal-close {
+        background: none;
+        border: none;
+        font-size: 2rem;
+        cursor: pointer;
+        color: var(--tnr-primary);
+        padding: 0;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+      }
+
+      .modal-close:hover {
+        background: rgba(63, 81, 181, 0.1);
+        transform: rotate(90deg);
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: var(--tnr-navy);
+        font-weight: 600;
+      }
+
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-family: inherit;
+        transition: all 0.3s ease;
+      }
+
+      .form-group input:focus,
+      .form-group select:focus,
+      .form-group textarea:focus {
+        outline: none;
+        border-color: var(--tnr-primary);
+        box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.1);
+      }
+
+      .form-group textarea {
+        min-height: 120px;
+        resize: vertical;
+      }
+
+      .form-group small {
+        display: block;
+        margin-top: 0.25rem;
+        color: #666;
+        font-size: 0.85rem;
+      }
+
+      .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+        justify-content: flex-end;
+      }
+
+      .btn-cancel {
+        background: #e0e0e0;
+        color: #333;
+      }
+
+      .btn-cancel:hover {
+        background: #d0d0d0;
+      }
+
+      .btn-schedule {
+        background: var(--tnr-success);
+        color: white;
+      }
+
+      .btn-schedule:hover {
+        background: #45a049;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+      }
+
+      .btn-schedule:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+
+      @media (max-width: 768px) {
+        .form-row {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* Admin Header Styles */
+      .admin-header {
+        background: linear-gradient(
+          135deg,
+          var(--tnr-navy) 0%,
+          var(--tnr-primary) 100%
+        );
+        color: white;
+        padding: 1rem 2rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        margin-bottom: 0;
+      }
+
+      .admin-header-inner {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      .admin-header-logo {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 1.25rem;
+        font-weight: bold;
+        text-decoration: none;
+        color: white;
+      }
+
+      .admin-header-logo img {
+        height: 35px;
+      }
+
+      .admin-header-menu {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .admin-header-link {
+        color: white;
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        font-size: 0.95rem;
+        font-weight: 500;
+        white-space: nowrap;
+      }
+
+      .admin-header-link:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateY(-2px);
+      }
+
+      .admin-header-link.active {
+        background: var(--tnr-gold);
+        color: var(--tnr-navy);
+      }
+
+      @media (max-width: 768px) {
+        .page-container {
+          padding: 1rem;
+        }
+
+        .filters-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .post-header {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Admin Header Menu -->
+    <header class="admin-header">
+      <div class="admin-header-inner">
+        <a href="/" class="admin-header-logo">
+          <img
+            src="media/logo.png"
+            alt="TNR Business Solutions Logo"
+            loading="lazy"
+          />
+          <span>TNR Business Solutions</span>
+        </a>
+        <nav class="admin-header-menu">
+          <a href="/" class="admin-header-link">🏠 Home</a>
+          <a href="/admin-dashboard-v2.html" class="admin-header-link"
+            >📊 Admin Dashboard</a
+          >
+          <a href="/platform-connections.html" class="admin-header-link"
+            >🌐 Platforms</a
+          >
+          <a href="/posts-management.html" class="admin-header-link active"
+            >📝 Posts</a
+          >
+          <a href="/admin-orders.html" class="admin-header-link">📦 Orders</a>
+          <a
+            href="/social-media-automation-dashboard.html"
+            class="admin-header-link"
+            >📱 Social Media</a
+          >
+          <a href="/admin-login.html" class="admin-header-link">🔐 Login</a>
+          <a href="#" class="admin-header-link" onclick="logout()">🚪 Logout</a>
+        </nav>
+      </div>
+    </header>
+
+    <div class="page-container">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div>
+          <h1>📝 Posts This Month</h1>
+          <p style="opacity: 0.8; margin-top: 0.5rem">
+            View and manage all social media posts
+          </p>
+        </div>
+        <div>
+          <a href="/admin-dashboard-v2.html" class="btn btn-secondary"
+            >← Back to Dashboard</a
+          >
+          <button
+            class="btn btn-secondary"
+            onclick="exportPosts('csv')"
+            style="margin-left: 0.5rem"
+          >
+            📥 Export CSV
+          </button>
+          <button
+            class="btn btn-secondary"
+            onclick="exportPosts('json')"
+            style="margin-left: 0.5rem"
+          >
+            📥 Export JSON
+          </button>
+          <button
+            class="btn btn-primary"
+            onclick="refreshPosts()"
+            style="margin-left: 0.5rem"
+          >
+            🔄 Refresh
+          </button>
+          <button
+            class="btn btn-primary"
+            onclick="openScheduleModal()"
+            style="margin-left: 0.5rem; background: var(--tnr-success)"
+          >
+            📅 Schedule Post
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats Overview -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">📝</div>
+          <div class="stat-value" id="total-posts-count">0</div>
+          <div class="stat-label">Total Posts</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">✅</div>
+          <div class="stat-value" id="published-posts">0</div>
+          <div class="stat-label">Published</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">⏳</div>
+          <div class="stat-value" id="scheduled-posts">0</div>
+          <div class="stat-label">Scheduled</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📊</div>
+          <div class="stat-value" id="total-engagement">0</div>
+          <div class="stat-label">Total Engagement</div>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="filters-section">
+        <div class="filters-grid">
+          <div class="filter-group">
+            <label for="platform-filter">Platform</label>
+            <select id="platform-filter" onchange="filterPosts()">
+              <option value="">All Platforms</option>
+              <option value="facebook">Facebook</option>
+              <option value="instagram">Instagram</option>
+              <option value="linkedin">LinkedIn</option>
+              <option value="twitter">Twitter/X</option>
+              <option value="pinterest">Pinterest</option>
+              <option value="threads">Threads</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="status-filter">Status</label>
+            <select id="status-filter" onchange="filterPosts()">
+              <option value="">All Status</option>
+              <option value="published">Published</option>
+              <option value="scheduled">Scheduled</option>
+              <option value="draft">Draft</option>
+              <option value="failed">Failed</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="date-filter">Date Range</label>
+            <select id="date-filter" onchange="filterPosts()">
+              <option value="this-month">This Month</option>
+              <option value="last-month">Last Month</option>
+              <option value="last-7-days">Last 7 Days</option>
+              <option value="last-30-days">Last 30 Days</option>
+              <option value="all">All Time</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="search-posts">Search</label>
+            <input
+              type="text"
+              id="search-posts"
+              placeholder="Search posts..."
+              onkeyup="filterPosts()"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Posts List -->
+      <div class="posts-list">
+        <div id="posts-container">
+          <div class="loading-state">
+            <div class="loading-icon">⏳</div>
+            <p>Loading posts...</p>
+          </div>
+        </div>
+        <!-- Pagination -->
+        <div
+          id="posts-pagination"
+          style="
+            display: none;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+          "
+        >
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              flex-wrap: wrap;
+              gap: 1rem;
+            "
+          >
+            <div style="color: white; opacity: 0.8">
+              <span id="posts-pagination-info">Showing 0-0 of 0</span>
+            </div>
+            <div style="display: flex; gap: 0.5rem">
+              <button
+                id="posts-prev-btn"
+                class="btn btn-secondary btn-small"
+                onclick="loadPreviousPage()"
+                disabled
+              >
+                ← Previous
+              </button>
+              <button
+                id="posts-next-btn"
+                class="btn btn-secondary btn-small"
+                onclick="loadNextPage()"
+                disabled
+              >
+                Next →
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Schedule Post Modal -->
+    <div
+      id="scheduleModal"
+      class="modal-overlay"
+      onclick="if(event.target === this) closeScheduleModal()"
+    >
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h2>📅 Schedule Multi-Platform Post</h2>
+          <button class="modal-close" onclick="closeScheduleModal()">
+            &times;
+          </button>
+        </div>
+        <form id="schedulePostForm" onsubmit="schedulePost(event)">
+          <div class="form-group">
+            <label for="scheduleClient">Client Name *</label>
+            <input
+              type="text"
+              id="scheduleClient"
+              placeholder="e.g., Demonte Contracting"
+              required
+            />
+            <small>Enter the client name for this post</small>
+          </div>
+
+          <div class="form-group">
+            <label>Select Platforms *</label>
+            <div
+              id="platform-checkboxes"
+              style="
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+                margin-top: 0.5rem;
+              "
+            >
+              <label
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 0.5rem;
+                  padding: 0.5rem;
+                  background: rgba(0, 0, 0, 0.05);
+                  border-radius: 6px;
+                  cursor: pointer;
+                "
+              >
+                <input
+                  type="checkbox"
+                  name="platforms"
+                  value="facebook"
+                  id="platform-facebook"
+                />
+                <span>📘 Facebook</span>
+              </label>
+              <label
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 0.5rem;
+                  padding: 0.5rem;
+                  background: rgba(0, 0, 0, 0.05);
+                  border-radius: 6px;
+                  cursor: pointer;
+                "
+              >
+                <input
+                  type="checkbox"
+                  name="platforms"
+                  value="instagram"
+                  id="platform-instagram"
+                />
+                <span>📸 Instagram</span>
+              </label>
+              <label
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 0.5rem;
+                  padding: 0.5rem;
+                  background: rgba(0, 0, 0, 0.05);
+                  border-radius: 6px;
+                  cursor: pointer;
+                "
+              >
+                <input
+                  type="checkbox"
+                  name="platforms"
+                  value="linkedin"
+                  id="platform-linkedin"
+                />
+                <span>💼 LinkedIn</span>
+              </label>
+              <label
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 0.5rem;
+                  padding: 0.5rem;
+                  background: rgba(0, 0, 0, 0.05);
+                  border-radius: 6px;
+                  cursor: pointer;
+                "
+              >
+                <input
+                  type="checkbox"
+                  name="platforms"
+                  value="twitter"
+                  id="platform-twitter"
+                />
+                <span>🐦 Twitter/X</span>
+              </label>
+            </div>
+            <small
+              >Select one or more platforms to post to simultaneously</small
+            >
+          </div>
+
+          <div
+            class="form-group"
+            id="facebook-page-group"
+            style="display: none"
+          >
+            <label for="schedulePage">Facebook/Instagram Page *</label>
+            <select id="schedulePage">
+              <option value="">Loading pages...</option>
+            </select>
+            <small>Required if posting to Facebook or Instagram</small>
+          </div>
+
+          <div class="form-group">
+            <label for="scheduleContent">Post Content *</label>
+            <textarea
+              id="scheduleContent"
+              placeholder="Write your post content here..."
+              required
+            ></textarea>
+            <small>Maximum 5000 characters</small>
+          </div>
+
+          <div class="form-group">
+            <label for="scheduleImageUrl">Image URL (Optional)</label>
+            <input
+              type="url"
+              id="scheduleImageUrl"
+              placeholder="https://example.com/image.jpg"
+            />
+            <small>URL to an image to include with the post</small>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="scheduleDate">Date *</label>
+              <input type="date" id="scheduleDate" required />
+            </div>
+            <div class="form-group">
+              <label for="scheduleTime">Time *</label>
+              <input type="time" id="scheduleTime" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>
+              <input
+                type="checkbox"
+                id="scheduleImmediate"
+                onchange="toggleScheduleFields()"
+              />
+              Post immediately (ignore date/time)
+            </label>
+          </div>
+
+          <div class="form-actions">
+            <button
+              type="button"
+              class="btn btn-cancel"
+              onclick="closeScheduleModal()"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="btn btn-schedule"
+              id="scheduleSubmitBtn"
+            >
+              📅 Schedule Post
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      let allPosts = [];
+      let filteredPosts = [];
+      let currentPage = 0;
+      let pageSize = 50;
+      let totalPosts = 0;
+      let paginationData = null;
+
+      // Load posts from API
+      async function loadPosts(page = 0) {
+        try {
+          currentPage = page;
+          const offset = page * pageSize;
+          const response = await fetch(
+            `/api/posts?dateRange=this-month&limit=${pageSize}&offset=${offset}`
+          );
+          const data = await response.json();
+
+          if (data.success && data.data) {
+            filteredPosts = data.data;
+            paginationData = data.pagination || null;
+            totalPosts = paginationData
+              ? paginationData.total
+              : filteredPosts.length;
+
+            // Update allPosts for stats calculation
+            if (page === 0) {
+              allPosts = [...filteredPosts];
+            }
+          } else {
+            filteredPosts = [];
+            paginationData = null;
+            totalPosts = 0;
+          }
+
+          updateStats();
+          renderPosts();
+          updatePagination();
+        } catch (error) {
+          console.error("Error loading posts:", error);
+          filteredPosts = [];
+          paginationData = null;
+          totalPosts = 0;
+          updateStats();
+          renderPosts();
+          updatePagination();
+        }
+      }
+
+      function updateStats() {
+        const total = allPosts.length;
+        const published = allPosts.filter(
+          (p) => p.status === "published"
+        ).length;
+        const scheduled = allPosts.filter(
+          (p) => p.status === "scheduled"
+        ).length;
+        const engagement = allPosts.reduce(
+          (sum, p) => sum + (p.engagement || 0),
+          0
+        );
+
+        document.getElementById("total-posts-count").textContent = total;
+        document.getElementById("published-posts").textContent = published;
+        document.getElementById("scheduled-posts").textContent = scheduled;
+        document.getElementById("total-engagement").textContent = engagement;
+      }
+
+      async function filterPosts(page = 0) {
+        const platform = document.getElementById("platform-filter").value;
+        const status = document.getElementById("status-filter").value;
+        const dateRange = document.getElementById("date-filter").value;
+        const search = document.getElementById("search-posts").value;
+
+        // Build API query
+        currentPage = page;
+        const offset = page * pageSize;
+        const params = new URLSearchParams();
+        if (platform) params.append("platform", platform);
+        if (status) params.append("status", status);
+        if (dateRange) params.append("dateRange", dateRange);
+        if (search) params.append("search", search);
+        params.append("limit", pageSize);
+        params.append("offset", offset);
+
+        try {
+          const response = await fetch(`/api/posts?${params.toString()}`);
+          const data = await response.json();
+
+          if (data.success && data.data) {
+            filteredPosts = data.data;
+            paginationData = data.pagination || null;
+            totalPosts = paginationData
+              ? paginationData.total
+              : filteredPosts.length;
+          } else {
+            filteredPosts = [];
+            paginationData = null;
+            totalPosts = 0;
+          }
+
+          renderPosts();
+          updatePagination();
+        } catch (error) {
+          console.error("Error filtering posts:", error);
+          // Fallback to client-side filtering
+          const now = new Date();
+          let startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+
+          if (dateRange === "last-month") {
+            startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+          } else if (dateRange === "last-7-days") {
+            startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          } else if (dateRange === "last-30-days") {
+            startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+          } else if (dateRange === "all") {
+            startDate = new Date(0);
+          }
+
+          filteredPosts = allPosts.filter((post) => {
+            const postDate = new Date(post.createdAt || post.created_at);
+            const matchesPlatform = !platform || post.platform === platform;
+            const matchesStatus = !status || post.status === status;
+            const matchesDate = postDate >= startDate;
+            const matchesSearch =
+              !search ||
+              (post.content &&
+                post.content.toLowerCase().includes(search.toLowerCase())) ||
+              (post.platform &&
+                post.platform.toLowerCase().includes(search.toLowerCase()));
+
+            return (
+              matchesPlatform && matchesStatus && matchesDate && matchesSearch
+            );
+          });
+
+          renderPosts();
+          updatePagination();
+        }
+      }
+
+      function updatePagination() {
+        const paginationDiv = document.getElementById("posts-pagination");
+        const prevBtn = document.getElementById("posts-prev-btn");
+        const nextBtn = document.getElementById("posts-next-btn");
+        const infoSpan = document.getElementById("posts-pagination-info");
+
+        if (!paginationData || totalPosts === 0) {
+          paginationDiv.style.display = "none";
+          return;
+        }
+
+        paginationDiv.style.display = "block";
+        const start = currentPage * pageSize + 1;
+        const end = Math.min((currentPage + 1) * pageSize, totalPosts);
+        infoSpan.textContent = `Showing ${start}-${end} of ${totalPosts}`;
+
+        prevBtn.disabled = currentPage === 0;
+        nextBtn.disabled = !paginationData.hasMore;
+      }
+
+      function loadPreviousPage() {
+        if (currentPage > 0) {
+          filterPosts(currentPage - 1);
+        }
+      }
+
+      function loadNextPage() {
+        if (paginationData && paginationData.hasMore) {
+          filterPosts(currentPage + 1);
+        }
+      }
+
+      function renderPosts() {
+        const container = document.getElementById("posts-container");
+
+        if (filteredPosts.length === 0) {
+          container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📝</div>
+                        <h3>No Posts Found</h3>
+                        <p>No posts match your current filters, or no posts have been created yet.</p>
+                        <p style="margin-top: 1rem;">
+                            <a href="/social-media-automation-dashboard.html" class="btn btn-primary" style="margin-top: 1rem;">
+                                Create Your First Post
+                            </a>
+                        </p>
+                    </div>
+                `;
+          return;
+        }
+
+        container.innerHTML = filteredPosts
+          .map((post) => {
+            const platformIcons = {
+              facebook: "📘",
+              instagram: "📸",
+              linkedin: "💼",
+              twitter: "🐦",
+              pinterest: "📌",
+              threads: "🧵",
+            };
+
+            const statusBadges = {
+              published:
+                '<span style="background: var(--tnr-success); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem;">✓ Published</span>',
+              scheduled:
+                '<span style="background: var(--tnr-warning); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem;">⏰ Scheduled</span>',
+              draft:
+                '<span style="background: var(--tnr-info); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem;">📝 Draft</span>',
+              failed:
+                '<span style="background: var(--tnr-danger); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem;">❌ Failed</span>',
+            };
+
+            const date = new Date(post.createdAt || post.created_at);
+            const formattedDate =
+              date.toLocaleDateString() +
+              " " +
+              date.toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              });
+
+            return `
+                    <div class="post-item">
+                        <div class="post-header">
+                            <div class="post-platform">
+                                <span>${
+                                  platformIcons[post.platform] || "📱"
+                                }</span>
+                                <span>${
+                                  post.platform
+                                    ? post.platform.charAt(0).toUpperCase() +
+                                      post.platform.slice(1)
+                                    : "Unknown"
+                                }</span>
+                                ${statusBadges[post.status] || ""}
+                            </div>
+                            <div class="post-date">${formattedDate}</div>
+                        </div>
+                        <div class="post-content">${escapeHtml(
+                          post.content || post.message || "No content"
+                        )}</div>
+                        <div class="post-meta">
+                            ${
+                              post.engagement
+                                ? `<span>👁️ ${post.engagement} views</span>`
+                                : ""
+                            }
+                            ${
+                              post.likes
+                                ? `<span>❤️ ${post.likes} likes</span>`
+                                : ""
+                            }
+                            ${
+                              post.comments
+                                ? `<span>💬 ${post.comments} comments</span>`
+                                : ""
+                            }
+                            ${
+                              post.shares
+                                ? `<span>🔄 ${post.shares} shares</span>`
+                                : ""
+                            }
+                            ${
+                              post.url
+                                ? `<span><a href="${post.url}" target="_blank" style="color: var(--tnr-gold);">View Post →</a></span>`
+                                : ""
+                            }
+                        </div>
+                        ${
+                          post.status === "failed" && post.error
+                            ? `
+                            <div style="margin-top: 1rem; padding: 1rem; background: rgba(244, 67, 54, 0.2); border-radius: 8px; border-left: 3px solid var(--tnr-danger);">
+                                <strong>Error:</strong> ${escapeHtml(
+                                  post.error
+                                )}
+                            </div>
+                        `
+                            : ""
+                        }
+                    </div>
+                `;
+          })
+          .join("");
+      }
+
+      function escapeHtml(text) {
+        const div = document.createElement("div");
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      function refreshPosts() {
+        document.getElementById("posts-container").innerHTML = `
+                <div class="loading-state">
+                    <div class="loading-icon">⏳</div>
+                    <p>Refreshing posts...</p>
+                </div>
+            `;
+        loadPosts(0);
+      }
+
+      async function exportPosts(format) {
+        try {
+          // Get all posts with current filters (no pagination limit)
+          const platform = document.getElementById("platform-filter").value;
+          const status = document.getElementById("status-filter").value;
+          const dateRange = document.getElementById("date-filter").value;
+          const search = document.getElementById("search-posts").value;
+
+          const params = new URLSearchParams();
+          if (platform) params.append("platform", platform);
+          if (status) params.append("status", status);
+          if (dateRange) params.append("dateRange", dateRange);
+          if (search) params.append("search", search);
+          params.append("limit", "10000"); // Large limit to get all
+          params.append("offset", "0");
+
+          const response = await fetch(`/api/posts?${params.toString()}`);
+          const data = await response.json();
+
+          if (!data.success || !data.data) {
+            alert("No posts to export");
+            return;
+          }
+
+          const posts = data.data;
+          const now = new Date().toISOString().split("T")[0];
+
+          if (format === "csv") {
+            // CSV Header
+            const headers = [
+              "ID",
+              "Platform",
+              "Content",
+              "Status",
+              "Published Date",
+              "Scheduled Date",
+              "Engagement",
+              "Likes",
+              "Comments",
+              "Shares",
+              "URL",
+              "Created At",
+            ];
+            const rows = posts.map((post) => [
+              post.id || "",
+              post.platform || "",
+              (post.content || "").replace(/"/g, '""'), // Escape quotes
+              post.status || "",
+              post.publishedDate || "",
+              post.scheduledDate || "",
+              post.engagement || 0,
+              post.likes || 0,
+              post.comments || 0,
+              post.shares || 0,
+              post.url || "",
+              post.createdAt || "",
+            ]);
+
+            const csvContent = [
+              headers.join(","),
+              ...rows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
+            ].join("\n");
+
+            const blob = new Blob([csvContent], {
+              type: "text/csv;charset=utf-8;",
+            });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `posts-export-${now}.csv`;
+            link.click();
+          } else if (format === "json") {
+            const jsonContent = JSON.stringify(posts, null, 2);
+            const blob = new Blob([jsonContent], {
+              type: "application/json;charset=utf-8;",
+            });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `posts-export-${now}.json`;
+            link.click();
+          }
+        } catch (error) {
+          console.error("Error exporting posts:", error);
+
+          if (globalThis.ErrorHandlerUI || window.ErrorHandlerUI) {
+            const ErrorUI = globalThis.ErrorHandlerUI || window.ErrorHandlerUI;
+            ErrorUI.showError(
+              {
+                message: error.message || "Unable to export posts",
+                error: "Export Error",
+                retryable: true,
+                help: "Please try again. If the problem persists, check your browser's download settings.",
+              },
+              {
+                title: "Export Failed",
+                duration: 6000,
+              }
+            );
+          } else {
+            alert("Error exporting posts: " + error.message);
+          }
+        }
+      }
+
+      function logout() {
+        if (confirm("Are you sure you want to logout?")) {
+          localStorage.removeItem("adminSession");
+          localStorage.removeItem("adminRefreshToken");
+          localStorage.removeItem("sessionExpiry");
+          localStorage.removeItem("adminUsername");
+          localStorage.removeItem("adminRole");
+          sessionStorage.removeItem("adminAuthenticated");
+          sessionStorage.removeItem("adminSessionToken");
+          window.location.href = "/admin-login.html";
+        }
+      }
+
+      // Authentication check
+      function checkAuthentication() {
+        const sessionToken =
+          localStorage.getItem("adminSession") ||
+          sessionStorage.getItem("adminSessionToken") ||
+          sessionStorage.getItem("adminAuthenticated");
+        const sessionExpiry = localStorage.getItem("sessionExpiry");
+
+        if (!sessionToken) {
+          window.location.href = "/admin-login.html";
+          return false;
+        }
+
+        if (sessionExpiry) {
+          const expiryTime = parseInt(sessionExpiry);
+          if (isNaN(expiryTime) || Date.now() > expiryTime) {
+            localStorage.removeItem("adminSession");
+            localStorage.removeItem("adminRefreshToken");
+            localStorage.removeItem("sessionExpiry");
+            window.location.href = "/admin-login.html";
+            return false;
+          }
+        }
+
+        return true;
+      }
+
+      // Initialize
+      if (checkAuthentication()) {
+        loadPosts();
+      }
+
+      // Schedule Post Modal Functions
+      let facebookPages = [];
+      let clients = [];
+
+      async function openScheduleModal() {
+        const modal = document.getElementById("scheduleModal");
+        if (!modal) {
+          alert("Schedule modal not found. Please refresh the page.");
+          return;
+        }
+        modal.classList.add("active");
+
+        // Check for date parameter in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const scheduleDateParam = urlParams.get("scheduleDate");
+
+        // Set minimum date to today
+        const today = new Date().toISOString().split("T")[0];
+        const dateInput = document.getElementById("scheduleDate");
+        if (dateInput) {
+          dateInput.min = today;
+          // Pre-fill date if provided in URL
+          if (scheduleDateParam) {
+            dateInput.value = scheduleDateParam;
+          }
+        }
+
+        // Set default time to 1 hour from now
+        const now = new Date();
+        now.setHours(now.getHours() + 1);
+        const defaultTime = now.toTimeString().slice(0, 5);
+        const timeInput = document.getElementById("scheduleTime");
+        if (timeInput) {
+          timeInput.value = defaultTime;
+        }
+
+        // Load Facebook pages and clients
+        await loadFacebookPages();
+        await loadClients();
+
+        // Update platform checkboxes based on connected platforms
+        await updatePlatformCheckboxes();
+
+        // Show/hide Facebook page selector based on platform selection
+        updateFacebookPageVisibility();
+
+        // Clear URL parameter after using it
+        if (scheduleDateParam) {
+          window.history.replaceState(
+            {},
+            document.title,
+            window.location.pathname
+          );
+        }
+      }
+
+      function closeScheduleModal() {
+        const modal = document.getElementById("scheduleModal");
+        if (modal) {
+          modal.classList.remove("active");
+          const form = document.getElementById("schedulePostForm");
+          if (form) {
+            form.reset();
+          }
+        }
+      }
+
+      function toggleScheduleFields() {
+        const immediate = document.getElementById("scheduleImmediate");
+        if (!immediate) return;
+
+        const checked = immediate.checked;
+        const dateInput = document.getElementById("scheduleDate");
+        const timeInput = document.getElementById("scheduleTime");
+
+        if (dateInput) dateInput.disabled = checked;
+        if (timeInput) timeInput.disabled = checked;
+
+        if (checked) {
+          if (dateInput) dateInput.required = false;
+          if (timeInput) timeInput.required = false;
+        } else {
+          if (dateInput) dateInput.required = true;
+          if (timeInput) timeInput.required = true;
+        }
+      }
+
+      async function loadFacebookPages() {
+        try {
+          const response = await fetch("/api/social/tokens?platform=facebook");
+          const data = await response.json();
+
+          if (data.success && data.tokens) {
+            facebookPages = data.tokens.filter((token) => token.has_token);
+            const pageSelect = document.getElementById("schedulePage");
+
+            if (!pageSelect) return;
+
+            if (facebookPages.length === 0) {
+              pageSelect.innerHTML =
+                '<option value="">No Facebook pages connected. Connect a page first.</option>';
+              return;
+            }
+
+            pageSelect.innerHTML =
+              '<option value="">Select a Facebook page...</option>';
+            facebookPages.forEach((page) => {
+              const option = document.createElement("option");
+              option.value = page.page_id;
+              option.textContent = page.page_name || `Page ${page.page_id}`;
+              pageSelect.appendChild(option);
+            });
+          } else {
+            const pageSelect = document.getElementById("schedulePage");
+            if (pageSelect) {
+              pageSelect.innerHTML =
+                '<option value="">Error loading pages</option>';
+            }
+          }
+        } catch (error) {
+          console.error("Error loading Facebook pages:", error);
+          const pageSelect = document.getElementById("schedulePage");
+          if (pageSelect) {
+            pageSelect.innerHTML =
+              '<option value="">Error loading pages</option>';
+          }
+        }
+      }
+
+      async function loadClients() {
+        try {
+          const response = await fetch("/api/crm/clients");
+          const data = await response.json();
+
+          if (data.success && data.clients) {
+            clients = data.clients;
+
+            // Create datalist for autocomplete
+            const clientInput = document.getElementById("scheduleClient");
+            if (!clientInput) return;
+
+            let datalist = document.getElementById("clientDatalist");
+
+            if (!datalist) {
+              datalist = document.createElement("datalist");
+              datalist.id = "clientDatalist";
+              clientInput.setAttribute("list", "clientDatalist");
+              document.body.appendChild(datalist);
+            }
+
+            datalist.innerHTML = "";
+            clients.forEach((client) => {
+              const option = document.createElement("option");
+              option.value =
+                client.name || client.businessName || client.company || "";
+              datalist.appendChild(option);
+            });
+          }
+        } catch (error) {
+          console.error("Error loading clients:", error);
+          // Continue without autocomplete - not critical
+          // Only log, don't show error to user as autocomplete is optional
+        }
+      }
+
+      async function schedulePost(event) {
+        event.preventDefault();
+
+        const submitBtn = document.getElementById("scheduleSubmitBtn");
+        if (!submitBtn) return;
+
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = "⏳ Scheduling...";
+
+        try {
+          const clientName = document
+            .getElementById("scheduleClient")
+            ?.value.trim();
+          const pageId = document.getElementById("schedulePage")?.value;
+          const content = document
+            .getElementById("scheduleContent")
+            ?.value.trim();
+          const imageUrl = document
+            .getElementById("scheduleImageUrl")
+            ?.value.trim();
+          const immediate =
+            document.getElementById("scheduleImmediate")?.checked;
+          const date = document.getElementById("scheduleDate")?.value;
+          const time = document.getElementById("scheduleTime")?.value;
+
+          // Get selected platforms
+          const selectedPlatforms = Array.from(
+            document.querySelectorAll('input[name="platforms"]:checked')
+          ).map((cb) => cb.value);
+
+          if (!clientName || selectedPlatforms.length === 0 || !content) {
+            const missingFields = [];
+            if (!clientName) missingFields.push("Client Name");
+            if (selectedPlatforms.length === 0)
+              missingFields.push("At least one platform");
+            if (!content) missingFields.push("Post Content");
+
+            if (globalThis.ErrorHandlerUI || window.ErrorHandlerUI) {
+              const ErrorUI =
+                globalThis.ErrorHandlerUI || window.ErrorHandlerUI;
+              ErrorUI.showError(
+                {
+                  message: `Please fill in all required fields: ${missingFields.join(
+                    ", "
+                  )}`,
+                  error: "Validation Error",
+                  retryable: false,
+                },
+                {
+                  title: "Missing Information",
+                  duration: 5000,
+                }
+              );
+            } else {
+              alert("Please fill in all required fields");
+            }
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+            return;
+          }
+
+          // Validate page ID if Facebook or Instagram is selected
+          if (
+            (selectedPlatforms.includes("facebook") ||
+              selectedPlatforms.includes("instagram")) &&
+            !pageId
+          ) {
+            if (globalThis.ErrorHandlerUI || window.ErrorHandlerUI) {
+              const ErrorUI =
+                globalThis.ErrorHandlerUI || window.ErrorHandlerUI;
+              ErrorUI.showError(
+                {
+                  message:
+                    "Facebook/Instagram page is required when posting to Facebook or Instagram",
+                  error: "Validation Error",
+                  retryable: false,
+                },
+                {
+                  title: "Missing Page Selection",
+                  duration: 5000,
+                }
+              );
+            } else {
+              alert(
+                "Please select a Facebook page for Facebook/Instagram posts"
+              );
+            }
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+            return;
+          }
+
+          // Build scheduled time
+          let scheduledTime = null;
+          if (!immediate) {
+            if (!date || !time) {
+              if (window.ErrorHandlerUI) {
+                window.ErrorHandlerUI.showError(
+                  {
+                    message: "Please select both date and time for scheduling",
+                    error: "Validation Error",
+                    retryable: false,
+                  },
+                  {
+                    title: "Missing Schedule Time",
+                    duration: 5000,
+                  }
+                );
+              } else {
+                alert("Please select both date and time");
+              }
+              submitBtn.disabled = false;
+              submitBtn.textContent = originalText;
+              return;
+            }
+
+            const scheduledDate = new Date(`${date}T${time}`);
+            const now = new Date();
+            const minTime = new Date(now.getTime() + 10 * 60 * 1000); // 10 minutes from now
+
+            if (scheduledDate <= minTime) {
+              if (window.ErrorHandlerUI) {
+                window.ErrorHandlerUI.showError(
+                  {
+                    message:
+                      "Scheduled time must be at least 10 minutes in the future. Facebook requires this minimum delay.",
+                    error: "Invalid Schedule Time",
+                    retryable: false,
+                    help: "Please select a time at least 10 minutes from now.",
+                  },
+                  {
+                    title: "Schedule Time Too Soon",
+                    duration: 6000,
+                  }
+                );
+              } else {
+                alert(
+                  "Scheduled time must be at least 10 minutes in the future"
+                );
+              }
+              submitBtn.disabled = false;
+              submitBtn.textContent = originalText;
+              return;
+            }
+
+            scheduledTime = scheduledDate.toISOString();
+          }
+
+          // Prepare request for multi-platform posting
+          const requestBody = {
+            platforms: selectedPlatforms,
+            message: content,
+            clientName: clientName,
+            useDatabaseToken: true,
+          };
+
+          if (imageUrl) {
+            requestBody.imageUrl = imageUrl;
+          }
+
+          if (scheduledTime) {
+            requestBody.scheduledTime = scheduledTime;
+          }
+
+          // Add pageId if Facebook or Instagram is selected
+          if (
+            selectedPlatforms.includes("facebook") ||
+            selectedPlatforms.includes("instagram")
+          ) {
+            requestBody.pageId = pageId;
+          }
+
+          // Submit to multi-platform API
+          let response;
+          let result;
+
+          try {
+            response = await fetch("/api/social/post-to-multiple-platforms", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(requestBody),
+            });
+
+            // Check if response is OK
+            if (!response.ok) {
+              // Try to parse error response
+              try {
+                result = await response.json();
+              } catch (parseError) {
+                throw new Error(
+                  `Server error: ${response.status} ${response.statusText}`
+                );
+              }
+            } else {
+              result = await response.json();
+            }
+          } catch (fetchError) {
+            // Network error
+            if (globalThis.ErrorHandlerUI || window.ErrorHandlerUI) {
+              const ErrorUI =
+                globalThis.ErrorHandlerUI || window.ErrorHandlerUI;
+              ErrorUI.showError(
+                {
+                  message: fetchError.message || "Unable to connect to server",
+                  error: "Network Error",
+                  retryable: true,
+                  help: "Please check your internet connection and try again.",
+                },
+                {
+                  title: "Connection Error",
+                  duration: 8000,
+                }
+              );
+            } else {
+              throw fetchError;
+            }
+            return;
+          }
+
+          if (
+            result.success ||
+            (result.summary && result.summary.successful > 0)
+          ) {
+            // Show success notification
+            const successMessage = result.summary
+              ? `Posted to ${result.summary.successful} of ${
+                  result.summary.total
+                } platform(s)${
+                  result.summary.failed > 0
+                    ? ` (${result.summary.failed} failed)`
+                    : ""
+                }`
+              : result.message || "Post scheduled successfully!";
+
+            if (globalThis.ErrorHandlerUI || window.ErrorHandlerUI) {
+              const ErrorUI =
+                globalThis.ErrorHandlerUI || window.ErrorHandlerUI;
+              ErrorUI.showSuccess(successMessage, {
+                title:
+                  result.summary?.failed > 0 ? "Partial Success" : "Success",
+                duration: 5000,
+              });
+            } else {
+              alert(`✅ ${successMessage}`);
+            }
+
+            // Show details if some platforms failed
+            if (result.failures && result.failures.length > 0) {
+              console.warn("Failed platforms:", result.failures);
+              if (globalThis.ErrorHandlerUI || window.ErrorHandlerUI) {
+                const ErrorUI =
+                  globalThis.ErrorHandlerUI || window.ErrorHandlerUI;
+                ErrorUI.showError(
+                  {
+                    message: `Some platforms failed: ${result.failures
+                      .map((f) => f.platform)
+                      .join(", ")}`,
+                    error: "Partial Failure",
+                    retryable: true,
+                    help: "Check your platform connections and try again.",
+                  },
+                  {
+                    title: "Some Posts Failed",
+                    duration: 8000,
+                  }
+                );
+              }
+            }
+
+            closeScheduleModal();
+
+            // Refresh posts list
+            setTimeout(() => {
+              loadPosts(0);
+            }, 1000);
+          } else {
+            // Show error notification
+            if (window.ErrorHandlerUI) {
+              window.ErrorHandlerUI.showError(result, {
+                title: result.error || "Scheduling Error",
+                duration: 8000,
+                showDetails: true,
+              });
+            } else {
+              alert(
+                `❌ Error: ${result.message || result.error}\n\n${
+                  result.help || ""
+                }`
+              );
+            }
+          }
+        } catch (error) {
+          console.error("Error scheduling post:", error);
+
+          // Show error notification
+          if (globalThis.ErrorHandlerUI || window.ErrorHandlerUI) {
+            const ErrorUI = globalThis.ErrorHandlerUI || window.ErrorHandlerUI;
+            ErrorUI.showError(
+              {
+                message: error.message || "An unexpected error occurred",
+                error: "Network Error",
+                retryable: true,
+                help: "Please check your connection and try again.",
+              },
+              {
+                title: "Scheduling Error",
+                duration: 8000,
+              }
+            );
+          } else {
+            alert(`❌ Error scheduling post: ${error.message}`);
+          }
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+        }
+      }
+
+      // Close modal on Escape key
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          closeScheduleModal();
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -20,8 +20,22 @@ function parseQuery(req) {
 
 /**
  * Parse request body (supports JSON)
+ * Handles both Vercel (pre-parsed) and local (stream) environments
  */
 function parseBody(req) {
+  // Vercel/serverless - body already parsed
+  if (req.body !== undefined) {
+    if (typeof req.body === 'string') {
+      try {
+        return Promise.resolve(JSON.parse(req.body));
+      } catch (e) {
+        return Promise.resolve({});
+      }
+    }
+    return Promise.resolve(req.body || {});
+  }
+
+  // Local/streaming - parse from stream
   return new Promise((resolve, reject) => {
     let body = "";
     req.on("data", (chunk) => {
@@ -71,8 +85,22 @@ function sendJson(res, statusCode, data, headers = {}) {
   res.end(JSON.stringify(data));
 }
 
+/**
+ * Send error response
+ * @param {Object} res - Response object
+ * @param {number} statusCode - HTTP status code
+ * @param {string} message - Error message
+ */
+function sendError(res, statusCode, message) {
+  return sendJson(res, statusCode, {
+    success: false,
+    error: message,
+  });
+}
+
 module.exports = {
   parseQuery,
   parseBody,
   sendJson,
+  sendError,
 };

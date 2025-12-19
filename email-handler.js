@@ -28,7 +28,7 @@ class EmailHandler {
     try {
       const mailOptions = {
         from: `"TNR Business Solutions Contact Form" <${process.env.SMTP_USER}>`,
-        to: process.env.BUSINESS_EMAIL || "roy.turner@tnrbusinesssolutions.com",
+        to: process.env.BUSINESS_EMAIL || "Roy.Turner@tnrbusinesssolutions.com",
         subject: `New Contact Form Submission from ${
           formData.name || "Unknown"
         }`,
@@ -200,10 +200,13 @@ Reply directly to this email to respond to the customer.
   // Send welcome email to new client
   async sendWelcomeEmail(clientData) {
     try {
-      const clientName = clientData.name || clientData.company || "Valued Client";
-      const services = Array.isArray(clientData.services) 
-        ? clientData.services 
-        : (clientData.services ? [clientData.services] : []);
+      const clientName =
+        clientData.name || clientData.company || "Valued Client";
+      const services = Array.isArray(clientData.services)
+        ? clientData.services
+        : clientData.services
+        ? [clientData.services]
+        : [];
 
       const welcomeEmailHTML = `
 <!DOCTYPE html>
@@ -233,7 +236,7 @@ Reply directly to this email to respond to the customer.
         </div>
         <div class="content">
             <div class="message-box">
-                <p>Hi ${clientName.split(' ')[0]},</p>
+                <p>Hi ${clientName.split(" ")[0]},</p>
                 
                 <p>I wanted to personally reach out and welcome you to TNR Business Solutions. I'm thrilled that you've chosen us to help grow your business and achieve your goals.</p>
                 
@@ -241,14 +244,20 @@ Reply directly to this email to respond to the customer.
                 
                 <p>We're committed to providing you with exceptional service and results that make a real difference for your business. Whether it's improving your online presence, reaching more customers, or streamlining your operations, we're here to help you succeed.</p>
                 
-                ${services.length > 0 ? `
+                ${
+                  services.length > 0
+                    ? `
                 <div class="services-list">
                     <p style="margin-top: 0; font-weight: bold; color: #2c5530;">Your Services with Us:</p>
                     <ul>
-                        ${services.map(service => `<li>${service}</li>`).join('')}
+                        ${services
+                          .map((service) => `<li>${service}</li>`)
+                          .join("")}
                     </ul>
                 </div>
-                ` : ''}
+                `
+                    : ""
+                }
                 
                 <p>Over the next few days, you can expect to hear from me or a member of my team as we begin working on your projects. We'll make sure you're kept in the loop every step of the way.</p>
                 
@@ -264,12 +273,14 @@ Reply directly to this email to respond to the customer.
                 <p>President</p>
                 <p>TNR Business Solutions</p>
                 <p>C: 412-499-2987</p>
-                <p>Roy.Turner@TNRBusinessSolutions.com</p>
+                <p>Roy.Turner@tnrbusinesssolutions.com</p>
                 <p>Www.TNRBusinessSolutions.com</p>
             </div>
         </div>
         <div class="footer">
-            <p>This email was sent to ${clientData.email || 'your email address'}</p>
+            <p>This email was sent to ${
+              clientData.email || "your email address"
+            }</p>
             <p>TNR Business Solutions | 418 Concord Avenue, Greensburg, PA 15601</p>
         </div>
     </div>
@@ -280,7 +291,7 @@ Reply directly to this email to respond to the customer.
       const welcomeEmailText = `
 Welcome to TNR Business Solutions!
 
-Hi ${clientName.split(' ')[0]},
+Hi ${clientName.split(" ")[0]},
 
 I wanted to personally reach out and welcome you to TNR Business Solutions. I'm thrilled that you've chosen us to help grow your business and achieve your goals.
 
@@ -288,7 +299,11 @@ As someone who's built this business from the ground up, I know how important it
 
 We're committed to providing you with exceptional service and results that make a real difference for your business. Whether it's improving your online presence, reaching more customers, or streamlining your operations, we're here to help you succeed.
 
-${services.length > 0 ? `Your Services with Us:\n${services.map(s => `- ${s}`).join('\n')}\n\n` : ''}
+${
+  services.length > 0
+    ? `Your Services with Us:\n${services.map((s) => `- ${s}`).join("\n")}\n\n`
+    : ""
+}
 
 Over the next few days, you can expect to hear from me or a member of my team as we begin working on your projects. We'll make sure you're kept in the loop every step of the way.
 
@@ -302,7 +317,7 @@ Roy A. Turner
 President
 TNR Business Solutions
 C: 412-499-2987
-Roy.Turner@TNRBusinessSolutions.com
+Roy.Turner@tnrbusinesssolutions.com
 Www.TNRBusinessSolutions.com
       `;
 
@@ -320,18 +335,26 @@ Www.TNRBusinessSolutions.com
       // Send notification email to Roy
       const notificationEmailOptions = {
         from: `"TNR Business Solutions CRM" <${process.env.SMTP_USER}>`,
-        to: process.env.BUSINESS_EMAIL || "Roy.Turner@TNRBusinessSolutions.com",
+        to: process.env.BUSINESS_EMAIL || "Roy.Turner@tnrbusinesssolutions.com",
         subject: `New Client Added: ${clientName}`,
         html: `
           <h2>New Client Added to CRM</h2>
           <p><strong>Client Name:</strong> ${clientName}</p>
-          <p><strong>Email:</strong> ${clientData.email || 'Not provided'}</p>
-          <p><strong>Phone:</strong> ${clientData.phone || 'Not provided'}</p>
-          <p><strong>Company:</strong> ${clientData.company || clientData.businessName || 'Not provided'}</p>
-          <p><strong>Services:</strong> ${services.join(', ') || 'Not specified'}</p>
-          <p><strong>Status:</strong> ${clientData.status || 'Active'}</p>
-          <p><strong>Source:</strong> ${clientData.source || 'Manual Entry'}</p>
-          ${clientData.notes ? `<p><strong>Notes:</strong> ${clientData.notes}</p>` : ''}
+          <p><strong>Email:</strong> ${clientData.email || "Not provided"}</p>
+          <p><strong>Phone:</strong> ${clientData.phone || "Not provided"}</p>
+          <p><strong>Company:</strong> ${
+            clientData.company || clientData.businessName || "Not provided"
+          }</p>
+          <p><strong>Services:</strong> ${
+            services.join(", ") || "Not specified"
+          }</p>
+          <p><strong>Status:</strong> ${clientData.status || "Active"}</p>
+          <p><strong>Source:</strong> ${clientData.source || "Manual Entry"}</p>
+          ${
+            clientData.notes
+              ? `<p><strong>Notes:</strong> ${clientData.notes}</p>`
+              : ""
+          }
           <hr>
           <p><em>A welcome email has been automatically sent to the client.</em></p>
           <p><em>Client ID: ${clientData.id}</em></p>
@@ -340,13 +363,13 @@ Www.TNRBusinessSolutions.com
 New Client Added to CRM
 
 Client Name: ${clientName}
-Email: ${clientData.email || 'Not provided'}
-Phone: ${clientData.phone || 'Not provided'}
-Company: ${clientData.company || clientData.businessName || 'Not provided'}
-Services: ${services.join(', ') || 'Not specified'}
-Status: ${clientData.status || 'Active'}
-Source: ${clientData.source || 'Manual Entry'}
-${clientData.notes ? `Notes: ${clientData.notes}` : ''}
+Email: ${clientData.email || "Not provided"}
+Phone: ${clientData.phone || "Not provided"}
+Company: ${clientData.company || clientData.businessName || "Not provided"}
+Services: ${services.join(", ") || "Not specified"}
+Status: ${clientData.status || "Active"}
+Source: ${clientData.source || "Manual Entry"}
+${clientData.notes ? `Notes: ${clientData.notes}` : ""}
 
 A welcome email has been automatically sent to the client.
 Client ID: ${clientData.id}
@@ -355,15 +378,16 @@ Client ID: ${clientData.id}
 
       await this.transporter.sendMail(notificationEmailOptions);
 
-      return { 
-        success: true, 
-        message: "Welcome email sent to client and notification sent to business email" 
+      return {
+        success: true,
+        message:
+          "Welcome email sent to client and notification sent to business email",
       };
     } catch (error) {
       console.error("Error sending welcome email:", error);
-      return { 
-        success: false, 
-        error: error.message 
+      return {
+        success: false,
+        error: error.message,
       };
     }
   }

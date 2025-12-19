@@ -2,7 +2,10 @@
 // Routes all API requests to appropriate handlers
 
 const { sendJson } = require("../server/handlers/http-utils");
-const { setCorsHeaders, handleCorsPreflight } = require("../server/handlers/cors-utils");
+const {
+  setCorsHeaders,
+  handleCorsPreflight,
+} = require("../server/handlers/cors-utils");
 
 module.exports = async (req, res) => {
   // Get pathname from request
@@ -42,6 +45,19 @@ module.exports = async (req, res) => {
     }
   }
 
+  // Handle direct /auth/* routes that were rewritten to /api/auth/*
+  // Vercel rewrites /auth/meta to /api/auth/meta, so we need to handle both
+  if (!route && pathname) {
+    // Check if pathname is /api/auth/* (from rewrite)
+    if (pathname.startsWith("/api/auth/")) {
+      route = pathname.replace("/api/", "");
+    }
+    // Also check if it's just /auth/* (direct access)
+    else if (pathname.startsWith("/auth/")) {
+      route = pathname.substring(1); // Remove leading /
+    }
+  }
+
   // Content Library routes
   if (route === "content-library" || route.startsWith("content-library/")) {
     const handler = require("../server/handlers/content-library-api");
@@ -49,8 +65,30 @@ module.exports = async (req, res) => {
   }
 
   // Dashboard Stats routes
-  if (route === "dashboard/stats" || route === "dashboard-stats") {
+  if (
+    route === "dashboard/stats" ||
+    route === "dashboard-stats" ||
+    route === "stats/dashboard"
+  ) {
     const handler = require("../server/handlers/dashboard-stats-api");
+    return await handler(req, res);
+  }
+
+  // Posts API routes
+  if (route === "posts" || route.startsWith("posts/")) {
+    const handler = require("../server/handlers/posts-api");
+    return await handler(req, res);
+  }
+
+  // Messages API routes
+  if (route === "messages" || route.startsWith("messages/")) {
+    const handler = require("../server/handlers/messages-api");
+    return await handler(req, res);
+  }
+
+  // Analytics Events API routes
+  if (route === "analytics/events" || route.startsWith("analytics/events/")) {
+    const handler = require("../server/handlers/analytics-events-api");
     return await handler(req, res);
   }
 
@@ -61,22 +99,25 @@ module.exports = async (req, res) => {
   }
 
   // Always log for debugging (will help identify routing issues)
-  console.log("API Route Debug:", {
-    pathname,
-    route,
-    query: req.query,
-    url: req.url,
-    method: req.method,
-    hasAll: req.query?.all !== undefined,
-    allValue: req.query?.all,
-  });
+  // Only log if route is not found (to reduce noise)
+  if (!route || route === "") {
+    console.log("API Route Debug:", {
+      pathname,
+      route,
+      query: req.query,
+      url: req.url,
+      method: req.method,
+      hasAll: req.query?.all !== undefined,
+      allValue: req.query?.all,
+    });
+  }
 
   // Handle CORS preflight requests
   const origin = req.headers.origin || req.headers.referer;
   if (handleCorsPreflight(req, res)) {
     return;
   }
-  
+
   // Set CORS headers for all requests
   setCorsHeaders(res, origin);
 
@@ -97,13 +138,15 @@ module.exports = async (req, res) => {
       if (!req.query) {
         req.query = {};
         // Parse query string from req.url if available
-        const urlParts = req.url.split('?');
+        const urlParts = req.url.split("?");
         if (urlParts.length > 1) {
           const queryString = urlParts[1];
-          queryString.split('&').forEach(param => {
-            const [key, value] = param.split('=');
+          queryString.split("&").forEach((param) => {
+            const [key, value] = param.split("=");
             if (key) {
-              req.query[decodeURIComponent(key)] = value ? decodeURIComponent(value) : '';
+              req.query[decodeURIComponent(key)] = value
+                ? decodeURIComponent(value)
+                : "";
             }
           });
         }
@@ -157,16 +200,29 @@ module.exports = async (req, res) => {
     }
 
     // Instagram Webhooks - specific endpoint
-    if (route === "instagram/webhooks" || route.startsWith("instagram/webhooks/")) {
+    if (
+      route === "instagram/webhooks" ||
+      route.startsWith("instagram/webhooks/")
+    ) {
       console.log("✅ Routing to Instagram Webhooks handler");
       const handler = require("../server/handlers/instagram-webhooks");
       return await handler(req, res);
     }
 
     // WhatsApp Webhooks - specific endpoint
-    if (route === "whatsapp/webhooks" || route.startsWith("whatsapp/webhooks/")) {
+    if (
+      route === "whatsapp/webhooks" ||
+      route.startsWith("whatsapp/webhooks/")
+    ) {
       console.log("✅ Routing to WhatsApp Webhooks handler");
       const handler = require("../server/handlers/whatsapp-webhooks");
+      return await handler(req, res);
+    }
+
+    // WhatsApp Send - send WhatsApp messages
+    if (route === "send/whatsapp" || route.startsWith("send/whatsapp/")) {
+      console.log("✅ Routing to WhatsApp Send handler");
+      const handler = require("../server/handlers/send-whatsapp");
       return await handler(req, res);
     }
 
@@ -256,10 +312,12 @@ module.exports = async (req, res) => {
 
     // Wix API routes - handle /api/wix requests (catch-all, must be last)
     // Explicitly exclude webhooks, seo-keywords, and test-token routes
-    if ((route === "wix" || route.startsWith("wix/")) && 
-        route !== "wix/webhooks" && 
-        !route.startsWith("wix/seo-keywords") &&
-        route !== "wix/test-token") {
+    if (
+      (route === "wix" || route.startsWith("wix/")) &&
+      route !== "wix/webhooks" &&
+      !route.startsWith("wix/seo-keywords") &&
+      route !== "wix/test-token"
+    ) {
       console.log("✅ Routing to Wix API handler");
       const handler = require("../server/handlers/wix-api-routes");
       return await handler(req, res);
@@ -332,8 +390,21 @@ module.exports = async (req, res) => {
         const handler = require("../server/handlers/social-tokens-api");
         return await handler(req, res);
       }
-      if (route.includes("check-facebook-permissions") || route === "social/check-facebook-permissions") {
+      if (
+        route.includes("check-facebook-permissions") ||
+        route === "social/check-facebook-permissions"
+      ) {
         const handler = require("../server/handlers/check-facebook-permissions");
+        return await handler(req, res);
+      }
+      // Multi-platform posting - must come before individual platform routes
+      if (
+        route.includes("post-to-multiple-platforms") ||
+        route.includes("post-to-multiple") ||
+        route === "social/post-to-multiple-platforms" ||
+        route === "social/post-to-multiple"
+      ) {
+        const handler = require("../server/handlers/post-to-multiple-platforms");
         return await handler(req, res);
       }
       if (
@@ -392,6 +463,7 @@ module.exports = async (req, res) => {
           "/api/auth/wix - Wix OAuth",
           "/api/wix - Wix automation API",
           "/api/social/tokens - Social media token management",
+          "/api/social/post-to-multiple-platforms - Post to multiple platforms simultaneously",
           "/api/social/post-to-facebook - Post to Facebook",
           "/api/social/post-to-instagram - Post to Instagram",
           "/api/social/post-to-linkedin - Post to LinkedIn",
@@ -411,33 +483,52 @@ module.exports = async (req, res) => {
       url: req.url,
       query: req.query,
       method: req.method,
+      hasAll: req.query?.all !== undefined,
+      allValue: req.query?.all,
     });
-    sendJson(res, 404, {
-      success: false,
-      error: "Endpoint not found",
-      message: `The API endpoint '${pathname}' was not found.`,
-      route: route,
-      pathname: pathname,
-      url: req.url,
-      method: req.method,
-      availableRoutes: [
-        "/api/crm/*",
-        "/api/campaigns/*",
-        "/api/auth/meta",
-        "/api/auth/linkedin",
-        "/api/auth/twitter",
-        "/api/auth/wix",
-        "/api/wix",
-        "/api/social/tokens",
-        "/api/social/post-to-facebook",
-        "/api/social/post-to-instagram",
-        "/api/social/post-to-linkedin",
-        "/api/social/post-to-twitter",
-        "/api/social/test-token",
-        "/api/social/get-insights",
-        "/api/admin/auth",
-      ],
-    });
+
+    // Set proper headers before sending response
+    if (!res.headersSent) {
+      res.statusCode = 404;
+      res.setHeader("Content-Type", "application/json");
+      const origin = req.headers.origin || req.headers.referer;
+      setCorsHeaders(res, origin);
+
+      res.end(
+        JSON.stringify({
+          success: false,
+          error: "Endpoint not found",
+          message: `The API endpoint '${pathname}' was not found.`,
+          route: route,
+          pathname: pathname,
+          url: req.url,
+          method: req.method,
+          availableRoutes: [
+            "/api/crm/*",
+            "/api/campaigns/*",
+            "/api/auth/meta",
+            "/api/auth/linkedin",
+            "/api/auth/twitter",
+            "/api/auth/wix",
+            "/api/wix",
+            "/api/social/tokens",
+            "/api/social/post-to-multiple-platforms",
+            "/api/social/post-to-facebook",
+            "/api/social/post-to-instagram",
+            "/api/social/post-to-linkedin",
+            "/api/social/post-to-twitter",
+            "/api/social/test-token",
+            "/api/social/get-insights",
+            "/api/admin/auth",
+            "/api/posts",
+            "/api/messages",
+            "/api/analytics/events",
+            "/api/stats/dashboard",
+            "/api/activity-log",
+          ],
+        })
+      );
+    }
   } catch (error) {
     console.error("❌ API Router Error:", error);
     console.error("Error stack:", error.stack);

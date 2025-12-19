@@ -40,7 +40,7 @@ After refreshing, when you submit a form:
    - OR: "✅ New user request submitted successfully. You will be notified via email."
 
 3. **Email should be sent to:**
-   - `BUSINESS_EMAIL` (Roy.Turner@TNRBusinessSolutions.com)
+   - `BUSINESS_EMAIL` (Roy.Turner@tnrbusinesssolutions.com)
 
 ## Verification
 

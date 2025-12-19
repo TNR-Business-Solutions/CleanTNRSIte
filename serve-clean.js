@@ -31,8 +31,16 @@ const PORT = process.env.PORT || 3000;
 
 // Handle admin authentication
 async function handleAdminAuth(req, res) {
+  console.log(
+    "🔐 handleAdminAuth called, method:",
+    req.method,
+    "url:",
+    req.url
+  );
+
   // Only accept POST requests
   if (req.method !== "POST") {
+    console.log("❌ Method not POST, returning 405");
     res.writeHead(405, { "Content-Type": "application/json" });
     res.end(
       JSON.stringify({
@@ -42,6 +50,8 @@ async function handleAdminAuth(req, res) {
     );
     return;
   }
+
+  console.log("✅ POST method accepted, processing auth...");
 
   try {
     let body = "";
@@ -69,8 +79,32 @@ async function handleAdminAuth(req, res) {
         const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "admin";
         const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "TNR2024!";
 
-        // Validate credentials
-        if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+        // Debug logging
+        console.log("🔐 Auth attempt:", {
+          providedUsername: username,
+          providedPassword: password
+            ? `${password.substring(0, 2)}***`
+            : "empty",
+          expectedUsername: ADMIN_USERNAME,
+          expectedPassword: ADMIN_PASSWORD
+            ? `${ADMIN_PASSWORD.substring(0, 2)}***`
+            : "empty",
+          usernameMatch: username === ADMIN_USERNAME,
+          passwordMatch: password === ADMIN_PASSWORD,
+          passwordLength: password?.length,
+          expectedLength: ADMIN_PASSWORD?.length,
+        });
+
+        // Validate credentials (trim whitespace and handle special characters)
+        const trimmedUsername = username?.trim();
+        const trimmedPassword = password?.trim();
+        const trimmedAdminUsername = ADMIN_USERNAME?.trim();
+        const trimmedAdminPassword = ADMIN_PASSWORD?.trim();
+
+        const usernameMatches = trimmedUsername === trimmedAdminUsername;
+        const passwordMatches = trimmedPassword === trimmedAdminPassword;
+
+        if (usernameMatches && passwordMatches) {
           // Generate a simple session token (in production, use JWT or proper session management)
           const sessionToken = Buffer.from(
             `${username}:${Date.now()}`
@@ -331,6 +365,53 @@ const server = http.createServer((req, res) => {
   const parsedUrl = url.parse(req.url, true);
   let pathname = parsedUrl.pathname;
 
+  // Handle Admin Authentication FIRST (before other API routes)
+  if (pathname === "/api/admin/auth") {
+    console.log("🔐 Admin auth route matched, method:", req.method);
+    // Handle CORS preflight (OPTIONS) requests
+    if (req.method === "OPTIONS") {
+      res.writeHead(200, {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+      });
+      res.end();
+      return;
+    }
+    handleAdminAuth(req, res);
+    return;
+  }
+
+  // Handle Admin Requests (password reset, new user)
+  if (pathname === "/api/admin-requests") {
+    const adminRequestsHandler = require("./server/handlers/admin-requests");
+    adminRequestsHandler(req, res).catch((err) => {
+      console.error("Admin Requests Error:", err);
+      if (!res.headersSent) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify({ success: false, error: "Internal server error" })
+        );
+      }
+    });
+    return;
+  }
+
+  // Handle WhatsApp Sending
+  if (pathname.startsWith("/api/send/whatsapp")) {
+    const whatsappHandler = require("./server/handlers/send-whatsapp");
+    whatsappHandler(req, res).catch((err) => {
+      console.error("WhatsApp Send Error:", err);
+      if (!res.headersSent) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify({ success: false, error: "Internal server error" })
+        );
+      }
+    });
+    return;
+  }
+
   // Handle CRM API requests
   if (pathname.startsWith("/api/crm/")) {
     const crmApiHandler = require("./server/handlers/crm-api");
@@ -366,6 +447,72 @@ const server = http.createServer((req, res) => {
     const workflowsApi = require("./server/handlers/workflows-api");
     workflowsApi(req, res).catch((err) => {
       console.error("Workflows API Error:", err);
+      if (!res.headersSent) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify({ success: false, error: "Internal server error" })
+        );
+      }
+    });
+    return;
+  }
+
+  // Handle Dashboard Stats API
+  if (
+    pathname === "/api/stats/dashboard" ||
+    pathname.startsWith("/api/stats/")
+  ) {
+    const dashboardStatsApi = require("./server/handlers/dashboard-stats-api");
+    dashboardStatsApi(req, res).catch((err) => {
+      console.error("Dashboard Stats API Error:", err);
+      if (!res.headersSent) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify({ success: false, error: "Internal server error" })
+        );
+      }
+    });
+    return;
+  }
+
+  // Handle Posts API
+  if (pathname.startsWith("/api/posts")) {
+    const postsApi = require("./server/handlers/posts-api");
+    postsApi(req, res).catch((err) => {
+      console.error("Posts API Error:", err);
+      if (!res.headersSent) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify({ success: false, error: "Internal server error" })
+        );
+      }
+    });
+    return;
+  }
+
+  // Handle Messages API
+  if (pathname.startsWith("/api/messages")) {
+    const messagesApi = require("./server/handlers/messages-api");
+    messagesApi(req, res).catch((err) => {
+      console.error("Messages API Error:", err);
+      if (!res.headersSent) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify({ success: false, error: "Internal server error" })
+        );
+      }
+    });
+    return;
+  }
+
+  // Handle Analytics Events API
+  if (
+    pathname.startsWith("/api/analytics/events") ||
+    pathname === "/api/analytics-events"
+  ) {
+    const analyticsEventsApi = require("./server/handlers/analytics-events-api");
+    analyticsEventsApi(req, res).catch((err) => {
+      console.error("Analytics Events API Error:", err);
       if (!res.headersSent) {
         res.writeHead(500, { "Content-Type": "application/json" });
         res.end(
@@ -479,6 +626,108 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // Handle LinkedIn OAuth
+  if (pathname.startsWith("/api/auth/linkedin")) {
+    if (pathname.includes("callback")) {
+      const callbackHandler = require("./server/handlers/auth-linkedin-callback");
+      callbackHandler(req, res).catch((err) => {
+        console.error("LinkedIn OAuth Callback Error:", err);
+        if (!res.headersSent) {
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(
+            JSON.stringify({ success: false, error: "Internal server error" })
+          );
+        }
+      });
+    } else {
+      const authHandler = require("./server/handlers/auth-linkedin");
+      authHandler(req, res).catch((err) => {
+        console.error("LinkedIn OAuth Error:", err);
+        if (!res.headersSent) {
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(
+            JSON.stringify({ success: false, error: "Internal server error" })
+          );
+        }
+      });
+    }
+    return;
+  }
+
+  // Handle Twitter OAuth
+  if (pathname.startsWith("/api/auth/twitter")) {
+    if (pathname.includes("callback")) {
+      const callbackHandler = require("./server/handlers/auth-twitter-callback");
+      callbackHandler(req, res).catch((err) => {
+        console.error("Twitter OAuth Callback Error:", err);
+        if (!res.headersSent) {
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(
+            JSON.stringify({ success: false, error: "Internal server error" })
+          );
+        }
+      });
+    } else {
+      const authHandler = require("./server/handlers/auth-twitter");
+      authHandler(req, res).catch((err) => {
+        console.error("Twitter OAuth Error:", err);
+        if (!res.headersSent) {
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(
+            JSON.stringify({ success: false, error: "Internal server error" })
+          );
+        }
+      });
+    }
+    return;
+  }
+
+  // Handle Threads OAuth
+  if (pathname.startsWith("/api/auth/threads")) {
+    if (pathname.includes("callback")) {
+      const callbackHandler = require("./server/handlers/auth-threads-callback");
+      callbackHandler(req, res).catch((err) => {
+        console.error("Threads OAuth Callback Error:", err);
+        if (!res.headersSent) {
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(
+            JSON.stringify({ success: false, error: "Internal server error" })
+          );
+        }
+      });
+    } else {
+      const authHandler = require("./server/handlers/auth-threads");
+      authHandler(req, res).catch((err) => {
+        console.error("Threads OAuth Error:", err);
+        if (!res.headersSent) {
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(
+            JSON.stringify({ success: false, error: "Internal server error" })
+          );
+        }
+      });
+    }
+    return;
+  }
+
+  // Handle Multi-Platform Social Media Posting
+  if (
+    pathname.startsWith("/api/social/post-to-multiple-platforms") ||
+    pathname.startsWith("/api/social/post-to-multiple")
+  ) {
+    const multiPlatformHandler = require("./server/handlers/post-to-multiple-platforms");
+    multiPlatformHandler(req, res).catch((err) => {
+      console.error("Multi-Platform Posting Error:", err);
+      if (!res.headersSent) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify({ success: false, error: "Internal server error" })
+        );
+      }
+    });
+    return;
+  }
+
   // Handle Social Media Posting
   if (pathname.startsWith("/api/social/post-to-facebook")) {
     const fbHandler = require("./server/handlers/post-to-facebook");
@@ -508,15 +757,25 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // Handle Admin Authentication
-  if (pathname === "/api/admin/auth") {
-    handleAdminAuth(req, res);
-    return;
-  }
-
   // Handle form submissions
-  if (req.method === "POST" && pathname === "/submit-form") {
-    handleFormSubmissionWithEmail(req, res);
+  if (pathname === "/submit-form") {
+    // Handle CORS preflight (OPTIONS) requests
+    if (req.method === "OPTIONS") {
+      res.writeHead(200, {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+      });
+      res.end();
+      return;
+    }
+    if (req.method === "POST") {
+      handleFormSubmissionWithEmail(req, res);
+      return;
+    }
+    // Method not allowed
+    res.writeHead(405, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ success: false, error: "Method not allowed" }));
     return;
   }
 
@@ -641,19 +900,9 @@ server.listen(PORT, () => {
   console.log(
     `📊 Admin Dashboard: http://localhost:${PORT}/admin-dashboard-v2.html`
   );
-  console.log(
-    `👥 CRM System: http://localhost:${PORT}/admin/crm/`
-  );
-  console.log(
-    `📧 Email Campaigns: http://localhost:${PORT}/admin/campaigns/`
-  );
-  console.log(
-    `🤖 Workflows: http://localhost:${PORT}/admin/automation/`
-  );
-  console.log(
-    `📈 Analytics: http://localhost:${PORT}/admin/analytics/`
-  );
-  console.log(
-    `📝 Templates: http://localhost:${PORT}/admin/email-templates/`
-  );
+  console.log(`👥 CRM System: http://localhost:${PORT}/admin/crm/`);
+  console.log(`📧 Email Campaigns: http://localhost:${PORT}/admin/campaigns/`);
+  console.log(`🤖 Workflows: http://localhost:${PORT}/admin/automation/`);
+  console.log(`📈 Analytics: http://localhost:${PORT}/admin/analytics/`);
+  console.log(`📝 Templates: http://localhost:${PORT}/admin/email-templates/`);
 });

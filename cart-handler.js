@@ -346,7 +346,7 @@ const sendOrderConfirmation = async (order) => {
         <h3 style="color: #2c5530;">Next Steps</h3>
         <p>Our team will contact you within 24 hours to discuss your project details and get started. We'll need to gather some additional information about your business and goals.</p>
         
-        <p>If you have any questions about your order, please don't hesitate to contact us at <a href="mailto:roy.turner@tnrbusinesssolutions.com">roy.turner@tnrbusinesssolutions.com</a> or call us at (412) 499-2987.</p>
+        <p>If you have any questions about your order, please don't hesitate to contact us at <a href="mailto:Roy.Turner@tnrbusinesssolutions.com">Roy.Turner@tnrbusinesssolutions.com</a> or call us at (412) 499-2987.</p>
         
         <p>Thank you for choosing TNR Business Solutions!</p>
         
@@ -354,7 +354,7 @@ const sendOrderConfirmation = async (order) => {
         <p style="font-size: 12px; color: #666; text-align: center;">
           TNR Business Solutions<br>
           418 Concord Avenue, Greensburg, PA 15601<br>
-          Phone: (412) 499-2987 | Email: roy.turner@tnrbusinesssolutions.com
+          Phone: (412) 499-2987 | Email: Roy.Turner@tnrbusinesssolutions.com
         </p>
       </div>
     `,

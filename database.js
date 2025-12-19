@@ -357,6 +357,8 @@ class TNRDatabase {
         page_name TEXT,
         instagram_account_id TEXT,
         instagram_username TEXT,
+        client_id TEXT,
+        client_name TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )`,
@@ -379,6 +381,20 @@ class TNRDatabase {
         metadata TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )`,
+
+      // Messages table (for tracking processed messages)
+      `CREATE TABLE IF NOT EXISTS messages (
+        id TEXT PRIMARY KEY,
+        platform TEXT,
+        sender TEXT,
+        recipient TEXT,
+        subject TEXT,
+        content TEXT,
+        status TEXT DEFAULT 'processed',
+        metadata TEXT,
+        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )`,
 
       // Settings table
@@ -428,6 +444,9 @@ class TNRDatabase {
         }
       }
       console.log("✅ All database tables created successfully");
+
+      // Migrate existing tables to add missing columns
+      await this.migrateTables();
     } else {
       // SQLite
       return new Promise((resolve, reject) => {
@@ -443,12 +462,96 @@ class TNRDatabase {
               completed++;
               if (completed === total) {
                 console.log("✅ All database tables created successfully");
-                resolve();
+                // Migrate existing tables to add missing columns
+                this.migrateTables()
+                  .then(() => resolve())
+                  .catch(reject);
               }
             }
           });
         });
       });
+    }
+  }
+
+  // Migrate tables to add missing columns
+  async migrateTables() {
+    try {
+      // Add client_id and client_name to social_media_tokens if they don't exist
+      if (this.usePostgres) {
+        // PostgreSQL: Check if columns exist first, then add if missing
+        try {
+          // Check if column exists
+          const checkColumn = await this.postgres.query(`
+            SELECT column_name 
+            FROM information_schema.columns 
+            WHERE table_name = 'social_media_tokens' 
+            AND column_name = 'client_id'
+          `);
+
+          if (checkColumn.rows.length === 0) {
+            await this.postgres.query(`
+              ALTER TABLE social_media_tokens 
+              ADD COLUMN client_id TEXT
+            `);
+            console.log("✅ Added client_id column to social_media_tokens");
+          }
+        } catch (err) {
+          console.warn("⚠️ Could not add client_id column:", err.message);
+        }
+
+        try {
+          // Check if column exists
+          const checkColumn = await this.postgres.query(`
+            SELECT column_name 
+            FROM information_schema.columns 
+            WHERE table_name = 'social_media_tokens' 
+            AND column_name = 'client_name'
+          `);
+
+          if (checkColumn.rows.length === 0) {
+            await this.postgres.query(`
+              ALTER TABLE social_media_tokens 
+              ADD COLUMN client_name TEXT
+            `);
+            console.log("✅ Added client_name column to social_media_tokens");
+          }
+        } catch (err) {
+          console.warn("⚠️ Could not add client_name column:", err.message);
+        }
+      } else {
+        // SQLite: Check if columns exist, then add if missing
+        try {
+          const columns = await this.query(
+            "PRAGMA table_info(social_media_tokens)"
+          );
+          const hasClientId = columns.some((col) => col.name === "client_id");
+          const hasClientName = columns.some(
+            (col) => col.name === "client_name"
+          );
+
+          if (!hasClientId) {
+            await this.execute(
+              "ALTER TABLE social_media_tokens ADD COLUMN client_id TEXT"
+            );
+            console.log("✅ Added client_id column to social_media_tokens");
+          }
+
+          if (!hasClientName) {
+            await this.execute(
+              "ALTER TABLE social_media_tokens ADD COLUMN client_name TEXT"
+            );
+            console.log("✅ Added client_name column to social_media_tokens");
+          }
+        } catch (err) {
+          console.warn(
+            "⚠️ Could not migrate social_media_tokens table:",
+            err.message
+          );
+        }
+      }
+    } catch (err) {
+      console.warn("⚠️ Migration error (non-critical):", err.message);
     }
   }
 
@@ -756,6 +859,8 @@ class TNRDatabase {
       tokenData.page_name || null,
       tokenData.instagram_account_id || null,
       tokenData.instagram_username || null,
+      tokenData.client_id || null,
+      tokenData.client_name || null,
       new Date().toISOString(),
       new Date().toISOString(),
     ];
@@ -771,6 +876,7 @@ class TNRDatabase {
         const sql = `UPDATE social_media_tokens SET 
           access_token = ?, token_type = ?, expires_at = ?, refresh_token = ?,
           user_id = ?, page_name = ?, instagram_account_id = ?, instagram_username = ?,
+          client_id = ?, client_name = ?,
           updated_at = ? WHERE platform = ? AND page_id = ?`;
         await this.execute(sql, [
           tokenData.access_token,
@@ -781,6 +887,8 @@ class TNRDatabase {
           tokenData.page_name || null,
           tokenData.instagram_account_id || null,
           tokenData.instagram_username || null,
+          tokenData.client_id || null,
+          tokenData.client_name || null,
           new Date().toISOString(),
           tokenData.platform,
           tokenData.page_id,
@@ -792,8 +900,9 @@ class TNRDatabase {
     const sql = `INSERT INTO social_media_tokens (
       id, platform, page_id, access_token, token_type, expires_at, refresh_token,
       user_id, page_name, instagram_account_id, instagram_username,
+      client_id, client_name,
       created_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
     await this.execute(sql, values);
     return { id: tokenId, ...tokenData };
@@ -1373,7 +1482,7 @@ class TNRDatabase {
   // Save API key
   async saveApiKey(platform, apiKey, metadata = null) {
     await this.ensureApiKeysTable();
-    
+
     const existing = await this.queryOne(
       "SELECT * FROM api_keys WHERE platform = ?",
       [platform]
@@ -1390,7 +1499,7 @@ class TNRDatabase {
         apiKey,
         metadata ? JSON.stringify(metadata) : null,
         new Date().toISOString(),
-        platform
+        platform,
       ]);
     } else {
       // Insert new key
@@ -1402,7 +1511,7 @@ class TNRDatabase {
         apiKey,
         metadata ? JSON.stringify(metadata) : null,
         new Date().toISOString(),
-        new Date().toISOString()
+        new Date().toISOString(),
       ]);
     }
     return { platform, saved: true };
@@ -1411,13 +1520,15 @@ class TNRDatabase {
   // Get all API keys (returns platform names only, not actual keys for security)
   async getApiKeys() {
     await this.ensureApiKeysTable();
-    const rows = await this.query("SELECT platform, metadata, created_at, updated_at FROM api_keys ORDER BY platform");
-    return rows.map(row => ({
+    const rows = await this.query(
+      "SELECT platform, metadata, created_at, updated_at FROM api_keys ORDER BY platform"
+    );
+    return rows.map((row) => ({
       platform: row.platform,
       hasKey: true,
       metadata: row.metadata ? JSON.parse(row.metadata) : null,
       created_at: row.created_at,
-      updated_at: row.updated_at
+      updated_at: row.updated_at,
     }));
   }
 
@@ -1428,11 +1539,13 @@ class TNRDatabase {
       "SELECT * FROM api_keys WHERE platform = ?",
       [platform]
     );
-    return row ? {
-      platform: row.platform,
-      api_key: row.api_key,
-      metadata: row.metadata ? JSON.parse(row.metadata) : null
-    } : null;
+    return row
+      ? {
+          platform: row.platform,
+          api_key: row.api_key,
+          metadata: row.metadata ? JSON.parse(row.metadata) : null,
+        }
+      : null;
   }
 
   // Delete API key

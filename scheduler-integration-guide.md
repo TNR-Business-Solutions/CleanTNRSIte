@@ -237,7 +237,7 @@ This guide will help you integrate the TNR Social Media Automation Dashboard wit
 ## 📞 **SUPPORT**
 
 For technical support with the TNR Social Media Automation Dashboard:
-- **Email**: roy.turner@tnrbusinesssolutions.com
+- **Email**: Roy.Turner@tnrbusinesssolutions.com
 - **Phone**: (412) 499-2987
 - **Website**: [tnrbusinesssolutions.com](https://tnrbusinesssolutions.com)
 

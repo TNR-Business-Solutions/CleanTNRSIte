@@ -4,7 +4,7 @@
 const businessInfo = {
   name: "TNR Business Solutions",
   owner: "Roy Turner",
-  email: "roy.turner@tnrbusinesssolutions.com",
+  email: "Roy.Turner@tnrbusinesssolutions.com",
   phone: "412-499-2987",
   address: "418 Concord Avenue, Greensburg, PA 15601",
   website: "https://www.tnrbusinesssolutions.com",

@@ -51,7 +51,7 @@
 ### **Step 2: Fill Out the Form**
 Fill in the contact form with test data:
 - **Name**: Roy Turner
-- **Email**: roy.turner@tnrbusinesssolutions.com
+- **Email**: Roy.Turner@tnrbusinesssolutions.com
 - **Phone**: 4124992987
 - **Company**: TNR Business Solutions
 - **Services**: Select any services
@@ -68,7 +68,7 @@ Click "Send My Message & Get Free Consultation" and watch the console output. Yo
   - TNRCRMData class: ✅ Available
   - window.tnrCRM instance: ✅ Exists
 ✅ CRM is ready, creating lead...
-Added lead to CRM: lead-1234567890 - Roy Turner (roy.turner@tnrbusinesssolutions.com)
+Added lead to CRM: lead-1234567890 - Roy Turner (Roy.Turner@tnrbusinesssolutions.com)
 ✅ Lead created successfully: {id: "lead-...", name: "Roy Turner", ...}
 💾 Lead saved to localStorage
 📊 Total leads in localStorage: 1
@@ -78,7 +78,7 @@ Added lead to CRM: lead-1234567890 - Roy Turner (roy.turner@tnrbusinesssolutions
 ```
 
 ### **Step 4: Verify Email**
-Check your email at `roy.turner@tnrbusinesssolutions.com` for the form submission notification.
+Check your email at `Roy.Turner@tnrbusinesssolutions.com` for the form submission notification.
 
 ### **Step 5: Verify CRM**
 1. Go to `http://localhost:5000/admin-dashboard.html`
@@ -93,7 +93,7 @@ Check your email at `roy.turner@tnrbusinesssolutions.com` for the form submissio
 ### ✅ **Success Indicators:**
 - Console shows all green checkmarks (✅)
 - Lead is created in CRM with all form data
-- Email is sent to roy.turner@tnrbusinesssolutions.com
+- Email is sent to Roy.Turner@tnrbusinesssolutions.com
 - Admin dashboard shows the new lead
 - Success alert appears after submission
 

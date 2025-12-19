@@ -76,6 +76,14 @@
       "destination": "/api/social/test-token"
     },
     {
+      "source": "/api/social/post-to-multiple-platforms",
+      "destination": "/api/social/post-to-multiple-platforms"
+    },
+    {
+      "source": "/api/social/post-to-multiple",
+      "destination": "/api/social/post-to-multiple-platforms"
+    },
+    {
       "source": "/admin/auth",
       "destination": "/api/admin/auth"
     },
@@ -86,6 +94,22 @@
     {
       "source": "/auth/wix/callback",
       "destination": "/api/auth/wix/callback"
+    },
+    {
+      "source": "/auth/linkedin",
+      "destination": "/api/auth/linkedin"
+    },
+    {
+      "source": "/auth/linkedin/callback",
+      "destination": "/api/auth/linkedin/callback"
+    },
+    {
+      "source": "/auth/twitter",
+      "destination": "/api/auth/twitter"
+    },
+    {
+      "source": "/auth/twitter/callback",
+      "destination": "/api/auth/twitter/callback"
     }
   ],
   "headers": [

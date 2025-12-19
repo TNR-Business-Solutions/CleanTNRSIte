@@ -5,6 +5,7 @@ const TNRDatabase = require('../../database');
 const { setCorsHeaders, handleCorsPreflight } = require('./cors-utils');
 const { sendErrorResponse, handleUnexpectedError, ERROR_CODES } = require('./error-handler');
 const { sendJson } = require('./http-utils');
+const { verifyToken, extractToken } = require('./jwt-utils');
 
 module.exports = async (req, res) => {
   // Handle CORS
@@ -13,6 +14,26 @@ module.exports = async (req, res) => {
     return;
   }
   setCorsHeaders(res, origin);
+
+  // JWT Authentication
+  const token = extractToken(req);
+  if (!token) {
+    return sendJson(res, 401, {
+      success: false,
+      error: "Authentication required",
+      message: "No token provided"
+    });
+  }
+
+  const decoded = verifyToken(token);
+  if (!decoded) {
+    return sendJson(res, 401, {
+      success: false,
+      error: "Invalid token",
+      message: "Token verification failed"
+    });
+  }
+  req.user = decoded;
 
   try {
     let body = '';

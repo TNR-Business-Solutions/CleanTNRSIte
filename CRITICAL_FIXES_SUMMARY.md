@@ -60,7 +60,7 @@
 - `SMTP_PASS` - SMTP password
 - `SMTP_HOST` - SMTP server (default: smtp.gmail.com)
 - `SMTP_PORT` - SMTP port (default: 587)
-- `BUSINESS_EMAIL` - Recipient email (default: Roy.Turner@TNRBusinessSolutions.com)
+- `BUSINESS_EMAIL` - Recipient email (default: Roy.Turner@tnrbusinesssolutions.com)
 
 **Files:**
 - `server/handlers/admin-requests.js` - Email sending handler

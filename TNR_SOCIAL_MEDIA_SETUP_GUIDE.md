@@ -204,7 +204,7 @@ This guide will help you connect TNR Business Solutions to all major social medi
 ## 📞 Support
 
 For technical support or questions:
-- Email: roy.turner@tnrbusinesssolutions.com
+- Email: Roy.Turner@tnrbusinesssolutions.com
 - Phone: (412) 499-2987
 - Website: www.tnrbusinesssolutions.com
 

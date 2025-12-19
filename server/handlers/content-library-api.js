@@ -6,6 +6,7 @@
 const TNRDatabase = require('../../database');
 const { setCorsHeaders, handleCorsPreflight } = require('./cors-utils');
 const { sendErrorResponse, handleUnexpectedError, ERROR_CODES } = require('./error-handler');
+const { verifyToken, extractToken } = require('./jwt-utils');
 
 let dbInstance = null;
 
@@ -52,6 +53,26 @@ module.exports = async (req, res) => {
     return;
   }
   setCorsHeaders(res, origin);
+
+  // JWT Authentication
+  const token = extractToken(req);
+  if (!token) {
+    return res.writeHead(401) || res.end(JSON.stringify({
+      success: false,
+      error: "Authentication required",
+      message: "No token provided"
+    }));
+  }
+
+  const decoded = verifyToken(token);
+  if (!decoded) {
+    return res.writeHead(401) || res.end(JSON.stringify({
+      success: false,
+      error: "Invalid token",
+      message: "Token verification failed"
+    }));
+  }
+  req.user = decoded;
 
   try {
     const db = await getDatabase();

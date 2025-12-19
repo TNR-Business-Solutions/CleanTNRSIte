@@ -3,7 +3,7 @@
 
 class TNREmailService {
   constructor() {
-    this.businessEmail = "roy.turner@tnrbusinesssolutions.com";
+    this.businessEmail = "Roy.Turner@tnrbusinesssolutions.com";
     this.businessPhone = "412-499-2987";
     this.businessAddress = "418 Concord Avenue, Greensburg, PA 15601";
   }
@@ -26,11 +26,11 @@ class TNREmailService {
             ? formData.services.join(", ")
             : formData.services || "Not specified",
           message: formData.message || "No message provided",
-          to_email: "roy.turner@tnrbusinesssolutions.com",
+          to_email: "Roy.Turner@tnrbusinesssolutions.com",
           subject: `New Contact Form Submission from ${
             formData.name || "Unknown"
           }`,
-          reply_to: formData.email || "roy.turner@tnrbusinesssolutions.com",
+          reply_to: formData.email || "Roy.Turner@tnrbusinesssolutions.com",
         },
       };
 
@@ -70,7 +70,7 @@ class TNREmailService {
         `New Contact Form Submission from ${formData.name || "Unknown"}`
       );
       const body = encodeURIComponent(emailContent);
-      const mailtoLink = `mailto:roy.turner@tnrbusinesssolutions.com?subject=${subject}&body=${body}`;
+      const mailtoLink = `mailto:Roy.Turner@tnrbusinesssolutions.com?subject=${subject}&body=${body}`;
 
       // Open email client
       window.open(mailtoLink);
@@ -116,7 +116,7 @@ Time: ${new Date().toLocaleString()}
   async sendWebhookEmail(formData) {
     try {
       const webhookData = {
-        to: "roy.turner@tnrbusinesssolutions.com",
+        to: "Roy.Turner@tnrbusinesssolutions.com",
         subject: `New Contact Form Submission from ${
           formData.name || "Unknown"
         }`,

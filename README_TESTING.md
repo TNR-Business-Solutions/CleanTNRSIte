@@ -48,7 +48,7 @@ You should immediately see:
 ### **4. Fill Out the Form**
 Enter any test data:
 - Name: Roy Turner
-- Email: roy.turner@tnrbusinesssolutions.com
+- Email: Roy.Turner@tnrbusinesssolutions.com
 - Phone: 4124992987
 - Company: TNR Business Solutions
 - Message: Testing
@@ -71,7 +71,7 @@ Click submit and watch the console. You should see:
 ```
 
 ### **6. Check Your Email**
-Check `roy.turner@tnrbusinesssolutions.com` for the form submission email.
+Check `Roy.Turner@tnrbusinesssolutions.com` for the form submission email.
 
 ### **7. Check Admin Dashboard**
 1. Go to: `http://localhost:5000/admin-dashboard.html`
@@ -87,7 +87,7 @@ Check `roy.turner@tnrbusinesssolutions.com` for the form submission email.
 - [ ] Console shows "Lead created successfully"
 - [ ] Console shows "Email sent successfully"
 - [ ] Success alert appears
-- [ ] Email received at roy.turner@tnrbusinesssolutions.com
+- [ ] Email received at Roy.Turner@tnrbusinesssolutions.com
 - [ ] Lead appears in admin dashboard with complete data
 
 ---
@@ -123,7 +123,7 @@ Lead created in CRM (localStorage)
      ↓
 Data sent to server
      ↓
-Email sent to roy.turner@tnrbusinesssolutions.com
+Email sent to Roy.Turner@tnrbusinesssolutions.com
      ↓
 Success message shown
      ↓

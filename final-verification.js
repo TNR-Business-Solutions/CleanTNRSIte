@@ -52,7 +52,7 @@ async function verify() {
   console.log('   ✅ Welcome email function created in email-handler.js');
   console.log('   ✅ Email triggered automatically on client creation');
   console.log('   ✅ Welcome email sent to: client email');
-  console.log('   ✅ Notification email sent to: Roy.Turner@TNRBusinessSolutions.com');
+  console.log('   ✅ Notification email sent to: Roy.Turner@tnrbusinesssolutions.com');
   
   console.log('\n✅ Step 5: Complete Flow');
   console.log('   ✅ Client Creation → SUCCESS');

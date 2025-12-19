@@ -2,7 +2,7 @@
 
 ## 🎯 **Backend Functionality Complete!**
 
-All forms across your website are now configured to send emails directly to **roy.turner@tnrbusinesssolutions.com**.
+All forms across your website are now configured to send emails directly to **Roy.Turner@tnrbusinesssolutions.com**.
 
 ## 📧 **What's Been Implemented:**
 
@@ -21,7 +21,7 @@ All forms across your website are now configured to send emails directly to **ro
 6. **Insurance Inquiry Form** (`packages.html`) - General insurance inquiries
 
 ### ✅ **Contact Information Standardized**
-- **Email**: roy.turner@tnrbusinesssolutions.com (consistent across all pages)
+- **Email**: Roy.Turner@tnrbusinesssolutions.com (consistent across all pages)
 - **Phone**: 412-499-2987 (properly formatted tel: links)
 - **Address**: 418 Concord Avenue, Greensburg, PA 15601
 
@@ -39,14 +39,14 @@ Edit the `.env` file in your project root and replace `your_app_password_here` w
 
 ```env
 # TNR Business Solutions Environment Variables
-BUSINESS_EMAIL=roy.turner@tnrbusinesssolutions.com
+BUSINESS_EMAIL=Roy.Turner@tnrbusinesssolutions.com
 BUSINESS_PHONE=412-499-2987
 BUSINESS_ADDRESS=418 Concord Avenue, Greensburg, PA 15601
 
 # Email Configuration (for form submissions)
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
-SMTP_USER=roy.turner@tnrbusinesssolutions.com
+SMTP_USER=Roy.Turner@tnrbusinesssolutions.com
 SMTP_PASS=your_actual_gmail_app_password_here
 
 # Server Configuration
@@ -143,7 +143,7 @@ Coverage Type: Full Coverage
 
 ### **Email Delivery:**
 - Emails are sent from your Gmail account
-- All form submissions go to roy.turner@tnrbusinesssolutions.com
+- All form submissions go to Roy.Turner@tnrbusinesssolutions.com
 - Form data is formatted and categorized automatically
 
 ### **Error Handling:**

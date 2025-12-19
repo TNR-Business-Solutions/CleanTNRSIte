@@ -9,7 +9,7 @@
 
 ### 2. Email System Updated
 - Updated `server/handlers/submit-form.js` to send TWO emails:
-  - **Business notification** to roy.turner@tnrbusinesssolutions.com
+  - **Business notification** to Roy.Turner@tnrbusinesssolutions.com
   - **Customer confirmation** email to the customer with submission details
 - Customer email includes professional HTML template with:
   - Thank you message

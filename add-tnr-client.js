@@ -5,7 +5,7 @@ const http = require('http');
 
 const clientData = {
   name: "TNR Business Solutions",
-  email: "Roy.Turner@TNRBusinessSolutions.com",
+  email: "Roy.Turner@tnrbusinesssolutions.com",
   phone: "412-499-2987",
   company: "TNR Business Solutions",
   website: "www.TNRBusinessSolutions.com",

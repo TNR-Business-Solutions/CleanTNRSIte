@@ -99,3 +99,6 @@ server/wix-tokens.json
 # AI/Extension generated files
 .github/instructions/codacy.instructions.md
 .github/instructions/snyk_rules.instructions.md
+
+# Snyk Security Extension - AI Rules (auto-generated)
+.cursor/rules/snyk_rules.mdc

@@ -75,7 +75,7 @@
 
 2. **Default Values**: The Settings API returns sensible defaults if no settings are found in the database:
    - Business Name: "TNR Business Solutions"
-   - Email: "roy.turner@tnrbusinesssolutions.com"
+   - Email: "Roy.Turner@tnrbusinesssolutions.com"
    - Phone: "(412) 499-2987"
    - Address: "418 Concord Avenue, Greensburg, PA 15601"
 

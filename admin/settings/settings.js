@@ -114,7 +114,7 @@ function resetSettings() {
     
     const defaultSettings = {
         businessName: 'TNR Business Solutions',
-        businessEmail: 'roy.turner@tnrbusinesssolutions.com',
+        businessEmail: 'Roy.Turner@tnrbusinesssolutions.com',
         businessPhone: '(412) 499-2987',
         businessAddress: '418 Concord Avenue, Greensburg, PA 15601'
     };

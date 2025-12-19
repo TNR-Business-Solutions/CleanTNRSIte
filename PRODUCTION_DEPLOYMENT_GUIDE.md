@@ -116,7 +116,7 @@ This will run:
    ```env
    SMTP_USER=your-email@gmail.com
    SMTP_PASS=your-app-password
-   BUSINESS_EMAIL=roy.turner@tnrbusinesssolutions.com
+   BUSINESS_EMAIL=Roy.Turner@tnrbusinesssolutions.com
    GOOGLE_ANALYTICS_ID=G-XXXXXXXXXX
    ```
 

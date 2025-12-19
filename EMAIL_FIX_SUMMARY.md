@@ -44,7 +44,7 @@ The password reset and new user request forms in `admin-login.html` were using a
 ## 📧 Email Details
 
 ### Password Reset Request Email
-- **To:** `BUSINESS_EMAIL` (Roy.Turner@TNRBusinessSolutions.com)
+- **To:** `BUSINESS_EMAIL` (Roy.Turner@tnrbusinesssolutions.com)
 - **Subject:** `🔐 Password Reset Request - [Username/Email]`
 - **Content:**
   - Username
@@ -54,7 +54,7 @@ The password reset and new user request forms in `admin-login.html` were using a
   - Next steps for approval
 
 ### New User Request Email
-- **To:** `BUSINESS_EMAIL` (Roy.Turner@TNRBusinessSolutions.com)
+- **To:** `BUSINESS_EMAIL` (Roy.Turner@tnrbusinesssolutions.com)
 - **Subject:** `👤 New User Access Request - [Name/Email]`
 - **Content:**
   - Full name
@@ -75,7 +75,7 @@ SMTP_USER=<your-smtp-email>
 SMTP_PASS=<your-smtp-password>
 SMTP_HOST=smtp.gmail.com (or your SMTP host)
 SMTP_PORT=587
-BUSINESS_EMAIL=Roy.Turner@TNRBusinessSolutions.com
+BUSINESS_EMAIL=Roy.Turner@tnrbusinesssolutions.com
 ```
 
 ---

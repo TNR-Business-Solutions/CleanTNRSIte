@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webhooks Management - TNR Admin Dashboard</title>
+    <link rel="stylesheet" href="assets/styles.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --tnr-navy: #1a237e;
+            --tnr-primary: #3f51b5;
+            --tnr-secondary: #7986cb;
+            --tnr-gold: #ffd700;
+            --tnr-success: #4caf50;
+            --tnr-warning: #ff9800;
+            --tnr-danger: #f44336;
+            --tnr-info: #2196f3;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--tnr-primary), var(--tnr-secondary));
+            min-height: 100vh;
+        }
+
+        .page-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .page-header h1 {
+            color: var(--tnr-gold);
+            font-size: 2rem;
+            margin: 0;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--tnr-gold);
+            color: var(--tnr-navy);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            border-radius: 8px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            color: white;
+            text-align: center;
+        }
+
+        .stat-card .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--tnr-gold);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-card .stat-label {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        .webhooks-list {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+        }
+
+        .webhook-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            color: white;
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--tnr-success);
+        }
+
+        .webhook-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .webhook-item.active {
+            border-left-color: var(--tnr-success);
+        }
+
+        .webhook-item.inactive {
+            border-left-color: var(--tnr-warning);
+        }
+
+        .webhook-item.error {
+            border-left-color: var(--tnr-danger);
+        }
+
+        .webhook-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .webhook-name {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .webhook-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: var(--tnr-success);
+            color: white;
+        }
+
+        .status-inactive {
+            background: var(--tnr-warning);
+            color: white;
+        }
+
+        .status-error {
+            background: var(--tnr-danger);
+            color: white;
+        }
+
+        .webhook-details {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .webhook-url {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            word-break: break-all;
+            opacity: 0.9;
+            margin-top: 0.5rem;
+        }
+
+        .webhook-meta {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            font-size: 0.85rem;
+            opacity: 0.8;
+            margin-top: 1rem;
+        }
+
+        .webhook-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: white;
+            opacity: 0.7;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .loading-state {
+            text-align: center;
+            padding: 3rem;
+            color: white;
+        }
+
+        .loading-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Admin Header Styles */
+        .admin-header {
+            background: linear-gradient(135deg, var(--tnr-navy) 0%, var(--tnr-primary) 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            margin-bottom: 0;
+        }
+
+        .admin-header-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .admin-header-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: bold;
+            text-decoration: none;
+            color: white;
+        }
+
+        .admin-header-logo img {
+            height: 35px;
+        }
+
+        .admin-header-menu {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .admin-header-link {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .admin-header-link:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-2px);
+        }
+
+        .admin-header-link.active {
+            background: var(--tnr-gold);
+            color: var(--tnr-navy);
+        }
+
+        @media (max-width: 768px) {
+            .page-container {
+                padding: 1rem;
+            }
+
+            .webhook-header {
+                flex-direction: column;
+            }
+
+            .webhook-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Admin Header Menu -->
+    <header class="admin-header">
+        <div class="admin-header-inner">
+            <a href="/" class="admin-header-logo">
+                <img src="media/logo.png" alt="TNR Business Solutions Logo" loading="lazy">
+                <span>TNR Business Solutions</span>
+            </a>
+            <nav class="admin-header-menu">
+                <a href="/" class="admin-header-link">🏠 Home</a>
+                <a href="/admin-dashboard-v2.html" class="admin-header-link">📊 Admin Dashboard</a>
+                <a href="/platform-connections.html" class="admin-header-link">🌐 Platforms</a>
+                <a href="/posts-management.html" class="admin-header-link">📝 Posts</a>
+                <a href="/messages-management.html" class="admin-header-link">💬 Messages</a>
+                <a href="/analytics-events.html" class="admin-header-link">📊 Analytics</a>
+                <a href="/webhooks-management.html" class="admin-header-link active">🔔 Webhooks</a>
+                <a href="/admin-orders.html" class="admin-header-link">📦 Orders</a>
+                <a href="/social-media-automation-dashboard.html" class="admin-header-link">📱 Social Media</a>
+                <a href="/admin-login.html" class="admin-header-link">🔐 Login</a>
+                <a href="#" class="admin-header-link" onclick="logout()">🚪 Logout</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="page-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div>
+                <h1>🔔 Active Webhooks</h1>
+                <p style="opacity: 0.8; margin-top: 0.5rem;">Manage and monitor all webhook endpoints</p>
+            </div>
+            <div>
+                <a href="/admin-dashboard-v2.html" class="btn btn-secondary">← Back to Dashboard</a>
+                <button class="btn btn-primary" onclick="refreshWebhooks()" style="margin-left: 0.5rem;">🔄 Refresh</button>
+            </div>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">🔔</div>
+                <div class="stat-value" id="total-webhooks-count">5</div>
+                <div class="stat-label">Total Webhooks</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">✅</div>
+                <div class="stat-value" id="active-webhooks">5</div>
+                <div class="stat-label">Active</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📊</div>
+                <div class="stat-value" id="total-calls">0</div>
+                <div class="stat-label">Total Calls</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">❌</div>
+                <div class="stat-value" id="failed-calls">0</div>
+                <div class="stat-label">Failed Calls</div>
+            </div>
+        </div>
+
+        <!-- Webhooks List -->
+        <div class="webhooks-list">
+            <div id="webhooks-container">
+                <div class="loading-state">
+                    <div class="loading-icon">⏳</div>
+                    <p>Loading webhooks...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Webhook definitions (based on your platform integrations)
+        const webhookDefinitions = [
+            {
+                id: 'wix-blog-category',
+                name: 'Wix Blog Category Webhook',
+                platform: 'Wix',
+                icon: '🏢',
+                url: '/api/wix/webhooks',
+                status: 'active',
+                description: 'Receives notifications when blog categories are created or updated',
+                events: ['blog.category.created', 'blog.category.updated'],
+                lastCall: null,
+                totalCalls: 0,
+                failedCalls: 0
+            },
+            {
+                id: 'meta-webhooks',
+                name: 'Meta/Facebook Webhooks',
+                platform: 'Meta',
+                icon: '📘',
+                url: '/api/meta/webhooks',
+                status: 'active',
+                description: 'Handles Facebook page events and messaging webhooks',
+                events: ['page.messaging', 'page.feed'],
+                lastCall: null,
+                totalCalls: 0,
+                failedCalls: 0
+            },
+            {
+                id: 'whatsapp-webhooks',
+                name: 'WhatsApp Business Webhooks',
+                platform: 'WhatsApp',
+                icon: '💬',
+                url: '/api/whatsapp/webhooks',
+                status: 'active',
+                description: 'Receives WhatsApp messages and status updates',
+                events: ['messages', 'status'],
+                lastCall: null,
+                totalCalls: 0,
+                failedCalls: 0
+            },
+            {
+                id: 'instagram-webhooks',
+                name: 'Instagram Business Webhooks',
+                platform: 'Instagram',
+                icon: '📸',
+                url: '/api/instagram/webhooks',
+                status: 'active',
+                description: 'Handles Instagram comments, mentions, and story insights',
+                events: ['comments', 'mentions', 'story_insights'],
+                lastCall: null,
+                totalCalls: 0,
+                failedCalls: 0
+            },
+            {
+                id: 'wix-seo-keywords',
+                name: 'Wix SEO Keywords Extension',
+                platform: 'Wix',
+                icon: '🏢',
+                url: '/api/wix/seo-keywords',
+                status: 'active',
+                description: 'SEO keywords management and tracking',
+                events: ['seo.update'],
+                lastCall: null,
+                totalCalls: 0,
+                failedCalls: 0
+            }
+        ];
+
+        let allWebhooks = [];
+        let filteredWebhooks = [];
+
+        // Load webhooks
+        async function loadWebhooks() {
+            try {
+                // For now, use the static definitions
+                // TODO: Replace with actual API endpoint when available
+                // const response = await fetch('/api/webhooks');
+                // const data = await response.json();
+                
+                allWebhooks = webhookDefinitions.map(webhook => ({
+                    ...webhook,
+                    baseUrl: window.location.origin
+                }));
+                
+                filteredWebhooks = [...allWebhooks];
+                
+                updateStats();
+                renderWebhooks();
+            } catch (error) {
+                console.error('Error loading webhooks:', error);
+                allWebhooks = webhookDefinitions;
+                filteredWebhooks = [...allWebhooks];
+                updateStats();
+                renderWebhooks();
+            }
+        }
+
+        function updateStats() {
+            const total = allWebhooks.length;
+            const active = allWebhooks.filter(w => w.status === 'active').length;
+            const totalCalls = allWebhooks.reduce((sum, w) => sum + (w.totalCalls || 0), 0);
+            const failedCalls = allWebhooks.reduce((sum, w) => sum + (w.failedCalls || 0), 0);
+
+            document.getElementById('total-webhooks-count').textContent = total;
+            document.getElementById('active-webhooks').textContent = active;
+            document.getElementById('total-calls').textContent = totalCalls;
+            document.getElementById('failed-calls').textContent = failedCalls;
+        }
+
+        function renderWebhooks() {
+            const container = document.getElementById('webhooks-container');
+
+            if (filteredWebhooks.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔔</div>
+                        <h3>No Webhooks Found</h3>
+                        <p>No webhooks are currently configured.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filteredWebhooks.map(webhook => {
+                const statusClass = webhook.status === 'active' ? 'active' : 
+                                   webhook.status === 'error' ? 'error' : 'inactive';
+                const statusBadge = webhook.status === 'active' 
+                    ? '<span class="status-badge status-active">✓ Active</span>'
+                    : webhook.status === 'error'
+                    ? '<span class="status-badge status-error">❌ Error</span>'
+                    : '<span class="status-badge status-inactive">⏸ Inactive</span>';
+
+                const fullUrl = `${webhook.baseUrl || window.location.origin}${webhook.url}`;
+                const lastCallText = webhook.lastCall 
+                    ? new Date(webhook.lastCall).toLocaleString()
+                    : 'Never';
+
+                return `
+                    <div class="webhook-item ${statusClass}">
+                        <div class="webhook-header">
+                            <div class="webhook-name">
+                                <span>${webhook.icon}</span>
+                                <span>${webhook.name}</span>
+                            </div>
+                            <div class="webhook-status">
+                                ${statusBadge}
+                            </div>
+                        </div>
+                        <div class="webhook-details">
+                            <div><strong>Platform:</strong> ${webhook.platform}</div>
+                            <div style="margin-top: 0.5rem;">${webhook.description}</div>
+                            <div class="webhook-url" style="margin-top: 1rem;">
+                                <strong>Endpoint:</strong><br>
+                                <code style="background: rgba(0,0,0,0.2); padding: 0.25rem 0.5rem; border-radius: 4px;">${fullUrl}</code>
+                            </div>
+                            ${webhook.events && webhook.events.length > 0 ? `
+                                <div style="margin-top: 1rem;">
+                                    <strong>Events:</strong>
+                                    <div style="margin-top: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                        ${webhook.events.map(event => `<span style="background: rgba(255,255,255,0.1); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.85rem;">${event}</span>`).join('')}
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="webhook-meta">
+                            <span>📊 Total Calls: ${webhook.totalCalls || 0}</span>
+                            <span>❌ Failed: ${webhook.failedCalls || 0}</span>
+                            <span>🕐 Last Call: ${lastCallText}</span>
+                        </div>
+                        <div class="webhook-actions">
+                            <button class="btn btn-small btn-primary" onclick="testWebhook('${webhook.id}')">🧪 Test</button>
+                            <button class="btn btn-small btn-secondary" onclick="viewWebhookLogs('${webhook.id}')">📋 Logs</button>
+                            ${webhook.status === 'active' 
+                                ? `<button class="btn btn-small btn-secondary" onclick="toggleWebhook('${webhook.id}')">⏸ Disable</button>`
+                                : `<button class="btn btn-small btn-primary" onclick="toggleWebhook('${webhook.id}')">▶ Enable</button>`
+                            }
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function testWebhook(webhookId) {
+            const webhook = allWebhooks.find(w => w.id === webhookId);
+            if (!webhook) return;
+
+            fetch(webhook.url, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert(`✅ ${webhook.name} is responding!`);
+                } else {
+                    alert(`⚠️ ${webhook.name} returned status: ${response.status}`);
+                }
+            })
+            .catch(error => {
+                alert(`❌ ${webhook.name} test failed: ${error.message}`);
+            });
+        }
+
+        function viewWebhookLogs(webhookId) {
+            alert('Webhook logs feature coming soon!');
+        }
+
+        function toggleWebhook(webhookId) {
+            const webhook = allWebhooks.find(w => w.id === webhookId);
+            if (!webhook) return;
+
+            const newStatus = webhook.status === 'active' ? 'inactive' : 'active';
+            webhook.status = newStatus;
+            
+            // TODO: Update via API
+            // fetch(`/api/webhooks/${webhookId}`, { method: 'PUT', body: JSON.stringify({ status: newStatus }) });
+            
+            updateStats();
+            renderWebhooks();
+        }
+
+        function refreshWebhooks() {
+            document.getElementById('webhooks-container').innerHTML = `
+                <div class="loading-state">
+                    <div class="loading-icon">⏳</div>
+                    <p>Refreshing webhooks...</p>
+                </div>
+            `;
+            loadWebhooks();
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('adminSession');
+                localStorage.removeItem('adminRefreshToken');
+                localStorage.removeItem('sessionExpiry');
+                localStorage.removeItem('adminUsername');
+                localStorage.removeItem('adminRole');
+                sessionStorage.removeItem('adminAuthenticated');
+                sessionStorage.removeItem('adminSessionToken');
+                window.location.href = '/admin-login.html';
+            }
+        }
+
+        // Authentication check
+        function checkAuthentication() {
+            const sessionToken = localStorage.getItem('adminSession') || 
+                                sessionStorage.getItem('adminSessionToken') ||
+                                sessionStorage.getItem('adminAuthenticated');
+            const sessionExpiry = localStorage.getItem('sessionExpiry');
+            
+            if (!sessionToken) {
+                window.location.href = '/admin-login.html';
+                return false;
+            }
+            
+            if (sessionExpiry) {
+                const expiryTime = parseInt(sessionExpiry);
+                if (isNaN(expiryTime) || Date.now() > expiryTime) {
+                    localStorage.removeItem('adminSession');
+                    localStorage.removeItem('adminRefreshToken');
+                    localStorage.removeItem('sessionExpiry');
+                    window.location.href = '/admin-login.html';
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+
+        // Initialize
+        if (checkAuthentication()) {
+            loadWebhooks();
+        }
+    </script>
+</body>
+</html>

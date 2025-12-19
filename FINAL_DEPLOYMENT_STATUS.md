@@ -119,7 +119,7 @@ Go to Vercel Dashboard → Your Project → Settings → Environment Variables:
 
 | Variable | Value | Environment |
 |----------|-------|-------------|
-| `EMAIL_USER` | roy.turner@tnrbusinesssolutions.com | Production |
+| `EMAIL_USER` | Roy.Turner@tnrbusinesssolutions.com | Production |
 | `EMAIL_PASS` | *Your Gmail App Password* | Production |
 
 ---

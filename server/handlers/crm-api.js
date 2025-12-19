@@ -4,6 +4,7 @@
 const TNRDatabase = require("../../database");
 const { URL } = require("url");
 const { sendErrorResponse, handleUnexpectedError, ERROR_CODES } = require("./error-handler");
+const { verifyToken, extractToken } = require("./jwt-utils");
 // Workflow executor is optional - only used for automation features
 let workflowExecutor;
 try {
@@ -49,6 +50,32 @@ module.exports = async function crmApiHandler(req, res) {
     // Set CORS headers
     setCorsHeaders(res, origin);
 
+    // JWT Authentication
+    const token = extractToken(req);
+    if (!token) {
+      setCorsHeaders(res, origin);
+      res.writeHead(401, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({
+        success: false,
+        error: "Authentication required",
+        message: "No token provided"
+      }));
+      return;
+    }
+
+    const decoded = verifyToken(token);
+    if (!decoded) {
+      setCorsHeaders(res, origin);
+      res.writeHead(401, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({
+        success: false,
+        error: "Invalid token",
+        message: "Token verification failed"
+      }));
+      return;
+    }
+    req.user = decoded;
+
     let db;
     let fullPath = req.url;
     
@@ -86,6 +113,7 @@ module.exports = async function crmApiHandler(req, res) {
     try {
       db = await getDatabase();
     } catch (e) {
+      console.error("❌ Database initialization error in CRM API:", e);
       // Fallback in serverless where sqlite may be unavailable
       db = {
         getClients: async () => [],
@@ -110,10 +138,24 @@ module.exports = async function crmApiHandler(req, res) {
           totalRevenue: 0,
         }),
       };
+      console.warn("⚠️ Using fallback database (empty data)");
     }
     if (req.method === "GET") {
       if (path === "clients" || path === "") {
-        let clients = await db.getClients();
+        let clients;
+        try {
+          clients = await db.getClients();
+        } catch (dbError) {
+          console.error("❌ Error fetching clients:", dbError);
+          setCorsHeaders(res, origin);
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ 
+            success: false, 
+            error: "Database error",
+            message: dbError.message || "Failed to fetch clients"
+          }));
+          return;
+        }
         if (parsedUrl) {
           const q = (parsedUrl.searchParams.get("q") || "").toLowerCase();
           const status = parsedUrl.searchParams.get("status");
@@ -249,7 +291,7 @@ module.exports = async function crmApiHandler(req, res) {
               console.log(
                 "📧 Sending notification to:",
                 process.env.BUSINESS_EMAIL ||
-                  "Roy.Turner@TNRBusinessSolutions.com"
+                  "Roy.Turner@tnrbusinesssolutions.com"
               );
 
               emailHandler

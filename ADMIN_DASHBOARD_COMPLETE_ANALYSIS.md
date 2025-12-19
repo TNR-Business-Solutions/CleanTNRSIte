@@ -368,7 +368,7 @@ admin/
 
 **Default Values:**
 - Business Name: TNR Business Solutions
-- Business Email: roy.turner@tnrbusinesssolutions.com
+- Business Email: Roy.Turner@tnrbusinesssolutions.com
 - Business Phone: (412) 499-2987
 - Business Address: 418 Concord Avenue, Greensburg, PA 15601
 

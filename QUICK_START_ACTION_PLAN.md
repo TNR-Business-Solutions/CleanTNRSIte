@@ -193,4 +193,4 @@ Create a simple spreadsheet to track your progress:
 
 **🎯 START NOW: Begin with Google Business Profile - it's the most important!**
 
-**📞 Need Help? Contact me at roy.turner@tnrbusinesssolutions.com or 412-499-2987**
+**📞 Need Help? Contact me at Roy.Turner@tnrbusinesssolutions.com or 412-499-2987**

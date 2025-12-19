@@ -16,7 +16,6 @@ class SimpleFormIntegration {
       "insurance-inquiry-form": "Insurance Inquiry",
       careerApplicationForm: "Career Application",
       "quote-form": "Quote Request",
-      "giveaway-form": "Black Friday Giveaway",
     };
 
     let formsFound = 0;
@@ -231,7 +230,7 @@ class SimpleFormIntegration {
     } catch (error) {
       console.error("❌ Form submission error:", error);
       alert(
-        "There was an error submitting your form. Please try again or contact us directly at roy.turner@tnrbusinesssolutions.com"
+        "There was an error submitting your form. Please try again or contact us directly at Roy.Turner@tnrbusinesssolutions.com"
       );
       throw error;
     }

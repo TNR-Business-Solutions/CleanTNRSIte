@@ -5,6 +5,7 @@ const TNRDatabase = require("../../database");
 const axios = require("axios");
 const { parseQuery, parseBody, sendJson } = require("./http-utils");
 const { setCorsHeaders, handleCorsPreflight } = require("./cors-utils");
+const { verifyToken, extractToken } = require("./jwt-utils");
 
 module.exports = async (req, res) => {
   // Handle CORS
@@ -13,6 +14,26 @@ module.exports = async (req, res) => {
     return;
   }
   setCorsHeaders(res, origin);
+
+  // JWT Authentication
+  const token = extractToken(req);
+  if (!token) {
+    return sendJson(res, 401, {
+      success: false,
+      error: "Authentication required",
+      message: "No token provided"
+    });
+  }
+
+  const decoded = verifyToken(token);
+  if (!decoded) {
+    return sendJson(res, 401, {
+      success: false,
+      error: "Invalid token",
+      message: "Token verification failed"
+    });
+  }
+  req.user = decoded;
 
   const db = new TNRDatabase();
   await db.initialize();
@@ -219,15 +240,18 @@ module.exports = async (req, res) => {
 
       // POST - Save token manually (for OAuth 1.0a tokens or manual entry)
       if (action === "save") {
-        const {
-          platform,
-          access_token,
-          access_token_secret,
-          page_id,
-          page_name,
-          user_id,
-          expires_at,
-        } = body;
+        try {
+          const {
+            platform,
+            access_token,
+            access_token_secret,
+            page_id,
+            page_name,
+            user_id,
+            expires_at,
+            client_id,
+            client_name,
+          } = body;
 
         if (!platform || !access_token) {
           sendJson(res, 400, {
@@ -248,33 +272,44 @@ module.exports = async (req, res) => {
           extractedUserId = access_token.split("-")[0];
         }
 
-        // Save token to database
-        const tokenData = {
-          platform: platform,
-          access_token: access_token,
-          token_type: body.token_type || "Bearer", // Include token_type from request
-          page_id: page_id || extractedUserId || null,
-          user_id: extractedUserId || user_id || null,
-          page_name:
-            page_name || `Twitter User (${extractedUserId || "Manual"})`,
-          expires_at: expires_at || null,
-          // Note: access_token_secret is not stored in current schema
-          // For OAuth 1.0a, we'd need to add this field to the database
-        };
-
-        await db.saveSocialMediaToken(tokenData);
-
-        sendJson(res, 200, {
-          success: true,
-          message: "Token saved successfully",
-          token: {
+          // Save token to database
+          const tokenData = {
             platform: platform,
-            page_id: tokenData.page_id,
-            page_name: tokenData.page_name,
-            user_id: tokenData.user_id,
-          },
-        });
-        return;
+            access_token: access_token,
+            token_type: body.token_type || "Bearer", // Include token_type from request
+            page_id: page_id || extractedUserId || null,
+            user_id: extractedUserId || user_id || null,
+            page_name:
+              page_name || `Twitter User (${extractedUserId || "Manual"})`,
+            expires_at: expires_at || null,
+            client_id: client_id || null,
+            client_name: client_name || null,
+            // Note: access_token_secret is not stored in current schema
+            // For OAuth 1.0a, we'd need to add this field to the database
+          };
+
+          await db.saveSocialMediaToken(tokenData);
+
+          sendJson(res, 200, {
+            success: true,
+            message: "Token saved successfully",
+            token: {
+              platform: platform,
+              page_id: tokenData.page_id,
+              page_name: tokenData.page_name,
+              user_id: tokenData.user_id,
+            },
+          });
+          return;
+        } catch (saveError) {
+          console.error("Error saving token:", saveError);
+          sendJson(res, 500, {
+            success: false,
+            error: saveError.message || "Failed to save token",
+            details: process.env.NODE_ENV === 'development' ? saveError.stack : undefined,
+          });
+          return;
+        }
       }
 
       // POST - Get token for posting (returns full token securely)

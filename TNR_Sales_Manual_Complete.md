@@ -7,7 +7,7 @@
 **Company:** TNR Business Solutions, LLC  
 **Address:** 418 Concord Avenue, Greensburg, PA 15601  
 **Phone:** (412) 499-2987  
-**Email:** roy.turner@tnrbusinesssolutions.com  
+**Email:** Roy.Turner@tnrbusinesssolutions.com  
 **Website:** www.tnrbusinesssolutions.com
 
 ---
@@ -1885,7 +1885,7 @@ Don't just identify one pain—stack 2-3 related pains to show the full cost of 
 
 ### Questions or Feedback?
 
-Email: roy.turner@tnrbusinesssolutions.com
+Email: Roy.Turner@tnrbusinesssolutions.com
 Phone: (412) 499-2987
 
 **This manual is a living document. As you learn and grow, share your insights so we can improve it for future reps.**

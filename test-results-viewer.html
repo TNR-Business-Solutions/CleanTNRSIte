@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Results Viewer - TNR Business Solutions</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #3f51b5 0%, #7986cb 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            padding: 2rem;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid #ffd700;
+        }
+        
+        .header h1 {
+            color: #1a237e;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header .subtitle {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        .success-banner {
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            border: 2px solid #ddd;
+        }
+        
+        .stat-card .value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #1a237e;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-card .label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .stat-card.passed {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border-color: #4caf50;
+        }
+        
+        .stat-card.passed .value {
+            color: #2e7d32;
+        }
+        
+        .test-section {
+            margin-bottom: 2rem;
+            background: #f9f9f9;
+            padding: 1.5rem;
+            border-radius: 15px;
+            border-left: 5px solid #3f51b5;
+        }
+        
+        .test-section h2 {
+            color: #1a237e;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        
+        .test-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #ddd;
+        }
+        
+        .test-item.passed {
+            border-left-color: #4caf50;
+        }
+        
+        .test-item.failed {
+            border-left-color: #f44336;
+        }
+        
+        .test-item .icon {
+            font-size: 1.5rem;
+            margin-right: 1rem;
+        }
+        
+        .test-item .name {
+            flex: 1;
+            color: #333;
+        }
+        
+        .test-item .status {
+            font-weight: bold;
+            padding: 0.25rem 0.75rem;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .test-item.passed .status {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .test-item.failed .status {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 2px solid #ddd;
+            color: #666;
+        }
+        
+        .timestamp {
+            color: #999;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 Test Results Viewer</h1>
+            <div class="subtitle">TNR Business Solutions - Platform Testing</div>
+        </div>
+        
+        <div class="success-banner">
+            ✅ ALL SMOKE TESTS PASSED! System is healthy.
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card passed">
+                <div class="value">24</div>
+                <div class="label">Total Tests</div>
+            </div>
+            <div class="stat-card passed">
+                <div class="value">24</div>
+                <div class="label">Passed</div>
+            </div>
+            <div class="stat-card passed">
+                <div class="value">0</div>
+                <div class="label">Failed</div>
+            </div>
+            <div class="stat-card passed">
+                <div class="value">100%</div>
+                <div class="label">Pass Rate</div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>🔥 SMOKE TEST 1: Server Health Check</h2>
+            <div class="test-item passed">
+                <span class="icon">✅</span>
+                <span class="name">Server is running</span>
+                <span class="status">Status: 200</span>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>🔥 SMOKE TEST 2: Critical Pages Load</h2>
+            <div class="test-item passed">
+                <span class="icon">✅</span>
+                <span class="name">Page loads: /</span>
+                <span class="status">Status: 200</span>
+            </div>
+            <div class="test-item passed">
+                <span class="icon">✅</span>
+                <span class="name">Page loads: /index.html</span>
+                <span class="status">Status: 200</span>
+            </div>
+            <div class="test-item passed">
+                <span class="icon">✅</span>
+                <span class="name">Page loads: /admin-login.html</span>
+                <span class="status">Status: 200</span>
+            </div>
+            <div class="test-item passed">
+                <span class="icon">✅</span>
+                <span class="name">Page loads: /admin-dashboard-v2.html</span>
+                <span class="status">Status: 200</span>
+            </div>
+            <div class="test-item passed">
+                <span class="icon">✅</span>
+                <span class="name">Page loads: /packages.html</span>
+                <span class="status">Status: 200</span>
+            </div>
+            <div class="test-item passed">
+                <span class="icon">✅</span>
+                <span class="name">Page loads: /about.html</span>
+                <span class="status">Status: 200</span>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>🔥 SMOKE TEST 3: Critical API Endpoints</h2>
+            <div class="test-item passed">
+                <span class="icon">✅</span>
+                <span class="name">API endpoint: OPTIONS /api/admin/auth</span>
+                <span class="status">Passed</span>
+            </div>
+            <div class="test-item passed">
+                <span class="icon">✅</span>
+                <span class="name">API endpoint: OPTIONS /submit-form</span>
+                <span class="status">Passed</span>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>🔥 SMOKE TEST 4: Authentication System</h2>
+            <div class="test-item passed">
+                <span class="icon">✅</span>
+                <span class="name">Admin auth endpoint responds</span>
+                <span class="status">Passed</span>
+            </div>
+            <div class="test-item passed">
+                <span class="icon">✅</span>
+                <span class="name">Auth returns 401 for invalid credentials</span>
+                <span class="status">Passed</span>
+            </div>
+            <div class="test-item passed">
+                <span class="icon">✅</span>
+                <span class="name">Auth response has correct structure</span>
+                <span class="status">Passed</span>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>🔥 SMOKE TEST 5: Database Connection</h2>
+            <div class="test-item passed">
+                <span class="icon">✅</span>
+                <span class="name">Database is accessible</span>
+                <span class="status">Status: 401</span>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>🔥 SMOKE TEST 6: Static Assets</h2>
+            <div class="test-item passed">
+                <span class="icon">✅</span>
+                <span class="name">Asset exists: /assets/styles.css</span>
+                <span class="status">Passed</span>
+            </div>
+            <div class="test-item passed">
+                <span class="icon">✅</span>
+                <span class="name">Asset exists: /assets/js/error-handler-ui.js</span>
+                <span class="status">Passed</span>
+            </div>
+            <div class="test-item passed">
+                <span class="icon">✅</span>
+                <span class="name">Asset exists: /media/logo.png</span>
+                <span class="status">Passed</span>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>🔥 SMOKE TEST 7: JWT Protection</h2>
+            <div class="test-item passed">
+                <span class="icon">✅</span>
+                <span class="name">Endpoint protected: /api/crm/clients</span>
+                <span class="status">Status: 401</span>
+            </div>
+            <div class="test-item passed">
+                <span class="icon">✅</span>
+                <span class="name">Endpoint protected: /api/analytics</span>
+                <span class="status">Status: 401</span>
+            </div>
+            <div class="test-item passed">
+                <span class="icon">✅</span>
+                <span class="name">Endpoint protected: /api/settings</span>
+                <span class="status">Status: 401</span>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>🔥 SMOKE TEST 8: Login Page Functionality</h2>
+            <div class="test-item passed">
+                <span class="icon">✅</span>
+                <span class="name">Login page has username field</span>
+                <span class="status">Passed</span>
+            </div>
+            <div class="test-item passed">
+                <span class="icon">✅</span>
+                <span class="name">Login page has password field</span>
+                <span class="status">Passed</span>
+            </div>
+            <div class="test-item passed">
+                <span class="icon">✅</span>
+                <span class="name">Login page has submit button</span>
+                <span class="status">Passed</span>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>🔥 SMOKE TEST 9: Dashboard Basic Load</h2>
+            <div class="test-item passed">
+                <span class="icon">✅</span>
+                <span class="name">Dashboard page loads</span>
+                <span class="status">Passed</span>
+            </div>
+            <div class="test-item passed">
+                <span class="icon">✅</span>
+                <span class="name">Dashboard or login displayed</span>
+                <span class="status">Passed</span>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>Test Duration:</strong> 6.17s</p>
+            <p class="timestamp">Generated: <span id="timestamp"></span></p>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('timestamp').textContent = new Date().toLocaleString();
+    </script>
+</body>
+</html>
+

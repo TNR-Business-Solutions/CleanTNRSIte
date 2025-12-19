@@ -1,79 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Settings - TNR Business Solutions</title>
-    <link rel="stylesheet" href="../../assets/styles.css">
-    <link rel="stylesheet" href="../shared/styles.css">
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
+    <link rel="stylesheet" href="../../assets/styles.css" />
+    <link rel="stylesheet" href="../shared/styles.css" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
     <!-- Load Admin Header -->
     <div id="admin-header-placeholder"></div>
-    
+
     <div class="admin-dashboard">
-        <div class="dashboard-container">
-            <div class="dashboard-header">
-                <h1>⚙️ System Settings</h1>
-                <p>Configure your business information and preferences</p>
-            </div>
-            
-            <div class="crm-section">
-                <h2 class="crm-title">⚙️ System Settings</h2>
-                
-                <div class="settings-container">
-                    <form id="settingsForm">
-                        <div class="form-group">
-                            <label for="businessName">Business Name *</label>
-                            <input type="text" id="businessName" value="TNR Business Solutions" placeholder="Enter business name" required />
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="businessEmail">Business Email *</label>
-                            <input type="email" id="businessEmail" value="roy.turner@tnrbusinesssolutions.com" placeholder="Enter business email" required />
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="businessPhone">Business Phone</label>
-                            <input type="tel" id="businessPhone" value="(412) 499-2987" placeholder="Enter business phone" />
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="businessAddress">Business Address</label>
-                            <textarea id="businessAddress" rows="3" placeholder="Enter business address">418 Concord Avenue, Greensburg, PA 15601</textarea>
-                        </div>
-                        
-                        <div class="form-actions">
-                            <button type="button" class="btn btn-primary" onclick="saveSettings()">💾 Save Settings</button>
-                            <button type="button" class="btn btn-secondary" onclick="resetSettings()">🔄 Reset</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+      <div class="dashboard-container">
+        <div class="dashboard-header">
+          <h1>⚙️ System Settings</h1>
+          <p>Configure your business information and preferences</p>
         </div>
+
+        <div class="crm-section">
+          <h2 class="crm-title">⚙️ System Settings</h2>
+
+          <div class="settings-container">
+            <form id="settingsForm">
+              <div class="form-group">
+                <label for="businessName">Business Name *</label>
+                <input
+                  type="text"
+                  id="businessName"
+                  value="TNR Business Solutions"
+                  placeholder="Enter business name"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="businessEmail">Business Email *</label>
+                <input
+                  type="email"
+                  id="businessEmail"
+                  value="Roy.Turner@tnrbusinesssolutions.com"
+                  placeholder="Enter business email"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="businessPhone">Business Phone</label>
+                <input
+                  type="tel"
+                  id="businessPhone"
+                  value="(412) 499-2987"
+                  placeholder="Enter business phone"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="businessAddress">Business Address</label>
+                <textarea
+                  id="businessAddress"
+                  rows="3"
+                  placeholder="Enter business address"
+                >
+418 Concord Avenue, Greensburg, PA 15601</textarea
+                >
+              </div>
+
+              <div class="form-actions">
+                <button
+                  type="button"
+                  class="btn btn-primary"
+                  onclick="saveSettings()"
+                >
+                  💾 Save Settings
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  onclick="resetSettings()"
+                >
+                  🔄 Reset
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
-    
+
     <!-- Scripts -->
     <script src="../../crm-data.js"></script>
     <script src="../../admin-api-client.js"></script>
     <script src="../shared/utils.js"></script>
     <script src="settings.js"></script>
-    
-    <script>
-        // Load admin header
-        fetch('../shared/header.html')
-            .then(r => r.text())
-            .then(html => {
-                document.getElementById('admin-header-placeholder').innerHTML = html;
-            });
-        
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('⚙️ Settings page loaded');
-            loadSettings();
-        });
-    </script>
-</body>
-</html>
 
+    <script>
+      // Load admin header
+      fetch("../shared/header.html")
+        .then((r) => r.text())
+        .then((html) => {
+          document.getElementById("admin-header-placeholder").innerHTML = html;
+        });
+
+      // Initialize on page load
+      document.addEventListener("DOMContentLoaded", function () {
+        console.log("⚙️ Settings page loaded");
+        loadSettings();
+      });
+    </script>
+  </body>
+</html>

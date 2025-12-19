@@ -1,0 +1,260 @@
+/* Error Handler UI Styles */
+
+/* Error Notifications */
+.error-notification,
+.success-notification {
+  position: fixed;
+  z-index: 10000;
+  max-width: 400px;
+  min-width: 300px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: all 0.3s ease;
+  margin: 1rem;
+}
+
+.error-notification.show,
+.success-notification.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.error-notification.hide,
+.success-notification.hide {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
+/* Position variants */
+.error-notification-top-right,
+.success-notification-top-right {
+  top: 20px;
+  right: 20px;
+}
+
+.error-notification-top-left,
+.success-notification-top-left {
+  top: 20px;
+  left: 20px;
+}
+
+.error-notification-bottom-right,
+.success-notification-bottom-right {
+  bottom: 20px;
+  right: 20px;
+}
+
+.error-notification-bottom-left,
+.success-notification-bottom-left {
+  bottom: 20px;
+  left: 20px;
+}
+
+.error-notification-center,
+.success-notification-center {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.error-notification-center.show,
+.success-notification-center.show {
+  transform: translate(-50%, -50%);
+}
+
+/* Content */
+.error-notification-content,
+.success-notification-content {
+  padding: 1.25rem;
+}
+
+.error-notification-header,
+.success-notification-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.error-icon,
+.success-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.error-title,
+.success-title {
+  flex: 1;
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.error-close-btn,
+.success-close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #999;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.error-close-btn:hover,
+.success-close-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #333;
+}
+
+.error-message,
+.success-message {
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 0.5rem;
+}
+
+.error-help {
+  color: #888;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 6px;
+}
+
+.error-id {
+  font-size: 0.75rem;
+  color: #999;
+  margin-top: 0.5rem;
+  font-family: "Courier New", monospace;
+}
+
+.error-id code {
+  background: rgba(0, 0, 0, 0.05);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.error-actions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.error-action-btn,
+.error-retry-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.error-action-btn {
+  background: var(--tnr-primary, #3f51b5);
+  color: white;
+}
+
+.error-action-btn:hover {
+  background: var(--tnr-navy, #1a237e);
+  transform: translateY(-1px);
+}
+
+.error-retry-btn {
+  background: var(--tnr-success, #4caf50);
+  color: white;
+}
+
+.error-retry-btn:hover {
+  background: #45a049;
+  transform: translateY(-1px);
+}
+
+/* Success notification specific */
+.success-notification {
+  border-left: 4px solid var(--tnr-success, #4caf50);
+}
+
+.error-notification {
+  border-left: 4px solid var(--tnr-danger, #f44336);
+}
+
+/* Loading Overlay */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-top-color: var(--tnr-primary, #3f51b5);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-message {
+  color: #666;
+  font-size: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .error-notification,
+  .success-notification {
+    max-width: calc(100% - 2rem);
+    margin: 1rem;
+  }
+
+  .error-notification-top-right,
+  .success-notification-top-right,
+  .error-notification-top-left,
+  .success-notification-top-left {
+    top: 10px;
+  }
+
+  .error-notification-bottom-right,
+  .success-notification-bottom-right,
+  .error-notification-bottom-left,
+  .success-notification-bottom-left {
+    bottom: 10px;
+  }
+}

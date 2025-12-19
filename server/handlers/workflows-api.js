@@ -3,18 +3,39 @@
 
 const TNRDatabase = require('../../database');
 const { parseQuery, parseBody, sendJson } = require('./http-utils');
+const { verifyToken, extractToken } = require('./jwt-utils');
 
 module.exports = async (req, res) => {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (req.method === 'OPTIONS') {
     res.writeHead(200);
     res.end();
     return;
   }
+
+  // JWT Authentication
+  const token = extractToken(req);
+  if (!token) {
+    return sendJson(res, 401, {
+      success: false,
+      error: "Authentication required",
+      message: "No token provided"
+    });
+  }
+
+  const decoded = verifyToken(token);
+  if (!decoded) {
+    return sendJson(res, 401, {
+      success: false,
+      error: "Invalid token",
+      message: "Token verification failed"
+    });
+  }
+  req.user = decoded;
 
   const db = new TNRDatabase();
   await db.initialize();

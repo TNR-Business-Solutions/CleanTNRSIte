@@ -48,7 +48,7 @@ module.exports = async (req, res) => {
           });
         }
 
-        const businessEmail = process.env.BUSINESS_EMAIL || "Roy.Turner@TNRBusinessSolutions.com";
+        const businessEmail = process.env.BUSINESS_EMAIL || "Roy.Turner@tnrbusinesssolutions.com";
 
         if (type === "forgot_password_request") {
           // Password reset request

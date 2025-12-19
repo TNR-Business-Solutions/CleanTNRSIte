@@ -29,9 +29,9 @@ Set these in Vercel dashboard (Settings → Environment Variables):
 ```
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
-SMTP_USER=roy.turner@tnrbusinesssolutions.com
+SMTP_USER=Roy.Turner@tnrbusinesssolutions.com
 SMTP_PASS=your_app_password_here
-BUSINESS_EMAIL=roy.turner@tnrbusinesssolutions.com
+BUSINESS_EMAIL=Roy.Turner@tnrbusinesssolutions.com
 BUSINESS_PHONE=412-499-2987
 BUSINESS_ADDRESS=418 Concord Avenue, Greensburg, PA 15601
 ```

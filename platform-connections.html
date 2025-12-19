@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Platform Connections - TNR Admin Dashboard</title>
+    <link rel="stylesheet" href="assets/styles.css" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --tnr-navy: #1a237e;
+        --tnr-primary: #3f51b5;
+        --tnr-secondary: #7986cb;
+        --tnr-gold: #ffd700;
+        --tnr-success: #4caf50;
+        --tnr-warning: #ff9800;
+        --tnr-danger: #f44336;
+        --tnr-info: #2196f3;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(
+          135deg,
+          var(--tnr-primary),
+          var(--tnr-secondary)
+        );
+        min-height: 100vh;
+      }
+
+      .page-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+
+      .page-header {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      .page-header h1 {
+        color: var(--tnr-gold);
+        font-size: 2rem;
+        margin: 0;
+      }
+
+      .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+      }
+
+      .btn-primary {
+        background: var(--tnr-gold);
+        color: var(--tnr-navy);
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+      }
+
+      .btn-secondary {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      .platforms-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      .platform-section {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 2rem;
+      }
+
+      .platform-section h2 {
+        color: var(--tnr-gold);
+        margin-top: 0;
+        margin-bottom: 1.5rem;
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .platform-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .platform-list-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        transition: all 0.3s ease;
+      }
+
+      .platform-list-item:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateX(5px);
+      }
+
+      .platform-list-item-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex: 1;
+      }
+
+      .platform-list-item-icon {
+        font-size: 2rem;
+      }
+
+      .platform-list-item-details {
+        flex: 1;
+      }
+
+      .platform-list-item-name {
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: white;
+        margin-bottom: 0.25rem;
+      }
+
+      .platform-list-item-features {
+        font-size: 0.85rem;
+        opacity: 0.8;
+        color: rgba(255, 255, 255, 0.9);
+      }
+
+      .platform-list-item-actions {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        display: inline-block;
+      }
+
+      .status-connected {
+        background: var(--tnr-success);
+        color: white;
+      }
+
+      .status-pending {
+        background: var(--tnr-warning);
+        color: white;
+      }
+
+      .btn-small {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+        border-radius: 8px;
+      }
+
+      .platform-empty {
+        text-align: center;
+        padding: 3rem;
+        opacity: 0.7;
+        font-style: italic;
+        color: white;
+      }
+
+      .loading-state {
+        text-align: center;
+        padding: 3rem;
+        color: white;
+      }
+
+      .loading-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        animation: spin 2s linear infinite;
+      }
+
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @media (max-width: 768px) {
+        .platforms-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .page-container {
+          padding: 1rem;
+        }
+
+        .platform-list-item {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 1rem;
+        }
+
+        .platform-list-item-actions {
+          width: 100%;
+          justify-content: flex-end;
+        }
+      }
+
+      /* Admin Header Styles */
+      .admin-header {
+        background: linear-gradient(
+          135deg,
+          var(--tnr-navy) 0%,
+          var(--tnr-primary) 100%
+        );
+        color: white;
+        padding: 1rem 2rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        margin-bottom: 0;
+      }
+
+      .admin-header-inner {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      .admin-header-logo {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 1.25rem;
+        font-weight: bold;
+        text-decoration: none;
+        color: white;
+      }
+
+      .admin-header-logo img {
+        height: 35px;
+      }
+
+      .admin-header-menu {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .admin-header-link {
+        color: white;
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        font-size: 0.95rem;
+        font-weight: 500;
+        white-space: nowrap;
+      }
+
+      .admin-header-link:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateY(-2px);
+      }
+
+      .admin-header-link.active {
+        background: var(--tnr-gold);
+        color: var(--tnr-navy);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Admin Header Menu -->
+    <header class="admin-header">
+      <div class="admin-header-inner">
+        <a href="/" class="admin-header-logo">
+          <img
+            src="media/logo.png"
+            alt="TNR Business Solutions Logo"
+            loading="lazy"
+          />
+          <span>TNR Business Solutions</span>
+        </a>
+        <nav class="admin-header-menu">
+          <a href="/" class="admin-header-link">🏠 Home</a>
+          <a href="/admin-dashboard-v2.html" class="admin-header-link"
+            >📊 Admin Dashboard</a
+          >
+          <a href="/platform-connections.html" class="admin-header-link active"
+            >🌐 Platform Connections</a
+          >
+          <a href="/admin-orders.html" class="admin-header-link">📦 Orders</a>
+          <a
+            href="/social-media-automation-dashboard.html"
+            class="admin-header-link"
+            >📱 Social Media</a
+          >
+          <a href="/admin-login.html" class="admin-header-link">🔐 Login</a>
+          <a href="#" class="admin-header-link" onclick="logout()">🚪 Logout</a>
+        </nav>
+      </div>
+    </header>
+
+    <div class="page-container">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div>
+          <h1>🌐 Platform Connections</h1>
+          <p style="opacity: 0.8; margin-top: 0.5rem">
+            Manage your social media and platform integrations
+          </p>
+        </div>
+        <div>
+          <a href="/admin-dashboard-v2.html" class="btn btn-secondary"
+            >← Back to Dashboard</a
+          >
+          <button
+            class="btn btn-primary"
+            onclick="refreshConnections()"
+            style="margin-left: 0.5rem"
+          >
+            🔄 Refresh
+          </button>
+        </div>
+      </div>
+
+      <!-- Platforms Grid -->
+      <div class="platforms-grid">
+        <!-- Connected Platforms -->
+        <div class="platform-section">
+          <h2>✅ Connected Platforms</h2>
+          <ul class="platform-list" id="connected-platforms-list">
+            <li class="loading-state">
+              <div class="loading-icon">⏳</div>
+              <p>Loading connected platforms...</p>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Available to Connect -->
+        <div class="platform-section">
+          <h2>🔗 Available to Connect</h2>
+          <ul class="platform-list" id="available-platforms-list">
+            <li class="loading-state">
+              <div class="loading-icon">⏳</div>
+              <p>Loading available platforms...</p>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Platform definitions
+      const platformDefinitions = {
+        wix: {
+          name: "Wix",
+          icon: "🏢",
+          status: "connected",
+          connectUrl: "/wix-client-dashboard.html",
+          manageUrl: "/wix-client-dashboard.html",
+          features: [
+            "SEO Automation",
+            "E-commerce Manager",
+            "Blog Webhooks",
+            "Editor Add-on",
+          ],
+        },
+        meta: {
+          name: "Meta/Facebook",
+          icon: "📘",
+          status: "connected",
+          connectUrl: "/auth/meta",
+          manageUrl: "/social-media-automation-dashboard.html",
+          features: [
+            "Page Events",
+            "Messaging Webhooks",
+            "Ad Management",
+            "Lead Capture",
+          ],
+        },
+        linkedin: {
+          name: "LinkedIn",
+          icon: "💼",
+          status: "oauth_ready",
+          connectUrl: "/auth/linkedin",
+          manageUrl: "/social-media-automation-dashboard.html",
+          features: [
+            "Profile Access",
+            "Company Pages",
+            "Post to Feed",
+            "OAuth 2.0",
+          ],
+        },
+        twitter: {
+          name: "Twitter/X",
+          icon: "🐦",
+          status: "oauth_ready",
+          connectUrl: "/auth/twitter",
+          manageUrl: "/social-media-automation-dashboard.html",
+          features: [
+            "Post Tweets",
+            "Timeline Access",
+            "Profile Management",
+            "OAuth 2.0",
+          ],
+        },
+        pinterest: {
+          name: "Pinterest",
+          icon: "📌",
+          status: "oauth_ready",
+          connectUrl: "/api/auth/pinterest",
+          manageUrl: "/social-media-automation-dashboard.html",
+          features: [
+            "Create Pins",
+            "Board Management",
+            "Profile Access",
+            "OAuth 2.0",
+          ],
+        },
+        threads: {
+          name: "Threads",
+          icon: "🧵",
+          status: "pending",
+          connectUrl: "/api/auth/threads",
+          manageUrl: null,
+          features: [
+            "Post Text Content",
+            "Post Images",
+            "OAuth Authentication",
+            "60-day Tokens",
+          ],
+        },
+        whatsapp: {
+          name: "WhatsApp Business",
+          icon: "💬",
+          status: "pending",
+          connectUrl: null,
+          manageUrl: null,
+          features: [
+            "Send/Receive Messages",
+            "Template Messages",
+            "Status Tracking",
+            "90-Day Free Trial",
+          ],
+        },
+        instagram: {
+          name: "Instagram Business",
+          icon: "📸",
+          status: "pending",
+          connectUrl: "/auth/meta",
+          manageUrl: null,
+          features: [
+            "Comment Management",
+            "Direct Messages",
+            "Story Insights",
+            "Mention Tracking",
+          ],
+          note: "Instagram connects through Facebook - use Meta/Facebook connection",
+        },
+      };
+
+      // Load platform status from API
+      async function loadPlatformStatus() {
+        try {
+          // Check actual connection status from API
+          const response = await fetch("/api/social/tokens");
+          let connectedPlatforms = [];
+
+          if (response.ok) {
+            const data = await response.json();
+            if (data.success && data.tokens) {
+              connectedPlatforms = data.tokens.map((t) =>
+                t.platform?.toLowerCase()
+              );
+            }
+          }
+
+          // Separate connected and available platforms
+          const connected = [];
+          const available = [];
+
+          Object.keys(platformDefinitions).forEach((key) => {
+            const platform = platformDefinitions[key];
+            const isConnected =
+              connectedPlatforms.includes(key) ||
+              platform.status === "connected" ||
+              platform.status === "oauth_ready";
+
+            if (isConnected) {
+              connected.push({ key, ...platform });
+            } else {
+              available.push({ key, ...platform });
+            }
+          });
+
+          // Render connected platforms
+          renderPlatformList("connected-platforms-list", connected, true);
+
+          // Render available platforms
+          renderPlatformList("available-platforms-list", available, false);
+        } catch (error) {
+          console.error("Error loading platform status:", error);
+          // Fallback to static definitions
+          const connected = Object.keys(platformDefinitions)
+            .filter((key) => {
+              const p = platformDefinitions[key];
+              return p.status === "connected" || p.status === "oauth_ready";
+            })
+            .map((key) => ({ key, ...platformDefinitions[key] }));
+
+          const available = Object.keys(platformDefinitions)
+            .filter((key) => {
+              const p = platformDefinitions[key];
+              return p.status === "pending";
+            })
+            .map((key) => ({ key, ...platformDefinitions[key] }));
+
+          renderPlatformList("connected-platforms-list", connected, true);
+          renderPlatformList("available-platforms-list", available, false);
+        }
+      }
+
+      function renderPlatformList(containerId, platforms, isConnected) {
+        const container = document.getElementById(containerId);
+
+        if (platforms.length === 0) {
+          container.innerHTML =
+            '<li class="platform-empty">No platforms in this category</li>';
+          return;
+        }
+
+        container.innerHTML = platforms
+          .map((platform) => {
+            const statusBadge = isConnected
+              ? '<span class="status-badge status-connected">✓ Connected</span>'
+              : '<span class="status-badge status-pending">⏳ Not Connected</span>';
+
+            const connectButton = platform.connectUrl
+              ? `<button class="btn btn-small btn-primary" onclick="connectPlatform('${platform.key}')">🔗 Connect</button>`
+              : `<button class="btn btn-small btn-secondary" onclick="openPlatformSetup('${platform.key}')">⚙️ Setup</button>`;
+
+            const manageButton = platform.manageUrl
+              ? `<button class="btn btn-small btn-secondary" onclick="managePlatform('${platform.key}')">🔧 Manage</button>`
+              : "";
+
+            const featuresList = platform.features.slice(0, 3).join(" • ");
+
+            return `
+                    <li class="platform-list-item">
+                        <div class="platform-list-item-info">
+                            <span class="platform-list-item-icon">${
+                              platform.icon
+                            }</span>
+                            <div class="platform-list-item-details">
+                                <div class="platform-list-item-name">${
+                                  platform.name
+                                }</div>
+                                ${statusBadge}
+                                <div class="platform-list-item-features">${featuresList}</div>
+                            </div>
+                        </div>
+                        <div class="platform-list-item-actions">
+                            ${!isConnected ? connectButton : ""}
+                            ${manageButton}
+                        </div>
+                    </li>
+                `;
+          })
+          .join("");
+      }
+
+      function connectPlatform(platformKey) {
+        const platform = platformDefinitions[platformKey];
+        if (platform && platform.connectUrl) {
+          window.location.href = platform.connectUrl;
+        } else {
+          openPlatformSetup(platformKey);
+        }
+      }
+
+      function managePlatform(platformKey) {
+        const platform = platformDefinitions[platformKey];
+        if (platform && platform.manageUrl) {
+          window.location.href = platform.manageUrl;
+        } else {
+          alert(`${platform.name} management dashboard coming soon!`);
+        }
+      }
+
+      function openPlatformSetup(platformKey) {
+        const setupGuides = {
+          whatsapp: "/WHATSAPP_API_SETUP.md",
+          instagram: "/INSTAGRAM_API_SETUP.md",
+          threads: "/THREADS_API_SETUP.md",
+        };
+
+        if (setupGuides[platformKey]) {
+          window.open(setupGuides[platformKey], "_blank");
+        } else {
+          alert(
+            `${
+              platformDefinitions[platformKey]?.name || platformKey
+            } setup guide coming soon!`
+          );
+        }
+      }
+
+      function refreshConnections() {
+        document.getElementById("connected-platforms-list").innerHTML = `
+                <li class="loading-state">
+                    <div class="loading-icon">⏳</div>
+                    <p>Refreshing...</p>
+                </li>
+            `;
+        document.getElementById("available-platforms-list").innerHTML = `
+                <li class="loading-state">
+                    <div class="loading-icon">⏳</div>
+                    <p>Refreshing...</p>
+                </li>
+            `;
+        loadPlatformStatus();
+      }
+
+      function logout() {
+        if (confirm("Are you sure you want to logout?")) {
+          localStorage.removeItem("adminSession");
+          localStorage.removeItem("adminRefreshToken");
+          localStorage.removeItem("sessionExpiry");
+          localStorage.removeItem("adminUsername");
+          localStorage.removeItem("adminRole");
+          sessionStorage.removeItem("adminAuthenticated");
+          sessionStorage.removeItem("adminSessionToken");
+          window.location.href = "/admin-login.html";
+        }
+      }
+
+      // Authentication check
+      function checkAuthentication() {
+        const sessionToken =
+          localStorage.getItem("adminSession") ||
+          sessionStorage.getItem("adminSessionToken") ||
+          sessionStorage.getItem("adminAuthenticated");
+        const sessionExpiry = localStorage.getItem("sessionExpiry");
+
+        if (!sessionToken) {
+          window.location.href = "/admin-login.html";
+          return false;
+        }
+
+        if (sessionExpiry) {
+          const expiryTime = parseInt(sessionExpiry);
+          if (isNaN(expiryTime) || Date.now() > expiryTime) {
+            localStorage.removeItem("adminSession");
+            localStorage.removeItem("adminRefreshToken");
+            localStorage.removeItem("sessionExpiry");
+            window.location.href = "/admin-login.html";
+            return false;
+          }
+        }
+
+        return true;
+      }
+
+      // Initialize
+      if (checkAuthentication()) {
+        loadPlatformStatus();
+      }
+    </script>
+  </body>
+</html>

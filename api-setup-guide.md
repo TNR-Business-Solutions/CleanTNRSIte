@@ -322,7 +322,7 @@ localStorage.setItem('debugMode', 'true');
 ## 📞 **SUPPORT & RESOURCES**
 
 ### **TNR Business Solutions Support**
-- **Email**: roy.turner@tnrbusinesssolutions.com
+- **Email**: Roy.Turner@tnrbusinesssolutions.com
 - **Phone**: (412) 499-2987
 - **Website**: https://tnrbusinesssolutions.com
 

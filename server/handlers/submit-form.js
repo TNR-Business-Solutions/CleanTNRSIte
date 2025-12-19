@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
   port: parseInt(process.env.SMTP_PORT || "587"),
   secure: false,
   auth: {
-    user: process.env.SMTP_USER || "roy.turner@tnrbusinesssolutions.com",
+    user: process.env.SMTP_USER || "Roy.Turner@tnrbusinesssolutions.com",
     pass: process.env.SMTP_PASS,
   },
 });
@@ -232,7 +232,7 @@ async function processFormSubmission(formData, res) {
 
     // Send emails - both to business and customer confirmation
     const businessEmail =
-      process.env.BUSINESS_EMAIL || "roy.turner@tnrbusinesssolutions.com";
+      process.env.BUSINESS_EMAIL || "Roy.Turner@tnrbusinesssolutions.com";
 
     // Customer confirmation email HTML
     const customerEmailHtml = `
@@ -306,7 +306,7 @@ async function processFormSubmission(formData, res) {
             <p>If you have any immediate questions, please don't hesitate to contact us directly:</p>
             <ul>
               <li><strong>Phone:</strong> <a href="tel:4124992987">(412) 499-2987</a></li>
-              <li><strong>Email:</strong> <a href="mailto:roy.turner@tnrbusinesssolutions.com">roy.turner@tnrbusinesssolutions.com</a></li>
+              <li><strong>Email:</strong> <a href="mailto:Roy.Turner@tnrbusinesssolutions.com">Roy.Turner@tnrbusinesssolutions.com</a></li>
               <li><strong>Address:</strong> 418 Concord Avenue, Greensburg, PA 15601</li>
             </ul>
             
@@ -319,7 +319,7 @@ async function processFormSubmission(formData, res) {
           <div class="footer">
             <p style="margin: 0;">TNR Business Solutions</p>
             <p style="margin: 5px 0;">418 Concord Avenue, Greensburg, PA 15601</p>
-            <p style="margin: 5px 0;">Phone: (412) 499-2987 | Email: roy.turner@tnrbusinesssolutions.com</p>
+            <p style="margin: 5px 0;">Phone: (412) 499-2987 | Email: Roy.Turner@tnrbusinesssolutions.com</p>
             <p style="margin: 10px 0 0 0; font-size: 10px;">This is an automated confirmation email. Please do not reply to this message.</p>
           </div>
         </div>

@@ -4,6 +4,7 @@
 const TNRDatabase = require("../../database");
 const EmailHandler = require("../../email-handler");
 const { URL } = require("url");
+const { verifyToken, extractToken } = require("./jwt-utils");
 
 // Initialize database connection
 let dbInstance = null;
@@ -25,7 +26,10 @@ function getEmailHandler() {
 }
 
 // Import CORS utilities
-const { setCorsHeaders: setCors, handleCorsPreflight } = require("./cors-utils");
+const {
+  setCorsHeaders: setCors,
+  handleCorsPreflight,
+} = require("./cors-utils");
 
 // Rate-limited email sender pool
 class EmailPool {
@@ -98,6 +102,26 @@ module.exports = async function campaignApiHandler(req, res) {
   if (handleCorsPreflight(req, res)) {
     return;
   }
+
+  // JWT Authentication
+  const token = extractToken(req);
+  if (!token) {
+    return res.status(401).json({
+      success: false,
+      error: "Authentication required",
+      message: "No token provided"
+    });
+  }
+
+  const decoded = verifyToken(token);
+  if (!decoded) {
+    return res.status(401).json({
+      success: false,
+      error: "Invalid token",
+      message: "Token verification failed"
+    });
+  }
+  req.user = decoded;
   setCors(res, origin);
 
   let db;
@@ -337,7 +361,7 @@ module.exports = async function campaignApiHandler(req, res) {
 
               const mailOptions = {
                 from: `"TNR Business Solutions" <${
-                  process.env.SMTP_USER || "roy.turner@tnrbusinesssolutions.com"
+                  process.env.SMTP_USER || "Roy.Turner@tnrbusinesssolutions.com"
                 }>`,
                 to: recipient.email,
                 subject: subject
@@ -350,7 +374,7 @@ module.exports = async function campaignApiHandler(req, res) {
                 text: personalizedText,
                 replyTo:
                   process.env.SMTP_USER ||
-                  "roy.turner@tnrbusinesssolutions.com",
+                  "Roy.Turner@tnrbusinesssolutions.com",
               };
 
               try {

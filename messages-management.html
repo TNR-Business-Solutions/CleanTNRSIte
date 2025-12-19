@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Messages Management - TNR Admin Dashboard</title>
+    <link rel="stylesheet" href="assets/styles.css" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --tnr-navy: #1a237e;
+        --tnr-primary: #3f51b5;
+        --tnr-secondary: #7986cb;
+        --tnr-gold: #ffd700;
+        --tnr-success: #4caf50;
+        --tnr-warning: #ff9800;
+        --tnr-danger: #f44336;
+        --tnr-info: #2196f3;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(
+          135deg,
+          var(--tnr-primary),
+          var(--tnr-secondary)
+        );
+        min-height: 100vh;
+      }
+
+      .page-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+
+      .page-header {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      .page-header h1 {
+        color: var(--tnr-gold);
+        font-size: 2rem;
+        margin: 0;
+      }
+
+      .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+      }
+
+      .btn-primary {
+        background: var(--tnr-gold);
+        color: var(--tnr-navy);
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+      }
+
+      .btn-secondary {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .stat-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 1.5rem;
+        color: white;
+        text-align: center;
+      }
+
+      .stat-card .stat-icon {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .stat-card .stat-value {
+        font-size: 2rem;
+        font-weight: bold;
+        color: var(--tnr-gold);
+        margin-bottom: 0.25rem;
+      }
+
+      .stat-card .stat-label {
+        opacity: 0.8;
+        font-size: 0.9rem;
+      }
+
+      .filters-section {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .filters-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+      }
+
+      .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .filter-group label {
+        color: white;
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+
+      .filter-group select,
+      .filter-group input {
+        padding: 0.75rem;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        font-size: 1rem;
+      }
+
+      .messages-list {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 2rem;
+      }
+
+      .message-item {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        color: white;
+        transition: all 0.3s ease;
+        border-left: 4px solid transparent;
+      }
+
+      .message-item:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateX(5px);
+      }
+
+      .message-item.incoming {
+        border-left-color: var(--tnr-info);
+      }
+
+      .message-item.outgoing {
+        border-left-color: var(--tnr-success);
+      }
+
+      .message-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      .message-sender {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+      }
+
+      .message-date {
+        opacity: 0.7;
+        font-size: 0.9rem;
+      }
+
+      .message-content {
+        margin-bottom: 1rem;
+        line-height: 1.6;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+      }
+
+      .message-meta {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        font-size: 0.85rem;
+        opacity: 0.8;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: white;
+        opacity: 0.7;
+      }
+
+      .empty-state-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+      }
+
+      .loading-state {
+        text-align: center;
+        padding: 3rem;
+        color: white;
+      }
+
+      .loading-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        animation: spin 2s linear infinite;
+      }
+
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Admin Header Styles */
+      .admin-header {
+        background: linear-gradient(
+          135deg,
+          var(--tnr-navy) 0%,
+          var(--tnr-primary) 100%
+        );
+        color: white;
+        padding: 1rem 2rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        margin-bottom: 0;
+      }
+
+      .admin-header-inner {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      .admin-header-logo {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 1.25rem;
+        font-weight: bold;
+        text-decoration: none;
+        color: white;
+      }
+
+      .admin-header-logo img {
+        height: 35px;
+      }
+
+      .admin-header-menu {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .admin-header-link {
+        color: white;
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        font-size: 0.95rem;
+        font-weight: 500;
+        white-space: nowrap;
+      }
+
+      .admin-header-link:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateY(-2px);
+      }
+
+      .admin-header-link.active {
+        background: var(--tnr-gold);
+        color: var(--tnr-navy);
+      }
+
+      @media (max-width: 768px) {
+        .page-container {
+          padding: 1rem;
+        }
+
+        .filters-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .message-header {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Admin Header Menu -->
+    <header class="admin-header">
+      <div class="admin-header-inner">
+        <a href="/" class="admin-header-logo">
+          <img
+            src="media/logo.png"
+            alt="TNR Business Solutions Logo"
+            loading="lazy"
+          />
+          <span>TNR Business Solutions</span>
+        </a>
+        <nav class="admin-header-menu">
+          <a href="/" class="admin-header-link">🏠 Home</a>
+          <a href="/admin-dashboard-v2.html" class="admin-header-link"
+            >📊 Admin Dashboard</a
+          >
+          <a href="/platform-connections.html" class="admin-header-link"
+            >🌐 Platforms</a
+          >
+          <a href="/posts-management.html" class="admin-header-link"
+            >📝 Posts</a
+          >
+          <a href="/messages-management.html" class="admin-header-link active"
+            >💬 Messages</a
+          >
+          <a href="/admin-orders.html" class="admin-header-link">📦 Orders</a>
+          <a
+            href="/social-media-automation-dashboard.html"
+            class="admin-header-link"
+            >📱 Social Media</a
+          >
+          <a href="/admin-login.html" class="admin-header-link">🔐 Login</a>
+          <a href="#" class="admin-header-link" onclick="logout()">🚪 Logout</a>
+        </nav>
+      </div>
+    </header>
+
+    <div class="page-container">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div>
+          <h1>💬 Messages Processed</h1>
+          <p style="opacity: 0.8; margin-top: 0.5rem">
+            View and manage all incoming and outgoing messages
+          </p>
+        </div>
+        <div>
+          <a href="/admin-dashboard-v2.html" class="btn btn-secondary"
+            >← Back to Dashboard</a
+          >
+          <button
+            class="btn btn-secondary"
+            onclick="exportMessages('csv')"
+            style="margin-left: 0.5rem"
+          >
+            📥 Export CSV
+          </button>
+          <button
+            class="btn btn-secondary"
+            onclick="exportMessages('json')"
+            style="margin-left: 0.5rem"
+          >
+            📥 Export JSON
+          </button>
+          <button
+            class="btn btn-primary"
+            onclick="refreshMessages()"
+            style="margin-left: 0.5rem"
+          >
+            🔄 Refresh
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats Overview -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">💬</div>
+          <div class="stat-value" id="total-messages-count">0</div>
+          <div class="stat-label">Total Messages</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📥</div>
+          <div class="stat-value" id="incoming-messages">0</div>
+          <div class="stat-label">Incoming</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📤</div>
+          <div class="stat-value" id="outgoing-messages">0</div>
+          <div class="stat-label">Outgoing</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">⏱️</div>
+          <div class="stat-value" id="avg-response-time">0m</div>
+          <div class="stat-label">Avg Response Time</div>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="filters-section">
+        <div class="filters-grid">
+          <div class="filter-group">
+            <label for="platform-filter">Platform</label>
+            <select id="platform-filter" onchange="filterMessages()">
+              <option value="">All Platforms</option>
+              <option value="whatsapp">WhatsApp</option>
+              <option value="instagram">Instagram</option>
+              <option value="facebook">Facebook Messenger</option>
+              <option value="sms">SMS</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="direction-filter">Direction</label>
+            <select id="direction-filter" onchange="filterMessages()">
+              <option value="">All Messages</option>
+              <option value="incoming">Incoming</option>
+              <option value="outgoing">Outgoing</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="status-filter">Status</label>
+            <select id="status-filter" onchange="filterMessages()">
+              <option value="">All Status</option>
+              <option value="read">Read</option>
+              <option value="unread">Unread</option>
+              <option value="replied">Replied</option>
+              <option value="pending">Pending</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="search-messages">Search</label>
+            <input
+              type="text"
+              id="search-messages"
+              placeholder="Search messages..."
+              onkeyup="filterMessages()"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Messages List -->
+      <div class="messages-list">
+        <div id="messages-container">
+          <div class="loading-state">
+            <div class="loading-icon">⏳</div>
+            <p>Loading messages...</p>
+          </div>
+        </div>
+        <!-- Pagination -->
+        <div
+          id="messages-pagination"
+          style="
+            display: none;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+          "
+        >
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              flex-wrap: wrap;
+              gap: 1rem;
+            "
+          >
+            <div style="color: white; opacity: 0.8">
+              <span id="messages-pagination-info">Showing 0-0 of 0</span>
+            </div>
+            <div style="display: flex; gap: 0.5rem">
+              <button
+                id="messages-prev-btn"
+                class="btn btn-secondary btn-small"
+                onclick="loadPreviousPage()"
+                disabled
+              >
+                ← Previous
+              </button>
+              <button
+                id="messages-next-btn"
+                class="btn btn-secondary btn-small"
+                onclick="loadNextPage()"
+                disabled
+              >
+                Next →
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let allMessages = [];
+      let filteredMessages = [];
+      let currentPage = 0;
+      let pageSize = 50;
+      let totalMessages = 0;
+      let paginationData = null;
+
+      // Load messages from API
+      async function loadMessages(page = 0) {
+        try {
+          currentPage = page;
+          const offset = page * pageSize;
+          const response = await fetch(
+            `/api/messages?limit=${pageSize}&offset=${offset}`
+          );
+          const data = await response.json();
+
+          if (data.success && data.data) {
+            filteredMessages = data.data;
+            paginationData = data.pagination || null;
+            totalMessages = paginationData
+              ? paginationData.total
+              : filteredMessages.length;
+
+            if (page === 0) {
+              allMessages = [...filteredMessages];
+            }
+          } else {
+            filteredMessages = [];
+            paginationData = null;
+            totalMessages = 0;
+          }
+
+          updateStats();
+          renderMessages();
+          updatePagination();
+        } catch (error) {
+          console.error("Error loading messages:", error);
+          filteredMessages = [];
+          paginationData = null;
+          totalMessages = 0;
+          updateStats();
+          renderMessages();
+          updatePagination();
+        }
+      }
+
+      function updateStats() {
+        const total = allMessages.length;
+        const incoming = allMessages.filter(
+          (m) => m.direction === "incoming"
+        ).length;
+        const outgoing = allMessages.filter(
+          (m) => m.direction === "outgoing"
+        ).length;
+
+        // Calculate average response time (mock for now)
+        const avgResponseTime = 0; // TODO: Calculate from actual data
+
+        document.getElementById("total-messages-count").textContent = total;
+        document.getElementById("incoming-messages").textContent = incoming;
+        document.getElementById("outgoing-messages").textContent = outgoing;
+        document.getElementById("avg-response-time").textContent =
+          avgResponseTime > 0 ? `${avgResponseTime}m` : "N/A";
+      }
+
+      async function filterMessages(page = 0) {
+        const platform = document.getElementById("platform-filter").value;
+        const direction = document.getElementById("direction-filter").value;
+        const status = document.getElementById("status-filter").value;
+        const search = document.getElementById("search-messages").value;
+
+        // Build API query
+        currentPage = page;
+        const offset = page * pageSize;
+        const params = new URLSearchParams();
+        if (platform) params.append("platform", platform);
+        if (direction) params.append("direction", direction);
+        if (status) params.append("status", status);
+        if (search) params.append("search", search);
+        params.append("limit", pageSize);
+        params.append("offset", offset);
+
+        try {
+          const response = await fetch(`/api/messages?${params.toString()}`);
+          const data = await response.json();
+
+          if (data.success && data.data) {
+            filteredMessages = data.data;
+            paginationData = data.pagination || null;
+            totalMessages = paginationData
+              ? paginationData.total
+              : filteredMessages.length;
+          } else {
+            filteredMessages = [];
+            paginationData = null;
+            totalMessages = 0;
+          }
+
+          renderMessages();
+          updatePagination();
+        } catch (error) {
+          console.error("Error filtering messages:", error);
+          // Fallback to client-side filtering
+          filteredMessages = allMessages.filter((message) => {
+            const matchesPlatform = !platform || message.platform === platform;
+            const matchesDirection =
+              !direction || message.direction === direction;
+            const matchesStatus = !status || message.status === status;
+            const matchesSearch =
+              !search ||
+              (message.content &&
+                message.content.toLowerCase().includes(search.toLowerCase())) ||
+              (message.from &&
+                message.from.toLowerCase().includes(search.toLowerCase())) ||
+              (message.to &&
+                message.to.toLowerCase().includes(search.toLowerCase()));
+
+            return (
+              matchesPlatform &&
+              matchesDirection &&
+              matchesStatus &&
+              matchesSearch
+            );
+          });
+
+          renderMessages();
+          updatePagination();
+        }
+      }
+
+      function updatePagination() {
+        const paginationDiv = document.getElementById("messages-pagination");
+        const prevBtn = document.getElementById("messages-prev-btn");
+        const nextBtn = document.getElementById("messages-next-btn");
+        const infoSpan = document.getElementById("messages-pagination-info");
+
+        if (!paginationData || totalMessages === 0) {
+          paginationDiv.style.display = "none";
+          return;
+        }
+
+        paginationDiv.style.display = "block";
+        const start = currentPage * pageSize + 1;
+        const end = Math.min((currentPage + 1) * pageSize, totalMessages);
+        infoSpan.textContent = `Showing ${start}-${end} of ${totalMessages}`;
+
+        prevBtn.disabled = currentPage === 0;
+        nextBtn.disabled = !paginationData.hasMore;
+      }
+
+      function loadPreviousPage() {
+        if (currentPage > 0) {
+          filterMessages(currentPage - 1);
+        }
+      }
+
+      function loadNextPage() {
+        if (paginationData && paginationData.hasMore) {
+          filterMessages(currentPage + 1);
+        }
+      }
+
+      function renderMessages() {
+        const container = document.getElementById("messages-container");
+
+        if (filteredMessages.length === 0) {
+          container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">💬</div>
+                        <h3>No Messages Found</h3>
+                        <p>No messages match your current filters, or no messages have been processed yet.</p>
+                    </div>
+                `;
+          return;
+        }
+
+        container.innerHTML = filteredMessages
+          .map((message) => {
+            const platformIcons = {
+              whatsapp: "💬",
+              instagram: "📸",
+              facebook: "📘",
+              sms: "📱",
+            };
+
+            const date = new Date(
+              message.timestamp || message.createdAt || message.created_at
+            );
+            const formattedDate =
+              date.toLocaleDateString() +
+              " " +
+              date.toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              });
+
+            const directionClass =
+              message.direction === "incoming" ? "incoming" : "outgoing";
+            const directionLabel =
+              message.direction === "incoming" ? "📥 From" : "📤 To";
+            const contact =
+              message.direction === "incoming"
+                ? message.from || "Unknown"
+                : message.to || "Unknown";
+
+            return `
+                    <div class="message-item ${directionClass}">
+                        <div class="message-header">
+                            <div class="message-sender">
+                                <span>${
+                                  platformIcons[message.platform] || "📱"
+                                }</span>
+                                <span>${
+                                  message.platform
+                                    ? message.platform.charAt(0).toUpperCase() +
+                                      message.platform.slice(1)
+                                    : "Unknown"
+                                }</span>
+                                <span style="opacity: 0.7;">•</span>
+                                <span>${directionLabel} ${contact}</span>
+                            </div>
+                            <div class="message-date">${formattedDate}</div>
+                        </div>
+                        <div class="message-content">${escapeHtml(
+                          message.content ||
+                            message.text ||
+                            message.body ||
+                            "No content"
+                        )}</div>
+                        <div class="message-meta">
+                            ${
+                              message.status
+                                ? `<span>Status: ${message.status}</span>`
+                                : ""
+                            }
+                            ${
+                              message.messageId
+                                ? `<span>ID: ${message.messageId}</span>`
+                                : ""
+                            }
+                        </div>
+                    </div>
+                `;
+          })
+          .join("");
+      }
+
+      function escapeHtml(text) {
+        const div = document.createElement("div");
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      function refreshMessages() {
+        document.getElementById("messages-container").innerHTML = `
+                <div class="loading-state">
+                    <div class="loading-icon">⏳</div>
+                    <p>Refreshing messages...</p>
+                </div>
+            `;
+        loadMessages(0);
+      }
+
+      async function exportMessages(format) {
+        try {
+          const platform = document.getElementById("platform-filter").value;
+          const direction = document.getElementById("direction-filter").value;
+          const status = document.getElementById("status-filter").value;
+          const search = document.getElementById("search-messages").value;
+
+          const params = new URLSearchParams();
+          if (platform) params.append("platform", platform);
+          if (direction) params.append("direction", direction);
+          if (status) params.append("status", status);
+          if (search) params.append("search", search);
+          params.append("limit", "10000");
+          params.append("offset", "0");
+
+          const response = await fetch(`/api/messages?${params.toString()}`);
+          const data = await response.json();
+
+          if (!data.success || !data.data) {
+            alert("No messages to export");
+            return;
+          }
+
+          const messages = data.data;
+          const now = new Date().toISOString().split("T")[0];
+
+          if (format === "csv") {
+            const headers = [
+              "ID",
+              "Platform",
+              "Direction",
+              "From",
+              "To",
+              "Content",
+              "Status",
+              "Timestamp",
+              "Phone",
+              "Email",
+            ];
+            const rows = messages.map((msg) => [
+              msg.id || "",
+              msg.platform || "",
+              msg.direction || "",
+              (msg.from || "").replace(/"/g, '""'),
+              (msg.to || "").replace(/"/g, '""'),
+              (msg.content || "").replace(/"/g, '""'),
+              msg.status || "",
+              msg.timestamp || "",
+              msg.phone || "",
+              msg.email || "",
+            ]);
+
+            const csvContent = [
+              headers.join(","),
+              ...rows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
+            ].join("\n");
+
+            const blob = new Blob([csvContent], {
+              type: "text/csv;charset=utf-8;",
+            });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `messages-export-${now}.csv`;
+            link.click();
+          } else if (format === "json") {
+            const jsonContent = JSON.stringify(messages, null, 2);
+            const blob = new Blob([jsonContent], {
+              type: "application/json;charset=utf-8;",
+            });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `messages-export-${now}.json`;
+            link.click();
+          }
+        } catch (error) {
+          console.error("Error exporting messages:", error);
+          alert("Error exporting messages: " + error.message);
+        }
+      }
+
+      function logout() {
+        if (confirm("Are you sure you want to logout?")) {
+          localStorage.removeItem("adminSession");
+          localStorage.removeItem("adminRefreshToken");
+          localStorage.removeItem("sessionExpiry");
+          localStorage.removeItem("adminUsername");
+          localStorage.removeItem("adminRole");
+          sessionStorage.removeItem("adminAuthenticated");
+          sessionStorage.removeItem("adminSessionToken");
+          window.location.href = "/admin-login.html";
+        }
+      }
+
+      // Authentication check
+      function checkAuthentication() {
+        const sessionToken =
+          localStorage.getItem("adminSession") ||
+          sessionStorage.getItem("adminSessionToken") ||
+          sessionStorage.getItem("adminAuthenticated");
+        const sessionExpiry = localStorage.getItem("sessionExpiry");
+
+        if (!sessionToken) {
+          window.location.href = "/admin-login.html";
+          return false;
+        }
+
+        if (sessionExpiry) {
+          const expiryTime = parseInt(sessionExpiry);
+          if (isNaN(expiryTime) || Date.now() > expiryTime) {
+            localStorage.removeItem("adminSession");
+            localStorage.removeItem("adminRefreshToken");
+            localStorage.removeItem("sessionExpiry");
+            window.location.href = "/admin-login.html";
+            return false;
+          }
+        }
+
+        return true;
+      }
+
+      // Initialize
+      if (checkAuthentication()) {
+        loadMessages();
+      }
+    </script>
+  </body>
+</html>

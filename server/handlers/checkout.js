@@ -5,7 +5,7 @@ const transporter = nodemailer.createTransport({
   port: parseInt(process.env.SMTP_PORT || "587"),
   secure: false,
   auth: {
-    user: process.env.SMTP_USER || "roy.turner@tnrbusinesssolutions.com",
+    user: process.env.SMTP_USER || "Roy.Turner@tnrbusinesssolutions.com",
     pass: process.env.SMTP_PASS,
   },
 });
@@ -21,48 +21,66 @@ module.exports = async (req, res) => {
   }
 
   if (req.method !== "POST") {
-    return res.status(405).json({ success: false, message: "Method not allowed" });
+    return res
+      .status(405)
+      .json({ success: false, message: "Method not allowed" });
   }
 
   try {
     const { sessionId, customerInfo, paymentInfo, cart } = req.body;
-    
-    console.log("📦 Checkout request received:", { sessionId, customerInfo, cartItems: cart.length });
+
+    console.log("📦 Checkout request received:", {
+      sessionId,
+      customerInfo,
+      cartItems: cart.length,
+    });
 
     // Generate order number
     const orderNumber = `TNR-${Date.now()}`;
-    
+
     // Calculate totals
     let subtotal = 0;
     let setupFee = 0;
-    
-    cart.forEach(item => {
+
+    cart.forEach((item) => {
       subtotal += item.price * item.quantity;
-      
+
       // Add setup fees
-      if (item.id.includes('website') || item.id.includes('ecommerce') || item.id.includes('seo')) {
+      if (
+        item.id.includes("website") ||
+        item.id.includes("ecommerce") ||
+        item.id.includes("seo")
+      ) {
         setupFee += 200;
-      } else if (item.id.includes('ads') || item.id.includes('analytics')) {
+      } else if (item.id.includes("ads") || item.id.includes("analytics")) {
         setupFee += 100;
       }
     });
-    
+
     const tax = subtotal * 0.08;
     const monthlyTotal = subtotal + tax;
     const annualTotal = monthlyTotal * 10;
-    
+
     // Build cart items HTML
-    const cartItemsHtml = cart.map(item => `
+    const cartItemsHtml = cart
+      .map(
+        (item) => `
       <tr>
         <td style="padding: 12px; border-bottom: 1px solid #ddd;">
           <strong>${item.name}</strong><br>
           <span style="color: #666; font-size: 14px;">${item.description}</span>
         </td>
-        <td style="padding: 12px; border-bottom: 1px solid #ddd; text-align: center;">${item.quantity}</td>
+        <td style="padding: 12px; border-bottom: 1px solid #ddd; text-align: center;">${
+          item.quantity
+        }</td>
         <td style="padding: 12px; border-bottom: 1px solid #ddd; text-align: right;">$${item.price.toLocaleString()}/mo</td>
-        <td style="padding: 12px; border-bottom: 1px solid #ddd; text-align: right;">$${(item.price * item.quantity).toLocaleString()}/mo</td>
+        <td style="padding: 12px; border-bottom: 1px solid #ddd; text-align: right;">$${(
+          item.price * item.quantity
+        ).toLocaleString()}/mo</td>
       </tr>
-    `).join('');
+    `
+      )
+      .join("");
 
     // Email to business
     const businessEmailHtml = `
@@ -90,11 +108,19 @@ module.exports = async (req, res) => {
           <div class="content">
             <div class="section">
               <h3>Customer Information</h3>
-              <p><strong>Name:</strong> ${customerInfo.firstName} ${customerInfo.lastName}</p>
+              <p><strong>Name:</strong> ${customerInfo.firstName} ${
+      customerInfo.lastName
+    }</p>
               <p><strong>Email:</strong> ${customerInfo.email}</p>
               <p><strong>Phone:</strong> ${customerInfo.phone}</p>
-              ${customerInfo.company ? `<p><strong>Company:</strong> ${customerInfo.company}</p>` : ''}
-              <p><strong>Address:</strong> ${customerInfo.address}, ${customerInfo.city}, ${customerInfo.state} ${customerInfo.zip}</p>
+              ${
+                customerInfo.company
+                  ? `<p><strong>Company:</strong> ${customerInfo.company}</p>`
+                  : ""
+              }
+              <p><strong>Address:</strong> ${customerInfo.address}, ${
+      customerInfo.city
+    }, ${customerInfo.state} ${customerInfo.zip}</p>
             </div>
 
             <div class="section">
@@ -116,7 +142,9 @@ module.exports = async (req, res) => {
                   </tr>
                   <tr>
                     <td colspan="3" style="padding: 12px; text-align: right;">Tax (8%):</td>
-                    <td style="padding: 12px; text-align: right;">$${tax.toFixed(2)}/mo</td>
+                    <td style="padding: 12px; text-align: right;">$${tax.toFixed(
+                      2
+                    )}/mo</td>
                   </tr>
                   <tr>
                     <td colspan="3" style="padding: 12px; text-align: right;">Setup Fee (One-time):</td>
@@ -124,11 +152,15 @@ module.exports = async (req, res) => {
                   </tr>
                   <tr class="total-row">
                     <td colspan="3" style="padding: 12px; text-align: right; font-size: 18px;">Monthly Total:</td>
-                    <td style="padding: 12px; text-align: right; font-size: 18px; color: #f59e0b;">$${monthlyTotal.toFixed(2)}/mo</td>
+                    <td style="padding: 12px; text-align: right; font-size: 18px; color: #f59e0b;">$${monthlyTotal.toFixed(
+                      2
+                    )}/mo</td>
                   </tr>
                   <tr>
                     <td colspan="3" style="padding: 12px; text-align: right;">Annual Total (Save 2 months!):</td>
-                    <td style="padding: 12px; text-align: right; color: #28a745;">$${annualTotal.toFixed(2)}/yr</td>
+                    <td style="padding: 12px; text-align: right; color: #28a745;">$${annualTotal.toFixed(
+                      2
+                    )}/yr</td>
                   </tr>
                 </tbody>
               </table>
@@ -136,13 +168,21 @@ module.exports = async (req, res) => {
 
             <div class="section">
               <h3>Project Details</h3>
-              <p><strong>Timeline:</strong> ${customerInfo.projectTimeline || 'Not specified'}</p>
-              ${customerInfo.specialRequests ? `<p><strong>Special Requests:</strong><br>${customerInfo.specialRequests}</p>` : ''}
+              <p><strong>Timeline:</strong> ${
+                customerInfo.projectTimeline || "Not specified"
+              }</p>
+              ${
+                customerInfo.specialRequests
+                  ? `<p><strong>Special Requests:</strong><br>${customerInfo.specialRequests}</p>`
+                  : ""
+              }
             </div>
 
             <div class="section">
               <h3>Payment Information</h3>
-              <p><strong>Method:</strong> ${paymentInfo.method === 'credit-card' ? 'Credit Card' : 'PayPal'}</p>
+              <p><strong>Method:</strong> ${
+                paymentInfo.method === "credit-card" ? "Credit Card" : "PayPal"
+              }</p>
               <p><strong>Session ID:</strong> ${sessionId}</p>
             </div>
 
@@ -201,11 +241,15 @@ module.exports = async (req, res) => {
                   ${cartItemsHtml}
                   <tr class="total-row">
                     <td colspan="2" style="padding: 12px; text-align: right;">Monthly Total:</td>
-                    <td style="padding: 12px; text-align: right; color: #f59e0b;">$${monthlyTotal.toFixed(2)}/mo</td>
+                    <td style="padding: 12px; text-align: right; color: #f59e0b;">$${monthlyTotal.toFixed(
+                      2
+                    )}/mo</td>
                   </tr>
                   <tr>
                     <td colspan="2" style="padding: 12px; text-align: right;">Annual Total (Save 2 months!):</td>
-                    <td style="padding: 12px; text-align: right; color: #28a745;">$${annualTotal.toFixed(2)}/yr</td>
+                    <td style="padding: 12px; text-align: right; color: #28a745;">$${annualTotal.toFixed(
+                      2
+                    )}/yr</td>
                   </tr>
                 </tbody>
               </table>
@@ -223,7 +267,7 @@ module.exports = async (req, res) => {
             <div style="margin-top: 20px; text-align: center; padding: 20px; background: white; border-radius: 8px;">
               <p><strong>Questions?</strong></p>
               <p>Contact us at:<br>
-              📧 <a href="mailto:roy.turner@tnrbusinesssolutions.com">roy.turner@tnrbusinesssolutions.com</a><br>
+              📧 <a href="mailto:Roy.Turner@tnrbusinesssolutions.com">Roy.Turner@tnrbusinesssolutions.com</a><br>
               📞 412-499-2987</p>
             </div>
 
@@ -235,7 +279,8 @@ module.exports = async (req, res) => {
       </html>
     `;
 
-    const businessEmail = process.env.BUSINESS_EMAIL || "roy.turner@tnrbusinesssolutions.com";
+    const businessEmail =
+      process.env.BUSINESS_EMAIL || "Roy.Turner@tnrbusinesssolutions.com";
 
     // Send emails
     const [businessResult, customerResult] = await Promise.all([
@@ -251,12 +296,12 @@ module.exports = async (req, res) => {
         replyTo: businessEmail,
         subject: `Order Confirmation #${orderNumber} - TNR Business Solutions`,
         html: customerEmailHtml,
-      })
+      }),
     ]);
 
     console.log("📧 Emails sent successfully:", {
       business: businessResult.messageId,
-      customer: customerResult.messageId
+      customer: customerResult.messageId,
     });
 
     return res.status(200).json({
@@ -265,7 +310,6 @@ module.exports = async (req, res) => {
       message: "Order processed successfully",
       emailSent: true,
     });
-
   } catch (error) {
     console.error("❌ Checkout error:", error);
     return res.status(500).json({
@@ -275,4 +319,3 @@ module.exports = async (req, res) => {
     });
   }
 };
-
