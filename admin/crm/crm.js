@@ -14,6 +14,36 @@
  * - admin/shared/utils.js (formatDate, closeModal, etc.)
  */
 
+// Helper function for authenticated API requests
+function getAuthHeaders() {
+    const token = localStorage.getItem("adminSession");
+    const headers = {
+        "Content-Type": "application/json"
+    };
+    if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+    }
+    return headers;
+}
+
+// Authenticated fetch wrapper
+async function authFetch(url, options = {}) {
+    const defaultOptions = {
+        headers: getAuthHeaders()
+    };
+    
+    const mergedOptions = {
+        ...defaultOptions,
+        ...options,
+        headers: {
+            ...defaultOptions.headers,
+            ...(options.headers || {})
+        }
+    };
+    
+    return fetch(url, mergedOptions);
+}
+
 // CRM Tab Switching
 function showCrmTab(tabName) {
     const sections = document.querySelectorAll('.crm-content');
@@ -109,7 +139,7 @@ async function loadClients() {
 
     let clients = [];
     try {
-        const res = await fetch('/api/crm/clients?' + params.toString());
+        const res = await authFetch('/api/crm/clients?' + params.toString());
         if (!res.ok) {
             throw new Error(`HTTP error! status: ${res.status}`);
         }
@@ -207,7 +237,7 @@ async function loadLeads() {
 
     let leads = [];
     try {
-        const res = await fetch('/api/crm/leads?' + params.toString());
+        const res = await authFetch('/api/crm/leads?' + params.toString());
         const data = await res.json();
         if (data.success) leads = data.data || [];
     } catch (e) {
@@ -283,7 +313,7 @@ async function loadLeads() {
         }
         
         try {
-            const res = await fetch('/api/crm/import-leads', {
+            const res = await authFetch('/api/crm/import-leads', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ csv: text })
@@ -309,7 +339,7 @@ function loadOrders() {
     if (!ordersList) return;
     
     // Try to load from API first, fallback to localStorage
-    fetch('/api/crm/orders')
+    authFetch('/api/crm/orders')
         .then(res => res.json())
         .then(data => {
             if (data.success && data.data) {
@@ -469,7 +499,7 @@ function saveNewClient() {
     }
     
     // Try API first, fallback to localStorage
-    fetch('/api/crm/clients', {
+    authFetch('/api/crm/clients', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(clientData)
@@ -510,7 +540,7 @@ function saveNewClient() {
 
 function editClient(clientId) {
     // Try API first
-    fetch(`/api/crm/clients?clientId=${clientId}`)
+    authFetch(`/api/crm/clients?clientId=${clientId}`)
         .then(res => res.json())
         .then(data => {
             const client = data.success ? data.client : (window.tnrCRM?.getClient?.(clientId));
@@ -624,7 +654,7 @@ function saveEditedClient(clientId) {
     }
     
     // Try API first
-    fetch(`/api/crm/clients?clientId=${clientId}`, {
+    authFetch(`/api/crm/clients?clientId=${clientId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(clientData)
@@ -669,7 +699,7 @@ function deleteClient(clientId) {
     }
     
     // Try API first
-    fetch(`/api/crm/clients?clientId=${clientId}`, {
+    authFetch(`/api/crm/clients?clientId=${clientId}`, {
         method: 'DELETE'
     })
     .then(res => res.json())
@@ -705,7 +735,7 @@ function deleteClient(clientId) {
 
 // Lead Functions
 function convertLeadToClient(leadId) {
-    fetch(`/api/crm/leads/convert?leadId=${leadId}`, {
+    authFetch(`/api/crm/leads/convert?leadId=${leadId}`, {
         method: 'POST'
     })
     .then(res => res.json())
@@ -755,7 +785,7 @@ function deleteLead(leadId) {
         return;
     }
     
-    fetch(`/api/crm/leads?leadId=${leadId}`, {
+    authFetch(`/api/crm/leads?leadId=${leadId}`, {
         method: 'DELETE'
     })
     .then(res => res.json())
@@ -1071,7 +1101,7 @@ function saveNewOrder() {
     };
     
     // Try API first
-    fetch('/api/crm/orders', {
+    authFetch('/api/crm/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderData)
@@ -1112,7 +1142,7 @@ function saveNewOrder() {
 
 function editOrder(orderId) {
     // Try API first
-    fetch(`/api/crm/orders?orderId=${orderId}`)
+    authFetch(`/api/crm/orders?orderId=${orderId}`)
         .then(res => res.json())
         .then(data => {
             const order = data.success ? data.order : ((window.tnrCRM?.orders || []).find(o => o.id === orderId));
@@ -1214,7 +1244,7 @@ function saveEditedOrder(orderId) {
     }
 
     // Try API first
-    fetch(`/api/crm/orders?orderId=${orderId}`, {
+    authFetch(`/api/crm/orders?orderId=${orderId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(update)
@@ -1259,7 +1289,7 @@ function deleteOrder(orderId) {
     }
     
     // Try API first
-    fetch(`/api/crm/orders?orderId=${orderId}`, {
+    authFetch(`/api/crm/orders?orderId=${orderId}`, {
         method: 'DELETE'
     })
     .then(res => res.json())
@@ -1302,7 +1332,7 @@ function deleteOrder(orderId) {
 // Update Client Statistics
 function updateClientStats() {
     // Try to get stats from API first
-    fetch('/api/crm/stats')
+    authFetch('/api/crm/stats')
         .then(res => res.json())
         .then(data => {
             if (data.success && data.stats) {

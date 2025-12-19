@@ -8,17 +8,29 @@ class TNRAdminAPI {
     this.baseURL = API_BASE_URL;
   }
 
+  // Get authentication headers
+  getAuthHeaders() {
+    const token = localStorage.getItem("adminSession");
+    const headers = {
+      "Content-Type": "application/json",
+    };
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+    return headers;
+  }
+
   // Generic request handler
   async request(endpoint, options = {}) {
     const url = `${this.baseURL}/${endpoint}`;
     const defaultOptions = {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: this.getAuthHeaders(),
     };
 
     const config = { ...defaultOptions, ...options };
+    // Merge headers to ensure Authorization is included
+    config.headers = { ...defaultOptions.headers, ...(options.headers || {}) };
 
     if (config.body && typeof config.body !== "string") {
       config.body = JSON.stringify(config.body);
