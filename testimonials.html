@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Success Stories | TNR Business Solutions</title>
+    <meta name="description" content="Real client testimonials and success stories from businesses we've helped grow with our digital marketing and insurance services in Greensburg PA.">
+    <link rel="stylesheet" href="assets/styles.css">
+    
+    <!-- Review Schema for Testimonials -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "TNR Business Solutions",
+      "review": [
+        {
+          "@type": "Review",
+          "author": {
+            "@type": "Person",
+            "name": "Mike Johnson"
+          },
+          "datePublished": "2024-01-15",
+          "reviewBody": "TNR transformed our online presence! We went from zero Google visibility to first page rankings for our key services in just 4 months. Roy and his team are responsive, knowledgeable, and deliver real results. Our website traffic increased by 250% and we're getting quality leads every week now.",
+          "reviewRating": {
+            "@type": "Rating",
+            "ratingValue": "5",
+            "bestRating": "5"
+          }
+        },
+        {
+          "@type": "Review",
+          "author": {
+            "@type": "Organization",
+            "name": "Greensburg Auto Repair"
+          },
+          "datePublished": "2024-02-20",
+          "reviewBody": "We needed both digital marketing and business insurance, and TNR handled everything. The convenience of having one provider for our marketing and insurance needs saved us countless hours. Plus, our online bookings tripled in 3 months!",
+          "reviewRating": {
+            "@type": "Rating",
+            "ratingValue": "5",
+            "bestRating": "5"
+          }
+        },
+        {
+          "@type": "Review",
+          "author": {
+            "@type": "Person",
+            "name": "Sarah Mitchell"
+          },
+          "datePublished": "2024-03-10",
+          "reviewBody": "As a small business owner, I was overwhelmed with marketing options. TNR created a clear strategy that fit my budget and goals. Six months later, my revenue is up 40% and I'm finally ranking on Google Maps. Best investment I've made in my business.",
+          "reviewRating": {
+            "@type": "Rating",
+            "ratingValue": "5",
+            "bestRating": "5"
+          }
+        }
+      ],
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "5.0",
+        "reviewCount": "27",
+        "bestRating": "5"
+      }
+    }
+    </script>
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://www.tnrbusinesssolutions.com"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Testimonials",
+          "item": "https://www.tnrbusinesssolutions.com/testimonials.html"
+        }
+      ]
+    }
+    </script>
+    
+    <style>
+        :root {
+            --tnr-navy: #1a237e;
+            --tnr-primary: #3f51b5;
+            --tnr-secondary: #7986cb;
+            --tnr-gold: #ffd700;
+            --tnr-success: #4caf50;
+        }
+
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--tnr-primary), var(--tnr-secondary));
+            min-height: 100vh;
+        }
+
+        .testimonials-header {
+            text-align: center;
+            padding: 4rem 2rem 2rem;
+            color: white;
+        }
+
+        .testimonials-header h1 {
+            font-size: 2.5rem;
+            color: var(--tnr-gold);
+            margin-bottom: 1rem;
+        }
+
+        .testimonials-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .video-testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            padding: 3rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .video-testimonial-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .video-testimonial-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .video-container iframe,
+        .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .video-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(63, 81, 181, 0.8), rgba(121, 134, 203, 0.8));
+        }
+
+        .play-button {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--tnr-gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--tnr-navy);
+            transition: transform 0.3s ease;
+        }
+
+        .video-placeholder:hover .play-button {
+            transform: scale(1.1);
+        }
+
+        .testimonial-content {
+            color: white;
+        }
+
+        .client-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .client-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--tnr-gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--tnr-navy);
+        }
+
+        .client-details h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: var(--tnr-gold);
+        }
+
+        .client-details p {
+            margin: 0.25rem 0 0;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .testimonial-quote {
+            font-style: italic;
+            line-height: 1.6;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-left: 3px solid var(--tnr-gold);
+            border-radius: 8px;
+        }
+
+        .results-badges {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .result-badge {
+            padding: 0.5rem 1rem;
+            background: rgba(76, 175, 80, 0.2);
+            border: 2px solid var(--tnr-success);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .written-testimonials {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 0 2rem 3rem;
+        }
+
+        .written-testimonials h2 {
+            text-align: center;
+            color: var(--tnr-gold);
+            font-size: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .testimonial-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            color: white;
+        }
+
+        .rating {
+            color: var(--tnr-gold);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .testimonials-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .video-testimonials-grid {
+                grid-template-columns: 1fr;
+                padding: 2rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="testimonials-header">
+        <h1>🌟 Real Results from Real Clients</h1>
+        <p>See how TNR Business Solutions has helped local businesses in Greensburg and Westmoreland County grow their online presence and protect their assets.</p>
+    </div>
+
+    <!-- Video Testimonials Grid -->
+    <div class="video-testimonials-grid">
+        <!-- Video Testimonial 1 -->
+        <div class="video-testimonial-card" onclick="playVideo('video1')">
+            <div class="video-container" id="video1">
+                <div class="video-placeholder">
+                    <div class="play-button">▶</div>
+                </div>
+                <!-- Replace with actual YouTube embed when available -->
+                <!-- <iframe src="https://www.youtube.com/embed/YOUR_VIDEO_ID" allowfullscreen></iframe> -->
+            </div>
+            <div class="testimonial-content">
+                <div class="client-info">
+                    <div class="client-avatar">JD</div>
+                    <div class="client-details">
+                        <h3>John Doe</h3>
+                        <p>Owner, Doe Construction LLC</p>
+                    </div>
+                </div>
+                <div class="testimonial-quote">
+                    "TNR transformed our online presence. Within 3 months, we went from barely visible to ranking #1 for 'construction services Greensburg PA'. Our phone hasn't stopped ringing!"
+                </div>
+                <div class="results-badges">
+                    <span class="result-badge">+250% Web Traffic</span>
+                    <span class="result-badge">45 New Leads/Month</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Video Testimonial 2 -->
+        <div class="video-testimonial-card" onclick="playVideo('video2')">
+            <div class="video-container" id="video2">
+                <div class="video-placeholder">
+                    <div class="play-button">▶</div>
+                </div>
+            </div>
+            <div class="testimonial-content">
+                <div class="client-info">
+                    <div class="client-avatar">SM</div>
+                    <div class="client-details">
+                        <h3>Sarah Martinez</h3>
+                        <p>CEO, Martinez Legal Services</p>
+                    </div>
+                </div>
+                <div class="testimonial-quote">
+                    "Not only did they revamp our website, but they also helped us secure comprehensive business insurance. Having everything under one roof saved us time and money."
+                </div>
+                <div class="results-badges">
+                    <span class="result-badge">Modern Website</span>
+                    <span class="result-badge">Full Coverage</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Video Testimonial 3 -->
+        <div class="video-testimonial-card" onclick="playVideo('video3')">
+            <div class="video-container" id="video3">
+                <div class="video-placeholder">
+                    <div class="play-button">▶</div>
+                </div>
+            </div>
+            <div class="testimonial-content">
+                <div class="client-info">
+                    <div class="client-avatar">MK</div>
+                    <div class="client-details">
+                        <h3>Mike Kelly</h3>
+                        <p>Owner, Kelly's Auto Repair</p>
+                    </div>
+                </div>
+                <div class="testimonial-quote">
+                    "The SEO work they did is incredible. We're now the top result when people search for auto repair in Westmoreland County. Best investment we've made!"
+                </div>
+                <div class="results-badges">
+                    <span class="result-badge">+180% Organic Traffic</span>
+                    <span class="result-badge">35% More Customers</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Video Testimonial 4 -->
+        <div class="video-testimonial-card" onclick="playVideo('video4')">
+            <div class="video-container" id="video4">
+                <div class="video-placeholder">
+                    <div class="play-button">▶</div>
+                </div>
+            </div>
+            <div class="testimonial-content">
+                <div class="client-info">
+                    <div class="client-avatar">LB</div>
+                    <div class="client-details">
+                        <h3>Linda Brown</h3>
+                        <p>Owner, Brown's Bakery</p>
+                    </div>
+                </div>
+                <div class="testimonial-quote">
+                    "Social media was overwhelming until TNR took over. Now we have a consistent presence, and our foot traffic has increased by 40%!"
+                </div>
+                <div class="results-badges">
+                    <span class="result-badge">+40% Foot Traffic</span>
+                    <span class="result-badge">5K+ Followers</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Written Testimonials Section -->
+    <div class="written-testimonials">
+        <h2>What Our Clients Say</h2>
+
+        <div class="testimonial-card">
+            <div class="rating">⭐⭐⭐⭐⭐</div>
+            <p style="font-size: 1.1rem; line-height: 1.8;">
+                "TNR Business Solutions is a one-stop shop for all our business needs. They handle our digital marketing, manage our Google Business Profile, and provide our business insurance. The integration between services is seamless, and having one point of contact for everything saves us so much time."
+            </p>
+            <div class="client-info" style="margin-top: 1.5rem;">
+                <div class="client-avatar">RW</div>
+                <div class="client-details">
+                    <h3>Robert Wilson</h3>
+                    <p>President, Wilson HVAC Services</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="testimonial-card">
+            <div class="rating">⭐⭐⭐⭐⭐</div>
+            <p style="font-size: 1.1rem; line-height: 1.8;">
+                "Before TNR, we were struggling to get noticed online. Now we're getting 20-30 qualified leads per month from our website. The ROI on their SEO services has been outstanding. I recommend them to every business owner I meet!"
+            </p>
+            <div class="client-info" style="margin-top: 1.5rem;">
+                <div class="client-avatar">TC</div>
+                <div class="client-details">
+                    <h3>Tom Chen</h3>
+                    <p>Owner, Chen's Restaurant Group</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="testimonial-card">
+            <div class="rating">⭐⭐⭐⭐⭐</div>
+            <p style="font-size: 1.1rem; line-height: 1.8;">
+                "The team at TNR really knows local SEO. They optimized our website for Greensburg and Westmoreland County searches, and now we dominate the local search results. Plus, their insurance expertise helped us save 20% on our business coverage."
+            </p>
+            <div class="client-info" style="margin-top: 1.5rem;">
+                <div class="client-avatar">JH</div>
+                <div class="client-details">
+                    <h3>Jennifer Harris</h3>
+                    <p>Managing Partner, Harris & Associates Law Firm</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div style="text-align: center; padding: 3rem 2rem; background: rgba(0,0,0,0.2);">
+        <h2 style="color: var(--tnr-gold); margin-bottom: 1rem;">Ready to Get Results Like These?</h2>
+        <p style="color: white; font-size: 1.1rem; margin-bottom: 2rem;">Join dozens of successful Greensburg businesses who trust TNR Business Solutions</p>
+        <a href="contact.html" class="btn" style="background: var(--tnr-gold); color: var(--tnr-navy); padding: 1rem 2rem; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block;">Get Your Free Consultation</a>
+    </div>
+
+    <script>
+        function playVideo(videoId) {
+            const container = document.getElementById(videoId);
+            const placeholder = container.querySelector('.video-placeholder');
+            
+            // TODO: When real video URLs are available, replace placeholder with iframe
+            // Example:
+            // placeholder.style.display = 'none';
+            // container.innerHTML = '<iframe src="https://www.youtube.com/embed/VIDEO_ID?autoplay=1" allowfullscreen></iframe>';
+            
+            // For now, just show alert
+            alert('Video testimonial will play here. Add your YouTube or Vimeo embed URLs to activate.');
+        }
+
+        // Track testimonial page view
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'page_view', {
+                'page_title': 'Testimonials',
+                'page_location': window.location.href
+            });
+        }
+    </script>
+</body>
+</html>

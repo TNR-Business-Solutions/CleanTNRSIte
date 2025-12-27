@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Referral Program | TNR Business Solutions</title>
+    <link rel="stylesheet" href="assets/styles.css">
+    <style>
+        :root {
+            --tnr-navy: #1a237e;
+            --tnr-primary: #3f51b5;
+            --tnr-secondary: #7986cb;
+            --tnr-gold: #ffd700;
+            --tnr-success: #4caf50;
+        }
+
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--tnr-primary), var(--tnr-secondary));
+            min-height: 100vh;
+        }
+
+        .referral-hero {
+            text-align: center;
+            padding: 4rem 2rem 3rem;
+            color: white;
+        }
+
+        .referral-hero h1 {
+            font-size: 3rem;
+            color: var(--tnr-gold);
+            margin-bottom: 1rem;
+        }
+
+        .referral-hero .reward {
+            font-size: 4rem;
+            font-weight: bold;
+            color: var(--tnr-gold);
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            margin: 1rem 0;
+        }
+
+        .referral-hero p {
+            font-size: 1.3rem;
+            max-width: 700px;
+            margin: 0 auto;
+            opacity: 0.95;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem 3rem;
+        }
+
+        .how-it-works {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .how-it-works h2 {
+            text-align: center;
+            color: var(--tnr-gold);
+            font-size: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .step-card {
+            text-align: center;
+            color: white;
+        }
+
+        .step-number {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--tnr-gold);
+            color: var(--tnr-navy);
+            font-size: 2.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+        }
+
+        .step-card h3 {
+            color: var(--tnr-gold);
+            margin-bottom: 1rem;
+        }
+
+        .referral-form-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .referral-form-section h2 {
+            text-align: center;
+            color: var(--tnr-gold);
+            font-size: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .referral-form {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .form-section {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .form-section h3 {
+            color: var(--tnr-gold);
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            color: white;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .submit-btn {
+            background: var(--tnr-gold);
+            color: var(--tnr-navy);
+            padding: 1rem 3rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .benefit-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            color: white;
+        }
+
+        .benefit-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .benefit-card h3 {
+            color: var(--tnr-gold);
+            margin-bottom: 1rem;
+        }
+
+        .terms {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 2rem;
+            border-radius: 12px;
+            color: white;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .terms h3 {
+            color: var(--tnr-gold);
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .referral-hero h1 {
+                font-size: 2rem;
+            }
+
+            .referral-hero .reward {
+                font-size: 3rem;
+            }
+
+            .steps-grid,
+            .benefits-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <div class="referral-hero">
+        <h1>🎁 Refer & Earn</h1>
+        <div class="reward">$100 CREDIT</div>
+        <p>
+            Refer a business to TNR Business Solutions and receive $100 credit 
+            when they sign up for our services. Help your friends grow while you save!
+        </p>
+    </div>
+
+    <div class="container">
+        <!-- How It Works -->
+        <div class="how-it-works">
+            <h2>How It Works</h2>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h3>Submit Referral</h3>
+                    <p>Fill out the form below with your friend's business information</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h3>We Reach Out</h3>
+                    <p>Our team contacts them about our services</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h3>They Sign Up</h3>
+                    <p>Your referral becomes a TNR client</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <h3>You Get $100</h3>
+                    <p>Receive $100 credit toward any of our services</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Benefits -->
+        <div class="benefits-grid">
+            <div class="benefit-card">
+                <div class="benefit-icon">💰</div>
+                <h3>Unlimited Referrals</h3>
+                <p>There's no limit! Refer 10 businesses, earn $1,000 in credits.</p>
+            </div>
+            <div class="benefit-card">
+                <div class="benefit-icon">🤝</div>
+                <h3>Help Friends Grow</h3>
+                <p>Share the same marketing & insurance expertise that helped your business.</p>
+            </div>
+            <div class="benefit-card">
+                <div class="benefit-icon">⚡</div>
+                <h3>Fast Payouts</h3>
+                <p>Credits applied within 7 days of referral's first payment.</p>
+            </div>
+        </div>
+
+        <!-- Referral Form -->
+        <div class="referral-form-section">
+            <h2>Submit a Referral</h2>
+            <form id="referral-form" class="referral-form">
+                <!-- Your Information -->
+                <div class="form-section">
+                    <h3>Your Information</h3>
+                    <div class="form-group">
+                        <label for="your-name">Your Name *</label>
+                        <input type="text" id="your-name" name="yourName" required placeholder="John Doe">
+                    </div>
+                    <div class="form-group">
+                        <label for="your-email">Your Email *</label>
+                        <input type="email" id="your-email" name="yourEmail" required placeholder="john@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="your-phone">Your Phone</label>
+                        <input type="tel" id="your-phone" name="yourPhone" placeholder="(412) 555-0123">
+                    </div>
+                </div>
+
+                <!-- Referral Information -->
+                <div class="form-section">
+                    <h3>Business You're Referring</h3>
+                    <div class="form-group">
+                        <label for="referral-name">Contact Name *</label>
+                        <input type="text" id="referral-name" name="referralName" required placeholder="Jane Smith">
+                    </div>
+                    <div class="form-group">
+                        <label for="referral-business">Business Name *</label>
+                        <input type="text" id="referral-business" name="referralBusiness" required placeholder="Smith's Construction">
+                    </div>
+                    <div class="form-group">
+                        <label for="referral-email">Their Email *</label>
+                        <input type="email" id="referral-email" name="referralEmail" required placeholder="jane@smithsconstruction.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="referral-phone">Their Phone *</label>
+                        <input type="tel" id="referral-phone" name="referralPhone" required placeholder="(724) 555-0199">
+                    </div>
+                    <div class="form-group">
+                        <label for="industry">Industry</label>
+                        <select id="industry" name="industry">
+                            <option value="">Select industry...</option>
+                            <option value="Construction">Construction</option>
+                            <option value="Restaurant">Restaurant/Food Service</option>
+                            <option value="Retail">Retail</option>
+                            <option value="Legal">Legal Services</option>
+                            <option value="Healthcare">Healthcare</option>
+                            <option value="Real Estate">Real Estate</option>
+                            <option value="Auto">Auto Services</option>
+                            <option value="Home Services">Home Services</option>
+                            <option value="Technology">Technology</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="services-interested">Services They Need</label>
+                        <select id="services-interested" name="servicesInterested">
+                            <option value="">Select service...</option>
+                            <option value="Digital Marketing">Digital Marketing</option>
+                            <option value="SEO">SEO Services</option>
+                            <option value="Web Design">Web Design</option>
+                            <option value="Social Media">Social Media Management</option>
+                            <option value="Business Insurance">Business Insurance</option>
+                            <option value="Auto Insurance">Auto Insurance</option>
+                            <option value="Multiple">Multiple Services</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="additional-info">Additional Information</label>
+                        <textarea id="additional-info" name="additionalInfo" rows="3" placeholder="Any details that would help us serve them better..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Hidden Fields -->
+                <input type="hidden" name="formType" value="referral">
+                <input type="hidden" name="source" value="referral_program">
+
+                <!-- Submit Button -->
+                <button type="submit" class="submit-btn">
+                    Submit Referral & Earn $100 💰
+                </button>
+
+                <!-- Success Message -->
+                <div id="success-message" style="display: none; margin-top: 2rem; padding: 1.5rem; background: rgba(76, 175, 80, 0.2); border: 2px solid #4caf50; border-radius: 8px; color: white; text-align: center;">
+                    ✅ Thank you! Your referral has been submitted. We'll contact them within 24 hours and keep you updated!
+                </div>
+            </form>
+        </div>
+
+        <!-- Terms & Conditions -->
+        <div class="terms">
+            <h3>Program Terms & Conditions</h3>
+            <ul style="padding-left: 1.5rem;">
+                <li>$100 credit awarded when referred business signs up for any service package</li>
+                <li>Minimum package value of $500 required for credit to apply</li>
+                <li>Credit applied within 7 business days of referral's first payment</li>
+                <li>Credits can be used toward any TNR Business Solutions service</li>
+                <li>Credits do not expire and can be accumulated</li>
+                <li>Referral must be a new customer (not previously contacted by TNR)</li>
+                <li>Self-referrals and referrals of existing clients do not qualify</li>
+                <li>TNR Business Solutions reserves the right to modify or terminate this program at any time</li>
+                <li>Credits are non-transferable and have no cash value</li>
+                <li>Maximum 10 referrals per quarter per person</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('referral-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('/submit-form', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    // Show success message
+                    document.getElementById('success-message').style.display = 'block';
+                    this.reset();
+
+                    // Track in analytics
+                    if (typeof gtag !== 'undefined') {
+                        gtag('event', 'referral_submitted', {
+                            'event_category': 'referral_program',
+                            'event_label': 'referral_form'
+                        });
+                    }
+
+                    // Scroll to success message
+                    document.getElementById('success-message').scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    alert('Something went wrong. Please try again or call us at (724) 513-8874');
+                }
+            } catch (error) {
+                console.error('Error submitting referral:', error);
+                alert('Network error. Please check your connection and try again.');
+            }
+        });
+
+        // Track page view
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'page_view', {
+                'page_title': 'Referral Program',
+                'page_location': window.location.href
+            });
+        }
+    </script>
+</body>
+</html>

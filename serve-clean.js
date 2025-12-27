@@ -281,6 +281,95 @@ async function handleCheckout(req, res) {
   }
 }
 
+// Handle dashboard stats API
+async function handleDashboardStats(req, res) {
+  try {
+    // Simulate real-time stats (integrate with your CRM/analytics system)
+    const stats = {
+      liveVisitors: Math.floor(Math.random() * 50) + 10,
+      todayLeads: Math.floor(Math.random() * 20) + 5,
+      monthlyRevenue: Math.floor(Math.random() * 50000) + 10000,
+      conversionRate: (Math.random() * 5 + 2).toFixed(1),
+      responseTime: (Math.random() * 2 + 1).toFixed(1)
+    };
+
+    res.writeHead(200, { 
+      "Content-Type": "application/json",
+      "Cache-Control": "no-cache, no-store, must-revalidate"
+    });
+    res.end(JSON.stringify(stats));
+  } catch (error) {
+    res.writeHead(500, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ success: false, message: "Failed to fetch stats" }));
+  }
+}
+
+// Handle recent leads API
+async function handleRecentLeads(req, res) {
+  try {
+    // Simulate recent leads (integrate with your CRM system)
+    const leads = [
+      {
+        id: 1,
+        name: "John Doe",
+        email: "john@example.com",
+        type: "insurance_quote",
+        source: "contact_form",
+        timestamp: new Date(Date.now() - 3600000).toISOString(),
+        status: "new"
+      },
+      {
+        id: 2,
+        name: "Jane Smith",
+        email: "jane@example.com",
+        type: "consultation",
+        source: "landing_page",
+        timestamp: new Date(Date.now() - 7200000).toISOString(),
+        status: "contacted"
+      },
+      {
+        id: 3,
+        name: "Bob Johnson",
+        email: "bob@example.com",
+        type: "quote_request",
+        source: "exit_intent",
+        timestamp: new Date(Date.now() - 10800000).toISOString(),
+        status: "new"
+      }
+    ];
+
+    res.writeHead(200, { 
+      "Content-Type": "application/json",
+      "Cache-Control": "no-cache, no-store, must-revalidate"
+    });
+    res.end(JSON.stringify(leads));
+  } catch (error) {
+    res.writeHead(500, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ success: false, message: "Failed to fetch leads" }));
+  }
+}
+
+// Handle export leads API
+async function handleExportLeads(req, res) {
+  try {
+    // Generate CSV data
+    const csvData = [
+      ['Name', 'Email', 'Type', 'Source', 'Timestamp', 'Status'],
+      ['John Doe', 'john@example.com', 'insurance_quote', 'contact_form', new Date().toISOString(), 'new'],
+      ['Jane Smith', 'jane@example.com', 'consultation', 'landing_page', new Date().toISOString(), 'contacted']
+    ].map(row => row.join(',')).join('\n');
+
+    res.writeHead(200, { 
+      "Content-Type": "text/csv",
+      "Content-Disposition": "attachment; filename=leads.csv"
+    });
+    res.end(csvData);
+  } catch (error) {
+    res.writeHead(500, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ success: false, message: "Failed to export leads" }));
+  }
+}
+
 // MIME types for different file extensions
 const mimeTypes = {
   ".html": "text/html",
@@ -802,6 +891,22 @@ const server = http.createServer((req, res) => {
 
   if (req.method === "GET" && pathname === "/cart") {
     handleCartRequest(req, res, "get");
+    return;
+  }
+
+  // Handle dashboard API endpoints
+  if (req.method === "GET" && pathname === "/api/dashboard/stats") {
+    handleDashboardStats(req, res);
+    return;
+  }
+
+  if (req.method === "GET" && pathname === "/api/leads/recent") {
+    handleRecentLeads(req, res);
+    return;
+  }
+
+  if (req.method === "GET" && pathname === "/api/leads/export") {
+    handleExportLeads(req, res);
     return;
   }
 

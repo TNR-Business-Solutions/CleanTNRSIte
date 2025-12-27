@@ -658,6 +658,117 @@
         </div>
       </div>
 
+      <!-- Real-Time Analytics Dashboard -->
+      <div class="analytics-dashboard" style="
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+      ">
+        <h2 style="color: var(--tnr-gold); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+          📈 Real-Time Analytics
+          <span id="analytics-loading" style="font-size: 0.8rem; color: rgba(255,255,255,0.7);">Loading...</span>
+        </h2>
+        
+        <div class="analytics-grid" style="
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 1rem;
+          margin-bottom: 2rem;
+        ">
+          <div class="analytics-card" style="
+            background: rgba(76, 175, 80, 0.2);
+            padding: 1.5rem;
+            border-radius: 15px;
+            border: 2px solid rgba(76, 175, 80, 0.3);
+          ">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">👥</div>
+            <div id="live-visitors" style="font-size: 2.5rem; font-weight: bold; color: white;">--</div>
+            <div style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">Live Visitors</div>
+          </div>
+          
+          <div class="analytics-card" style="
+            background: rgba(33, 150, 243, 0.2);
+            padding: 1.5rem;
+            border-radius: 15px;
+            border: 2px solid rgba(33, 150, 243, 0.3);
+          ">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">📋</div>
+            <div id="today-leads" style="font-size: 2.5rem; font-weight: bold; color: white;">--</div>
+            <div style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">Today's Leads</div>
+          </div>
+          
+          <div class="analytics-card" style="
+            background: rgba(255, 215, 0, 0.2);
+            padding: 1.5rem;
+            border-radius: 15px;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+          ">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">💰</div>
+            <div id="monthly-revenue" style="font-size: 2.5rem; font-weight: bold; color: white;">--</div>
+            <div style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">Monthly Revenue</div>
+          </div>
+          
+          <div class="analytics-card" style="
+            background: rgba(156, 39, 176, 0.2);
+            padding: 1.5rem;
+            border-radius: 15px;
+            border: 2px solid rgba(156, 39, 176, 0.3);
+          ">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">🎯</div>
+            <div id="conversion-rate" style="font-size: 2.5rem; font-weight: bold; color: white;">--</div>
+            <div style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">Conversion Rate</div>
+          </div>
+          
+          <div class="analytics-card" style="
+            background: rgba(255, 152, 0, 0.2);
+            padding: 1.5rem;
+            border-radius: 15px;
+            border: 2px solid rgba(255, 152, 0, 0.3);
+          ">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">⚡</div>
+            <div id="response-time" style="font-size: 2.5rem; font-weight: bold; color: white;">--</div>
+            <div style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">Avg Response (hrs)</div>
+          </div>
+        </div>
+
+        <div style="margin-top: 2rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h3 style="color: white; font-size: 1.2rem;">Recent Leads</h3>
+            <button class="btn btn-small btn-primary" onclick="exportLeads()">📥 Export CSV</button>
+          </div>
+          
+          <div id="recent-leads-container" style="
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            padding: 1rem;
+            max-height: 400px;
+            overflow-y: auto;
+          ">
+            <table id="leads-table" style="width: 100%; color: white;">
+              <thead>
+                <tr style="border-bottom: 2px solid rgba(255,255,255,0.2);">
+                  <th style="padding: 0.75rem; text-align: left;">Name</th>
+                  <th style="padding: 0.75rem; text-align: left;">Email</th>
+                  <th style="padding: 0.75rem; text-align: left;">Type</th>
+                  <th style="padding: 0.75rem; text-align: left;">Source</th>
+                  <th style="padding: 0.75rem; text-align: left;">Time</th>
+                  <th style="padding: 0.75rem; text-align: left;">Status</th>
+                </tr>
+              </thead>
+              <tbody id="leads-tbody">
+                <tr>
+                  <td colspan="6" style="padding: 2rem; text-align: center; color: rgba(255,255,255,0.5);">
+                    Loading leads...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
       <!-- Stats Overview -->
       <div class="stats-overview">
         <div
@@ -2663,6 +2774,22 @@
         if (e.key === "Escape") {
           closeQuickPostModal();
         }
+      });
+    </script>
+    <script src="admin-dashboard-analytics.js"></script>
+    <script>
+      // Initialize dashboard analytics
+      const dashboardAnalytics = new DashboardAnalytics();
+      
+      // Custom export function for the dashboard
+      function exportLeads() {
+        window.location.href = '/api/leads/export';
+      }
+      
+      // Load analytics on page load
+      window.addEventListener('load', () => {
+        dashboardAnalytics.loadStats();
+        dashboardAnalytics.loadRecentLeads();
       });
     </script>
   </body>

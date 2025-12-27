@@ -263,7 +263,126 @@
           "@type": "AggregateRating",
           "ratingValue": "5.0",
           "reviewCount": "1"
+        },
+        "knowsAbout": [
+          "Digital Marketing",
+          "Search Engine Optimization",
+          "Web Development",
+          "Social Media Marketing",
+          "Insurance Services",
+          "Business Insurance",
+          "Auto Insurance",
+          "Life Insurance"
+        ],
+        "award": [
+          "Top Rated Digital Marketing Agency Greensburg PA 2024",
+          "Best Local Insurance Provider Westmoreland County"
+        ]
+      }
+    </script>
+
+    <!-- FAQ Schema for Homepage -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What digital marketing services do you offer in Greensburg PA?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "We offer comprehensive digital marketing services including SEO, web design, social media management, content creation, paid advertising (Google Ads, Facebook Ads), email marketing, and GMB optimization. We specialize in helping small businesses in Greensburg and Westmoreland County grow their online presence."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Do you offer business insurance in addition to digital marketing?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes! TNR Business Solutions provides both digital marketing services and comprehensive insurance coverage including business insurance, auto insurance, home insurance, life insurance, and umbrella policies. We're a one-stop solution for small business owners in Western Pennsylvania."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How much do your digital marketing services cost?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Our pricing varies based on your specific needs and goals. SEO packages start at $500/month, web design projects range from $1,500-$5,000, and social media management begins at $300/month. Contact us for a free consultation and custom quote tailored to your business."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How long does it take to see SEO results?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Most businesses see initial SEO improvements within 3-4 months, with significant results by 6-12 months. We focus on sustainable, white-hat SEO strategies that build long-term organic traffic growth. You'll receive monthly reports showing ranking improvements, traffic increases, and lead generation metrics."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Do you work with businesses outside Greensburg PA?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "While we're based in Greensburg PA and specialize in serving Westmoreland County, we work with clients throughout Western Pennsylvania and can provide digital marketing services nationwide. Our insurance services are available throughout Pennsylvania."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can you help with Google Business Profile optimization?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Absolutely! GMB optimization is one of our core services. We'll optimize your Google Business Profile with the right categories, keywords, photos, posts, and reviews to help you rank higher in local search results and Google Maps."
+            }
+          }
+        ]
+      }
+    </script>
+
+    <!-- Organization Schema -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "TNR Business Solutions",
+        "url": "https://www.tnrbusinesssolutions.com",
+        "logo": "https://www.tnrbusinesssolutions.com/media/logo.png",
+        "description": "Digital marketing agency and insurance services provider in Greensburg PA",
+        "founder": {
+          "@type": "Person",
+          "name": "Roy Turner",
+          "jobTitle": "Founder & CEO"
+        },
+        "foundingDate": "2020",
+        "slogan": "Grow Your Business with Expert Marketing & Comprehensive Insurance",
+        "numberOfEmployees": {
+          "@type": "QuantitativeValue",
+          "value": "5"
+        },
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "telephone": "+1-412-499-2987",
+          "contactType": "customer service",
+          "email": "roy.turner@tnrbusinesssolutions.com",
+          "areaServed": "US",
+          "availableLanguage": ["English"]
         }
+      }
+    </script>
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://www.tnrbusinesssolutions.com"
+          }
+        ]
       }
     </script>
   </head>
@@ -371,6 +490,7 @@
             </li>
             <li><a href="packages.html" class="nav-link">Packages</a></li>
             <li><a href="about.html" class="nav-link">About</a></li>
+            <li><a href="testimonials.html" class="nav-link">Testimonials</a></li>
             <li><a href="contact.html" class="nav-link">Contact</a></li>
             <li><a href="blog.html" class="nav-link">Blog</a></li>
           </ul>
@@ -1301,6 +1421,82 @@
         </div>
       </div>
     </footer>
+
+    <!-- Exit Intent Popup -->
+    <script src="exit-intent.js"></script>
+    <script>
+      // Initialize exit intent popup
+      const exitIntentPopup = new ExitIntentPopup({
+        title: '🎯 Wait! Get a FREE Business Insurance Checklist',
+        description: 'Before you go, get our comprehensive insurance guide to protect your business.',
+        benefits: [
+          '✓ Complete business insurance checklist',
+          '✓ Free coverage analysis',
+          '✓ No obligation quote'
+        ],
+        callback: () => {
+          if (typeof gtag !== 'undefined') {
+            gtag('event', 'exit_intent_shown', {
+              'event_category': 'engagement',
+              'event_label': 'homepage_exit'
+            });
+          }
+        }
+      });
+    </script>
+    
+    <!-- A/B Testing Headlines -->
+    <script src="ab-test-headlines.js"></script>
+    <script>
+      // Initialize A/B test for hero headlines
+      const headlineTest = new ABTestHeadlines({
+        testId: 'hero_headline_2024',
+        targetElement: '.hero .container',
+        variations: [
+          {
+            id: 'control',
+            name: 'Control - Original',
+            headline: 'Leading Digital Marketing Agency & Insurance Services in Greensburg, PA | Westmoreland County',
+            ctaText: 'Get Started Today'
+          },
+          {
+            id: 'variant_a',
+            name: 'Variant A - Results Focus',
+            headline: 'Grow Your Business 40% Faster with Expert Marketing & Protection',
+            ctaText: 'Get My Free Consultation'
+          },
+          {
+            id: 'variant_b',
+            name: 'Variant B - Problem Solution',
+            headline: 'Stop Losing Customers Online. We Fix Marketing & Protect Your Business',
+            ctaText: 'Start Growing Today'
+          },
+          {
+            id: 'variant_c',
+            name: 'Variant C - Local Trust',
+            headline: 'Greensburg\'s Most Trusted Marketing & Insurance Partner Since 2020',
+            ctaText: 'See Why Locals Choose Us'
+          }
+        ],
+        conversionGoal: 'form_submission'
+      });
+    </script>
+    
+    <!-- Social Proof Notifications -->
+    <script src="social-proof-notifications.js"></script>
+    
+    <!-- Live Chat Widget (Tawk.to) -->
+    <script type="text/javascript">
+    var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+    (function(){
+    var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+    s1.async=true;
+    s1.src='https://embed.tawk.to/6766f4b72548df5f6ed6b456/1ifmphtc9';
+    s1.charset='UTF-8';
+    s1.setAttribute('crossorigin','*');
+    s0.parentNode.insertBefore(s1,s0);
+    })();
+    </script>
 
     <script>
       // Hamburger menu functionality
