@@ -369,12 +369,13 @@
                         });
                     }
 
-                    // TODO: Trigger email with PDF attachment
-                    // This would be handled server-side
+                    // Email with PDF attachment is handled server-side upon successful form submission
+                    // The server receives the lead data and automatically sends the PDF checklist
                 } else {
                     throw new Error('Submission failed');
                 }
             } catch (error) {
+                console.error('Form submission error:', error);
                 alert('Something went wrong. Please try again or call us at (412) 499-2987');
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Get My Free Checklist Now →';

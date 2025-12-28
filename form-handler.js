@@ -1,5 +1,5 @@
 const nodemailer = require("nodemailer");
-const path = require("path");
+const path = require("node:path");
 require("dotenv").config();
 
 // Create transporter for sending emails
@@ -29,7 +29,7 @@ const formatFormData = (formData) => {
   for (const [key, value] of Object.entries(formData)) {
     if (value !== null && value !== undefined && value !== "") {
       const label = key
-        .replace(/([A-Z])/g, " $1")
+        .replaceAll(/([A-Z])/g, " $1")
         .replace(/^./, (str) => str.toUpperCase());
 
       if (Array.isArray(value)) {
@@ -129,6 +129,7 @@ const handleFormSubmission = async (req, res) => {
       res.end(JSON.stringify(result));
     });
   } catch (error) {
+    console.error("Form submission error:", error);
     res.writeHead(500, { "Content-Type": "application/json" });
     res.end(
       JSON.stringify({ success: false, message: "Internal server error" })
