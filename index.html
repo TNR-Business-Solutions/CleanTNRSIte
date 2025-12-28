@@ -1511,6 +1511,20 @@
             mainNav.classList.toggle("active");
             hamburger.classList.toggle("active");
           });
+
+          // Close menu when a nav link is tapped (mobile)
+          const navLinks = mainNav.querySelectorAll("a");
+          navLinks.forEach((link) => {
+            link.addEventListener("click", function () {
+              if (window.innerWidth <= 768) {
+                mainNav.classList.remove("active");
+                hamburger.classList.remove("active");
+                dropdowns.forEach((dropdown) =>
+                  dropdown.classList.remove("active")
+                );
+              }
+            });
+          });
         }
 
         // Handle dropdown menus on mobile
