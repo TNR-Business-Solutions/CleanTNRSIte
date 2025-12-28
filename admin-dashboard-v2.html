@@ -599,109 +599,70 @@
       </div>
 
       <!-- Real-Time Analytics Dashboard -->
-      <div class="analytics-dashboard" style="
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        border-radius: 20px;
-        padding: 2rem;
-        margin-bottom: 2rem;
-      ">
-        <h2 style="color: var(--tnr-gold); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+      <div class="analytics-dashboard">
+        <h2 class="analytics-title">
           📈 Real-Time Analytics
-          <span id="analytics-loading" style="font-size: 0.8rem; color: rgba(255,255,255,0.7);">Loading...</span>
+          <span id="analytics-loading" class="analytics-loading">Loading...</span>
         </h2>
         
-        <div class="analytics-grid" style="
+        <div class="analytics-grid">
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
           gap: 1rem;
           margin-bottom: 2rem;
         ">
-          <div class="analytics-card" style="
-            background: rgba(76, 175, 80, 0.2);
-            padding: 1.5rem;
-            border-radius: 15px;
-            border: 2px solid rgba(76, 175, 80, 0.3);
-          ">
-            <div style="font-size: 2rem; margin-bottom: 0.5rem;">👥</div>
-            <div id="live-visitors" style="font-size: 2.5rem; font-weight: bold; color: white;">--</div>
-            <div style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">Live Visitors</div>
+          <div class="analytics-card analytics-card-green">
+            <div class="analytics-card-icon">👥</div>
+            <div id="live-visitors" class="analytics-card-value">--</div>
+            <div class="analytics-card-label">Live Visitors</div>
           </div>
           
-          <div class="analytics-card" style="
-            background: rgba(33, 150, 243, 0.2);
-            padding: 1.5rem;
-            border-radius: 15px;
-            border: 2px solid rgba(33, 150, 243, 0.3);
-          ">
-            <div style="font-size: 2rem; margin-bottom: 0.5rem;">📋</div>
-            <div id="today-leads" style="font-size: 2.5rem; font-weight: bold; color: white;">--</div>
-            <div style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">Today's Leads</div>
+          <div class="analytics-card analytics-card-blue">
+            <div class="analytics-card-icon">📋</div>
+            <div id="today-leads" class="analytics-card-value">--</div>
+            <div class="analytics-card-label">Today's Leads</div>
           </div>
           
-          <div class="analytics-card" style="
-            background: rgba(255, 215, 0, 0.2);
-            padding: 1.5rem;
-            border-radius: 15px;
-            border: 2px solid rgba(255, 215, 0, 0.3);
-          ">
-            <div style="font-size: 2rem; margin-bottom: 0.5rem;">💰</div>
-            <div id="monthly-revenue" style="font-size: 2.5rem; font-weight: bold; color: white;">--</div>
-            <div style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">Monthly Revenue</div>
+          <div class="analytics-card analytics-card-gold">
+            <div class="analytics-card-icon">💰</div>
+            <div id="monthly-revenue" class="analytics-card-value">--</div>
+            <div class="analytics-card-label">Monthly Revenue</div>
           </div>
           
-          <div class="analytics-card" style="
-            background: rgba(156, 39, 176, 0.2);
-            padding: 1.5rem;
-            border-radius: 15px;
-            border: 2px solid rgba(156, 39, 176, 0.3);
-          ">
-            <div style="font-size: 2rem; margin-bottom: 0.5rem;">🎯</div>
-            <div id="conversion-rate" style="font-size: 2.5rem; font-weight: bold; color: white;">--</div>
-            <div style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">Conversion Rate</div>
+          <div class="analytics-card analytics-card-purple">
+            <div class="analytics-card-icon">🎯</div>
+            <div id="conversion-rate" class="analytics-card-value">--</div>
+            <div class="analytics-card-label">Conversion Rate</div>
           </div>
           
-          <div class="analytics-card" style="
-            background: rgba(255, 152, 0, 0.2);
-            padding: 1.5rem;
-            border-radius: 15px;
-            border: 2px solid rgba(255, 152, 0, 0.3);
-          ">
-            <div style="font-size: 2rem; margin-bottom: 0.5rem;">⚡</div>
-            <div id="response-time" style="font-size: 2.5rem; font-weight: bold; color: white;">--</div>
-            <div style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">Avg Response (hrs)</div>
+          <div class="analytics-card analytics-card-orange">
+            <div class="analytics-card-icon">⚡</div>
+            <div id="response-time" class="analytics-card-value">--</div>
+            <div class="analytics-card-label">Avg Response (hrs)</div>
           </div>
         </div>
 
-        <div style="margin-top: 2rem;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-            <h3 style="color: white; font-size: 1.2rem;">Recent Leads</h3>
+        <div class="leads-section">
+          <div class="leads-header">
+            <h3 class="leads-title">Recent Leads</h3>
             <button class="btn btn-small btn-primary" onclick="exportLeads()">📥 Export CSV</button>
           </div>
           
-          <div id="recent-leads-container" style="
-            background: rgba(0,0,0,0.2);
-            border-radius: 10px;
-            padding: 1rem;
-            max-height: 400px;
-            overflow-y: auto;
-          ">
-            <table id="leads-table" style="width: 100%; color: white;">
+          <div id="recent-leads-container" class="leads-container">
+            <table id="leads-table" class="leads-table">
               <thead>
-                <tr style="border-bottom: 2px solid rgba(255,255,255,0.2);">
-                  <th style="padding: 0.75rem; text-align: left;">Name</th>
-                  <th style="padding: 0.75rem; text-align: left;">Email</th>
-                  <th style="padding: 0.75rem; text-align: left;">Type</th>
-                  <th style="padding: 0.75rem; text-align: left;">Source</th>
-                  <th style="padding: 0.75rem; text-align: left;">Time</th>
-                  <th style="padding: 0.75rem; text-align: left;">Status</th>
+                <tr class="leads-table-header">
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Type</th>
+                  <th>Source</th>
+                  <th>Time</th>
+                  <th>Status</th>
                 </tr>
               </thead>
               <tbody id="leads-tbody">
-                <tr>
-                  <td colspan="6" style="padding: 2rem; text-align: center; color: rgba(255,255,255,0.5);">
-                    Loading leads...
-                  </td>
+                <tr class="leads-table-row">
+                  <td colspan="6" class="leads-empty">Loading leads...</td>
                 </tr>
               </tbody>
             </table>
@@ -714,7 +675,6 @@
         <div
           class="stat-card clickable"
           onclick="window.location.href='/platform-connections.html'"
-          style="cursor: pointer"
           onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='/platform-connections.html';}"
           role="button"
           tabindex="0"
@@ -1082,7 +1042,7 @@
             margin-bottom: 1rem;
           "
         >
-          <h2 class="section-title" style="margin: 0">📊 Recent Activity</h2>
+          <h2 class="section-title">📊 Recent Activity</h2>
           <button
             class="btn btn-small btn-secondary"
             onclick="loadActivityLog()"

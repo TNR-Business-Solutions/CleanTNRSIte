@@ -37,35 +37,70 @@ class TNRDatabase {
 
   // Initialize database (auto-detects SQLite or Neon Postgres)
   async initialize() {
+    // Check if we're on Vercel (production)
+    const isVercel = !!process.env.VERCEL;
+    const isProduction = process.env.NODE_ENV === 'production' || isVercel;
+
     if (this.usePostgres) {
       try {
         if (!Pool) {
-          throw new Error("Neon Pool driver not available");
-        }
+          const error = new Error("Neon Pool driver not available");
+          console.error("❌ Postgres initialization error:", error.message);
+          if (isProduction) {
+            throw error; // Fail loudly on production/Vercel
+          }
+          // Only fall back to SQLite in local development
+          this.usePostgres = false;
+        } else {
+          // Configure Neon to use fetch for WebSockets compatibility
+          if (neonConfig) {
+            neonConfig.fetchConnectionCache = true;
+          }
 
-        // Configure Neon to use fetch for WebSockets compatibility
-        if (neonConfig) {
-          neonConfig.fetchConnectionCache = true;
-        }
+          // Create Neon Pool client (compatible with standard pg Pool)
+          // Pool.query() supports dynamic SQL strings
+          if (!process.env.POSTGRES_URL) {
+            throw new Error("POSTGRES_URL environment variable is not set");
+          }
 
-        // Create Neon Pool client (compatible with standard pg Pool)
-        // Pool.query() supports dynamic SQL strings
-        this.postgres = new Pool({
-          connectionString: process.env.POSTGRES_URL,
-        });
-        console.log("✅ Using Neon Postgres database (Pool)");
-        await this.createTables();
-        return;
+          this.postgres = new Pool({
+            connectionString: process.env.POSTGRES_URL,
+          });
+          console.log("✅ Using Neon Postgres database (Pool)");
+          await this.createTables();
+          return;
+        }
       } catch (err) {
-        console.error("❌ Postgres initialization error:", err);
-        console.error("Falling back to SQLite");
-        // Fall through to SQLite initialization below
+        console.error("❌ Postgres initialization error:", err.message);
+        console.error("   Error details:", err);
+        console.error("   POSTGRES_URL:", process.env.POSTGRES_URL ? "Set" : "Not set");
+        console.error("   VERCEL:", isVercel ? "Yes" : "No");
+        console.error("   NODE_ENV:", process.env.NODE_ENV || "undefined");
+        
+        // On Vercel/production, fail loudly instead of falling back to SQLite
+        if (isProduction) {
+          console.error("🚨 CRITICAL: Cannot fall back to SQLite on Vercel (read-only filesystem)");
+          throw new Error(
+            `Postgres initialization failed on production: ${err.message}. ` +
+            `SQLite fallback is not available on Vercel. Please check POSTGRES_URL environment variable.`
+          );
+        }
+        
+        // Only fall back to SQLite in local development
+        console.warn("⚠️  Falling back to SQLite (local development only)");
         this.usePostgres = false;
       }
     }
 
     if (!this.usePostgres) {
-      // SQLite for local development
+      // SQLite for local development only
+      if (isProduction) {
+        throw new Error(
+          "SQLite cannot be used on Vercel/production. " +
+          "Please set POSTGRES_URL environment variable for production deployment."
+        );
+      }
+      
       return new Promise((resolve, reject) => {
         this.db = new sqlite3.Database(this.dbPath, (err) => {
           if (err) {

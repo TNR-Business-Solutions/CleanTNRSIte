@@ -75,3 +75,277 @@
   justify-content: flex-end;
   flex-wrap: wrap;
 }
+
+/* Analytics Dashboard Styles */
+.analytics-dashboard {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.analytics-title {
+  color: var(--tnr-gold);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.analytics-loading {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.analytics-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  color: white;
+}
+
+.analytics-card-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.analytics-card-value {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: white;
+  margin-bottom: 0.5rem;
+}
+
+.analytics-card-label {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+}
+
+.leads-section {
+  margin-top: 2rem;
+}
+
+.leads-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.leads-title {
+  color: white;
+  font-size: 1.2rem;
+}
+
+.leads-container {
+  max-height: 400px;
+  overflow-y: auto;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+.leads-table {
+  width: 100%;
+  color: white;
+}
+
+.leads-table-header {
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.leads-table th {
+  padding: 0.75rem;
+  text-align: left;
+}
+
+.leads-table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.leads-empty {
+  padding: 2rem;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Colored Analytics Cards */
+.analytics-card-green {
+  background: rgba(76, 175, 80, 0.2);
+  padding: 1.5rem;
+  border-radius: 15px;
+  border: 2px solid rgba(76, 175, 80, 0.3);
+}
+
+.analytics-card-blue {
+  background: rgba(33, 150, 243, 0.2);
+  padding: 1.5rem;
+  border-radius: 15px;
+  border: 2px solid rgba(33, 150, 243, 0.3);
+}
+
+.analytics-card-gold {
+  background: rgba(255, 215, 0, 0.2);
+  padding: 1.5rem;
+  border-radius: 15px;
+  border: 2px solid rgba(255, 215, 0, 0.3);
+}
+
+.analytics-card-purple {
+  background: rgba(156, 39, 176, 0.2);
+  padding: 1.5rem;
+  border-radius: 15px;
+  border: 2px solid rgba(156, 39, 176, 0.3);
+}
+
+.analytics-card-orange {
+  background: rgba(255, 152, 0, 0.2);
+  padding: 1.5rem;
+  border-radius: 15px;
+  border: 2px solid rgba(255, 152, 0, 0.3);
+}
+
+.analytics-card-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.analytics-card-value {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: white;
+}
+
+.analytics-card-label {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+}
+
+/* Recent Leads Section */
+.leads-section {
+  margin-top: 2rem;
+}
+
+.leads-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.leads-title {
+  color: white;
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+.leads-container {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  padding: 1rem;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.leads-table {
+  width: 100%;
+  color: white;
+  border-collapse: collapse;
+}
+
+.leads-table thead tr {
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.leads-table th {
+  padding: 0.75rem;
+  text-align: left;
+}
+
+.leads-table td {
+  padding: 0.75rem;
+  text-align: left;
+}
+
+.leads-table-row td {
+  padding: 0.75rem;
+}
+
+.leads-empty {
+  padding: 2rem;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Stats Overview Section */
+.stats-overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.stat-card.clickable {
+  cursor: pointer;
+}
+
+.stat-card.clickable:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-5px);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.stat-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: white;
+}
+
+.stat-label {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+/* Platforms Section */
+.platforms-section {
+  margin-top: 2rem;
+}
+
+.section-title {
+  color: white;
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  margin-top: 0;
+}
+
+.platforms-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}

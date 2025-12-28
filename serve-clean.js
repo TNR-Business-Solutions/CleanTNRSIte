@@ -38,7 +38,8 @@ async function handleAdminAuth(req, res) {
     req.url
   );
 
-  // Only accept POST requests
+  // OPTIONS requests are handled before this function is called
+  // Only accept POST requests (OPTIONS already handled)
   if (req.method !== "POST") {
     console.log("❌ Method not POST, returning 405");
     res.writeHead(405, { "Content-Type": "application/json" });

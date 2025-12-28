@@ -9,6 +9,7 @@ const realUpdates = require('./wix-real-updates');
 const verification = require('./wix-verification');
 const keywordsModule = require('./wix-seo-keywords');
 const { clientTokensDB } = require('./wix-api-client');
+const { sendJson } = require('./http-utils');
 
 /**
  * Handle Wix API requests
@@ -28,12 +29,12 @@ module.exports = async (req, res) => {
     
     if (!action) {
       console.error('❌ Missing action parameter');
-      return res.status(400).json({ error: 'Missing action parameter' });
+      return sendJson(res, 400, { error: 'Missing action parameter' });
     }
     
     if (!instanceId && !['listClients', 'getClients', 'getChangeSummary'].includes(action)) {
       console.error(`❌ Missing instanceId for action: ${action}`);
-      return res.status(400).json({ error: `Missing instanceId parameter for action: ${action}` });
+      return sendJson(res, 400, { error: `Missing instanceId parameter for action: ${action}` });
     }
     
     let result;
@@ -47,7 +48,7 @@ module.exports = async (req, res) => {
         updatedAt: data.updatedAt,
         hasValidToken: data.expiresAt > Date.now()
       }));
-      return res.json({ success: true, clients });
+      return sendJson(res, 200, { success: true, clients });
     }
     
     if (action === 'getClientDetails') {
@@ -83,13 +84,13 @@ module.exports = async (req, res) => {
       }
       
       if (!clientData) {
-        return res.status(404).json({ error: 'Client not found. Please reconnect the Wix client.' });
+        return sendJson(res, 404, { error: 'Client not found. Please reconnect the Wix client.' });
       }
       
       // Use metasite ID from metadata if available
       const actualInstanceId = clientData.metadata?.metasiteId || instanceId;
       
-      return res.json({
+      return sendJson(res, 200, {
         success: true,
         client: {
           instanceId: actualInstanceId,
@@ -189,7 +190,7 @@ module.exports = async (req, res) => {
     // Verification Actions
     else if (action === 'verifyProductUpdate') {
       if (!instanceId) {
-        return res.status(400).json({ error: 'Missing instanceId parameter' });
+        return sendJson(res, 400, { error: 'Missing instanceId parameter' });
       }
       result = await verification.verifyProductUpdate(instanceId, req.body.productId, req.body.expectedChanges);
     } else if (action === 'getChangeSummary') {
@@ -278,7 +279,7 @@ module.exports = async (req, res) => {
     
     else {
       console.error(`❌ Unknown action: ${action}`);
-      return res.status(400).json({ error: `Unknown action: ${action}` });
+      return sendJson(res, 400, { error: `Unknown action: ${action}` });
     }
     
     if (result === undefined) {
@@ -287,7 +288,7 @@ module.exports = async (req, res) => {
     }
     
     console.log(`✅ Action ${action} completed successfully`);
-    res.json({ success: true, data: result });
+    sendJson(res, 200, { success: true, data: result });
     
   } catch (error) {
     console.error('❌ Wix API Route Error:', error);
@@ -297,7 +298,7 @@ module.exports = async (req, res) => {
       console.error('   Response status:', error.response.status);
       console.error('   Response data:', error.response.data);
     }
-    res.status(500).json({
+    sendJson(res, 500, {
       success: false,
       error: error.message,
       details: error.response?.data || null,

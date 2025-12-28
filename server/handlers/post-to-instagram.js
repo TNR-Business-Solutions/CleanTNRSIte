@@ -1,5 +1,6 @@
 const axios = require('axios');
 const TNRDatabase = require('../../database');
+const { sendJson } = require('./http-utils');
 
 module.exports = async (req, res) => {
   // Set CORS headers
@@ -9,12 +10,13 @@ module.exports = async (req, res) => {
 
   // Handle OPTIONS preflight
   if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+    res.writeHead(200);
+    return res.end();
   }
 
   // Only accept POST requests
   if (req.method !== 'POST') {
-    return res.status(405).json({
+    return sendJson(res, 405, {
       success: false,
       error: 'Method not allowed',
       message: 'This endpoint only accepts POST requests'
@@ -28,7 +30,7 @@ module.exports = async (req, res) => {
       try {
         body = JSON.parse(req.body);
       } catch (e) {
-        return res.status(400).json({
+        return sendJson(res, 400, {
           success: false,
           error: 'Invalid JSON',
           message: 'Request body must be valid JSON'
@@ -76,7 +78,7 @@ module.exports = async (req, res) => {
   }
 
   if (!accessToken) {
-    return res.status(400).json({
+    return sendJson(res, 400, {
       success: false,
       error: 'Missing pageAccessToken',
       message: 'Please provide a Facebook Page Access Token or connect your account via OAuth',
@@ -85,7 +87,7 @@ module.exports = async (req, res) => {
   }
 
   if (!message) {
-    return res.status(400).json({
+    return sendJson(res, 400, {
       success: false,
       error: 'Missing message',
       message: 'Please provide post content'
@@ -113,7 +115,7 @@ module.exports = async (req, res) => {
       console.log('Page data:', pageData);
 
       if (!pageData.instagram_business_account) {
-        return res.status(400).json({
+        return sendJson(res, 400, {
           success: false,
           error: 'No Instagram Account',
           message: 'This Facebook Page is not connected to an Instagram Business Account. Please connect your Instagram account in Facebook Page settings.',
@@ -163,7 +165,7 @@ module.exports = async (req, res) => {
 
       console.log('Instagram post published:', publishResponse.data);
 
-      res.json({
+      sendJson(res, 200, {
         success: true,
         message: 'Successfully posted to Instagram!',
         postId: publishResponse.data.id,
@@ -175,7 +177,7 @@ module.exports = async (req, res) => {
     } else {
       // Text-only post (Instagram doesn't support text-only posts natively)
       // We need to guide the user to add an image or use Facebook instead
-      return res.status(400).json({
+      return sendJson(res, 400, {
         success: false,
         error: 'Image Required',
         message: 'Instagram requires an image for all posts. Text-only posts are not supported.',
@@ -194,7 +196,7 @@ module.exports = async (req, res) => {
     if (error.response?.data?.error) {
       const fbError = error.response.data.error;
       
-      return res.status(400).json({
+      return sendJson(res, 400, {
         success: false,
         error: fbError.message,
         errorType: fbError.type,
@@ -204,7 +206,7 @@ module.exports = async (req, res) => {
       });
     }
 
-    return res.status(500).json({
+    return sendJson(res, 500, {
       success: false,
       error: error.message,
       message: 'An unexpected error occurred while posting to Instagram.'
