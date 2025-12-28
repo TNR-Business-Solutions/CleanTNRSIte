@@ -24,7 +24,7 @@ class ExitIntentPopup {
     }
 
     // Don't show on admin pages
-    if (window.location.pathname.includes('admin')) {
+    if (globalThis.location?.pathname.includes('admin')) {
       return;
     }
 
@@ -156,7 +156,7 @@ class ExitIntentPopup {
 }
 
 // Global functions
-window.closeExitPopup = function() {
+globalThis.closeExitPopup = function() {
   const overlay = document.getElementById('exit-popup-overlay');
   if (overlay) {
     overlay.style.display = 'none';
@@ -164,7 +164,7 @@ window.closeExitPopup = function() {
   }
 };
 
-window.submitExitPopupForm = async function(event) {
+globalThis.submitExitPopupForm = async function(event) {
   event.preventDefault();
   
   const form = event.target;
@@ -199,7 +199,7 @@ window.submitExitPopupForm = async function(event) {
 
       // Auto close after 5 seconds
       setTimeout(() => {
-        window.closeExitPopup();
+        globalThis.closeExitPopup();
       }, 5000);
     } else {
       alert('Something went wrong. Please try again or call us at (412) 499-2987');
@@ -210,11 +210,14 @@ window.submitExitPopupForm = async function(event) {
   }
 };
 
-// Initialize exit intent
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    new ExitIntentPopup();
-  });
-} else {
-  new ExitIntentPopup();
+// Initialize exit intent popup
+function initializeExitIntent() {
+  if (typeof window !== 'undefined') {
+    globalThis.exitPopupInstance = new ExitIntentPopup();
+  }
 }
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeExitIntent);
+} else {
+  initializeExitIntent();
