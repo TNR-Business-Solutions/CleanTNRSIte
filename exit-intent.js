@@ -221,3 +221,4 @@ if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initializeExitIntent);
 } else {
   initializeExitIntent();
+}
