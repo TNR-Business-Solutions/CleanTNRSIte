@@ -4,6 +4,7 @@
 const TNRDatabase = require("../../database");
 const { parseQuery, parseBody, sendJson } = require("./http-utils");
 const { verifyToken, extractToken } = require("./jwt-utils");
+const Logger = require("../utils/logger");
 
 // Initialize database connection (singleton pattern)
 let dbInstance = null;
