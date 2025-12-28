@@ -56,7 +56,7 @@ module.exports = async (req, res) => {
   try {
     db = await getDatabase();
   } catch (dbError) {
-    console.error("Database initialization error:", dbError);
+    Logger.error("Database initialization error:", dbError.message);
     // Return empty analytics if database fails (SQLite doesn't work on Vercel)
     if (req.method === "GET") {
       return sendJson(res, 200, {
@@ -353,7 +353,7 @@ module.exports = async (req, res) => {
       error: "Method not allowed",
     });
   } catch (error) {
-    console.error("Analytics API error:", error);
+    Logger.error("Analytics API error:", error.message);
     sendJson(res, 500, {
       success: false,
       error: error.message || "Internal server error",

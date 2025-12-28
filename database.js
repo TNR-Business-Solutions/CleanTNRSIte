@@ -26,13 +26,15 @@ class TNRDatabase {
     this.usePostgres = !!process.env.POSTGRES_URL;
     this.postgres = null;
 
-    // Debug: Log environment detection
-    console.log("🔍 Database initialization:", {
-      hasPostgresUrl: !!process.env.POSTGRES_URL,
-      hasDatabaseUrl: !!process.env.DATABASE_URL,
-      usePostgres: this.usePostgres,
-      nodeEnv: process.env.NODE_ENV,
-    });
+    // Debug: Log environment detection (only in development)
+    if (process.env.NODE_ENV === 'development' || !process.env.VERCEL) {
+      console.log("🔍 Database initialization:", {
+        hasPostgresUrl: !!process.env.POSTGRES_URL,
+        hasDatabaseUrl: !!process.env.DATABASE_URL,
+        usePostgres: this.usePostgres,
+        nodeEnv: process.env.NODE_ENV,
+      });
+    }
   }
 
   // Initialize database (auto-detects SQLite or Neon Postgres)

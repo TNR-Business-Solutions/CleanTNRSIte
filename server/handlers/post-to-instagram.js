@@ -1,6 +1,7 @@
 const axios = require('axios');
 const TNRDatabase = require('../../database');
 const { sendJson } = require('./http-utils');
+const Logger = require('../utils/logger');
 
 module.exports = async (req, res) => {
   // Set CORS headers
@@ -57,7 +58,7 @@ module.exports = async (req, res) => {
         if (!targetInstagramAccountId && token.instagram_account_id) {
           targetInstagramAccountId = token.instagram_account_id;
         }
-        console.log('✅ Using Instagram token from database:', token.instagram_username || token.page_id);
+        Logger.success('Using Instagram token from database:', token.instagram_username || token.page_id);
       } else {
         // Try Facebook token if Instagram not found (Instagram uses Facebook page tokens)
         const fbToken = await db.getSocialMediaToken('facebook', pageId || null);
@@ -66,13 +67,13 @@ module.exports = async (req, res) => {
           if (fbToken.instagram_account_id) {
             targetInstagramAccountId = fbToken.instagram_account_id;
           }
-          console.log('✅ Using Facebook token for Instagram:', fbToken.page_name || fbToken.page_id);
+          Logger.success('Using Facebook token for Instagram:', fbToken.page_name || fbToken.page_id);
         } else {
-          console.log('⚠️ No token found in database, using provided token');
+          Logger.warn('No token found in database, using provided token');
         }
       }
     } catch (dbError) {
-      console.warn('⚠️ Database error, using provided token:', dbError.message);
+      Logger.warn('Database error, using provided token:', dbError.message);
       // Continue with provided token if database fails
     }
   }
@@ -95,7 +96,7 @@ module.exports = async (req, res) => {
   }
 
   try {
-    console.log('Starting Instagram post process...');
+    Logger.info('Starting Instagram post process...');
     
     // Step 1: Get the Facebook Page's Instagram Business Account ID
     // If we have Instagram account ID from database, use it directly
@@ -112,7 +113,7 @@ module.exports = async (req, res) => {
       });
 
       const pageData = pageResponse.data;
-      console.log('Page data:', pageData);
+      Logger.debug('Page data retrieved:', { id: pageData.id, name: pageData.name });
 
       if (!pageData.instagram_business_account) {
         return sendJson(res, 400, {
@@ -132,12 +133,12 @@ module.exports = async (req, res) => {
 
       instagramAccountId = pageData.instagram_business_account.id;
     }
-    console.log('Instagram Account ID:', instagramAccountId);
+    Logger.debug('Instagram Account ID:', instagramAccountId);
 
     // Step 2: Check if this is an image post or text post
     if (imageUrl) {
       // Image post (requires 2-step process: create container, then publish)
-      console.log('Creating Instagram image post...');
+      Logger.info('Creating Instagram image post...');
       
       // Step 2a: Create media container
       const containerResponse = await axios.post(
@@ -151,7 +152,7 @@ module.exports = async (req, res) => {
       );
 
       const creationId = containerResponse.data.id;
-      console.log('Media container created:', creationId);
+      Logger.debug('Media container created:', creationId);
 
       // Step 2b: Publish the container
       const publishResponse = await axios.post(
@@ -163,7 +164,7 @@ module.exports = async (req, res) => {
         { timeout: 15000 }
       );
 
-      console.log('Instagram post published:', publishResponse.data);
+      Logger.success('Instagram post published:', { postId: publishResponse.data.id });
 
       sendJson(res, 200, {
         success: true,
@@ -189,8 +190,8 @@ module.exports = async (req, res) => {
     }
 
   } catch (error) {
-    console.error('Instagram posting error:', error.message);
-    console.error('Error details:', error.response?.data);
+    Logger.error('Instagram posting error:', error.message);
+    Logger.error('Error details:', error.response?.data);
 
     // Handle specific errors
     if (error.response?.data?.error) {

@@ -5,12 +5,13 @@ const TNRDatabase = require("../../database");
 const { URL } = require("url");
 const { sendErrorResponse, handleUnexpectedError, ERROR_CODES } = require("./error-handler");
 const { verifyToken, extractToken } = require("./jwt-utils");
+const Logger = require("../utils/logger");
 // Workflow executor is optional - only used for automation features
 let workflowExecutor;
 try {
   workflowExecutor = require("../workflow-executor");
 } catch (e) {
-  console.log("Workflow executor not loaded (optional feature)");
+  // Optional feature - no logging needed
   workflowExecutor = null;
 }
 
@@ -34,7 +35,7 @@ try {
   const activityLog = require("./activity-log-api");
   logActivity = activityLog.logActivity;
 } catch (e) {
-  console.log("Activity logging not available (optional feature)");
+  // Optional feature - no logging needed
   logActivity = async () => {}; // No-op if not available
 }
 
@@ -89,7 +90,7 @@ module.exports = async function crmApiHandler(req, res) {
         const urlToParse = fullPath.startsWith('/') ? fullPath : `/${fullPath}`;
         return new URL(urlToParse, "http://localhost");
       } catch (e) {
-        console.error("URL parse error:", e);
+        Logger.error("URL parse error:", e.message);
         return null;
       }
     })();
@@ -105,15 +106,12 @@ module.exports = async function crmApiHandler(req, res) {
     const urlQueryParams = parsedUrl ? Object.fromEntries(parsedUrl.searchParams) : {};
     const allQueryParams = { ...urlQueryParams, ...queryFromReq };
 
-    console.log("📋 CRM API Request:", req.method, fullPath, "Path:", path);
-    console.log("📋 Query params from URL:", urlQueryParams);
-    console.log("📋 Query params from req.query:", queryFromReq);
-    console.log("📋 Combined query params:", allQueryParams);
+    Logger.debug("CRM API Request", { method: req.method, fullPath, path, queryParams: allQueryParams });
 
     try {
       db = await getDatabase();
     } catch (e) {
-      console.error("❌ Database initialization error in CRM API:", e);
+      Logger.error("Database initialization error in CRM API:", e.message);
       // Fallback in serverless where sqlite may be unavailable
       db = {
         getClients: async () => [],
@@ -138,7 +136,7 @@ module.exports = async function crmApiHandler(req, res) {
           totalRevenue: 0,
         }),
       };
-      console.warn("⚠️ Using fallback database (empty data)");
+      Logger.warn("Using fallback database (empty data)");
     }
     if (req.method === "GET") {
       if (path === "clients" || path === "") {
@@ -146,7 +144,7 @@ module.exports = async function crmApiHandler(req, res) {
         try {
           clients = await db.getClients();
         } catch (dbError) {
-          console.error("❌ Error fetching clients:", dbError);
+          Logger.error("Error fetching clients:", dbError.message);
           setCorsHeaders(res, origin);
           res.writeHead(500, { "Content-Type": "application/json" });
           res.end(JSON.stringify({ 
@@ -200,7 +198,7 @@ module.exports = async function crmApiHandler(req, res) {
         setCorsHeaders(res);
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ success: true, data: clients }));
-        console.log("✅ Clients returned:", clients.length);
+        Logger.debug("Clients returned:", clients.length);
       } else if (path.startsWith("clients/")) {
         const id = path.replace("clients/", "");
         const client = await db.getClient(id);
@@ -259,8 +257,7 @@ module.exports = async function crmApiHandler(req, res) {
         );
       }
     } else if (req.method === "POST") {
-      console.log("📥 POST request received:", fullPath);
-      console.log("📥 POST path:", path);
+      Logger.debug("POST request received", { fullPath, path });
       let body = "";
 
       req.on("data", (chunk) => {
@@ -268,10 +265,10 @@ module.exports = async function crmApiHandler(req, res) {
       });
 
       req.on("end", async () => {
-        console.log("📥 POST body received, length:", body.length);
+        Logger.debug("POST body received", { length: body.length });
         try {
           const data = JSON.parse(body);
-          console.log("📥 POST data parsed successfully");
+          Logger.debug("POST data parsed successfully");
 
           if (path === "clients") {
             const client = await db.addClient(data);
@@ -287,8 +284,8 @@ module.exports = async function crmApiHandler(req, res) {
               const EmailHandler = require("../../email-handler");
               const emailHandler = new EmailHandler();
 
-              console.log("📧 Sending welcome email to:", client.email);
-              console.log(
+              Logger.info("Sending welcome email to:", client.email);
+              Logger.debug(
                 "📧 Sending notification to:",
                 process.env.BUSINESS_EMAIL ||
                   "Roy.Turner@tnrbusinesssolutions.com"
@@ -298,28 +295,19 @@ module.exports = async function crmApiHandler(req, res) {
                 .sendWelcomeEmail(client)
                 .then((result) => {
                   if (result.success) {
-                    console.log("✅ Welcome email sent successfully!");
-                    console.log("   Message:", result.message);
+                    Logger.success("Welcome email sent successfully!", { message: result.message });
                   } else {
-                    console.error(
-                      "❌ Failed to send welcome email:",
-                      result.error
-                    );
+                    Logger.error("Failed to send welcome email:", result.error);
                   }
                 })
                 .catch((err) => {
-                  console.error("❌ Error sending welcome email:", err.message);
-                  console.error("   Stack:", err.stack);
+                  Logger.error("Error sending welcome email:", err.message);
+                  Logger.error("Stack:", err.stack);
                 });
             } catch (emailError) {
-              console.error(
-                "❌ Failed to initialize email handler:",
-                emailError.message
-              );
-              console.error("   Stack:", emailError.stack);
-              console.error(
-                "   Make sure SMTP_USER and SMTP_PASS are set in .env file"
-              );
+              Logger.error("Failed to initialize email handler:", emailError.message);
+              Logger.error("Stack:", emailError.stack);
+              Logger.warn("Make sure SMTP_USER and SMTP_PASS are set in .env file");
             }
 
             res.writeHead(201, { "Content-Type": "application/json" });

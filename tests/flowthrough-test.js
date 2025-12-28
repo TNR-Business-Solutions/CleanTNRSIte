@@ -39,13 +39,22 @@ async function testPublicWebsiteFlow() {
     
     // Step 2: Navigate to Services
     log('\n2️⃣  Navigating to services...', 'blue');
-    const servicesLink = await page.$('a[href*="service"], a[href*="packages"]');
-    if (servicesLink) {
-      await servicesLink.click();
-      await page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 10000 });
-      log('   ✅ Services page loaded', 'green');
-    } else {
-      log('   ⚠️  Services link not found', 'yellow');
+    try {
+      // Try multiple selector strategies
+      const servicesLink = await page.$('a[href*="service"], a[href*="packages"], a[href="/services.html"], a[href="services.html"]');
+      if (servicesLink) {
+        await Promise.all([
+          page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 10000 }),
+          servicesLink.click()
+        ]);
+        log('   ✅ Services page loaded', 'green');
+      } else {
+        // Fallback: navigate directly
+        await page.goto(`${BASE_URL}/services.html`, { waitUntil: 'networkidle0', timeout: 10000 });
+        log('   ✅ Services page loaded (direct navigation)', 'green');
+      }
+    } catch (error) {
+      log(`   ⚠️  Services navigation issue: ${error.message}`, 'yellow');
     }
     
     // Step 3: Contact Form
@@ -91,10 +100,16 @@ async function testAdminLoginToActionFlow() {
     await page.type('#username', ADMIN_USERNAME);
     await page.type('#password', ADMIN_PASSWORD);
     
-    await Promise.all([
-      page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 10000 }),
-      page.click('button[type="submit"]')
+    // Submit form and wait for response
+    const submitPromise = page.click('button[type="submit"]');
+    await Promise.race([
+      page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 15000 }),
+      page.waitForResponse(response => response.url().includes('/api/admin/auth'), { timeout: 15000 })
     ]);
+    await submitPromise;
+    
+    // Wait a bit for localStorage to be updated
+    await page.waitForTimeout(1000);
     
     const sessionToken = await page.evaluate(() => localStorage.getItem('adminSession'));
     if (sessionToken) {

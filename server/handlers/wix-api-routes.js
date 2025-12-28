@@ -10,6 +10,7 @@ const verification = require('./wix-verification');
 const keywordsModule = require('./wix-seo-keywords');
 const { clientTokensDB } = require('./wix-api-client');
 const { sendJson } = require('./http-utils');
+const Logger = require('../utils/logger');
 
 /**
  * Handle Wix API requests
@@ -20,20 +21,21 @@ module.exports = async (req, res) => {
     const action = req.body?.action || req.query?.action;
     const instanceId = req.body?.instanceId || req.query?.instanceId;
     
-    console.log(`🎯 Wix API Request received`);
-    console.log(`   Method: ${req.method}`);
-    console.log(`   Action: ${action || 'MISSING'}`);
-    console.log(`   Instance ID: ${instanceId || 'N/A'}`);
-    console.log(`   Body keys: ${req.body ? Object.keys(req.body).join(', ') : 'none'}`);
-    console.log(`   Query keys: ${req.query ? Object.keys(req.query).join(', ') : 'none'}`);
+    Logger.debug('Wix API Request received', {
+      method: req.method,
+      action: action || 'MISSING',
+      instanceId: instanceId || 'N/A',
+      bodyKeys: req.body ? Object.keys(req.body).join(', ') : 'none',
+      queryKeys: req.query ? Object.keys(req.query).join(', ') : 'none'
+    });
     
     if (!action) {
-      console.error('❌ Missing action parameter');
+      Logger.error('Missing action parameter');
       return sendJson(res, 400, { error: 'Missing action parameter' });
     }
     
     if (!instanceId && !['listClients', 'getClients', 'getChangeSummary'].includes(action)) {
-      console.error(`❌ Missing instanceId for action: ${action}`);
+      Logger.error(`Missing instanceId for action: ${action}`);
       return sendJson(res, 400, { error: `Missing instanceId parameter for action: ${action}` });
     }
     
@@ -57,7 +59,7 @@ module.exports = async (req, res) => {
       
       // If not in memory, try loading from database
       if (!clientData) {
-        console.log(`🔍 Client data not in memory, checking database for instance: ${instanceId}`);
+        Logger.debug(`Client data not in memory, checking database for instance: ${instanceId}`);
         try {
           const tokenManager = require('./wix-token-manager');
           const dbToken = await tokenManager.getToken(instanceId);
@@ -76,10 +78,10 @@ module.exports = async (req, res) => {
             
             // Cache in memory
             clientTokensDB.set(instanceId, clientData);
-            console.log(`✅ Loaded client data from database`);
+            Logger.success('Loaded client data from database');
           }
         } catch (error) {
-          console.error(`❌ Error loading client data from database:`, error.message);
+          Logger.error('Error loading client data from database:', error.message);
         }
       }
       
@@ -132,19 +134,19 @@ module.exports = async (req, res) => {
     } else if (action === 'trackPageView') {
       // Track page view from embedded script
       result = { success: true, message: 'Page view tracked' };
-      console.log('📊 Page view tracked:', req.body.pageData);
+      Logger.debug('Page view tracked:', req.body.pageData);
     } else if (action === 'trackSEOMetrics') {
       // Track SEO metrics from embedded script
       result = { success: true, message: 'SEO metrics tracked' };
-      console.log('📈 SEO metrics tracked:', req.body.metrics);
+      Logger.debug('SEO metrics tracked:', req.body.metrics);
     } else if (action === 'trackWebVital') {
       // Track Web Vitals from embedded script
       result = { success: true, message: 'Web Vital tracked' };
-      console.log('⚡ Web Vital tracked:', req.body.metric, req.body.value);
+      Logger.debug('Web Vital tracked:', req.body.metric, req.body.value);
     } else if (action === 'trackEvent') {
       // Track custom events from embedded script
       result = { success: true, message: 'Event tracked' };
-      console.log('🎯 Event tracked:', req.body.eventName, req.body.eventData);
+      Logger.debug('Event tracked:', req.body.eventName, req.body.eventData);
     }
     
     // E-commerce Actions
@@ -278,25 +280,24 @@ module.exports = async (req, res) => {
     }
     
     else {
-      console.error(`❌ Unknown action: ${action}`);
+      Logger.error(`Unknown action: ${action}`);
       return sendJson(res, 400, { error: `Unknown action: ${action}` });
     }
     
     if (result === undefined) {
-      console.warn(`⚠️  Action ${action} completed but returned undefined`);
+      Logger.warn(`Action ${action} completed but returned undefined`);
       result = { message: 'Action completed but no data returned' };
     }
     
-    console.log(`✅ Action ${action} completed successfully`);
+    Logger.success(`Action ${action} completed successfully`);
     sendJson(res, 200, { success: true, data: result });
     
   } catch (error) {
-    console.error('❌ Wix API Route Error:', error);
-    console.error('   Error message:', error.message);
-    console.error('   Error stack:', error.stack);
+    Logger.error('Wix API Route Error:', error.message);
+    Logger.error('Error stack:', error.stack);
     if (error.response) {
-      console.error('   Response status:', error.response.status);
-      console.error('   Response data:', error.response.data);
+      Logger.error('Response status:', error.response.status);
+      Logger.error('Response data:', error.response.data);
     }
     sendJson(res, 500, {
       success: false,
