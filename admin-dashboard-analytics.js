@@ -1,9 +1,22 @@
+// Browser globals extracted for lint clarity
+const {
+  document: browserDocument,
+  fetch: browserFetch,
+  console: browserConsole,
+  setTimeout: browserSetTimeout,
+  setInterval: browserSetInterval,
+  alert: browserAlert,
+  URL: BrowserURL,
+  location: browserLocation
+} = globalThis;
+
 // TNR Business Solutions - Admin Dashboard Analytics
 // Real-time analytics integration for admin dashboard
 
 class DashboardAnalytics {
+  static REFRESH_INTERVAL_MS = 30000;
+
   constructor() {
-    this.updateInterval = 30000; // 30 seconds
     this.init();
   }
 
@@ -16,43 +29,43 @@ class DashboardAnalytics {
 
   async loadStats() {
     try {
-      const response = await fetch('/api/dashboard/stats');
+      const response = await browserFetch('/api/dashboard/stats');
       const stats = await response.json();
       
       this.updateStatsDisplay(stats);
     } catch (error) {
-      console.error('Failed to load stats:', error);
+      browserConsole.error('Failed to load stats:', error);
       this.showError('Unable to load dashboard statistics');
     }
   }
 
   updateStatsDisplay(stats) {
     // Update visitor count
-    const visitorsEl = document.getElementById('visitors-today');
+    const visitorsEl = browserDocument.getElementById('visitors-today');
     if (visitorsEl) {
       visitorsEl.textContent = stats.visitorsToday || 0;
       this.animateNumber(visitorsEl);
     }
 
     // Update form submissions
-    const formsEl = document.getElementById('form-submissions');
+    const formsEl = browserDocument.getElementById('form-submissions');
     if (formsEl) {
       formsEl.textContent = `${stats.leadsToday || 0} new leads`;
     }
 
     // Update quote requests
-    const quotesEl = document.getElementById('quote-requests');
+    const quotesEl = browserDocument.getElementById('quote-requests');
     if (quotesEl) {
       quotesEl.textContent = `${stats.quotesRequested || 0} quotes`;
     }
 
     // Update GMB stats
-    const gmbViewsEl = document.getElementById('gmb-views');
+    const gmbViewsEl = browserDocument.getElementById('gmb-views');
     if (gmbViewsEl) {
       gmbViewsEl.textContent = `Views: ${stats.gmbViews || 0}`;
     }
 
-    const gmbActionsEl = document.getElementById('gmb-actions');
+    const gmbActionsEl = browserDocument.getElementById('gmb-actions');
     if (gmbActionsEl) {
       gmbActionsEl.textContent = `Actions: ${stats.gmbActions || 0}`;
     }
@@ -62,7 +75,7 @@ class DashboardAnalytics {
       ? ((stats.quotesRequested / stats.leadsToday) * 100).toFixed(1)
       : 0;
     
-    const conversionEl = document.getElementById('conversion-rate');
+    const conversionEl = browserDocument.getElementById('conversion-rate');
     if (conversionEl) {
       conversionEl.textContent = `${conversionRate}%`;
     }
@@ -70,23 +83,23 @@ class DashboardAnalytics {
 
   async loadRecentLeads() {
     try {
-      const response = await fetch('/api/leads/recent');
+      const response = await browserFetch('/api/leads/recent');
       const leads = await response.json();
       
       this.displayLeads(leads);
     } catch (error) {
-      console.error('Failed to load leads:', error);
+      browserConsole.error('Failed to load leads:', error);
     }
   }
 
   displayLeads(leads) {
-    const tbody = document.getElementById('leads-body');
+    const tbody = browserDocument.getElementById('leads-body');
     if (!tbody) return;
 
     tbody.innerHTML = '';
 
     leads.forEach(lead => {
-      const row = document.createElement('tr');
+      const row = browserDocument.createElement('tr');
       row.innerHTML = `
         <td>${this.formatTime(lead.timestamp)}</td>
         <td>${this.escapeHtml(lead.name)}</td>
@@ -128,31 +141,31 @@ class DashboardAnalytics {
 
   animateNumber(element) {
     element.classList.add('pulse-animation');
-    setTimeout(() => element.classList.remove('pulse-animation'), 600);
+    browserSetTimeout(() => element.classList.remove('pulse-animation'), 600);
   }
 
   escapeHtml(text) {
-    const div = document.createElement('div');
+    const div = browserDocument.createElement('div');
     div.textContent = text;
     return div.innerHTML;
   }
 
   startAutoRefresh() {
-    setInterval(() => {
+    browserSetInterval(() => {
       this.loadStats();
       this.loadRecentLeads();
-    }, this.updateInterval);
+    }, DashboardAnalytics.REFRESH_INTERVAL_MS);
   }
 
   setupEventHandlers() {
     // Export leads button
-    const exportBtn = document.getElementById('export-leads-btn');
+    const exportBtn = browserDocument.getElementById('export-leads-btn');
     if (exportBtn) {
       exportBtn.addEventListener('click', () => this.exportLeads());
     }
 
     // Refresh button
-    const refreshBtn = document.getElementById('refresh-stats-btn');
+    const refreshBtn = browserDocument.getElementById('refresh-stats-btn');
     if (refreshBtn) {
       refreshBtn.addEventListener('click', () => {
         this.loadStats();
@@ -163,52 +176,56 @@ class DashboardAnalytics {
 
   async exportLeads() {
     try {
-      const response = await fetch('/api/leads/export', {
+      const response = await browserFetch('/api/leads/export', {
         method: 'POST'
       });
       const blob = await response.blob();
       
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const url = BrowserURL.createObjectURL(blob);
+      const a = browserDocument.createElement('a');
       a.href = url;
       a.download = `leads-${new Date().toISOString().split('T')[0]}.csv`;
-      document.body.appendChild(a);
+      browserDocument.body.appendChild(a);
       a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
+      a.remove();
+      BrowserURL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Failed to export leads:', error);
-      alert('Failed to export leads. Please try again.');
+      browserConsole.error('Failed to export leads:', error);
+      browserAlert('Failed to export leads. Please try again.');
     }
   }
 
   showError(message) {
-    const errorDiv = document.createElement('div');
+    const errorDiv = browserDocument.createElement('div');
     errorDiv.className = 'alert alert-error';
     errorDiv.textContent = message;
     
-    const container = document.querySelector('.dashboard-grid');
+    const container = browserDocument.querySelector('.dashboard-grid');
     if (container) {
       container.insertBefore(errorDiv, container.firstChild);
-      setTimeout(() => errorDiv.remove(), 5000);
+      browserSetTimeout(() => errorDiv.remove(), 5000);
     }
   }
 }
 
 // Initialize dashboard when DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    new DashboardAnalytics();
-  });
+const mountDashboardAnalytics = () => {
+  if (!globalThis.dashboardAnalytics) {
+    globalThis.dashboardAnalytics = new DashboardAnalytics();
+  }
+};
+
+if (browserDocument.readyState === 'loading') {
+  browserDocument.addEventListener('DOMContentLoaded', mountDashboardAnalytics);
 } else {
-  new DashboardAnalytics();
+  mountDashboardAnalytics();
 }
 
 // Global functions for lead actions
-window.viewLead = function(leadId) {
-  window.location.href = `/admin-lead-detail.html?id=${leadId}`;
+globalThis.viewLead = function(leadId) {
+  browserLocation.href = `/admin-lead-detail.html?id=${leadId}`;
 };
 
-window.contactLead = function(leadId) {
-  window.location.href = `/admin-lead-detail.html?id=${leadId}&action=contact`;
+globalThis.contactLead = function(leadId) {
+  browserLocation.href = `/admin-lead-detail.html?id=${leadId}&action=contact`;
 };
