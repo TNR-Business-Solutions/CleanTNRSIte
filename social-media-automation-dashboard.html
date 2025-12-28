@@ -1385,7 +1385,221 @@
             }
           });
         }
+
+        // Ensure job-specific fields are shown/hidden correctly on load
+        toggleJobPostingFields();
       });
+
+      // Toggle job posting specific inputs
+      function toggleJobPostingFields() {
+        const contentTypeEl = document.getElementById("contentType");
+        const isJobPost = contentTypeEl?.value === "job-posting";
+        const jobFields = document.getElementById("jobPostingFields");
+        const jobEmailFields = document.getElementById(
+          "jobPostingEmailFields"
+        );
+
+        [jobFields, jobEmailFields].forEach((el) => {
+          if (el) {
+            el.classList.toggle("d-none", !isJobPost);
+          }
+        });
+      }
+
+      // Quick content library helper to drop a ready-made template into any textarea
+      function openContentLibrary(targetId) {
+        const target = document.getElementById(targetId);
+
+        if (!target) {
+          console.warn("Content library target not found", targetId);
+          alert("Unable to open the content library for this section.");
+          return;
+        }
+
+        const library = contentTemplateLibrary || {};
+        const templateKeys = Object.keys(library);
+
+        if (!templateKeys.length) {
+          alert("Content library is unavailable right now.");
+          return;
+        }
+
+        const chosenType = (
+          prompt(
+            "Choose a content type to insert from the library:\n" +
+              templateKeys.join(", ")
+          ) || "test-post"
+        ).trim();
+
+        const libraryEntry = library[chosenType];
+        let template = "";
+
+        if (Array.isArray(libraryEntry)) {
+          template =
+            libraryEntry[Math.floor(Math.random() * libraryEntry.length)] || "";
+        } else if (libraryEntry && typeof libraryEntry === "object") {
+          const industryKeys = Object.keys(libraryEntry);
+          const chosenIndustry = (
+            prompt(
+              `Choose an industry for "${chosenType}":\n` +
+                industryKeys.join(", ")
+            ) || industryKeys[0]
+          ).trim();
+          const industryTemplates =
+            libraryEntry[chosenIndustry] || libraryEntry[industryKeys[0]];
+
+          if (Array.isArray(industryTemplates)) {
+            template =
+              industryTemplates[
+                Math.floor(Math.random() * industryTemplates.length)
+              ] || "";
+          }
+        }
+
+        if (!template) {
+          alert("No templates available for that selection.");
+          return;
+        }
+
+        const businessName =
+          document.getElementById("clientBusinessName")?.value ||
+          document.getElementById("clientBusinessNameLinkedIn")?.value ||
+          document.getElementById("clientBusinessNameTwitter")?.value ||
+          document.getElementById("clientBusinessNameNextdoor")?.value ||
+          "TNR Business Solutions";
+        const industryType =
+          document.getElementById("professionType")?.value ||
+          document.getElementById("professionTypeLinkedIn")?.value ||
+          document.getElementById("professionTypeTwitter")?.value ||
+          document.getElementById("professionTypeNextdoor")?.value ||
+          "digital-marketing";
+        const location = "Greensburg PA";
+        const phone = "(412) 499-2987";
+        const jobTitle =
+          document.getElementById("jobTitle")?.value || "Team Member";
+        const email =
+          document.getElementById("jobEmail")?.value ||
+          `careers@${businessName.toLowerCase().replace(/\s+/g, "")}.com`;
+
+        const filledTemplate = template
+          .replaceAll(/{business}/g, businessName)
+          .replaceAll(/{location}/g, location)
+          .replaceAll(/{phone}/g, phone)
+          .replaceAll(/{industry}/g, getIndustryName(industryType))
+          .replaceAll(/#{location}/g, "#" + location.replace(/\s+/g, ""))
+          .replaceAll(/{jobTitle}/g, jobTitle)
+          .replaceAll(/{email}/g, email);
+
+        target.value = filledTemplate;
+
+        const previewContainer = target.closest(".post-preview");
+        if (previewContainer) {
+          previewContainer.classList.remove("hidden");
+        }
+
+        // Trigger any character counters tied to the textarea
+        target.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+
+      // Basic logout to match admin dashboard behavior
+      function logout() {
+        sessionStorage.removeItem("adminAuthenticated");
+        sessionStorage.removeItem("adminLoginTime");
+        window.location.href = "/admin-login.html";
+      }
+
+      // Lightweight in-page smoke tests to validate key UI hooks without external APIs
+      function runDashboardSmokeTests() {
+        const results = [];
+
+        const record = (name, pass, detail = "") => {
+          results.push({ name, pass: Boolean(pass), detail });
+        };
+
+        // Core form controls
+        record(
+          "Content type selector present",
+          document.getElementById("contentType")
+        );
+        record(
+          "Job posting fields toggle",
+          (() => {
+            const select = document.getElementById("contentType");
+            const jobFields = document.getElementById("jobPostingFields");
+            if (!select || !jobFields) return false;
+            select.value = "job-posting";
+            toggleJobPostingFields();
+            const visible = !jobFields.classList.contains("d-none");
+            select.value = "service-promotion";
+            toggleJobPostingFields();
+            return visible;
+          })()
+        );
+
+        // Platform tabs
+        record(
+          "Platform tabs render",
+          document.querySelectorAll(".platform-tab").length >= 4
+        );
+
+        // Generators exposed
+        record("Facebook generator", typeof generateContent === "function");
+        record(
+          "LinkedIn generator",
+          typeof generateLinkedInContent === "function"
+        );
+        record(
+          "Twitter generator",
+          typeof generateTwitterContent === "function"
+        );
+        record(
+          "Nextdoor generator",
+          typeof generateNextdoorContent === "function"
+        );
+
+        // Posting endpoints wired
+        record("Facebook poster", typeof postToFacebook === "function");
+        record("Instagram poster", typeof postToInstagram === "function");
+        record("LinkedIn poster", typeof postGeneratedToLinkedIn === "function");
+        record("Twitter poster", typeof postGeneratedToTwitter === "function");
+        record("Nextdoor poster", typeof postGeneratedToNextdoor === "function");
+
+        // Content library helper
+        record("Content library helper", typeof openContentLibrary === "function");
+
+        // Character counters
+        record(
+          "Facebook char counter",
+          typeof updateFacebookCharCount === "function"
+        );
+        record(
+          "Twitter char counter",
+          typeof updateTwitterCharCount === "function"
+        );
+        record(
+          "LinkedIn char counter",
+          typeof updateLinkedInCharCount === "function"
+        );
+
+        const summary = {
+          passed: results.every((r) => r.pass),
+          total: results.length,
+          failures: results.filter((r) => !r.pass),
+          results,
+        };
+
+        if (console && console.table) {
+          console.table(results.map((r) => ({
+            Check: r.name,
+            Pass: r.pass ? "✅" : "❌",
+            Detail: r.detail || "",
+          })));
+        } else {
+          console.log(results);
+        }
+
+        return summary;
+      }
 
       // Meta OAuth Functions
       function connectMeta() {
@@ -2208,9 +2422,10 @@
           card.classList.remove("loading");
 
           const pageNameEl = document.getElementById("insightsPageName");
-          if (pageNameEl)
+          if (pageNameEl) {
             const pageName = data.page?.name || "Facebook Page";
             pageNameEl.textContent = pageName;
+          }
 
           const dateRangeEl = document.getElementById("insightsDateRange");
           if (dateRangeEl)
@@ -2232,7 +2447,7 @@
                 : "Fans: --";
 
           const followersEl = document.getElementById("insightsFollowerCount");
-          if (followersEl)
+          if (followersEl) {
             let followersText;
             if (data.page?.followersCount !== undefined) {
               followersText = `${formatFullNumber(data.page.followersCount)} Followers`;
@@ -2240,6 +2455,7 @@
               followersText = "Followers: --";
             }
             followersEl.textContent = followersText;
+          }
 
           const igEl = document.getElementById("insightsInstagramStatus");
           if (igEl)
