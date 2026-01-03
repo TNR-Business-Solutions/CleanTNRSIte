@@ -1492,6 +1492,12 @@
     s1.src='https://embed.tawk.to/6766f4b72548df5f6ed6b456/1ifmphtc9';
     s1.charset='UTF-8';
     s1.setAttribute('crossorigin','*');
+    s1.onerror = function() {
+      // Silently handle Tawk.to load errors to prevent console noise
+      if (console && console.debug) {
+        console.debug('Tawk.to chat widget not available');
+      }
+    };
     s0.parentNode.insertBefore(s1,s0);
     })();
     </script>
