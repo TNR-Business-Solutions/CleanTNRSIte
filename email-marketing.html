@@ -434,6 +434,14 @@
             const mainNav = document.querySelector('.main-nav');
             const dropdowns = document.querySelectorAll('.dropdown');
 
+            // Ensure menu is closed on page load (mobile only)
+            if (window.innerWidth <= 768 && mainNav) {
+              mainNav.classList.remove('active');
+              if (hamburger) {
+                hamburger.classList.remove('active');
+              }
+            }
+
             // Toggle mobile menu
             if (hamburger && mainNav) {
                 hamburger.addEventListener('click', function() {
@@ -472,6 +480,14 @@
                     mainNav.classList.remove('active');
                     hamburger.classList.remove('active');
                     dropdowns.forEach(dropdown => dropdown.classList.remove('active'));
+                } else {
+                    // Ensure menu is closed when resizing to mobile
+                    if (mainNav) {
+                      mainNav.classList.remove('active');
+                    }
+                    if (hamburger) {
+                      hamburger.classList.remove('active');
+                    }
                 }
             });
 
