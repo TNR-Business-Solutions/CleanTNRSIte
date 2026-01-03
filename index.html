@@ -85,6 +85,7 @@
 
     <!-- CSS -->
     <link rel="stylesheet" href="assets/styles.css?v=20250108-2" />
+    <link rel="stylesheet" href="assets/chatbot.css" />
 
     <!-- Canonical and Language -->
     <link rel="canonical" href="https://www.tnrbusinesssolutions.com" />
@@ -1482,7 +1483,47 @@
       });
     </script>
     
-    <!-- Custom Chatbot Widget -->
+    <!-- Chatbot -->
+    <div class="chatbot-container">
+      <button class="chatbot-button" aria-label="Open chat" id="chatbot-toggle">
+        💬
+      </button>
+      <div class="chatbot-window" id="chatbot-window">
+        <div class="chatbot-header">
+          <h3>Chat with Us</h3>
+          <button
+            class="chatbot-close"
+            id="chatbot-close"
+            aria-label="Close chat"
+          >
+            ×
+          </button>
+        </div>
+        <div class="chatbot-messages" id="chatbot-messages">
+          <div class="chatbot-message bot-message">
+            <p>Hello! How can we help you today?</p>
+          </div>
+        </div>
+        <div class="chatbot-input-area">
+          <input
+            type="text"
+            class="chatbot-input"
+            id="chatbot-input"
+            placeholder="Type your message..."
+            aria-label="Chat input"
+          />
+          <button
+            class="chatbot-send"
+            id="chatbot-send"
+            aria-label="Send message"
+          >
+            Send
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chatbot Script -->
     <script src="assets/chatbot.js"></script>
 
     <script>
