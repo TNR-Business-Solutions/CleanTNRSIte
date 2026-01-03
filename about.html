@@ -838,18 +838,33 @@
     </footer>
 
     <script>
-      // Hamburger menu functionality
+      // Hamburger menu functionality - ensure menu is closed immediately
+      (function() {
+        // Close menu immediately, before DOM is ready
+        if (window.innerWidth <= 768) {
+          const style = document.createElement('style');
+          style.textContent = '.main-nav { display: none !important; } .main-nav.active { display: flex !important; }';
+          document.head.appendChild(style);
+        }
+      })();
+
       document.addEventListener("DOMContentLoaded", function () {
         const hamburger = document.querySelector(".hamburger");
         const mainNav = document.querySelector(".main-nav");
         const dropdowns = document.querySelectorAll(".dropdown");
 
-        // Ensure menu is closed on page load (mobile only)
-        if (window.innerWidth <= 768 && mainNav) {
-          mainNav.classList.remove("active");
+        // Force menu closed on page load (mobile only)
+        if (window.innerWidth <= 768) {
+          if (mainNav) {
+            mainNav.classList.remove("active");
+            mainNav.style.display = "none";
+          }
           if (hamburger) {
             hamburger.classList.remove("active");
           }
+          dropdowns.forEach((dropdown) => {
+            dropdown.classList.remove("active");
+          });
         }
 
         // Toggle mobile menu

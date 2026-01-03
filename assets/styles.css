@@ -88,7 +88,7 @@
   }
   
   .main-nav {
-    display: none;
+    display: none !important;
     flex-direction: column;
     width: 100%;
     background: var(--tnr-navy);
@@ -103,7 +103,7 @@
   }
   
   .main-nav.active {
-    display: flex;
+    display: flex !important;
   }
   
   .main-nav li {
