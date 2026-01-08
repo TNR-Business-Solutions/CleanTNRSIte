@@ -98,6 +98,22 @@ module.exports = async (req, res) => {
     return await handler(req, res);
   }
 
+  // Leads Recent routes - redirect to CRM API
+  if (route === "leads/recent" || route === "leads/recent/") {
+    // Redirect to CRM API with limit parameter
+    const handler = require("../server/handlers/crm-api");
+    // Modify the route to match CRM API expectations
+    req.query = req.query || {};
+    req.query.limit = req.query.limit || "10";
+    req.query.sort = "createdAt";
+    req.query.order = "desc";
+    // Set route to crm/leads for the CRM handler
+    const originalRoute = route;
+    route = "crm/leads";
+    req.url = "/api/crm/leads?limit=10&sort=createdAt&order=desc";
+    return await handler(req, res);
+  }
+
   // Always log for debugging (will help identify routing issues)
   // Only log if route is not found (to reduce noise)
   if (!route || route === "") {

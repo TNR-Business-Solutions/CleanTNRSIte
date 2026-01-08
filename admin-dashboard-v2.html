@@ -2498,7 +2498,9 @@
       });
 
       async function quickPost(event) {
-        event.preventDefault();
+        if (event) {
+          event.preventDefault();
+        }
 
         const submitBtn = document.getElementById("quickPostSubmitBtn");
         if (!submitBtn) return;

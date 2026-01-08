@@ -29,14 +29,41 @@ class DashboardAnalytics {
 
   async loadStats() {
     try {
-      const response = await browserFetch('/api/dashboard/stats');
+      const headers = this.getAuthHeaders();
+      const response = await browserFetch('/api/dashboard/stats', {
+        headers: headers
+      });
+      
+      if (!response.ok) {
+        if (response.status === 401) {
+          browserConsole.warn('Authentication required for dashboard stats');
+          return;
+        }
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
       const stats = await response.json();
       
-      this.updateStatsDisplay(stats);
+      if (stats.success && stats.data) {
+        this.updateStatsDisplay(stats.data);
+      } else {
+        this.updateStatsDisplay(stats);
+      }
     } catch (error) {
       browserConsole.error('Failed to load stats:', error);
       this.showError('Unable to load dashboard statistics');
     }
+  }
+
+  getAuthHeaders() {
+    const token = localStorage.getItem("adminSession");
+    const headers = {
+      "Content-Type": "application/json"
+    };
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+    return headers;
   }
 
   updateStatsDisplay(stats) {
@@ -83,12 +110,52 @@ class DashboardAnalytics {
 
   async loadRecentLeads() {
     try {
-      const response = await browserFetch('/api/leads/recent');
+      const headers = this.getAuthHeaders();
+      const response = await browserFetch('/api/leads/recent', {
+        headers: headers
+      });
+      
+      if (!response.ok) {
+        if (response.status === 404) {
+          // Endpoint doesn't exist yet, try CRM API instead
+          return this.loadRecentLeadsFromCRM();
+        }
+        if (response.status === 401) {
+          browserConsole.warn('Authentication required for recent leads');
+          return;
+        }
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
       const leads = await response.json();
       
-      this.displayLeads(leads);
+      if (leads.success && leads.data) {
+        this.displayLeads(leads.data);
+      } else {
+        this.displayLeads(leads);
+      }
     } catch (error) {
       browserConsole.error('Failed to load leads:', error);
+      // Try fallback to CRM API
+      this.loadRecentLeadsFromCRM();
+    }
+  }
+
+  async loadRecentLeadsFromCRM() {
+    try {
+      const headers = this.getAuthHeaders();
+      const response = await browserFetch('/api/crm/leads?limit=10&sort=createdAt&order=desc', {
+        headers: headers
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.data) {
+          this.displayLeads(result.data);
+        }
+      }
+    } catch (error) {
+      browserConsole.error('Failed to load leads from CRM:', error);
     }
   }
 

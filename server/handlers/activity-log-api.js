@@ -5,6 +5,7 @@
 
 const TNRDatabase = require("../../database");
 const { setCorsHeaders, handleCorsPreflight } = require("./cors-utils");
+const { sendJson, sendError } = require("./http-utils");
 const {
   sendErrorResponse,
   handleUnexpectedError,
@@ -109,20 +110,20 @@ module.exports = async (req, res) => {
   // JWT Authentication
   const token = extractToken(req);
   if (!token) {
-    return res.writeHead(401) || res.end(JSON.stringify({
+    return sendJson(res, 401, {
       success: false,
       error: "Authentication required",
       message: "No token provided"
-    }));
+    });
   }
 
   const decoded = verifyToken(token);
   if (!decoded) {
-    return res.writeHead(401) || res.end(JSON.stringify({
+    return sendJson(res, 401, {
       success: false,
       error: "Invalid token",
       message: "Token verification failed"
-    }));
+    });
   }
   req.user = decoded;
 
@@ -167,7 +168,7 @@ module.exports = async (req, res) => {
         createdAt: item.created_at,
       }));
 
-      return res.status(200).json({
+      return sendJson(res, 200, {
         success: true,
         data: activities,
         count: activities.length,
@@ -202,7 +203,7 @@ module.exports = async (req, res) => {
             activityData.metadata || null
           );
 
-          return res.status(200).json({
+          return sendJson(res, 200, {
             success: true,
             message: "Activity logged successfully",
           });
