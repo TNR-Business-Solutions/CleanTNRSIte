@@ -436,7 +436,7 @@ module.exports = async (req, res) => {
 
         // If body not parsed, read from stream
         if (!formData || Object.keys(formData).length === 0) {
-          return new Promise((streamResolve) => {
+          await new Promise((streamResolve) => {
             let body = "";
             req.on("data", (chunk) => {
               body += chunk.toString();

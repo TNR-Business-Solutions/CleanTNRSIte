@@ -195,7 +195,7 @@ module.exports = async function crmApiHandler(req, res) {
             return 0;
           });
         }
-        setCorsHeaders(res);
+        setCorsHeaders(res, origin);
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ success: true, data: clients }));
         Logger.debug("Clients returned:", clients.length);
@@ -712,7 +712,16 @@ module.exports = async function crmApiHandler(req, res) {
     }
   } catch (error) {
     console.error("❌ API Error:", error);
-    res.writeHead(500, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ success: false, error: error.message }));
+    console.error("❌ API Error stack:", error.stack);
+    if (!res.headersSent) {
+      const origin = req.headers.origin || req.headers.referer;
+      setCorsHeaders(res, origin);
+      res.writeHead(500, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ 
+        success: false, 
+        error: "Internal server error",
+        message: error.message 
+      }));
+    }
   }
 };
