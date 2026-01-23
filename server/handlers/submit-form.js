@@ -2,6 +2,7 @@
 const nodemailer = require("nodemailer");
 const { setCorsHeaders, handleCorsPreflight } = require("./cors-utils");
 const { rateLimiter } = require("./rate-limiter");
+const { sendJson } = require("./http-utils");
 
 // Apply rate limiting to form submissions
 const formRateLimiter = rateLimiter('forms');
@@ -383,7 +384,7 @@ async function processFormSubmission(formData, res) {
     console.log("📧 Business email sent successfully:", info.messageId);
 
     // Return success response
-    return res.status(200).json({
+    return sendJson(res, 200, {
       success: true,
       message: "Form submitted successfully",
       emailSent: true,
@@ -393,7 +394,7 @@ async function processFormSubmission(formData, res) {
     });
   } catch (error) {
     console.error("❌ Error processing form:", error);
-    return res.status(500).json({
+    return sendJson(res, 500, {
       success: false,
       message: "Failed to process form submission",
       error: error.message,
@@ -412,68 +413,76 @@ module.exports = async (req, res) => {
   // Apply rate limiting
   return new Promise((resolve) => {
     formRateLimiter(req, res, async () => {
-
-  // Only accept POST requests
-  if (req.method !== "POST") {
-    return res
-      .status(405)
-      .json({ success: false, message: "Method not allowed" });
-  }
-
-  try {
-    // Handle request body - Vercel may pre-parse or we need to read stream
-    let formData = {};
-
-    if (req.body && typeof req.body === "object" && !Array.isArray(req.body)) {
-      formData = req.body;
-    } else if (typeof req.body === "string") {
       try {
-        formData = JSON.parse(req.body);
-      } catch (e) {
-        // Will read from stream below
-      }
-    }
+        // Only accept POST requests
+        if (req.method !== "POST") {
+          sendJson(res, 405, { success: false, message: "Method not allowed" });
+          resolve();
+          return;
+        }
 
-    // If body not parsed, read from stream
-    if (!formData || Object.keys(formData).length === 0) {
-      return new Promise((resolve) => {
-        let body = "";
-        req.on("data", (chunk) => {
-          body += chunk.toString();
-        });
-        req.on("end", async () => {
+        // Handle request body - Vercel may pre-parse or we need to read stream
+        let formData = {};
+
+        if (req.body && typeof req.body === "object" && !Array.isArray(req.body)) {
+          formData = req.body;
+        } else if (typeof req.body === "string") {
           try {
-            formData = body.trim() ? JSON.parse(body) : {};
-            await processFormSubmission(formData, res);
-            resolve();
-          } catch (parseError) {
-            console.error("❌ Error parsing form data:", parseError);
-            return res.status(400).json({
-              success: false,
-              message: "Invalid form data",
-              error: parseError.message,
-            });
+            formData = JSON.parse(req.body);
+          } catch (e) {
+            // Will read from stream below
           }
-        });
-        req.on("error", (error) => {
-          console.error("❌ Request stream error:", error);
-          return res.status(500).json({
-            success: false,
-            message: "Request error",
-            error: error.message,
-          });
-        });
-      });
-    }
+        }
 
-    // Process the form submission
-    await processFormSubmission(formData, res);
-  } catch (error) {
-    console.error("❌ Error in submit-form handler:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Failed to process form submission",
-      error: error.message,
+        // If body not parsed, read from stream
+        if (!formData || Object.keys(formData).length === 0) {
+          return new Promise((streamResolve) => {
+            let body = "";
+            req.on("data", (chunk) => {
+              body += chunk.toString();
+            });
+            req.on("end", async () => {
+              try {
+                formData = body.trim() ? JSON.parse(body) : {};
+                await processFormSubmission(formData, res);
+                resolve();
+                streamResolve();
+              } catch (parseError) {
+                console.error("❌ Error parsing form data:", parseError);
+                sendJson(res, 400, {
+                  success: false,
+                  message: "Invalid form data",
+                  error: parseError.message,
+                });
+                resolve();
+                streamResolve();
+              }
+            });
+            req.on("error", (error) => {
+              console.error("❌ Request stream error:", error);
+              sendJson(res, 500, {
+                success: false,
+                message: "Request error",
+                error: error.message,
+              });
+              resolve();
+              streamResolve();
+            });
+          });
+        } else {
+          // Process the form submission
+          await processFormSubmission(formData, res);
+          resolve();
+        }
+      } catch (error) {
+        console.error("❌ Error in submit-form handler:", error);
+        sendJson(res, 500, {
+          success: false,
+          message: "Failed to process form submission",
+          error: error.message,
+        });
+        resolve();
+      }
     });
-  }
+  });
 };

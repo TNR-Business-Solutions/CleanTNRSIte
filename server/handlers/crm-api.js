@@ -258,17 +258,44 @@ module.exports = async function crmApiHandler(req, res) {
       }
     } else if (req.method === "POST") {
       Logger.debug("POST request received", { fullPath, path });
-      let body = "";
+      
+      // Handle body parsing - Vercel may pre-parse, or we need to read from stream
+      const parseBody = async () => {
+        // Check if body is already parsed (Vercel/serverless)
+        if (req.body && typeof req.body === "object" && !Array.isArray(req.body)) {
+          Logger.debug("Using pre-parsed body from req.body");
+          return req.body;
+        } else if (typeof req.body === "string") {
+          try {
+            Logger.debug("Parsing req.body string");
+            return JSON.parse(req.body);
+          } catch (e) {
+            // Will read from stream below
+          }
+        }
+        
+        // Read from stream if not pre-parsed
+        return new Promise((resolve, reject) => {
+          let body = "";
+          req.on("data", (chunk) => {
+            body += chunk.toString();
+          });
+          req.on("end", () => {
+            try {
+              Logger.debug("POST body received from stream", { length: body.length });
+              const data = body.trim() ? JSON.parse(body) : {};
+              resolve(data);
+            } catch (parseError) {
+              reject(parseError);
+            }
+          });
+          req.on("error", reject);
+        });
+      };
 
-      req.on("data", (chunk) => {
-        body += chunk.toString();
-      });
-
-      req.on("end", async () => {
-        Logger.debug("POST body received", { length: body.length });
-        try {
-          const data = JSON.parse(body);
-          Logger.debug("POST data parsed successfully");
+      try {
+        const data = await parseBody();
+        Logger.debug("POST data parsed successfully");
 
           if (path === "clients") {
             const client = await db.addClient(data);
@@ -457,11 +484,20 @@ module.exports = async function crmApiHandler(req, res) {
         } catch (error) {
           console.error("❌ POST request error:", error.message);
           console.error("❌ POST request error stack:", error.stack);
-          console.error("❌ POST body was:", body.substring(0, 500));
           setCorsHeaders(res);
           res.writeHead(400, { "Content-Type": "application/json" });
           handleUnexpectedError(res, error, 'CRM API');
         }
+      } catch (error) {
+        console.error("❌ POST body parsing error:", error.message);
+        console.error("❌ POST body parsing error stack:", error.stack);
+        setCorsHeaders(res);
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ 
+          success: false, 
+          error: "Invalid request body",
+          message: error.message 
+        }));
       });
     } else if (req.method === "PUT") {
       let body = "";
