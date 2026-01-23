@@ -200,56 +200,128 @@ module.exports = async function crmApiHandler(req, res) {
         res.end(JSON.stringify({ success: true, data: clients }));
         Logger.debug("Clients returned:", clients.length);
       } else if (path.startsWith("clients/")) {
-        const id = path.replace("clients/", "");
-        const client = await db.getClient(id);
-        res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ success: true, data: client }));
-      } else if (path.startsWith("leads/")) {
-        const id = path.replace("leads/", "");
-        const lead = await db.getLead(id);
-        res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ success: true, data: lead }));
-      } else if (path === "leads") {
-        // Parse filter parameters from URL
-        const filter = {};
-        if (parsedUrl) {
-          const q = parsedUrl.searchParams.get("q");
-          const status = parsedUrl.searchParams.get("status");
-          const businessType = parsedUrl.searchParams.get("businessType");
-          const source = parsedUrl.searchParams.get("source");
-          const interest = parsedUrl.searchParams.get("interest");
-          const sort = parsedUrl.searchParams.get("sort") || "createdAt";
-          const order = parsedUrl.searchParams.get("order") || "desc";
-
-          if (q) filter.q = q;
-          if (status) filter.status = status;
-          if (businessType) filter.businessType = businessType;
-          if (source) filter.source = source;
-          if (interest) filter.interest = interest;
-          filter.sort = sort;
-          filter.order = order;
+        try {
+          const id = path.replace("clients/", "");
+          const client = await db.getClient(id);
+          setCorsHeaders(res, origin);
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ success: true, data: client }));
+        } catch (dbError) {
+          Logger.error("Error fetching client:", dbError.message);
+          setCorsHeaders(res, origin);
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ 
+            success: false, 
+            error: "Database error",
+            message: dbError.message || "Failed to fetch client"
+          }));
         }
+      } else if (path.startsWith("leads/")) {
+        try {
+          const id = path.replace("leads/", "");
+          const lead = await db.getLead(id);
+          setCorsHeaders(res, origin);
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ success: true, data: lead }));
+        } catch (dbError) {
+          Logger.error("Error fetching lead:", dbError.message);
+          setCorsHeaders(res, origin);
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ 
+            success: false, 
+            error: "Database error",
+            message: dbError.message || "Failed to fetch lead"
+          }));
+        }
+      } else if (path === "leads") {
+        try {
+          // Parse filter parameters from URL
+          const filter = {};
+          if (parsedUrl) {
+            const q = parsedUrl.searchParams.get("q");
+            const status = parsedUrl.searchParams.get("status");
+            const businessType = parsedUrl.searchParams.get("businessType");
+            const source = parsedUrl.searchParams.get("source");
+            const interest = parsedUrl.searchParams.get("interest");
+            const sort = parsedUrl.searchParams.get("sort") || "createdAt";
+            const order = parsedUrl.searchParams.get("order") || "desc";
 
-        // Get leads with filters (SQL-level filtering for better performance)
-        const leads = await db.getLeads(filter);
+            if (q) filter.q = q;
+            if (status) filter.status = status;
+            if (businessType) filter.businessType = businessType;
+            if (source) filter.source = source;
+            if (interest) filter.interest = interest;
+            filter.sort = sort;
+            filter.order = order;
+          }
 
-        res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ success: true, data: leads }));
+          // Get leads with filters (SQL-level filtering for better performance)
+          const leads = await db.getLeads(filter);
+
+          setCorsHeaders(res, origin);
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ success: true, data: leads }));
+        } catch (dbError) {
+          Logger.error("Error fetching leads:", dbError.message);
+          setCorsHeaders(res, origin);
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ 
+            success: false, 
+            error: "Database error",
+            message: dbError.message || "Failed to fetch leads"
+          }));
+        }
       } else if (path === "orders") {
-        const orders = await db.getOrders();
-        res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ success: true, data: orders }));
+        try {
+          const orders = await db.getOrders();
+          setCorsHeaders(res, origin);
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ success: true, data: orders }));
+        } catch (dbError) {
+          Logger.error("Error fetching orders:", dbError.message);
+          setCorsHeaders(res, origin);
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ 
+            success: false, 
+            error: "Database error",
+            message: dbError.message || "Failed to fetch orders"
+          }));
+        }
       } else if (path === "stats") {
-        const stats = await db.getStats();
-        res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ success: true, data: stats }));
+        try {
+          const stats = await db.getStats();
+          setCorsHeaders(res, origin);
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ success: true, data: stats }));
+        } catch (dbError) {
+          Logger.error("Error fetching stats:", dbError.message);
+          setCorsHeaders(res, origin);
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ 
+            success: false, 
+            error: "Database error",
+            message: dbError.message || "Failed to fetch stats"
+          }));
+        }
       } else if (path === "social-posts") {
-        const status = parsedUrl
-          ? parsedUrl.searchParams.get("status") || null
-          : null;
-        const posts = await db.getSocialPosts(status);
-        res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ success: true, data: posts }));
+        try {
+          const status = parsedUrl
+            ? parsedUrl.searchParams.get("status") || null
+            : null;
+          const posts = await db.getSocialPosts(status);
+          setCorsHeaders(res, origin);
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ success: true, data: posts }));
+        } catch (dbError) {
+          Logger.error("Error fetching social posts:", dbError.message);
+          setCorsHeaders(res, origin);
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ 
+            success: false, 
+            error: "Database error",
+            message: dbError.message || "Failed to fetch social posts"
+          }));
+        }
       } else {
         res.writeHead(404, { "Content-Type": "application/json" });
         res.end(

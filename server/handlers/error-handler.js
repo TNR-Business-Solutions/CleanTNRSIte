@@ -152,7 +152,8 @@ function sendErrorResponse(res, errorCode, message = null, details = {}) {
   console.error(`[Error ${errorCode}] ${errorResponse.error.message}`, logDetails);
   
   if (!res.headersSent) {
-    res.status(statusCode).json(errorResponse);
+    res.writeHead(statusCode, { "Content-Type": "application/json" });
+    res.end(JSON.stringify(errorResponse));
   }
 }
 
@@ -182,7 +183,8 @@ function handleUnexpectedError(res, error, context = 'Unknown') {
   );
   
   if (!res.headersSent) {
-    res.status(500).json(errorResponse);
+    res.writeHead(500, { "Content-Type": "application/json" });
+    res.end(JSON.stringify(errorResponse));
   }
 }
 
