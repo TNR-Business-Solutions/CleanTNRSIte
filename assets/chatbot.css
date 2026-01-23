@@ -156,11 +156,24 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
+.user-message p {
+    color: white; /* Ensure white text on dark blue background */
+}
+
 .chatbot-message p {
     margin: 0;
     line-height: 1.5;
     font-size: 0.95rem;
-    color: #ffffff; /* White text for readability on army green */
+}
+
+/* Bot messages have gold background, so use dark text */
+.bot-message p {
+    color: #1a365d;
+}
+
+/* User messages have dark blue background, so use white text */
+.user-message p {
+    color: white;
 }
 
 .chatbot-options {
