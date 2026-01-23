@@ -384,6 +384,7 @@ module.exports = async function crmApiHandler(req, res) {
         const data = await parseBody();
         Logger.debug("POST data parsed successfully");
 
+        try {
           if (path === "clients") {
             const client = await db.addClient(data);
 
@@ -571,7 +572,7 @@ module.exports = async function crmApiHandler(req, res) {
         } catch (error) {
           console.error("❌ POST request error:", error.message);
           console.error("❌ POST request error stack:", error.stack);
-          setCorsHeaders(res);
+          setCorsHeaders(res, origin);
           res.writeHead(400, { "Content-Type": "application/json" });
           handleUnexpectedError(res, error, 'CRM API');
         }
