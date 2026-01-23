@@ -578,14 +578,14 @@ module.exports = async function crmApiHandler(req, res) {
       } catch (error) {
         console.error("❌ POST body parsing error:", error.message);
         console.error("❌ POST body parsing error stack:", error.stack);
-        setCorsHeaders(res);
+        setCorsHeaders(res, origin);
         res.writeHead(400, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ 
           success: false, 
           error: "Invalid request body",
           message: error.message 
         }));
-      });
+      }
     } else if (req.method === "PUT") {
       let body = "";
 
