@@ -3,6 +3,17 @@ const nodemailer = require("nodemailer");
 const { setCorsHeaders, handleCorsPreflight } = require("./cors-utils");
 const { rateLimiter } = require("./rate-limiter");
 const { sendJson } = require("./http-utils");
+const TNRDatabase = require("../../database");
+
+// Initialize database instance
+let dbInstance = null;
+async function getDatabase() {
+  if (!dbInstance) {
+    dbInstance = new TNRDatabase();
+    await dbInstance.initialize();
+  }
+  return dbInstance;
+}
 
 // Apply rate limiting to form submissions
 const formRateLimiter = rateLimiter('forms');
@@ -20,8 +31,52 @@ const transporter = nodemailer.createTransport({
 
 // Process form submission and send email
 async function processFormSubmission(formData, res) {
+  let leadCreated = false;
+  let leadId = null;
+  
   try {
     console.log("📥 Serverless function received form data:", formData);
+    
+    // Create lead in database (before sending email)
+    try {
+      const db = await getDatabase();
+      const leadData = {
+        name: formData.name || formData.firstName || "Unknown",
+        firstName: formData.firstName || "",
+        lastName: formData.lastName || "",
+        email: formData.email || null,
+        phone: formData.phone || null,
+        company: formData.company || formData.businessName || null,
+        website: formData.website || null,
+        industry: formData.industry || null,
+        services: Array.isArray(formData.services) ? formData.services : (formData.services ? [formData.services] : []),
+        budget: formData.budget || null,
+        timeline: formData.timeline || null,
+        message: formData.message || formData.description || null,
+        additionalInfo: formData.additionalInfo || null,
+        contactMethod: formData.contactMethod || formData.preferredContact || null,
+        source: formData.source || "Website Form",
+        status: "New",
+        address: formData.address || formData.businessAddress || null,
+        city: formData.city || null,
+        state: formData.state || null,
+        zipCode: formData.zipCode || null,
+        businessType: formData.businessType || null,
+        businessName: formData.businessName || formData.company || null,
+        businessAddress: formData.businessAddress || formData.address || null,
+        interest: formData.interest || null,
+        notes: formData.notes || null,
+      };
+      
+      const lead = await db.addLead(leadData);
+      leadCreated = true;
+      leadId = lead.id;
+      console.log("✅ Lead created in database:", lead.id, "-", lead.name || lead.email);
+    } catch (dbError) {
+      console.error("❌ Error creating lead in database:", dbError.message);
+      console.error("❌ Database error stack:", dbError.stack);
+      // Don't fail the whole request if database fails - still send email
+    }
 
     // Normalize email and name fields - handle arrays by taking first value
     if (Array.isArray(formData.email)) {
@@ -391,6 +446,8 @@ async function processFormSubmission(formData, res) {
       messageId: info.messageId,
       customerEmailSent: customerEmailSent,
       customerMessageId: customerMessageId,
+      leadCreated: leadCreated,
+      leadId: leadId,
     });
   } catch (error) {
     console.error("❌ Error processing form:", error);
