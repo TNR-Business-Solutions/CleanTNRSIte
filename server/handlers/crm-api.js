@@ -139,6 +139,7 @@ module.exports = async function crmApiHandler(req, res) {
       Logger.warn("Using fallback database (empty data)");
     }
     if (req.method === "GET") {
+      try {
       if (path === "clients" || path === "") {
         let clients;
         try {
@@ -323,10 +324,24 @@ module.exports = async function crmApiHandler(req, res) {
           }));
         }
       } else {
+        setCorsHeaders(res, origin);
         res.writeHead(404, { "Content-Type": "application/json" });
         res.end(
           JSON.stringify({ success: false, error: "Endpoint not found" })
         );
+      }
+      } catch (getError) {
+        Logger.error("GET request error:", getError.message);
+        Logger.error("GET request error stack:", getError.stack);
+        if (!res.headersSent) {
+          setCorsHeaders(res, origin);
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ 
+            success: false, 
+            error: "Internal server error",
+            message: getError.message || "Failed to process GET request"
+          }));
+        }
       }
     } else if (req.method === "POST") {
       Logger.debug("POST request received", { fullPath, path });

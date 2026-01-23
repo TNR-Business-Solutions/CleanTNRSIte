@@ -38,12 +38,31 @@ class TNRAdminAPI {
 
     try {
       const response = await fetch(url, config);
-      const data = await response.json();
+      
+      // Check if response is JSON
+      const contentType = response.headers.get("content-type");
+      let data;
+      
+      if (contentType && contentType.includes("application/json")) {
+        try {
+          data = await response.json();
+        } catch (jsonError) {
+          // If JSON parsing fails, get text to see what we got
+          const text = await response.text();
+          console.error(`API Error - Invalid JSON response (${endpoint}):`, text.substring(0, 500));
+          throw new Error(`Invalid JSON response from server: ${response.status} ${response.statusText}`);
+        }
+      } else {
+        // Not JSON - get text response
+        const text = await response.text();
+        console.error(`API Error - Non-JSON response (${endpoint}):`, text.substring(0, 500));
+        throw new Error(`Server returned non-JSON response: ${response.status} ${response.statusText}`);
+      }
 
       if (data.success) {
         return data.data;
       } else {
-        throw new Error(data.error || "API request failed");
+        throw new Error(data.error || data.message || "API request failed");
       }
     } catch (error) {
       console.error(`API Error (${endpoint}):`, error);
