@@ -23,6 +23,15 @@ class SimpleFormIntegration {
       const form = document.getElementById(formId);
       if (form) {
         const formType = forms[formId];
+        
+        // Check if handler already attached (prevent duplicates)
+        if (form.dataset.handlerAttached === "true") {
+          console.log(`⚠️ Handler already attached to #${formId}, skipping`);
+          return;
+        }
+        
+        // Mark as attached and add event listener
+        form.dataset.handlerAttached = "true";
         form.addEventListener("submit", (e) => this.handleSubmit(e, formType));
         console.log(`✅ ${formType} handler attached to #${formId}`);
         formsFound++;
@@ -40,6 +49,23 @@ class SimpleFormIntegration {
 
   async handleSubmit(event, formType = "Contact Form") {
     event.preventDefault();
+    event.stopImmediatePropagation(); // Prevent other handlers from firing
+    
+    // Prevent double submission
+    const form = event.target;
+    if (form.dataset.submitting === "true") {
+      console.warn("⚠️ Form submission already in progress, ignoring duplicate");
+      return;
+    }
+    
+    form.dataset.submitting = "true";
+    const submitButton = form.querySelector('button[type="submit"]');
+    if (submitButton) {
+      submitButton.disabled = true;
+      const originalText = submitButton.textContent;
+      submitButton.textContent = "Sending...";
+    }
+    
     console.log(`📝 ${formType} submitted`);
 
     const formData = new FormData(event.target);
@@ -233,6 +259,15 @@ class SimpleFormIntegration {
         "There was an error submitting your form. Please try again or contact us directly at Roy.Turner@tnrbusinesssolutions.com"
       );
       throw error;
+    } finally {
+      // Reset submission flag and button state
+      form.dataset.submitting = "false";
+      if (submitButton) {
+        submitButton.disabled = false;
+        if (originalText) {
+          submitButton.textContent = originalText;
+        }
+      }
     }
   }
 
@@ -518,17 +553,22 @@ class SimpleFormIntegration {
 if (typeof window !== "undefined") {
   console.log("🚀 form-integration-simple.js loaded");
 
-  // Wait for DOM to be fully ready
-  if (document.readyState === "loading") {
-    console.log("⏳ Waiting for DOM to load...");
-    document.addEventListener("DOMContentLoaded", () => {
-      console.log("📄 DOM ready, initializing form integration");
-      window.simpleFormIntegration = new SimpleFormIntegration();
-    });
+  // Prevent duplicate initialization
+  if (window.simpleFormIntegration) {
+    console.warn("⚠️ form-integration-simple.js already initialized, skipping");
   } else {
-    console.log(
-      "📄 DOM already ready, initializing form integration immediately"
-    );
-    window.simpleFormIntegration = new SimpleFormIntegration();
+    // Wait for DOM to be fully ready
+    if (document.readyState === "loading") {
+      console.log("⏳ Waiting for DOM to load...");
+      document.addEventListener("DOMContentLoaded", () => {
+        console.log("📄 DOM ready, initializing form integration");
+        window.simpleFormIntegration = new SimpleFormIntegration();
+      });
+    } else {
+      console.log(
+        "📄 DOM already ready, initializing form integration immediately"
+      );
+      window.simpleFormIntegration = new SimpleFormIntegration();
+    }
   }
 }
