@@ -1,7 +1,9 @@
 # Development files
 node_modules/
+**/node_modules/
 *.log
 .env*
+.env
 
 # IDE files
 .vscode/
