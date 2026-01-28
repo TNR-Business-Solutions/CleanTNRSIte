@@ -8,6 +8,14 @@ const {
 } = require("../server/handlers/cors-utils");
 
 module.exports = async (req, res) => {
+  // Check eBay routes FIRST - before any other processing
+  // This ensures eBay webhooks are handled even if route parsing fails
+  if (req.url && (req.url.includes("/ebay/notifications/") || req.url.includes("/api/ebay/notifications/"))) {
+    console.log("✅ eBay route detected early:", req.url);
+    const handler = require("../server/handlers/ebay-notifications-api");
+    return await handler(req, res);
+  }
+
   // Get pathname from request
   // Vercel provides req.url with query string, or we can use the path directly
   let pathname = req.url.split("?")[0]; // Remove query string if present
