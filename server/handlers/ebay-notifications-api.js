@@ -27,31 +27,35 @@ module.exports = async (req, res) => {
 
     // GET - eBay webhook verification (challenge-response)
     if (method === "GET") {
-      const challenge = req.query.challenge;
-      const verifyToken = req.query.verificationToken || req.headers["x-ebay-verification-token"];
+      // eBay sends challenge and verificationToken as query parameters
+      const challenge = req.query.challenge || req.query.challenge_code;
+      const verifyToken = req.query.verificationToken || 
+                         req.query.verification_token ||
+                         req.headers["x-ebay-verification-token"] ||
+                         req.headers["x-ebay-verificationtoken"];
 
       console.log("eBay Webhook Verification Request:", {
         challenge,
-        verifyToken,
+        verifyToken: verifyToken ? verifyToken.substring(0, 20) + "..." : null,
         query: req.query,
-        headers: req.headers,
+        url: req.url,
+        method: req.method,
       });
 
-      // Verify the token matches
-      if (verifyToken !== EBAY_VERIFICATION_TOKEN) {
+      // Verify the token matches (case-sensitive)
+      if (verifyToken && verifyToken !== EBAY_VERIFICATION_TOKEN) {
         console.warn("eBay verification token mismatch:", {
-          received: verifyToken,
-          expected: EBAY_VERIFICATION_TOKEN.substring(0, 10) + "...",
+          received: verifyToken.substring(0, 20) + "...",
+          expected: EBAY_VERIFICATION_TOKEN.substring(0, 20) + "...",
         });
-        return sendJson(res, 401, {
-          success: false,
-          error: "Invalid verification token",
-        });
+        res.writeHead(401, { "Content-Type": "text/plain" });
+        res.end("Invalid verification token");
+        return;
       }
 
-      // Return the challenge string (eBay requirement)
+      // Return the challenge string (eBay requirement - must be plain text, not JSON)
       if (challenge) {
-        console.log("✅ eBay webhook verified successfully");
+        console.log("✅ eBay webhook verified successfully, returning challenge:", challenge);
         res.writeHead(200, {
           "Content-Type": "text/plain",
           "X-Content-Type-Options": "nosniff",
@@ -60,12 +64,17 @@ module.exports = async (req, res) => {
         return;
       }
 
-      // If no challenge, return success anyway
-      return sendJson(res, 200, {
-        success: true,
-        message: "eBay webhook endpoint is active",
-        verificationToken: EBAY_VERIFICATION_TOKEN.substring(0, 10) + "...",
-      });
+      // If no challenge but token is valid, return success message
+      if (verifyToken === EBAY_VERIFICATION_TOKEN) {
+        res.writeHead(200, { "Content-Type": "text/plain" });
+        res.end("eBay webhook endpoint is active");
+        return;
+      }
+
+      // If no token provided, return error
+      res.writeHead(400, { "Content-Type": "text/plain" });
+      res.end("Missing verification token");
+      return;
     }
 
     // POST - Handle eBay notification events
