@@ -131,8 +131,9 @@
       .text-muted-small { font-size: 0.8rem; color: #6c757d; }
       .char-count { text-align: right; margin-top: 5px; color: #666; font-size: 14px; }
       .textarea-medium { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 14px; line-height: 1.6; resize: vertical; min-height: 150px; }
-      .textarea-small { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 14px; line-height: 1.6; resize: vertical; min-height: 100px; white-space: pre-wrap; }
+      .textarea-small { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 14px; line-height: 1.6; resize: vertical; min-height: 120px; }
       .textarea-tiny { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 14px; line-height: 1.6; resize: vertical; min-height: 80px; white-space: pre-wrap; }
+      .status-div { margin-top: 15px; padding: 12px; border-radius: 4px; display: none; }
     </style>
   </head>
   <body>
@@ -469,14 +470,7 @@
                 <span id="facebookCharCountPreview">0</span> characters
               </div>
               <div class="hashtag-suggestions" id="hashtagSuggestions"></div>
-              <div
-                style="
-                  display: flex;
-                  gap: 10px;
-                  margin-top: 15px;
-                  flex-wrap: wrap;
-                "
-              >
+              <div class="flex-gap-10-mt-15-wrap">
                 <button
                   class="btn flex-1-min-200"
                   onclick="postToFacebook()"
@@ -504,12 +498,7 @@
                   type="url"
                   id="postImageUrl"
                   placeholder="https://example.com/image.jpg"
-                  style="
-                    width: 100%;
-                    padding: 8px;
-                    border: 1px solid #ddd;
-                    border-radius: 4px;
-                  "
+                  class="form-input-full"
                 />
               </div>
             </div>
@@ -817,41 +806,17 @@
               <textarea
                 id="previewContentTwitter"
                 rows="6"
-                style="
-                  width: 100%;
-                  padding: 12px;
-                  border: 1px solid #ddd;
-                  border-radius: 4px;
-                  font-family: inherit;
-                  font-size: 14px;
-                  line-height: 1.6;
-                  resize: vertical;
-                  min-height: 120px;
-                "
+                class="textarea-small"
                 placeholder="Generated content will appear here. You can edit it before posting."
               ></textarea>
-              <div
-                style="
-                  text-align: right;
-                  margin-top: 5px;
-                  color: #666;
-                  font-size: 14px;
-                "
-              >
+              <div class="char-count">
                 <span id="twitterCharCountPreview">0</span>/280 characters
               </div>
               <div
                 class="hashtag-suggestions"
                 id="hashtagSuggestionsTwitter"
               ></div>
-              <div
-                style="
-                  display: flex;
-                  gap: 10px;
-                  margin-top: 15px;
-                  flex-wrap: wrap;
-                "
-              >
+              <div class="flex-gap-10-mt-15-wrap">
                 <button
                   class="btn flex-1-min-200-twitter"
                   onclick="postGeneratedToTwitter()"
@@ -867,12 +832,7 @@
               </div>
               <div
                 id="twitterStatus"
-                style="
-                  margin-top: 15px;
-                  padding: 12px;
-                  border-radius: 4px;
-                  display: none;
-                "
+                class="status-div"
               ></div>
             </div>
           </div>
@@ -993,28 +953,10 @@
               <textarea
                 id="previewContentNextdoor"
                 rows="8"
-                style="
-                  width: 100%;
-                  padding: 12px;
-                  border: 1px solid #ddd;
-                  border-radius: 4px;
-                  font-family: inherit;
-                  font-size: 14px;
-                  line-height: 1.6;
-                  resize: vertical;
-                  min-height: 200px;
-                  white-space: pre-wrap;
-                "
+                class="textarea-full"
                 placeholder="Generated content will appear here. You can edit it before posting."
               ></textarea>
-              <div
-                style="
-                  text-align: right;
-                  margin-top: 5px;
-                  color: #666;
-                  font-size: 14px;
-                "
-              >
+              <div class="char-count">
                 <strong>Character Count:</strong>
                 <span id="nextdoorCharCountPreview">0</span> characters
                 <br /><small
@@ -1022,14 +964,7 @@
                   community-focused content performs best.</small
                 >
               </div>
-              <div
-                style="
-                  display: flex;
-                  gap: 10px;
-                  margin-top: 15px;
-                  flex-wrap: wrap;
-                "
-              >
+              <div class="flex-gap-10-mt-15-wrap">
                 <button
                   class="btn flex-1-min-200-nextdoor"
                   onclick="postGeneratedToNextdoor()"
@@ -1051,12 +986,7 @@
               </div>
               <div
                 id="nextdoorStatus"
-                style="
-                  margin-top: 15px;
-                  padding: 12px;
-                  border-radius: 4px;
-                  display: none;
-                "
+                class="status-div"
               ></div>
             </div>
           </div>
@@ -1505,7 +1435,26 @@
       function logout() {
         sessionStorage.removeItem("adminAuthenticated");
         sessionStorage.removeItem("adminLoginTime");
+        localStorage.removeItem("adminSession");
         window.location.href = "/admin-login.html";
+      }
+
+      // Check authentication on page load
+      function checkAuth() {
+        const token = localStorage.getItem("adminSession");
+        if (!token) {
+          console.warn("⚠️ No authentication token found. Some features may not work.");
+          console.info("💡 Tip: Login to admin dashboard first for full functionality.");
+        } else {
+          console.log("✅ Authentication token found");
+        }
+      }
+
+      // Run auth check when page loads
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", checkAuth);
+      } else {
+        checkAuth();
       }
 
       // Lightweight in-page smoke tests to validate key UI hooks without external APIs
@@ -1626,7 +1575,7 @@
           }
 
           // Get tokens from database
-          const response = await fetch("/api/social-tokens?platform=twitter");
+          const response = await authFetch("/api/social-tokens?platform=twitter");
           const data = await response.json();
 
           if (!data.success || !data.tokens || data.tokens.length === 0) {
@@ -1642,7 +1591,7 @@
 
           // Test the first token
           const token = data.tokens[0];
-          const testResponse = await fetch("/api/social-tokens", {
+          const testResponse = await authFetch("/api/social-tokens", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -1730,7 +1679,7 @@
             statusDiv.textContent = "Posting to Twitter/X...";
           }
 
-          const response = await fetch("/api/post-to-twitter", {
+          const response = await authFetch("/api/post-to-twitter", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -1800,7 +1749,7 @@
         try {
           console.log("Saving Twitter token...", { tokenLength: token.length });
 
-          const response = await fetch("/api/social-tokens", {
+          const response = await authFetch("/api/social-tokens", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -1898,7 +1847,7 @@
 
           // Test the first token
           const token = data.tokens[0];
-          const testResponse = await fetch("/api/social-tokens", {
+          const testResponse = await authFetch("/api/social-tokens", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -1953,7 +1902,7 @@
         }
 
         try {
-          const response = await fetch("/api/social-tokens", {
+          const response = await authFetch("/api/social-tokens", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -1984,17 +1933,119 @@
         }
       }
 
+      // Helper function for authenticated API requests
+      function getAuthHeaders() {
+        const token = localStorage.getItem("adminSession");
+        const headers = {
+          "Content-Type": "application/json"
+        };
+        if (token) {
+          headers["Authorization"] = `Bearer ${token}`;
+        } else {
+          console.warn("⚠️ No adminSession token found in localStorage. User may need to login.");
+        }
+        return headers;
+      }
+
+      // Authenticated fetch wrapper
+      async function authFetch(url, options = {}) {
+        const token = localStorage.getItem("adminSession");
+        
+        // Log for debugging
+        if (!token) {
+          console.warn("⚠️ No adminSession token found. User needs to login first.");
+          console.info("💡 Go to /admin-login.html to login");
+        } else {
+          console.log("✅ Using authentication token for request:", url.substring(0, 50) + "...");
+        }
+        
+        const defaultOptions = {
+          headers: getAuthHeaders()
+        };
+        
+        const mergedOptions = {
+          ...defaultOptions,
+          ...options,
+          headers: {
+            ...defaultOptions.headers,
+            ...(options.headers || {})
+          }
+        };
+        
+        // Debug: Log headers being sent (but not the token value)
+        console.log("📤 Request headers:", {
+          hasAuthorization: !!mergedOptions.headers.Authorization,
+          authorizationPrefix: mergedOptions.headers.Authorization ? mergedOptions.headers.Authorization.substring(0, 20) + "..." : "none",
+          url: url
+        });
+        
+        const response = await fetch(url, mergedOptions);
+        
+        // If 401, check if user needs to login
+        if (response.status === 401) {
+          const token = localStorage.getItem("adminSession");
+          if (!token) {
+            console.error("❌ Authentication required. Please login to admin dashboard first.");
+            const shouldLogin = confirm(
+              "You need to be logged in to access this feature.\n\n" +
+              "Would you like to go to the login page?"
+            );
+            if (shouldLogin) {
+              window.location.href = "/admin-login.html";
+            }
+          } else {
+            console.error("❌ Token exists but authentication failed. Token may be expired or invalid.");
+            console.info("💡 Try logging in again to get a fresh token.");
+          }
+        }
+        
+        return response;
+      }
+
       // Helper function to get Meta token from database
       async function getMetaTokenFromDatabase() {
         try {
-          const response = await fetch("/api/social/tokens?platform=facebook");
+          const response = await authFetch("/api/social/tokens?platform=facebook");
           const data = await response.json();
 
           console.log("getMetaTokenFromDatabase response:", data);
 
           if (data.success && data.tokens && data.tokens.length > 0) {
-            const token = data.tokens[0];
-            console.log("Token from database:", token);
+            // Find the best token: prioritize tokens with page_id and instagram_account_id
+            // Expected Page ID: 623423940864671 (TNR Business Solutions)
+            // Expected Instagram ID: 17841477683105907
+            let token = null;
+            
+            // First, try to find token with both page_id and instagram_account_id
+            token = data.tokens.find(t => 
+              t.page_id === '623423940864671' && 
+              t.instagram_account_id === '17841477683105907'
+            );
+            
+            // If not found, try to find token with page_id matching TNR Business Solutions
+            if (!token) {
+              token = data.tokens.find(t => 
+                t.page_id === '623423940864671' || 
+                (t.page_name && t.page_name.includes('TNR Business Solutions'))
+              );
+            }
+            
+            // If not found, try to find any token with instagram_account_id
+            if (!token) {
+              token = data.tokens.find(t => t.instagram_account_id);
+            }
+            
+            // If not found, try to find any token with page_id (not null)
+            if (!token) {
+              token = data.tokens.find(t => t.page_id && t.page_id !== null);
+            }
+            
+            // Fallback to first token if none found
+            if (!token) {
+              token = data.tokens[0];
+            }
+            
+            console.log("Selected token from database:", token);
 
             // Ensure token.id exists and is valid
             if (!token.id) {
@@ -2012,6 +2063,9 @@
               tokenId: String(token.id),
               platform: "facebook",
               page_name: token.page_name,
+              page_id: token.page_id,
+              instagram_account_id: token.instagram_account_id,
+              instagram_username: token.instagram_username,
               has_token: token.has_token,
             };
           } else {
@@ -2044,7 +2098,7 @@
         if (!tokenId && tokenInput && tokenInput.value.trim()) {
           // User has manually entered a token, try to find tokenId from database
           try {
-            const response = await fetch(
+            const response = await authFetch(
               "/api/social/tokens?platform=facebook"
             );
             const data = await response.json();
@@ -2125,7 +2179,7 @@
           console.log("Sending test-token request body:", requestBody);
           console.log("JSON stringified:", JSON.stringify(requestBody));
 
-          const response = await fetch("/api/social/test-token", {
+          const response = await authFetch("/api/social/test-token", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(requestBody),
@@ -2403,7 +2457,7 @@
         card.classList.add("loading");
 
         try {
-          const response = await fetch("/api/social/get-insights", {
+          const response = await authFetch("/api/social/get-insights", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ pageAccessToken, pageId }),
@@ -2533,7 +2587,7 @@
         if (token) {
           // Save to database via API
           try {
-            const response = await fetch("/api/social/tokens?action=save", {
+            const response = await authFetch("/api/social/tokens?action=save", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
@@ -2573,7 +2627,7 @@
         // Get token from database using the get action (returns full token)
         let token = null;
         try {
-          const tokenResponse = await fetch("/api/social/tokens?action=get", {
+          const tokenResponse = await authFetch("/api/social/tokens?action=get", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ platform: "facebook" }),
@@ -2629,7 +2683,7 @@
             postData.imageUrl = imageUrl;
           }
 
-          const response = await fetch("/api/social/post-to-facebook", {
+          const response = await authFetch("/api/social/post-to-facebook", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(postData),
@@ -2754,7 +2808,7 @@
         }
 
         try {
-          const response = await fetch("/api/social/post-to-instagram", {
+          const response = await authFetch("/api/social/post-to-instagram", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -2915,7 +2969,7 @@
               );
               // Try to get tokenId from database
               try {
-                const response = await fetch(
+                const response = await authFetch(
                   "/api/social/tokens?platform=facebook"
                 );
                 const data = await response.json();
@@ -2970,11 +3024,41 @@
       // Load Meta/Facebook/Instagram connection status from database
       async function loadMetaConnectionStatus() {
         try {
-          const response = await fetch("/api/social/tokens?platform=facebook");
+          const response = await authFetch("/api/social/tokens?platform=facebook");
           const data = await response.json();
 
           if (data.success && data.tokens && data.tokens.length > 0) {
-            const facebookToken = data.tokens[0];
+            // Find the best token: prioritize tokens with page_id and instagram_account_id
+            let facebookToken = null;
+            
+            // First, try to find token with both page_id and instagram_account_id
+            facebookToken = data.tokens.find(t => 
+              t.page_id === '623423940864671' && 
+              t.instagram_account_id === '17841477683105907'
+            );
+            
+            // If not found, try to find token with page_id matching TNR Business Solutions
+            if (!facebookToken) {
+              facebookToken = data.tokens.find(t => 
+                t.page_id === '623423940864671' || 
+                (t.page_name && t.page_name.includes('TNR Business Solutions'))
+              );
+            }
+            
+            // If not found, try to find any token with instagram_account_id
+            if (!facebookToken) {
+              facebookToken = data.tokens.find(t => t.instagram_account_id);
+            }
+            
+            // If not found, try to find any token with page_id (not null)
+            if (!facebookToken) {
+              facebookToken = data.tokens.find(t => t.page_id && t.page_id !== null);
+            }
+            
+            // Fallback to first token if none found
+            if (!facebookToken) {
+              facebookToken = data.tokens[0];
+            }
             const metaStatus = document.getElementById("metaStatus");
 
             if (metaStatus) {
@@ -2992,7 +3076,7 @@
                 }`;
               } else {
                 // Check if there's a separate Instagram token
-                const igResponse = await fetch(
+                const igResponse = await authFetch(
                   "/api/social/tokens?platform=instagram"
                 );
                 const igData = await igResponse.json();
@@ -3060,7 +3144,7 @@
       // Load Twitter connection status from database
       async function loadTwitterConnectionStatus() {
         try {
-          const response = await fetch("/api/social-tokens?platform=twitter");
+          const response = await authFetch("/api/social-tokens?platform=twitter");
           const data = await response.json();
 
           if (data.success && data.tokens && data.tokens.length > 0) {
@@ -3696,7 +3780,7 @@
               .appendChild(statusDiv);
           }
 
-          const response = await fetch("/api/social/post-to-linkedin", {
+          const response = await authFetch("/api/social/post-to-linkedin", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -3806,7 +3890,7 @@
             statusDiv.textContent = "Posting to Twitter/X...";
           }
 
-          const response = await fetch("/api/post-to-twitter", {
+          const response = await authFetch("/api/post-to-twitter", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -3958,7 +4042,7 @@
             statusDiv.textContent = "Posting to Nextdoor...";
           }
 
-          const response = await fetch("/api/post-to-nextdoor", {
+          const response = await authFetch("/api/post-to-nextdoor", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -3975,7 +4059,7 @@
               statusDiv.style.color = "#155724";
               statusDiv.innerHTML = `✅ Post published to Nextdoor successfully!<br><a href="${
                 data.postUrl || "#"
-              }" target="_blank" style="color: #155724; text-decoration: underline;">View Post →</a>`;
+              }" target="_blank" class="text-success-link">View Post →</a>`;
             }
 
             // Clear preview after successful post

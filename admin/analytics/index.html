@@ -25,7 +25,10 @@
             <div class="crm-section">
                 <div class="analytics-header">
                     <h2 class="crm-title">📈 Performance Analytics</h2>
-                    <button class="btn btn-primary" onclick="loadAnalytics()">🔄 Refresh</button>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span id="lastUpdateTime" style="font-size: 0.875rem; color: #666;">Loading...</span>
+                        <button class="btn btn-primary" onclick="loadAnalytics()">🔄 Refresh</button>
+                    </div>
                 </div>
                 
                 <div id="analyticsContent" class="analytics-content">

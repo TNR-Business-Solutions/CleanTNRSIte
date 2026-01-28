@@ -14,7 +14,7 @@ const {
 // Real-time analytics integration for admin dashboard
 
 class DashboardAnalytics {
-  static REFRESH_INTERVAL_MS = 30000;
+  static REFRESH_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
 
   constructor() {
     this.init();

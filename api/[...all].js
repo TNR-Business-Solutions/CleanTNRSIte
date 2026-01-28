@@ -56,6 +56,14 @@ module.exports = async (req, res) => {
     else if (pathname.startsWith("/auth/")) {
       route = pathname.substring(1); // Remove leading /
     }
+    // Handle /ebay/* routes (rewritten to /api/ebay/*)
+    else if (pathname.startsWith("/api/ebay/")) {
+      route = pathname.replace("/api/", "");
+    }
+    // Also check if it's just /ebay/* (direct access)
+    else if (pathname.startsWith("/ebay/")) {
+      route = pathname.substring(1); // Remove leading /
+    }
   }
 
   // Content Library routes
@@ -92,9 +100,23 @@ module.exports = async (req, res) => {
     return await handler(req, res);
   }
 
+  // Platform Analytics API routes
+  if (route === "platform-analytics" || route.startsWith("platform-analytics/")) {
+    const handler = require("../server/handlers/platform-analytics-api");
+    return await handler(req, res);
+  }
+
   // Activity Log routes
   if (route === "activity-log" || route.startsWith("activity-log/")) {
     const handler = require("../server/handlers/activity-log-api");
+    return await handler(req, res);
+  }
+
+  // eBay Notification routes - check early before CORS
+  if (route === "ebay/notifications/marketplace-deletion" || 
+      route.startsWith("ebay/notifications/") ||
+      pathname && pathname.includes("/ebay/notifications/")) {
+    const handler = require("../server/handlers/ebay-notifications-api");
     return await handler(req, res);
   }
 

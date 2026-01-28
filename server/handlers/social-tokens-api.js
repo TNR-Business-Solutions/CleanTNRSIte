@@ -118,21 +118,108 @@ module.exports = async (req, res) => {
         try {
           if (platform === "facebook" || platform === "instagram") {
             // Test Facebook/Instagram token
-            const testUrl =
-              platform === "instagram" && token.instagram_account_id
-                ? `https://graph.facebook.com/v19.0/${token.instagram_account_id}?fields=id,username&access_token=${token.access_token}`
-                : `https://graph.facebook.com/v19.0/me?access_token=${token.access_token}`;
+            let pageData = null;
+            let instagram = null;
 
-            const response = await axios.get(testUrl, { timeout: 5000 });
+            if (platform === "instagram" && token.instagram_account_id) {
+              // Test Instagram token directly
+              const igResponse = await axios.get(
+                `https://graph.facebook.com/v19.0/${token.instagram_account_id}`,
+                {
+                  params: {
+                    fields: "id,username,name",
+                    access_token: token.access_token,
+                  },
+                  timeout: 5000,
+                }
+              );
+              pageData = {
+                id: igResponse.data.id,
+                name: igResponse.data.name || igResponse.data.username,
+                username: igResponse.data.username,
+              };
+              instagram = {
+                id: igResponse.data.id,
+                username: igResponse.data.username,
+                name: igResponse.data.name,
+              };
+            } else if (platform === "facebook") {
+              // Test Facebook Page token
+              if (token.page_id) {
+                // Test the Page directly
+                const pageResponse = await axios.get(
+                  `https://graph.facebook.com/v19.0/${token.page_id}`,
+                  {
+                    params: {
+                      fields: "id,name,category,instagram_business_account{id,username,name}",
+                      access_token: token.access_token,
+                    },
+                    timeout: 5000,
+                  }
+                );
+
+                pageData = {
+                  id: pageResponse.data.id,
+                  name: pageResponse.data.name || token.page_name,
+                  category: pageResponse.data.category,
+                };
+
+                // Check for Instagram Business Account
+                if (pageResponse.data?.instagram_business_account) {
+                  instagram = {
+                    id: pageResponse.data.instagram_business_account.id,
+                    username: pageResponse.data.instagram_business_account.username,
+                    name: pageResponse.data.instagram_business_account.name,
+                  };
+
+                  // Update token in database with Instagram info if not already set
+                  if (!token.instagram_account_id) {
+                    try {
+                      await db.saveSocialMediaToken({
+                        platform: "facebook",
+                        page_id: token.page_id,
+                        access_token: token.access_token,
+                        token_type: token.token_type || "Bearer",
+                        expires_at: token.expires_at,
+                        page_name: token.page_name || pageData.name,
+                        instagram_account_id: instagram.id,
+                        instagram_username: instagram.username,
+                      });
+                      console.log("✅ Updated Facebook token with Instagram info");
+                    } catch (updateError) {
+                      console.warn("Could not update token with Instagram info:", updateError.message);
+                    }
+                  }
+                }
+              } else {
+                // Fallback to /me if no page_id
+                const meResponse = await axios.get(
+                  `https://graph.facebook.com/v19.0/me`,
+                  {
+                    params: {
+                      fields: "id,name",
+                      access_token: token.access_token,
+                    },
+                    timeout: 5000,
+                  }
+                );
+                pageData = {
+                  id: meResponse.data.id,
+                  name: meResponse.data.name || token.page_name,
+                };
+              }
+            }
 
             sendJson(res, 200, {
               success: true,
-              valid: true,
+              isValid: true,
+              tokenId: token.id,
               platform: platform,
-              account: response.data,
+              page: pageData,
+              instagram: instagram,
               message: `✅ ${
                 platform === "instagram" ? "Instagram" : "Facebook"
-              } token is valid`,
+              } token is valid${instagram ? ` - Instagram connected: @${instagram.username}` : ""}`,
             });
             return;
           } else if (platform === "linkedin") {

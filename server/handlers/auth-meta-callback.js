@@ -275,6 +275,9 @@ module.exports = async (req, res) => {
         console.warn(
           "   Solution: Go to Facebook Page Settings → Instagram → Connect Account"
         );
+        console.warn(
+          "   Direct link: https://www.facebook.com/TNRBusinessSolutions/settings/instagram"
+        );
       }
     } catch (dbError) {
       console.error("⚠️ Could not save tokens to database:", dbError.message);
@@ -494,7 +497,14 @@ function generateSuccessHTML(data) {
                     ${
                       page.hasInstagram
                         ? `<div class="instagram-badge">📷 Instagram: @${page.instagramAccount?.username}</div>`
-                        : ""
+                        : `<div style="background: #fff3cd; color: #856404; padding: 10px; border-radius: 8px; margin-top: 10px; font-size: 14px;">
+                            ⚠️ No Instagram connected to this Page.<br>
+                            <strong>To connect Instagram:</strong><br>
+                            1. Go to <a href="https://www.facebook.com/${page.id}/settings/instagram" target="_blank" style="color: #667eea;">Facebook Page Settings → Instagram</a><br>
+                            2. Click "Connect Account"<br>
+                            3. Ensure Instagram account is Business or Creator (not Personal)<br>
+                            4. Re-run OAuth flow after connecting
+                          </div>`
                     }
                     
                     <div style="margin-top: 15px;">

@@ -35,7 +35,7 @@ async function ensureActivityLogTable() {
         type TEXT NOT NULL,
         action TEXT NOT NULL,
         description TEXT,
-        user TEXT,
+        "user" TEXT,
         module TEXT,
         metadata TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -80,11 +80,12 @@ async function logActivity(
 ) {
   try {
     const db = await getDatabase();
+    // Quote 'user' column for PostgreSQL (reserved keyword)
+    const insertSQL = db.usePostgres
+      ? `INSERT INTO activity_log (type, action, description, "user", module, metadata) VALUES (?, ?, ?, ?, ?, ?)`
+      : `INSERT INTO activity_log (type, action, description, user, module, metadata) VALUES (?, ?, ?, ?, ?, ?)`;
     await db.query(
-      `
-      INSERT INTO activity_log (type, action, description, user, module, metadata)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `,
+      insertSQL,
       [
         type,
         action,
@@ -140,7 +141,9 @@ module.exports = async (req, res) => {
 
     // GET - List activities
     if (method === "GET") {
-      let sql = "SELECT * FROM activity_log WHERE 1=1";
+      // Quote 'user' column for PostgreSQL (reserved keyword)
+      const userColumn = db.usePostgres ? '"user"' : 'user';
+      let sql = `SELECT id, type, action, description, ${userColumn} as user, module, metadata, created_at FROM activity_log WHERE 1=1`;
       const params = [];
 
       if (type) {

@@ -110,6 +110,14 @@
     {
       "source": "/auth/twitter/callback",
       "destination": "/api/auth/twitter/callback"
+    },
+    {
+      "source": "/ebay/notifications/marketplace-deletion",
+      "destination": "/api/ebay/notifications/marketplace-deletion"
+    },
+    {
+      "source": "/ebay/notifications/:path*",
+      "destination": "/api/ebay/notifications/:path*"
     }
   ],
   "headers": [

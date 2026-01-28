@@ -107,14 +107,27 @@ module.exports = async (req, res) => {
           totalRevenue: 0,
         }));
 
+        // Get all data sources in parallel
         const dataPromise = Promise.race([
-          Promise.all([db.getClients(), db.getLeads(), db.getOrders()]),
+          Promise.all([
+            db.getClients(),
+            db.getLeads(),
+            db.getOrders(),
+            // Get social media posts
+            db.query(`SELECT * FROM social_media_posts ORDER BY createdAt DESC LIMIT 1000`).catch(() => []),
+            // Get form submissions
+            db.query(`SELECT * FROM form_submissions ORDER BY createdAt DESC LIMIT 1000`).catch(() => []),
+            // Get analytics events
+            db.query(`SELECT * FROM analytics ORDER BY createdAt DESC LIMIT 1000`).catch(() => []),
+            // Get social media tokens (for platform connections)
+            db.getSocialMediaTokens().catch(() => []),
+          ]),
           new Promise((_, reject) =>
             setTimeout(() => reject(new Error("Data query timeout")), 5000)
           ),
-        ]).catch(() => [[], [], []]);
+        ]).catch(() => [[], [], [], [], [], [], []]);
 
-        const [stats, [clients, leads, orders]] = await Promise.all([
+        const [stats, [clients, leads, orders, socialPosts, formSubmissions, analyticsEvents, socialTokens]] = await Promise.all([
           statsPromise,
           dataPromise,
         ]);
@@ -203,6 +216,56 @@ module.exports = async (req, res) => {
           businessTypes[type] = (businessTypes[type] || 0) + 1;
         });
 
+        // Calculate social media metrics
+        const now = new Date();
+        const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+        const last30Days = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        
+        const postsThisMonth = (socialPosts || []).filter((p) => {
+          const postDate = new Date(p.createdAt || p.created_at || 0);
+          return postDate >= currentMonthStart;
+        }).length;
+        
+        const postsLast30Days = (socialPosts || []).filter((p) => {
+          const postDate = new Date(p.createdAt || p.created_at || 0);
+          return postDate >= last30Days;
+        }).length;
+        
+        // Platform breakdown
+        const platformBreakdown = {};
+        (socialPosts || []).forEach((post) => {
+          const platform = post.platform || "Unknown";
+          platformBreakdown[platform] = (platformBreakdown[platform] || 0) + 1;
+        });
+        
+        // Form submissions metrics
+        const formSubmissionsLast30Days = (formSubmissions || []).filter((f) => {
+          const subDate = new Date(f.createdAt || f.created_at || 0);
+          return subDate >= last30Days;
+        }).length;
+        
+        // Analytics events metrics
+        const analyticsEventsLast30Days = (analyticsEvents || []).filter((e) => {
+          const eventDate = new Date(e.createdAt || e.created_at || e.timestamp || 0);
+          return eventDate >= last30Days;
+        }).length;
+        
+        // Event type breakdown
+        const eventTypeBreakdown = {};
+        (analyticsEvents || []).forEach((event) => {
+          const eventType = event.eventType || "Unknown";
+          eventTypeBreakdown[eventType] = (eventTypeBreakdown[eventType] || 0) + 1;
+        });
+        
+        // Connected platforms count
+        const uniquePlatforms = new Set();
+        (socialTokens || []).forEach((token) => {
+          if (token.platform) {
+            uniquePlatforms.add(token.platform.toLowerCase());
+          }
+        });
+        const platformsConnected = uniquePlatforms.size;
+
         analytics = {
           overview: {
             totalClients: stats.totalClients,
@@ -213,12 +276,21 @@ module.exports = async (req, res) => {
             totalOrders: stats.totalOrders,
             completedOrders: stats.completedOrders,
             totalRevenue: stats.totalRevenue,
+            // New real-time metrics
+            platformsConnected: platformsConnected,
+            postsThisMonth: postsThisMonth,
+            postsLast30Days: postsLast30Days,
+            formSubmissionsLast30Days: formSubmissionsLast30Days,
+            analyticsEventsLast30Days: analyticsEventsLast30Days,
+            totalSocialPosts: (socialPosts || []).length,
+            totalFormSubmissions: (formSubmissions || []).length,
+            totalAnalyticsEvents: (analyticsEvents || []).length,
           },
           leadSources: Object.entries(leadSources)
             .map(([source, count]) => ({
               source,
               count,
-              percentage: ((count / totalLeads) * 100).toFixed(1),
+              percentage: totalLeads > 0 ? ((count / totalLeads) * 100).toFixed(1) : "0",
             }))
             .sort((a, b) => b.count - a.count),
           businessTypes: Object.entries(businessTypes)
@@ -247,6 +319,37 @@ module.exports = async (req, res) => {
               return daysAgo <= 30;
             }).length,
           },
+          // New analytics sections
+          socialMedia: {
+            totalPosts: (socialPosts || []).length,
+            postsThisMonth: postsThisMonth,
+            postsLast30Days: postsLast30Days,
+            platformBreakdown: Object.entries(platformBreakdown)
+              .map(([platform, count]) => ({
+                platform,
+                count,
+                percentage: (socialPosts || []).length > 0 
+                  ? ((count / (socialPosts || []).length) * 100).toFixed(1) 
+                  : "0",
+              }))
+              .sort((a, b) => b.count - a.count),
+            platformsConnected: platformsConnected,
+          },
+          website: {
+            formSubmissions: (formSubmissions || []).length,
+            formSubmissionsLast30Days: formSubmissionsLast30Days,
+            analyticsEvents: (analyticsEvents || []).length,
+            analyticsEventsLast30Days: analyticsEventsLast30Days,
+            eventTypeBreakdown: Object.entries(eventTypeBreakdown)
+              .map(([eventType, count]) => ({
+                eventType,
+                count,
+                percentage: (analyticsEvents || []).length > 0
+                  ? ((count / (analyticsEvents || []).length) * 100).toFixed(1)
+                  : "0",
+              }))
+              .sort((a, b) => b.count - a.count),
+          },
         };
       }
 
@@ -262,6 +365,39 @@ module.exports = async (req, res) => {
           bounceRate: 0,
           campaigns: [],
         };
+      }
+
+      // Get platform analytics if requested
+      if (type === "platforms" || type === "all") {
+        try {
+          // Fetch platform analytics from database
+          const platformAnalytics = await db.query(
+            `SELECT * FROM platform_analytics 
+             ORDER BY fetchedAt DESC 
+             LIMIT 1000`
+          ).catch(() => []);
+
+          // Group by platform
+          const platformData = {};
+          platformAnalytics.forEach((row) => {
+            if (!platformData[row.platform]) {
+              platformData[row.platform] = {
+                accountName: row.accountName,
+                metrics: {},
+                lastFetched: row.fetchedAt,
+              };
+            }
+            platformData[row.platform].metrics[row.metricType] = {
+              value: row.metricValue,
+              data: JSON.parse(row.metricData || "{}"),
+            };
+          });
+
+          analytics.platforms = platformData;
+        } catch (error) {
+          Logger.error("Error fetching platform analytics:", error);
+          analytics.platforms = {};
+        }
       }
 
       if (type === "crm" || type === "all") {

@@ -474,8 +474,20 @@ module.exports = async function crmApiHandler(req, res) {
             const order = await db.addOrder(data);
             res.writeHead(201, { "Content-Type": "application/json" });
             res.end(JSON.stringify({ success: true, data: order }));
-          } else if (path === "convert-lead") {
-            const client = await db.convertLeadToClient(data.leadId);
+          } else if (path === "convert-lead" || path === "leads/convert") {
+            // Handle both /api/crm/convert-lead and /api/crm/leads/convert
+            // Extract leadId from query string if not in body
+            const leadId = data.leadId || (parsedUrl ? parsedUrl.searchParams.get("leadId") : null) || (queryFromReq.leadId);
+            if (!leadId) {
+              setCorsHeaders(res, origin);
+              res.writeHead(400, { "Content-Type": "application/json" });
+              res.end(JSON.stringify({ 
+                success: false, 
+                error: "leadId is required" 
+              }));
+              return;
+            }
+            const client = await db.convertLeadToClient(leadId);
             res.writeHead(200, { "Content-Type": "application/json" });
             res.end(JSON.stringify({ success: true, data: client }));
           } else if (path === "social-posts") {

@@ -1773,11 +1773,34 @@
       loadStats();
       loadActivityLog();
 
-      // Auto-refresh every 30 seconds
-      setInterval(() => {
-        loadStats();
-        loadActivityLog();
-      }, 30000);
+      // Auto-refresh every 5 minutes when dashboard is active
+      let dashboardRefreshInterval = null;
+      
+      function startDashboardRefresh() {
+        // Clear any existing interval
+        if (dashboardRefreshInterval) {
+          clearInterval(dashboardRefreshInterval);
+        }
+        
+        // Only refresh if page is visible (user is actively viewing)
+        dashboardRefreshInterval = setInterval(() => {
+          if (!document.hidden) {
+            loadStats();
+            loadActivityLog();
+          }
+        }, 5 * 60 * 1000); // 5 minutes
+      }
+      
+      // Start refresh on page load
+      startDashboardRefresh();
+      
+      // Also refresh when page becomes visible again
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+          loadStats();
+          loadActivityLog();
+        }
+      });
 
       // Quick Post Functions
       let quickPostFacebookPages = [];

@@ -8,10 +8,41 @@
  * - Lead sources breakdown
  * - Business types breakdown
  * - Recent activity tracking
+ * - Real-time data updates
  * 
  * Dependencies:
  * - admin/shared/utils.js (formatDate, etc.)
  */
+
+// Helper function for authenticated API requests
+function getAuthHeaders() {
+    const token = localStorage.getItem("adminSession");
+    const headers = {
+        "Content-Type": "application/json"
+    };
+    if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+    }
+    return headers;
+}
+
+// Authenticated fetch wrapper
+async function authFetch(url, options = {}) {
+    const defaultOptions = {
+        headers: getAuthHeaders()
+    };
+    
+    const mergedOptions = {
+        ...defaultOptions,
+        ...options,
+        headers: {
+            ...defaultOptions.headers,
+            ...(options.headers || {})
+        }
+    };
+    
+    return fetch(url, mergedOptions);
+}
 
 // Load Analytics
 async function loadAnalytics() {
@@ -21,7 +52,8 @@ async function loadAnalytics() {
     analyticsContent.innerHTML = '<div class="loading-state"><div class="loading-icon">📊</div><p>Loading analytics...</p></div>';
 
     try {
-        const res = await fetch('/api/analytics?type=all');
+        // Use authenticated fetch
+        const res = await authFetch('/api/analytics?type=all');
         const data = await res.json();
 
         if (!data.success) {
@@ -30,6 +62,12 @@ async function loadAnalytics() {
 
         const analytics = data.analytics;
         renderAnalytics(analytics);
+        
+        // Update last refresh time
+        const lastUpdateEl = document.getElementById('lastUpdateTime');
+        if (lastUpdateEl) {
+            lastUpdateEl.textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+        }
 
     } catch (error) {
         console.error('Error loading analytics:', error);
@@ -58,6 +96,9 @@ function renderAnalytics(analytics) {
     const recentActivity = analytics.recentActivity || {};
     const revenueTrend = analytics.revenueTrend || [];
     const conversionFunnel = analytics.conversionFunnel || {};
+    const socialMedia = analytics.socialMedia || {};
+    const website = analytics.website || {};
+    const platforms = analytics.platforms || {};
 
     analyticsContent.innerHTML = `
         <!-- Overview Cards -->
@@ -81,6 +122,26 @@ function renderAnalytics(analytics) {
                 <div class="overview-value">$${formatRevenue(overview.totalRevenue || 0)}</div>
                 <div class="overview-label">Total Revenue</div>
                 <div class="overview-subtext success">${overview.completedOrders || 0} orders</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-value">${overview.platformsConnected || 0}</div>
+                <div class="overview-label">Platforms Connected</div>
+                <div class="overview-subtext info">Social Media</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-value">${overview.postsThisMonth || 0}</div>
+                <div class="overview-label">Posts This Month</div>
+                <div class="overview-subtext success">${overview.postsLast30Days || 0} last 30 days</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-value">${overview.formSubmissionsLast30Days || 0}</div>
+                <div class="overview-label">Form Submissions</div>
+                <div class="overview-subtext info">Last 30 days</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-value">${overview.analyticsEventsLast30Days || 0}</div>
+                <div class="overview-label">Analytics Events</div>
+                <div class="overview-subtext info">Last 30 days</div>
             </div>
         </div>
 
@@ -123,6 +184,65 @@ function renderAnalytics(analytics) {
             </div>
         </div>
 
+        <!-- Social Media Analytics -->
+        ${socialMedia.platformBreakdown && socialMedia.platformBreakdown.length > 0 ? `
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3 class="chart-title">📱 Social Media Posts by Platform</h3>
+                <button class="btn btn-small btn-secondary" onclick="exportChart('socialPlatforms')">📥 Export</button>
+            </div>
+            <canvas id="socialPlatformsChart" style="max-height: 250px;"></canvas>
+        </div>
+        ` : ''}
+
+        <!-- Website Analytics -->
+        ${website.eventTypeBreakdown && website.eventTypeBreakdown.length > 0 ? `
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3 class="chart-title">🌐 Website Events by Type</h3>
+                <button class="btn btn-small btn-secondary" onclick="exportChart('eventTypes')">📥 Export</button>
+            </div>
+            <canvas id="eventTypesChart" style="max-height: 250px;"></canvas>
+        </div>
+        ` : ''}
+
+        <!-- Platform Analytics Section -->
+        ${Object.keys(platforms).length > 0 ? `
+        <div class="chart-card full-width">
+            <div class="chart-header">
+                <h3 class="chart-title">📱 Platform Analytics (Google, Facebook, Instagram, X, Nextdoor)</h3>
+                <button class="btn btn-primary" onclick="fetchPlatformAnalytics()">🔄 Refresh Platform Data</button>
+            </div>
+            <div id="platformAnalyticsContent" class="platform-analytics-grid">
+                ${Object.entries(platforms).map(([platform, data]) => `
+                    <div class="platform-analytics-card">
+                        <h4 class="platform-name">${getPlatformIcon(platform)} ${platform.charAt(0).toUpperCase() + platform.slice(1)}</h4>
+                        <p class="platform-account">${data.accountName || 'Account'}</p>
+                        <div class="platform-metrics">
+                            ${Object.entries(data.metrics || {}).map(([metric, value]) => `
+                                <div class="platform-metric">
+                                    <span class="metric-label">${metric}:</span>
+                                    <span class="metric-value">${formatMetricValue(value.value || value)}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <p class="platform-last-updated">Last updated: ${formatDate(data.lastFetched)}</p>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+        ` : `
+        <div class="chart-card full-width">
+            <div class="chart-header">
+                <h3 class="chart-title">📱 Platform Analytics</h3>
+                <button class="btn btn-primary" onclick="fetchPlatformAnalytics()">🔄 Fetch Platform Data</button>
+            </div>
+            <div class="empty-state">
+                <p>No platform analytics data available. Click "Fetch Platform Data" to load analytics from Google, Facebook, Instagram, X, and Nextdoor.</p>
+            </div>
+        </div>
+        `}
+
         <!-- Recent Activity -->
         <div class="recent-activity-card">
             <div class="chart-header">
@@ -138,6 +258,14 @@ function renderAnalytics(analytics) {
                     <div class="activity-stat-value">${recentActivity.newLeads || 0}</div>
                     <div class="activity-stat-label">New Leads</div>
                 </div>
+                <div class="activity-stat">
+                    <div class="activity-stat-value">${overview.postsLast30Days || 0}</div>
+                    <div class="activity-stat-label">Social Posts</div>
+                </div>
+                <div class="activity-stat">
+                    <div class="activity-stat-value">${overview.formSubmissionsLast30Days || 0}</div>
+                    <div class="activity-stat-label">Form Submissions</div>
+                </div>
             </div>
         </div>
     `;
@@ -148,6 +276,14 @@ function renderAnalytics(analytics) {
         renderLeadSourcesChart(leadSources);
         renderBusinessTypesChart(businessTypes);
         renderConversionFunnelChart(conversionFunnel);
+        
+        // Render new charts if data exists
+        if (socialMedia.platformBreakdown && socialMedia.platformBreakdown.length > 0) {
+            renderSocialPlatformsChart(socialMedia.platformBreakdown);
+        }
+        if (website.eventTypeBreakdown && website.eventTypeBreakdown.length > 0) {
+            renderEventTypesChart(website.eventTypeBreakdown);
+        }
     }, 100);
 }
 
@@ -398,14 +534,16 @@ function exportReport() {
         charts: {}
     };
 
-    // Get current analytics data
-    fetch('/api/analytics?type=all')
+    // Get current analytics data using authenticated fetch
+    authFetch('/api/analytics?type=all')
         .then(r => r.json())
         .then(data => {
             if (data.success) {
                 report.overview = data.analytics.overview;
                 report.leadSources = data.analytics.leadSources;
                 report.businessTypes = data.analytics.businessTypes;
+                report.socialMedia = data.analytics.socialMedia;
+                report.website = data.analytics.website;
                 
                 // Convert to CSV
                 const csv = convertToCSV(report);
@@ -429,7 +567,11 @@ function convertToCSV(report) {
     csv += `Total Leads,${report.overview.totalLeads || 0}\n`;
     csv += `New Leads,${report.overview.newLeads || 0}\n`;
     csv += `Total Revenue,$${report.overview.totalRevenue || 0}\n`;
-    csv += `Conversion Rate,${report.overview.conversionRate || 0}%\n\n`;
+    csv += `Conversion Rate,${report.overview.conversionRate || 0}%\n`;
+    csv += `Platforms Connected,${report.overview.platformsConnected || 0}\n`;
+    csv += `Posts This Month,${report.overview.postsThisMonth || 0}\n`;
+    csv += `Form Submissions (30d),${report.overview.formSubmissionsLast30Days || 0}\n`;
+    csv += `Analytics Events (30d),${report.overview.analyticsEventsLast30Days || 0}\n\n`;
     
     csv += 'Lead Sources\n';
     csv += 'Source,Count,Percentage\n';
@@ -442,6 +584,22 @@ function convertToCSV(report) {
     (report.businessTypes || []).forEach(type => {
         csv += `${type.type || 'Unknown'},${type.count || 0}\n`;
     });
+    
+    if (report.socialMedia && report.socialMedia.platformBreakdown) {
+        csv += '\nSocial Media Platforms\n';
+        csv += 'Platform,Posts,Percentage\n';
+        report.socialMedia.platformBreakdown.forEach(platform => {
+            csv += `${platform.platform || 'Unknown'},${platform.count || 0},${platform.percentage || 0}%\n`;
+        });
+    }
+    
+    if (report.website && report.website.eventTypeBreakdown) {
+        csv += '\nWebsite Event Types\n';
+        csv += 'Event Type,Count,Percentage\n';
+        report.website.eventTypeBreakdown.forEach(event => {
+            csv += `${event.eventType || 'Unknown'},${event.count || 0},${event.percentage || 0}%\n`;
+        });
+    }
     
     return csv;
 }
@@ -467,6 +625,79 @@ function formatRevenue(amount) {
     return amount.toFixed(0);
 }
 
+// Get Platform Icon
+function getPlatformIcon(platform) {
+    const icons = {
+        google: '🔍',
+        facebook: '📘',
+        instagram: '📷',
+        twitter: '🐦',
+        x: '🐦',
+        nextdoor: '🏘️',
+        facebookPixel: '📊',
+        pixel: '📊',
+        googleBusiness: '🏢',
+        googleMyBusiness: '🏢',
+        threads: '🧵',
+        linkedin: '💼'
+    };
+    return icons[platform.toLowerCase()] || '📱';
+}
+
+// Format Metric Value
+function formatMetricValue(value) {
+    if (typeof value === 'object' && value !== null) {
+        return formatRevenue(value.total || value.value || 0);
+    }
+    if (typeof value === 'number') {
+        return formatRevenue(value);
+    }
+    return value || '0';
+}
+
+// Format Date
+function formatDate(dateString) {
+    if (!dateString) return 'Never';
+    const date = new Date(dateString);
+    return date.toLocaleString();
+}
+
+// Fetch Platform Analytics
+async function fetchPlatformAnalytics() {
+    try {
+        const button = event?.target || document.querySelector('button[onclick*="fetchPlatformAnalytics"]');
+        if (button) {
+            button.disabled = true;
+            button.textContent = '🔄 Fetching...';
+        }
+
+        const res = await authFetch('/api/platform-analytics?action=fetch');
+        const data = await res.json();
+
+        if (data.success) {
+            // Reload analytics to show updated platform data
+            await loadAnalytics();
+            if (button) {
+                button.textContent = '✅ Fetched!';
+                setTimeout(() => {
+                    button.disabled = false;
+                    button.textContent = '🔄 Refresh Platform Data';
+                }, 2000);
+            }
+        } else {
+            throw new Error(data.error || 'Failed to fetch platform analytics');
+        }
+    } catch (error) {
+        console.error('Error fetching platform analytics:', error);
+        alert('Error fetching platform analytics: ' + error.message);
+        const button = event?.target || document.querySelector('button[onclick*="fetchPlatformAnalytics"]');
+        if (button) {
+            button.disabled = false;
+            button.textContent = '🔄 Refresh Platform Data';
+        }
+    }
+}
+
 // Escape HTML
 function escapeHtml(text) {
     if (!text) return '';
@@ -475,23 +706,144 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+// Render Social Media Platforms Chart
+function renderSocialPlatformsChart(platformBreakdown) {
+    const ctx = document.getElementById('socialPlatformsChart');
+    if (!ctx) return;
+
+    if (chartInstances.socialPlatforms) {
+        chartInstances.socialPlatforms.destroy();
+    }
+
+    const labels = platformBreakdown.map(p => p.platform || 'Unknown');
+    const data = platformBreakdown.map(p => p.count || 0);
+    const colors = generateColors(platformBreakdown.length);
+
+    chartInstances.socialPlatforms = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: colors,
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        boxWidth: 12,
+                        padding: 10
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.parsed || 0;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                            return `${label}: ${value} posts (${percentage}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Render Event Types Chart
+function renderEventTypesChart(eventTypeBreakdown) {
+    const ctx = document.getElementById('eventTypesChart');
+    if (!ctx) return;
+
+    if (chartInstances.eventTypes) {
+        chartInstances.eventTypes.destroy();
+    }
+
+    const labels = eventTypeBreakdown.map(e => e.eventType || 'Unknown');
+    const data = eventTypeBreakdown.map(e => e.count || 0);
+    const colors = generateColors(eventTypeBreakdown.length);
+
+    chartInstances.eventTypes = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Events',
+                data: data,
+                backgroundColor: colors,
+                borderColor: colors.map(c => c.replace('0.8', '1')),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+}
+
 // Initialize Analytics
+let analyticsRefreshInterval = null;
+
 function initializeAnalytics() {
     console.log('📈 Initializing Analytics page...');
     loadAnalytics();
     
-    // Auto-refresh every 5 minutes
-    setInterval(() => {
-        loadAnalytics();
-    }, 5 * 60 * 1000);
+    // Clear any existing interval
+    if (analyticsRefreshInterval) {
+        clearInterval(analyticsRefreshInterval);
+    }
+    
+    // Auto-refresh every 5 minutes when dashboard is active
+    analyticsRefreshInterval = setInterval(() => {
+        // Only refresh if page is visible (user is actively viewing)
+        if (!document.hidden) {
+            console.log('🔄 Auto-refreshing analytics (5 min interval)...');
+            loadAnalytics();
+        }
+    }, 5 * 60 * 1000); // 5 minutes
+    
+    // Also refresh when page becomes visible again
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+            console.log('📊 Page visible - refreshing analytics...');
+            loadAnalytics();
+        }
+    });
 }
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', () => {
+    if (analyticsRefreshInterval) {
+        clearInterval(analyticsRefreshInterval);
+    }
+});
 
 // Export functions to global scope
 window.loadAnalytics = loadAnalytics;
 window.initializeAnalytics = initializeAnalytics;
-
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', function() {
-    initializeAnalytics();
-});
+window.authFetch = authFetch;
+window.exportChart = exportChart;
+window.exportReport = exportReport;
+window.fetchPlatformAnalytics = fetchPlatformAnalytics;
 

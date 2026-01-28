@@ -354,6 +354,20 @@ class TNRDatabase {
         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )`,
 
+      // Platform Analytics table
+      `CREATE TABLE IF NOT EXISTS platform_analytics (
+        id TEXT PRIMARY KEY,
+        platform TEXT NOT NULL,
+        platformAccountId TEXT,
+        accountName TEXT,
+        metricType TEXT NOT NULL,
+        metricValue REAL,
+        metricData TEXT,
+        dateRange TEXT,
+        fetchedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )`,
+
       // Activity timeline table
       `CREATE TABLE IF NOT EXISTS activities (
         id TEXT PRIMARY KEY,

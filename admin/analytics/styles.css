@@ -261,6 +261,73 @@
     color: #666;
 }
 
+/* Platform Analytics */
+.platform-analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.platform-analytics-card {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.platform-analytics-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.platform-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--tnr-navy);
+    margin-bottom: 0.5rem;
+}
+
+.platform-account {
+    font-size: 0.875rem;
+    color: #666;
+    margin-bottom: 1rem;
+}
+
+.platform-metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.platform-metric {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    background: white;
+    border-radius: 4px;
+}
+
+.metric-label {
+    font-weight: 600;
+    color: #333;
+}
+
+.metric-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--tnr-gold);
+}
+
+.platform-last-updated {
+    font-size: 0.75rem;
+    color: #999;
+    margin-top: 1rem;
+    text-align: right;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .analytics-header {
@@ -281,6 +348,10 @@
     }
     
     .recent-activity-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .platform-analytics-grid {
         grid-template-columns: 1fr;
     }
 }
