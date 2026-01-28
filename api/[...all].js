@@ -112,13 +112,7 @@ module.exports = async (req, res) => {
     return await handler(req, res);
   }
 
-  // eBay Notification routes - check early before CORS
-  if (route === "ebay/notifications/marketplace-deletion" || 
-      route.startsWith("ebay/notifications/") ||
-      pathname && pathname.includes("/ebay/notifications/")) {
-    const handler = require("../server/handlers/ebay-notifications-api");
-    return await handler(req, res);
-  }
+  // eBay route already handled above (moved earlier)
 
   // Leads Recent routes - redirect to CRM API
   if (route === "leads/recent" || route === "leads/recent/") {
@@ -133,6 +127,17 @@ module.exports = async (req, res) => {
     const originalRoute = route;
     route = "crm/leads";
     req.url = "/api/crm/leads?limit=10&sort=createdAt&order=desc";
+    return await handler(req, res);
+  }
+
+  // eBay Notification routes - check VERY EARLY before CORS and other routes
+  // This must be checked before CORS to ensure it's handled correctly
+  if (route === "ebay/notifications/marketplace-deletion" || 
+      route.startsWith("ebay/notifications/") ||
+      (pathname && pathname.includes("/ebay/notifications/")) ||
+      (req.url && req.url.includes("/ebay/notifications/"))) {
+    console.log("✅ eBay route matched:", { route, pathname, url: req.url });
+    const handler = require("../server/handlers/ebay-notifications-api");
     return await handler(req, res);
   }
 
