@@ -122,6 +122,10 @@
     {
       "source": "/ebay/notifications/:path*",
       "destination": "/api/ebay/notifications/:path*"
+    },
+    {
+      "source": "/api/ebay/:path*",
+      "destination": "/api/ebay/:path*"
     }
   ],
   "headers": [
